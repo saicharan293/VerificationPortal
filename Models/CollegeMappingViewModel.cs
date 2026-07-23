@@ -71,4 +71,56 @@ namespace VerificationPortal.Models
         public List<TblRguhsFacultyUser> AvailableUsers { get; set; } = new();
         public List<Faculty> AvailableFaculties { get; set; } = new();
     }
+
+    public class CollegeMappingEditViewModel
+    {
+        public int Id { get; set; }
+
+        [Required]
+        [Display(Name = "Faculty")]
+        public int FacultyCode { get; set; }
+
+        [Required]
+        [RegularExpression("^[A-Z]$", ErrorMessage = "Must be a single uppercase letter")]
+        [Display(Name = "From Letter")]
+        public string FromLetter { get; set; } = "A";
+
+        [Required]
+        [RegularExpression("^[A-Z]$", ErrorMessage = "Must be a single uppercase letter")]
+        [Display(Name = "To Letter")]
+        public string ToLetter { get; set; } = "Z";
+
+        [Required]
+        [Display(Name = "From College")]
+        public string CollegeFrom { get; set; } = "";
+
+        [Required]
+        [Display(Name = "To College")]
+        public string CollegeTo { get; set; } = "";
+
+        public bool IsActive { get; set; } = true;
+
+        // Display properties
+        public string UserName { get; set; } = "";
+        public string UserId { get; set; } = "";
+        public string UserDesignation { get; set; } = "";
+        public string FacultyName { get; set; } = "";
+        public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; } = "";
+
+        // Dropdown data
+        public List<Faculty> AvailableFaculties { get; set; } = new();
+        public List<SelectCollegeOption> AvailableColleges { get; set; } = new();
+
+        // For client-side filtering
+        public string SelectedCollegeFromCode { get; set; } = "";
+        public string SelectedCollegeToCode { get; set; } = "";
+    }
+
+    public class SelectCollegeOption
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string DisplayText => $"{Code} - {Name}";
+    }
 }

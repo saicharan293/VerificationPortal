@@ -1,4 +1,4 @@
-﻿@model VerificationPortal.Models.TblCollegeMapping
+@model VerificationPortal.Models.CollegeMappingEditViewModel
 @{
     ViewData["Title"] = "Edit College Mapping";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,6 +6,117 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <style>
+        /* College dropdowns - responsive with content-based width */
+        .college-dropdown-container {
+            width: 100%;
+        }
+
+        .college-dropdown-container .form-select {
+            min-width: 0;
+            width: 90%;
+            max-width: none;
+            /* Allow dropdown to expand based on content */
+            white-space: nowrap;
+        }
+
+        /* When content is too long, allow wrapping */
+        @@media (max-width: 991px) {
+            .college-dropdown-container .form-select {
+                width: 100%;
+            }
+        }
+
+        /* Ensure dropdown menu expands to fit content */
+        .college-dropdown-container .form-select option {
+            white-space: nowrap;
+        }
+
+        /* Flex container for responsive wrapping */
+        .college-dropdowns-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .college-dropdowns-row .college-dropdown-container {
+            flex: 1 1 45%; /* Grow, shrink, basis 45% - allows wrapping */
+            min-width: 280px; /* Minimum before wrapping */
+            max-width: calc(50% - 0.375rem); /* Max 50% minus gap on large screens */
+        }
+
+        @@media (max-width: 767px) {
+            .college-dropdowns-row .college-dropdown-container {
+                flex-basis: 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* Overlap error modal styles */
+        .overlap-modal .modal-header {
+            background-color: #fff3cd;
+            border-bottom: 1px solid #ffc107;
+        }
+
+        .overlap-modal .modal-header .modal-title {
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .overlap-modal .modal-body {
+            padding: 1.5rem;
+        }
+
+        .overlap-conflict-item {
+            background-color: #f8f9fa;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .overlap-conflict-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .overlap-conflict-user {
+            font-weight: 600;
+            color: #856404;
+            font-size: 1.1rem;
+        }
+
+        .overlap-conflict-details {
+            color: #6c757d;
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .overlap-conflict-range {
+            font-family: monospace;
+            background-color: #fff3cd;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .overlap-conflict-college-codes {
+            font-size: 0.85rem;
+            color: #495057;
+            margin-top: 0.25rem;
+        }
+
+        .overlap-modal .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+
+        .overlap-modal .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+    </style>
 }
 
 <section class="admin-page-header">
@@ -23,66 +134,87 @@
             <input type="hidden" asp-for="UserName" />
             <input type="hidden" asp-for="CreatedDate" />
             <input type="hidden" asp-for="CreatedBy" />
+            <input type="hidden" asp-for="SelectedCollegeFromCode" />
+            <input type="hidden" asp-for="SelectedCollegeToCode" />
 
             <div class="user-info-box">
                 <i class="bi bi-person-circle"></i>
                 <div>
                     <strong>@Model.UserName</strong>
-                    <small>@ViewBag.User?.DesignationDescription</small>
+                    <small>@Model.UserDesignation</small>
                 </div>
-                <span class="faculty-badge">@ViewBag.Faculty?.FacultyName</span>
+                <span class="faculty-badge">@Model.FacultyName</span>
             </div>
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger @(ViewData.ModelState.IsValid ? "d-none" : "")"
+                 id="validationSummary">
+            </div>
             <div class="row g-3 mt-3">
-                <div class="col-md-6">
+                <div class="col-12 col-md-6 col-lg-4">
                     <label asp-for="FacultyCode" class="form-label">Faculty</label>
-                    <select asp-for="FacultyCode" class="form-select">
-                        @foreach (var fac in (IEnumerable<VerificationPortal.Models.Faculty>)ViewBag.Faculties)
+                    <select asp-for="FacultyCode" class="form-select" id="facultyCode">
+                        @foreach (var fac in Model.AvailableFaculties)
                         {
-                            <option value="@fac.FacultyId">@fac.FacultyName</option>
+                            <option value="@fac.FacultyId" @(Model.FacultyCode == fac.FacultyId ? "selected" : "")>@fac.FacultyName</option>
                         }
                     </select>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <label asp-for="FromLetter" class="form-label">From Letter *</label>
-                    <input asp-for="FromLetter"
-                           class="form-control text-uppercase"
-                           maxlength="1" />
+                    <select asp-for="FromLetter" class="form-select" id="fromLetter">
+                        @for (char c = 'A'; c <= 'Z'; c++)
+                        {
+                            <option value="@c" @(Model.FromLetter?.ToUpper() == c.ToString() ? "selected" : "")>@c</option>
+                        }
+                    </select>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <label asp-for="ToLetter" class="form-label">To Letter *</label>
-                    <input asp-for="ToLetter"
-                           class="form-control text-uppercase"
-                           maxlength="1" />
+                    <select asp-for="ToLetter" class="form-select" id="toLetter">
+                        @for (char c = 'A'; c <= 'Z'; c++)
+                        {
+                            <option value="@c" @(Model.ToLetter?.ToUpper() == c.ToString() ? "selected" : "")>@c</option>
+                        }
+                    </select>
                 </div>
 
-                <div class="col-md-3">
-                    <label asp-for="CollegeFrom" class="form-label">From College Code *</label>
-                    <input asp-for="CollegeFrom"
-                           class="form-control text-uppercase"
-                           maxlength="10" />
+                <div class="college-dropdowns-row">
+                <div class="college-dropdown-container">
+                    <label asp-for="CollegeFrom" class="form-label">From College *</label>
+                    <select asp-for="CollegeFrom" class="form-select" id="collegeFrom">
+                        <option value="">-- Select College --</option>
+                        @foreach (var college in Model.AvailableColleges)
+                        {
+                            <option value="@college.Code" @(Model.CollegeFrom == college.Code ? "selected" : "")>
+                                @college.DisplayText
+                            </option>
+                        }
+                    </select>
                 </div>
 
-                <div class="col-md-3">
-                    <label asp-for="CollegeTo" class="form-label">To College Code *</label>
-                    <input asp-for="CollegeTo"
-                           class="form-control text-uppercase"
-                           maxlength="10" />
+                <div class="college-dropdown-container">
+                    <label asp-for="CollegeTo" class="form-label">To College *</label>
+                    <select asp-for="CollegeTo" class="form-select" id="collegeTo">
+                        <option value="">-- Select College --</option>
+                        @foreach (var college in Model.AvailableColleges)
+                        {
+                            <option value="@college.Code" @(Model.CollegeTo == college.Code ? "selected" : "")>
+                                @college.DisplayText
+                            </option>
+                        }
+                    </select>
                 </div>
+            </div>
 
                 <div class="col-12">
                     <div class="form-check form-switch">
                         <input type="checkbox"
-                               name="IsActive"
-                               value="true"
-                               class="form-check-input"
-                        @(Model.IsActive == true ? "checked" : "") />
-
-                        <input type="hidden" name="IsActive" value="false" />
+                               asp-for="IsActive"
+                               class="form-check-input" />
+                        <label class="form-check-label">Active</label>
                     </div>
                 </div>
             </div>
@@ -98,3 +230,248 @@
         </form>
     </div>
 </section>
+
+<!-- Overlap Validation Modal -->
+<div class="modal fade overlap-modal" id="overlapModal" tabindex="-1" aria-labelledby="overlapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="overlapModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Overlap Detected!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="overlapModalBody">
+                <!-- Content will be populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
+                    <i class="bi bi-check-lg me-1"></i>Understood, I'll Adjust
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        let allColleges = [];
+
+        // Initialize allColleges from server-rendered options on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            const fromSelect = document.getElementById("collegeFrom");
+            allColleges = Array.from(fromSelect.options).slice(1).map(opt => ({
+                code: opt.value,
+                name: opt.text.split(' - ')[1] || opt.text
+            }));
+
+            // If a From College is already selected, update the To College dropdown
+            if (fromSelect.value) {
+                updateToCollegeDropdown();
+            }
+        });
+
+        async function loadColleges() {
+            const facultyId = document.getElementById("facultyCode").value;
+            const fromLetter = document.getElementById("fromLetter").value;
+            const toLetter = document.getElementById("toLetter").value;
+
+            if (!facultyId) {
+                return;
+            }
+
+            const response = await fetch(`/CollegeMapping/GetCollegesByFaculty?facultyId=${facultyId}&fromLetter=${fromLetter}&toLetter=${toLetter}`);
+
+            if (!response.ok) {
+                console.error("Failed to load colleges");
+                return;
+            }
+
+            allColleges = await response.json();
+
+            const fromSelect = document.getElementById("collegeFrom");
+            const toSelect = document.getElementById("collegeTo");
+
+            // Store current selections to restore after reload
+            const currentFromValue = fromSelect.value;
+            const currentToValue = toSelect.value;
+
+            fromSelect.innerHTML = '<option value="">-- Select College --</option>';
+            toSelect.innerHTML = '<option value="">-- Select College --</option>';
+
+            allColleges.forEach(c => {
+                fromSelect.innerHTML += `<option value="${c.code}">${c.code} - ${c.name}</option>`;
+            });
+
+            // Restore CollegeFrom selection if it exists in the new list
+            if (currentFromValue && allColleges.some(c => c.code === currentFromValue)) {
+                fromSelect.value = currentFromValue;
+            }
+
+            updateToCollegeDropdown();
+
+            // Restore CollegeTo selection if it exists in the new list
+            if (currentToValue && allColleges.some(c => c.code === currentToValue)) {
+                toSelect.value = currentToValue;
+            }
+        }
+
+        function updateToCollegeDropdown() {
+            const fromCode = document.getElementById("collegeFrom").value;
+            const toSelect = document.getElementById("collegeTo");
+
+            // Store current selection
+            const currentToValue = toSelect.value;
+
+            toSelect.innerHTML = '<option value="">-- Select College --</option>';
+
+            if (!fromCode) {
+                // If no from college selected, show all colleges
+                allColleges.forEach(c => {
+                    toSelect.innerHTML += `<option value="${c.code}">${c.code} - ${c.name}</option>`;
+                });
+                return;
+            }
+
+            const startIndex = allColleges.findIndex(c => c.code === fromCode);
+
+            if (startIndex === -1) {
+                // If fromCode not found, show all colleges
+                allColleges.forEach(c => {
+                    toSelect.innerHTML += `<option value="${c.code}">${c.code} - ${c.name}</option>`;
+                });
+                return;
+            }
+
+            allColleges.slice(startIndex).forEach(c => {
+                toSelect.innerHTML += `<option value="${c.code}">${c.code} - ${c.name}</option>`;
+            });
+
+            // Restore CollegeTo selection if it exists in the filtered list
+            if (currentToValue && allColleges.slice(startIndex).some(c => c.code === currentToValue)) {
+                toSelect.value = currentToValue;
+            }
+        }
+
+        // Attach event listeners - only on filter changes
+        document.getElementById("facultyCode").addEventListener("change", loadColleges);
+        document.getElementById("fromLetter").addEventListener("change", loadColleges);
+        document.getElementById("toLetter").addEventListener("change", loadColleges);
+        document.getElementById("collegeFrom").addEventListener("change", updateToCollegeDropdown);
+
+        // Overlap validation modal handler
+        document.addEventListener("DOMContentLoaded", function () {
+            // Check if there's an overlap error in the validation summary
+            const validationSummary = document.getElementById("validationSummary");
+            if (validationSummary) {
+                const errorText = validationSummary.textContent || validationSummary.innerText;
+                if (errorText.includes("Overlap Detected")) {
+                    showOverlapModal(validationSummary.textContent);
+                }
+            }
+        });
+
+        function showOverlapModal(errorHtml) {
+            // Parse the error HTML to extract conflict information
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(errorHtml, 'text/html');
+
+            // Extract the main message and conflicts
+            const fullText = doc.body.textContent || doc.body.innerText || errorHtml;
+
+            // Create modal content
+            let modalContent = `
+                <div class="alert alert-warning mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>College Range Overlap Detected</strong>
+                    <p class="mb-0 mt-2">The college range you selected overlaps with existing mappings for other users in the same faculty.</p>
+                </div>
+                <p class="text-muted small mb-3">Please adjust the From/To letters or college codes to resolve the conflict.</p>
+            `;
+
+            // Extract conflicts from the error message
+            // The error format is: "⚠️ <strong>Overlap Detected!</strong> The college range <strong>A-C</strong> (D001-D009) overlaps with existing mappings:<br/>1. User 'MedicalUser' (Unknown) in DENTAL has range C-D (D008-D040)<br/>Please adjust..."
+            const conflicts = [];
+            const conflictRegex = /(\d+)\.\s*User\s*'([^']+)'\s*\(([^)]+)\)\s*in\s*([^:]+)\s*has\s*range\s*([^:]+)\s*\(([^)]+)\)/g;
+            let match;
+
+            while ((match = conflictRegex.exec(fullText)) !== null) {
+                conflicts.push({
+                    index: match[1],
+                    userName: match[2],
+                    designation: match[3],
+                    facultyName: match[4].trim(),
+                    letterRange: match[5].trim(),
+                    collegeCodeRange: match[6].trim()
+                });
+            }
+
+            // Also try a simpler regex for the new format
+            if (conflicts.length === 0) {
+                const simpleRegex = /(\d+)\.\s*([^<]+)/g;
+                let simpleMatch;
+                while ((simpleMatch = simpleRegex.exec(fullText)) !== null) {
+                    // Parse the conflict string
+                    const conflictText = simpleMatch[2].trim();
+                    conflicts.push({ rawText: conflictText });
+                }
+            }
+
+            if (conflicts.length > 0) {
+                modalContent += '<div class="overlap-conflicts">';
+                conflicts.forEach(conflict => {
+                    if (conflict.userName) {
+                        modalContent += `
+                            <div class="overlap-conflict-item">
+                                <div class="overlap-conflict-user">
+                                    <i class="bi bi-person-fill me-2"></i>
+                                    ${conflict.userName}
+                                    <span class="badge bg-secondary ms-2">${conflict.designation}</span>
+                                </div>
+                                <div class="overlap-conflict-details">
+                                    <i class="bi bi-building me-1"></i>
+                                    <strong>Faculty:</strong> ${conflict.facultyName}
+                                </div>
+                                <div class="overlap-conflict-details">
+                                    <i class="bi bi-alpha me-1"></i>
+                                    <strong>Letter Range:</strong>
+                                    <span class="overlap-conflict-range">${conflict.letterRange}</span>
+                                </div>
+                                <div class="overlap-conflict-college-codes">
+                                    <i class="bi bi-code-slash me-1"></i>
+                                    <strong>College Codes:</strong> ${conflict.collegeCodeRange}
+                                </div>
+                            </div>
+                        `;
+                    } else if (conflict.rawText) {
+                        modalContent += `
+                            <div class="overlap-conflict-item">
+                                <div class="overlap-conflict-user">${conflict.rawText}</div>
+                            </div>
+                        `;
+                    }
+                });
+                modalContent += '</div>';
+            } else {
+                // Fallback: show the raw error message
+                modalContent += `<div class="overlap-conflict-item"><div class="overlap-conflict-user">${fullText.replace(/<[^>]*>/g, '')}</div></div>`;
+            }
+
+            document.getElementById('overlapModalBody').innerHTML = modalContent;
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('overlapModal'));
+
+            // Redirect to edit page when modal is closed
+            const modalElement = document.getElementById('overlapModal');
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                // Redirect to the edit page to reset the form
+                window.location.href = window.location.href;
+            });
+
+            modal.show();
+        }
+
+    </script>
+}

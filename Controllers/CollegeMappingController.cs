@@ -344,40 +344,105 @@ namespace VerificationPortal.Controllers
             if (mapping == null)
                 return NotFound();
 
+            var fromCollege = await _context.AffiliationCollegeMasters
+                .FirstOrDefaultAsync(c => c.CollegeCode == mapping.CollegeFrom);
+
+            var toCollege = await _context.AffiliationCollegeMasters
+                .FirstOrDefaultAsync(c => c.CollegeCode == mapping.CollegeTo);
+
             var user = await _context.TblRguhsFacultyUsers
                 .FirstOrDefaultAsync(u => u.UserId == mapping.UserId);
 
-            ViewBag.User = user;
-            ViewBag.Faculty = mapping.FacultyCodeNavigation;
-            ViewBag.Faculties = await _context.Faculties
+            var faculties = await _context.Faculties
                 .OrderBy(f => f.FacultyName)
                 .ToListAsync();
 
-            return View(mapping);
+            // Load colleges for the selected letter range
+            var colleges = await _context.AffiliationCollegeMasters
+                .Where(c => c.FacultyCode == mapping.FacultyCode.ToString()
+                         && c.CollegeName != null)
+                .OrderBy(c => c.CollegeName)
+                .ToListAsync();
+
+            colleges = colleges
+                .Where(c =>
+                {
+                    var letter = c.CollegeName!.Substring(0, 1).ToUpper();
+
+                    return string.Compare(letter, mapping.FromLetter, StringComparison.OrdinalIgnoreCase) >= 0
+                        && string.Compare(letter, mapping.ToLetter, StringComparison.OrdinalIgnoreCase) <= 0;
+                })
+                .ToList();
+
+            var model = new CollegeMappingEditViewModel
+            {
+                Id = mapping.Id,
+                FacultyCode = mapping.FacultyCode,
+                FromLetter = mapping.FromLetter?.ToUpper() ?? "A",
+                ToLetter = mapping.ToLetter?.ToUpper() ?? "Z",
+                CollegeFrom = mapping.CollegeFrom?.ToUpper() ?? "",
+                CollegeTo = mapping.CollegeTo?.ToUpper() ?? "",
+                IsActive = mapping.IsActive,
+                UserName = mapping.UserName,
+                UserId = mapping.UserId.ToString(),
+                UserDesignation = user?.DesignationDescription ?? "",
+                FacultyName = mapping.FacultyCodeNavigation?.FacultyName ?? "",
+                CreatedDate = mapping.CreatedDate ?? DateTime.MinValue,
+                CreatedBy = mapping.CreatedBy ?? "",
+                AvailableFaculties = faculties,
+                AvailableColleges = colleges.Select(c => new SelectCollegeOption
+                {
+                    Code = c.CollegeCode,
+                    Name = c.CollegeName ?? ""
+                }).ToList(),
+                SelectedCollegeFromCode = mapping.CollegeFrom?.ToUpper() ?? "",
+                SelectedCollegeToCode = mapping.CollegeTo?.ToUpper() ?? ""
+            };
+
+            return View(model);
         }
 
         // POST: /CollegeMapping/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,ViceChancellor,Director")]
-        public async Task<IActionResult> Edit(int id, TblCollegeMapping mapping)
+        public async Task<IActionResult> Edit(int id, CollegeMappingEditViewModel model)
         {
-            if (id != mapping.Id)
+            if (id != model.Id)
                 return NotFound();
 
             if (!ModelState.IsValid)
             {
-                ViewBag.User = await _context.TblRguhsFacultyUsers
-                    .FirstOrDefaultAsync(u => u.UserId == mapping.UserId);
-
-                ViewBag.Faculty = await _context.Faculties
-                    .FirstOrDefaultAsync(f => f.FacultyId == mapping.FacultyCode);
-
-                ViewBag.Faculties = await _context.Faculties
+                // Reload dropdown data
+                var faculties = await _context.Faculties
                     .OrderBy(f => f.FacultyName)
                     .ToListAsync();
 
-                return View(mapping);
+                var colleges = await _context.AffiliationCollegeMasters
+                    .Where(c => c.FacultyCode == model.FacultyCode.ToString()
+                             && c.Status == true
+                             && c.CollegeName != null)
+                    .OrderBy(c => c.CollegeName)
+                    .ToListAsync();
+
+                colleges = colleges
+                    .Where(c =>
+                    {
+                        var letter = c.CollegeName!.Substring(0, 1).ToUpper();
+
+                        return string.Compare(letter, model.FromLetter, StringComparison.OrdinalIgnoreCase) >= 0
+                            && string.Compare(letter, model.ToLetter, StringComparison.OrdinalIgnoreCase) <= 0;
+                    })
+                    .ToList();
+
+                model.AvailableFaculties = faculties;
+                model.AvailableColleges = colleges.Select(c => new SelectCollegeOption
+                {
+                    Code = c.CollegeCode,
+                    Name = c.CollegeName ?? ""
+                }).ToList();
+
+                return View(model);
             }
 
             try
@@ -387,15 +452,75 @@ namespace VerificationPortal.Controllers
                 if (existing == null)
                     return NotFound();
 
-                existing.FacultyCode = mapping.FacultyCode;
+                // Check for overlapping mappings with OTHER users for the same faculty
+                var overlapMappings = await _context.TblCollegeMappings
+                    .Where(m => m.Id != id
+                             && m.FacultyCode == model.FacultyCode
+                             && m.IsActive == true)
+                    .Include(m => m.FacultyCodeNavigation)
+                    .ToListAsync();
 
-                existing.FromLetter = mapping.FromLetter.ToUpper().Trim();
-                existing.ToLetter = mapping.ToLetter.ToUpper().Trim();
+                // Get college names for the new range to compare alphabetically
+                var newFromCollege = await _context.AffiliationCollegeMasters
+                    .FirstOrDefaultAsync(c => c.CollegeCode == model.CollegeFrom.ToUpper().Trim());
+                var newToCollege = await _context.AffiliationCollegeMasters
+                    .FirstOrDefaultAsync(c => c.CollegeCode == model.CollegeTo.ToUpper().Trim());
 
-                existing.CollegeFrom = mapping.CollegeFrom.ToUpper().Trim();
-                existing.CollegeTo = mapping.CollegeTo.ToUpper().Trim();
+                if (newFromCollege != null && newToCollege != null)
+                {
+                    var newFromLetter = newFromCollege.CollegeName?.Substring(0, 1).ToUpper() ?? "";
+                    var newToLetter = newToCollege.CollegeName?.Substring(0, 1).ToUpper() ?? "";
 
-                existing.IsActive = mapping.IsActive;
+                    var conflicts = new List<string>();
+
+                    foreach (var otherMapping in overlapMappings)
+                    {
+                        // Get the college names for the existing mapping's range
+                        var otherFromCollege = await _context.AffiliationCollegeMasters
+                            .FirstOrDefaultAsync(c => c.CollegeCode == otherMapping.CollegeFrom);
+                        var otherToCollege = await _context.AffiliationCollegeMasters
+                            .FirstOrDefaultAsync(c => c.CollegeCode == otherMapping.CollegeTo);
+
+                        if (otherFromCollege != null && otherToCollege != null)
+                        {
+                            var otherFromLetter = otherFromCollege.CollegeName?.Substring(0, 1).ToUpper() ?? "";
+                            var otherToLetter = otherToCollege.CollegeName?.Substring(0, 1).ToUpper() ?? "";
+
+                            // Check if ranges overlap alphabetically
+                            // Two ranges [A, B] and [C, D] overlap if: A <= D && C <= B
+                            bool rangesOverlap = string.Compare(newFromLetter, otherToLetter, StringComparison.OrdinalIgnoreCase) <= 0
+                                              && string.Compare(otherFromLetter, newToLetter, StringComparison.OrdinalIgnoreCase) <= 0;
+
+                            if (rangesOverlap)
+                            {
+                                var user = await _context.TblRguhsFacultyUsers
+                                    .FirstOrDefaultAsync(u => u.UserId == otherMapping.UserId);
+                                var facultyName = otherMapping.FacultyCodeNavigation?.FacultyName ?? "Unknown Faculty";
+                                conflicts.Add($"User '{user?.UserName ?? otherMapping.UserName}' ({user?.DesignationDescription ?? "Unknown"}) in {facultyName} has range {otherFromLetter}-{otherToLetter} ({otherMapping.CollegeFrom}-{otherMapping.CollegeTo})");
+                            }
+                        }
+                    }
+
+                    if (conflicts.Any())
+                    {
+                        ModelState.AddModelError("",
+                            $"⚠️ <strong>Overlap Detected!</strong> The college range <strong>{newFromLetter}-{newToLetter}</strong> ({model.CollegeFrom}-{model.CollegeTo}) overlaps with existing mappings:<br/>" +
+                            string.Join("<br/>", conflicts.Select((c, i) => $"{i + 1}. {c}")) +
+                            "<br/>Please adjust the From/To letters or college codes to avoid conflicts.");
+                        await PopulateEditViewModel(model);
+                        return View(model);
+                    }
+                }
+
+                existing.FacultyCode = model.FacultyCode;
+
+                existing.FromLetter = model.FromLetter.ToUpper().Trim();
+                existing.ToLetter = model.ToLetter.ToUpper().Trim();
+
+                existing.CollegeFrom = model.CollegeFrom.ToUpper().Trim();
+                existing.CollegeTo = model.CollegeTo.ToUpper().Trim();
+
+                existing.IsActive = model.IsActive;
 
                 await _context.SaveChangesAsync();
 
@@ -405,12 +530,14 @@ namespace VerificationPortal.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MappingExists(mapping.Id))
+                if (!MappingExists(model.Id))
                     return NotFound();
 
                 throw;
             }
         }
+
+
         // POST: /CollegeMapping/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -589,6 +716,37 @@ namespace VerificationPortal.Controllers
                     .OrderBy(c => c.CollegeName)
                     .ToListAsync();
             }
+        }
+
+        private async Task PopulateEditViewModel(CollegeMappingEditViewModel model)
+        {
+            var faculties = await _context.Faculties
+                .OrderBy(f => f.FacultyName)
+                .ToListAsync();
+
+            var colleges = await _context.AffiliationCollegeMasters
+                .Where(c => c.FacultyCode == model.FacultyCode.ToString()
+                         && c.Status == true
+                         && c.CollegeName != null)
+                .OrderBy(c => c.CollegeName)
+                .ToListAsync();
+
+            colleges = colleges
+                .Where(c =>
+                {
+                    var letter = c.CollegeName!.Substring(0, 1).ToUpper();
+
+                    return string.Compare(letter, model.FromLetter, StringComparison.OrdinalIgnoreCase) >= 0
+                        && string.Compare(letter, model.ToLetter, StringComparison.OrdinalIgnoreCase) <= 0;
+                })
+                .ToList();
+
+            model.AvailableFaculties = faculties;
+            model.AvailableColleges = colleges.Select(c => new SelectCollegeOption
+            {
+                Code = c.CollegeCode,
+                Name = c.CollegeName ?? ""
+            }).ToList();
         }
 
         // GET: /CollegeMapping/GetCollegesByFaculty?facultyId=X&collegeFrom=A&collegeTo=Z

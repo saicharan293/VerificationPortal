@@ -6,6 +6,12 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <style>
+        /* Validation summary - hidden by default, shown via JS if needed */
+        .validation-summary-hidden {
+            display: none;
+        }
+    </style>
 }
 
 <section class="admin-page-header">
@@ -27,7 +33,7 @@
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-hidden" id="validationSummary"></div>
 
             <div class="row g-3">
                 <!-- Faculty Selection -->
@@ -211,7 +217,7 @@
             const clearAllBtn = document.getElementById('clearAllBtn');
 
             try {
-                const url = `@Url.Action("GetCollegesByFaculty", "CollegeMapping")?facultyId=${facultyId}&collegeFrom=${encodeURIComponent(fromLetter)}&collegeTo=${encodeURIComponent(toLetter)}`;
+                const url = `@Url.Action("GetCollegesByFaculty", "CollegeMapping")?facultyId=${facultyId}&fromLetter=${encodeURIComponent(fromLetter)}&toLetter=${encodeURIComponent(toLetter)}`;
                 const response = await fetch(url);
                 const colleges = await response.json();
 
