@@ -1,0 +1,154 @@
+﻿@using System.Security.Claims
+@model VerificationPortal.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard - " + Model.User.DesignationDescription;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show py-2 small" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+<!-- ==================== DASHBOARD HEADER ==================== -->
+<section class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="dashboard-welcome">
+                    <div class="welcome-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div>
+                        <span class="welcome-label">Welcome back,</span>
+                        <h2 class="welcome-name">@Model.User.UserName</h2>
+                        <p class="welcome-designation">
+                            <i class="bi bi-award-fill"></i> @Model.User.DesignationDescription
+                            @if (Model.Faculty != null)
+                            {
+                                <span class="separator-dot">•</span>
+                                <i class="bi bi-mortarboard-fill"></i>
+                                @Model.Faculty.FacultyName
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="role-badge-large role-@Model.Role.ToLower().Replace(" ", "")">
+                    <i class="bi bi-shield-fill-check"></i>
+                    <span>@Model.Role</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== QUICK STATS ==================== -->
+<section class="dashboard-stats">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dash">
+                    <div class="stat-icon-dash stat-blue">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+                    <div>
+                        <h4>@Model.TotalAssignedColleges</h4>
+                        <p>Assigned Colleges</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dash">
+                    <div class="stat-icon-dash stat-green">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div>
+                        <h4>0</h4>
+                        <p>Verified</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dash">
+                    <div class="stat-icon-dash stat-orange">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div>
+                        <h4>0</h4>
+                        <p>Pending</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dash">
+                    <div class="stat-icon-dash stat-purple">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div>
+                        <h4>@DateTime.Now.ToString("dd MMM")</h4>
+                        <p>Today's Date</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== QUICK ACTIONS ONLY ==================== -->
+<section class="dashboard-content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="dashboard-card">
+                    <div class="card-header-dash">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                        <h5>Quick Actions</h5>
+                    </div>
+                    <div class="card-body-dash">
+                        <div class="quick-action-list">
+                            @if (Model.IsAdmin)
+                            {
+                                <a href="#" class="quick-action-item">
+                                    <i class="bi bi-people-fill"></i>
+                                    <span>Manage Users</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                                <a href="#" class="quick-action-item">
+                                    <i class="bi bi-building-add"></i>
+                                    <span>Assign Colleges</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            }
+                            <a href="#" class="quick-action-item">
+                                <i class="bi bi-search"></i>
+                                <span>Search Colleges</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="#" class="quick-action-item">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>View Reports</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="#" class="quick-action-item">
+                                <i class="bi bi-gear-fill"></i>
+                                <span>Settings</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

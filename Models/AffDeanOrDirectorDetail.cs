@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace VerificationPortal.Models;
+
+public partial class AffDeanOrDirectorDetail
+{
+    public int Id { get; set; }
+
+    public string? FacultyCode { get; set; }
+
+    public string? CollegeCode { get; set; }
+
+    public string? DeanOrDirectorName { get; set; }
+
+    public string? DeanQualification { get; set; }
+
+    public DateOnly? DeanQualificationDate { get; set; }
+
+    public string? DeanUniversity { get; set; }
+
+    public string? DeanStateCouncilNumber { get; set; }
+
+    public bool? RecognizedByMci { get; set; }
+
+    public string? CourseLevel { get; set; }
+
+    public DateTime? CreatedOn { get; set; }
+
+    public string? Ipaddress { get; set; }
+
+    public string? Browser { get; set; }
+
+    public string? DeviceType { get; set; }
+
+    public byte[] RowTimestamp { get; set; } = null!;
+
+    public bool? RecognizedByDci { get; set; }
+
+    public virtual ICollection<AffDeanAdministrativeExperience> AffDeanAdministrativeExperiences { get; set; } = new List<AffDeanAdministrativeExperience>();
+
+    public virtual ICollection<AffDeanTeachingExperience> AffDeanTeachingExperiences { get; set; } = new List<AffDeanTeachingExperience>();
+}

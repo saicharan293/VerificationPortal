@@ -1,0 +1,139 @@
+﻿@model VerificationPortal.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login - Verification Portal";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Login Page CSS (Standalone - includes both styles & theme) -->
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+</head>
+<body class="login-page">
+    <div class="login-wrapper">
+        <!-- Theme Toggle for Login Page -->
+        <button class="theme-toggle theme-toggle-login" id="themeToggle" aria-label="Toggle theme">
+            <i class="bi bi-moon-fill moon-icon"></i>
+            <i class="bi bi-sun-fill sun-icon"></i>
+        </button>
+
+        <div class="login-container">
+            <div class="row g-0">
+                <!-- Left Side - Branding -->
+                <div class="col-lg-5 d-none d-lg-block login-brand-side">
+                    <div class="brand-content">
+                        <div class="brand-logo-large">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h2 class="brand-title-large">Karnataka Affiliation</h2>
+                        <h3 class="brand-subtitle-large">Verification Portal</h3>
+                        <p class="brand-tagline">Government of Karnataka</p>
+
+                        <ul class="brand-features">
+                            <li><i class="bi bi-check2"></i> Secure Authentication</li>
+                            <li><i class="bi bi-check2"></i> Role-Based Access</li>
+                            <li><i class="bi bi-check2"></i> Multi-Faculty Support</li>
+                            <li><i class="bi bi-check2"></i> Verified Data Portal</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Side - Login Form -->
+                <div class="col-lg-7 login-form-side">
+                    <div class="login-form-container">
+                        <a href="/" class="back-home">
+                            <i class="bi bi-arrow-left"></i> Home
+                        </a>
+
+                        <div class="login-header">
+                            <h3>Sign In</h3>
+                            <p>Access your dashboard</p>
+                        </div>
+
+                        @if (TempData["InfoMessage"] != null)
+                        {
+                            <div class="alert alert-info py-2 small" role="alert">
+                                <i class="bi bi-info-circle"></i> @TempData["InfoMessage"]
+                            </div>
+                        }
+
+                        <form asp-action="Login" asp-controller="Account" method="post" class="login-form">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                            <div class="form-floating mb-2">
+                                <input asp-for="UserName" class="form-control" id="userName" placeholder="Username" autocomplete="username" />
+                                <label for="userName">Username</label>
+                                <span asp-validation-for="UserName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-2 password-wrapper">
+                                <input asp-for="Password" class="form-control password-input" id="password" type="password" placeholder="Password" autocomplete="current-password" />
+                                <label for="password">Password</label>
+                                <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </button>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-options mb-3">
+                                <div class="form-check">
+                                    <input asp-for="RememberMe" class="form-check-input" id="rememberMe" />
+                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                </div>
+                                <a href="#" class="forgot-link">Forgot?</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-login-submit">
+                                Sign In <i class="bi bi-arrow-right"></i>
+                            </button>
+
+                            <div class="designations-row">
+                                <span class="role-tag vc">VC</span>
+                                <span class="role-tag dr">DR</span>
+                                <span class="role-tag rg">RG</span>
+                                <span class="role-tag re">RE</span>
+                                <span class="role-tag ar">AR</span>
+                                <span class="role-tag so">SO</span>
+                                <span class="role-tag jr">JR</span>
+                                <span class="role-tag deo">DEO</span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script>
+        // Password toggle
+        document.getElementById('togglePassword')?.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            if (type === 'text') {
+                eyeIcon.classList.remove('bi-eye');
+                eyeIcon.classList.add('bi-eye-slash');
+                this.classList.add('active');
+            } else {
+                eyeIcon.classList.remove('bi-eye-slash');
+                eyeIcon.classList.add('bi-eye');
+                this.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+﻿@*
+    Master Layout for Karnataka Affiliation Verification Portal
+    - Handles both authenticated and unauthenticated states
+    - Includes theme toggle and responsive navigation
+*@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Official Government of Karnataka portal for college affiliation data verification" />
+    <meta name="theme-color" content="#1e40af" />
+    <title>@ViewData["Title"] - Karnataka Affiliation Verification Portal</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    @* ==================== NAVBAR ==================== *@
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- Authenticated User Navbar -->
+        <nav class="navbar navbar-expand-lg sticky-top auth-navbar">
+            <div class="container">
+                <!-- Brand Logo -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <div class="brand-wrapper">
+                        <div class="brand-logo">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">Karnataka Affiliation</span>
+                            <span class="brand-subtitle">Verification Portal</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Navbar Actions -->
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <!-- Theme Toggle Button -->
+                    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                        <i class="bi bi-moon-fill moon-icon"></i>
+                        <i class="bi bi-sun-fill sun-icon"></i>
+                    </button>
+
+                    <!-- User Info Display -->
+                    <div class="user-info-nav">
+                        <i class="bi bi-person-circle"></i>
+                        <div class="user-info-text">
+                            <strong>@User.Identity.Name</strong>
+                            <small>@User.FindFirst("Designation")?.Value</small>
+                        </div>
+                    </div>
+
+                    <!-- Logout Form -->
+                    <form asp-controller="Account" asp-action="Logout" asp-antiforgery="true" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-logout-nav" title="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-none d-md-inline">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    }
+    else
+    {
+        <!-- Public/Guest Navbar -->
+        <nav class="navbar navbar-expand-lg sticky-top custom-navbar">
+            <div class="container">
+                <!-- Brand Logo -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <div class="brand-wrapper">
+                        <div class="brand-logo">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">Karnataka Affiliation</span>
+                            <span class="brand-subtitle">Verification Portal</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse" id="publicNavbar">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#verify">
+                                <i class="bi bi-search"></i> Verify
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#faculties">
+                                <i class="bi bi-mortarboard"></i> Faculties
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#stats">
+                                <i class="bi bi-graph-up"></i> Statistics
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2 ms-lg-3 mt-2 mt-lg-0">
+                        <!-- Theme Toggle Button -->
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                            <i class="bi bi-moon-fill moon-icon"></i>
+                            <i class="bi bi-sun-fill sun-icon"></i>
+                        </button>
+
+                        <!-- Login Button -->
+                        <a class="btn btn-login" asp-controller="Account" asp-action="Login">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    }
+
+    @* ==================== MAIN CONTENT ==================== *@
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    @* ==================== SCRIPTS ==================== *@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

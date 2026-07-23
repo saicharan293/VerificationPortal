@@ -1,0 +1,533 @@
+﻿@model VerificationPortal.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Karnataka College Affiliation Verification Portal";
+
+    var faculties = new List<VerificationPortal.Models.FacultyItem>
+    {
+        new() { Name = "Medical", Icon = "bi-heart-pulse-fill", Slug = "medical" },
+        new() { Name = "Dental", Icon = "bi-clipboard2-pulse-fill", Slug = "dental" },
+        new() { Name = "Pharmacy", Icon = "bi-capsule", Slug = "pharmacy" },
+        new() { Name = "Physiotherapy", Icon = "bi-activity", Slug = "physiotherapy" },
+        new() { Name = "Nursing", Icon = "bi-heart-fill", Slug = "nursing" },
+        new() { Name = "Ayurveda", Icon = "bi-flower1", Slug = "ayurveda" },
+        new() { Name = "Homeopathy", Icon = "bi-droplet-fill", Slug = "homeopathy" },
+        new() { Name = "Engineering", Icon = "bi-gear-fill", Slug = "engineering" },
+        new() { Name = "Allied Health", Icon = "bi-bandaid-fill", Slug = "allied-health" }
+    };
+}
+
+<!-- ==================== HERO / SEARCH SECTION ==================== -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="hero-content text-center" data-aos="fade-up">
+                    <div class="hero-badge">
+                        <i class="bi bi-patch-check-fill"></i>
+                        <span>Official Government of Karnataka Portal</span>
+                    </div>
+                    <h1 class="hero-title">
+                        College Affiliation Data <span class="gradient-text">Verification Portal</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Search and verify affiliation details of colleges across all faculties in Karnataka.
+                        Maintained by the Department of Higher Education.
+                    </p>
+
+                    <!-- Main Search Box -->
+                    <div class="search-wrapper" data-aos="fade-up" data-aos-delay="200">
+                        <div class="search-tabs">
+                            <button type="button" class="search-tab active" data-search-type="college">
+                                <i class="bi bi-building"></i> By College Name
+                            </button>
+                            <button type="button" class="search-tab" data-search-type="code">
+                                <i class="bi bi-hash"></i> By College Code
+                            </button>
+                            <button type="button" class="search-tab" data-search-type="district">
+                                <i class="bi bi-geo-alt"></i> By District
+                            </button>
+                            <button type="button" class="search-tab" data-search-type="faculty">
+                                <i class="bi bi-mortarboard"></i> By Faculty
+                            </button>
+                        </div>
+                        <div class="search-input-group">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" class="search-input"
+                                   placeholder="Enter college name, code, or district to verify..."
+                                   id="searchInput" />
+                            <button type="button" class="search-btn">
+                                Verify <i class="bi bi-arrow-right-circle"></i>
+                            </button>
+                        </div>
+                        <div class="search-helper">
+                            <small>
+                                <i class="bi bi-info-circle"></i>
+                                Search results show verified affiliation data including trust details, courses, intake, faculty, and infrastructure.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== QUICK ACTIONS ==================== -->
+<section class="quick-actions">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <a href="#" class="action-card action-primary">
+                    <div class="action-icon">
+                        <i class="bi bi-search-heart"></i>
+                    </div>
+                    <h5>Verify College</h5>
+                    <p>Check affiliation status of any college</p>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <a href="#" class="action-card action-success">
+                    <div class="action-icon">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                    </div>
+                    <h5>Submit Data</h5>
+                    <p>For colleges to submit affiliation data</p>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <a href="#" class="action-card action-info">
+                    <div class="action-icon">
+                        <i class="bi bi-file-earmark-medical"></i>
+                    </div>
+                    <h5>Download Reports</h5>
+                    <p>Access verified data and reports</p>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <a href="#" class="action-card action-warning">
+                    <div class="action-icon">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h5>Admin Login</h5>
+                    <p>For university & government officials</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DATA CATEGORIES ==================== -->
+<section id="verify" class="data-categories">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <span class="section-subtitle">What We Verify</span>
+            <h2 class="section-title">Data Categories Under Verification</h2>
+            <p class="section-description">
+                The portal verifies comprehensive affiliation data across multiple categories for every college
+            </p>
+        </div>
+
+        <div class="row g-3 mt-4">
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up">
+                <div class="data-cat-item">
+                    <i class="bi bi-building-fill-check"></i>
+                    <span>College/Institution Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="50">
+                <div class="data-cat-item">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Trust & Member Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="data-cat-item">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Dean / Director Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="150">
+                <div class="data-cat-item">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <span>Principal Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="data-cat-item">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                    <span>UG Course Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="250">
+                <div class="data-cat-item">
+                    <i class="bi bi-journal-medical"></i>
+                    <span>PG Course Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="data-cat-item">
+                    <i class="bi bi-bar-chart-line-fill"></i>
+                    <span>Course-wise Intake</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="350">
+                <div class="data-cat-item">
+                    <i class="bi bi-person-workspace"></i>
+                    <span>Faculty Repository</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="data-cat-item">
+                    <i class="bi bi-house-fill"></i>
+                    <span>Land & Building</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="450">
+                <div class="data-cat-item">
+                    <i class="bi bi-door-open-fill"></i>
+                    <span>Classrooms</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="data-cat-item">
+                    <i class="bi bi-eyedropper"></i>
+                    <span>Laboratories</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="550">
+                <div class="data-cat-item">
+                    <i class="bi bi-hospital-fill"></i>
+                    <span>Clinical Facilities</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="data-cat-item">
+                    <i class="bi bi-lamp-fill"></i>
+                    <span>Chair Distribution</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="650">
+                <div class="data-cat-item">
+                    <i class="bi bi-bed-fill"></i>
+                    <span>Bed Distribution</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="700">
+                <div class="data-cat-item">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Hostel Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="750">
+                <div class="data-cat-item">
+                    <i class="bi bi-tooth"></i>
+                    <span>Dental Units</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="800">
+                <div class="data-cat-item">
+                    <i class="bi bi-tools"></i>
+                    <span>Equipment List</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="850">
+                <div class="data-cat-item">
+                    <i class="bi bi-truck-front-fill"></i>
+                    <span>Vehicle Details</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="900">
+                <div class="data-cat-item">
+                    <i class="bi bi-clipboard2-pulse-fill"></i>
+                    <span>Medical Education Units</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="950">
+                <div class="data-cat-item">
+                    <i class="bi bi-three-dots"></i>
+                    <span>And More...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FACULTIES ==================== -->
+<section id="faculties" class="faculties-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <span class="section-subtitle">Browse by Faculty</span>
+            <h2 class="section-title">Faculties Covered</h2>
+            <p class="section-description">
+                Select a faculty to view affiliated colleges and their verified data
+            </p>
+        </div>
+
+        <div class="row g-3 mt-4">
+            @foreach (var faculty in faculties)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <a asp-controller="College" asp-action="ByFaculty" asp-route-faculty="@faculty.Slug" class="faculty-item">
+                        <div class="faculty-icon">
+                            <i class="bi @faculty.Icon"></i>
+                        </div>
+                        <span>@faculty.Name</span>
+                        <i class="bi bi-chevron-right faculty-arrow"></i>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ==================== VERIFICATION PROCESS ==================== -->
+<section id="process" class="process-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <span class="section-subtitle">How It Works</span>
+            <h2 class="section-title">Verification Process</h2>
+            <p class="section-description">
+                Data submitted by colleges goes through a hierarchical verification workflow
+            </p>
+        </div>
+
+        <div class="process-flow mt-5">
+            <div class="process-step" data-aos="fade-up">
+                <div class="step-circle">1</div>
+                <div class="step-content">
+                    <h6>Data Entry (DEO)</h6>
+                    <p>Data Entry Operator submits affiliation data</p>
+                </div>
+            </div>
+            <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+
+            <div class="process-step" data-aos="fade-up" data-aos-delay="100">
+                <div class="step-circle">2</div>
+                <div class="step-content">
+                    <h6>Junior Review (JR)</h6>
+                    <p>Junior Assistant validates submitted data</p>
+                </div>
+            </div>
+            <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+
+            <div class="process-step" data-aos="fade-up" data-aos-delay="200">
+                <div class="step-circle">3</div>
+                <div class="step-content">
+                    <h6>Section Processing (SO)</h6>
+                    <p>Section Officer processes the application</p>
+                </div>
+            </div>
+            <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+
+            <div class="process-step" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-circle">4</div>
+                <div class="step-content">
+                    <h6>Assistant Verification (AR)</h6>
+                    <p>Assistant Registrar conducts verification</p>
+                </div>
+            </div>
+            <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+
+            <div class="process-step" data-aos="fade-up" data-aos-delay="400">
+                <div class="step-circle">5</div>
+                <div class="step-content">
+                    <h6>Registrar Approval (RG/RE)</h6>
+                    <p>Registrar provides final approval</p>
+                </div>
+            </div>
+            <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+
+            <div class="process-step" data-aos="fade-up" data-aos-delay="500">
+                <div class="step-circle">6</div>
+                <div class="step-content">
+                    <h6>Final Sign-off (DR/VC)</h6>
+                    <p>Director / Vice Chancellor final approval</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== STATISTICS ==================== -->
+<section id="stats" class="stats-section">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-subtitle">Portal Statistics</span>
+            <h2 class="section-title">Verified Data at a Glance</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-building-fill"></i></div>
+                    <h3 class="stat-number" data-target="1247">0</h3>
+                    <p class="stat-label">Total Affiliated Colleges</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="stat-card stat-verified">
+                    <div class="stat-icon"><i class="bi bi-patch-check-fill"></i></div>
+                    <h3 class="stat-number" data-target="1180">0</h3>
+                    <p class="stat-label">Verified & Published</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="stat-card stat-pending">
+                    <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                    <h3 class="stat-number" data-target="67">0</h3>
+                    <p class="stat-label">Under Verification</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="400">
+                <div class="stat-card stat-districts">
+                    <div class="stat-icon"><i class="bi bi-map-fill"></i></div>
+                    <h3 class="stat-number" data-target="31">0</h3>
+                    <p class="stat-label">Districts Covered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== NOTICES ==================== -->
+<section id="notifications" class="notices-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <span class="section-subtitle">Latest Updates</span>
+            <h2 class="section-title">Notices & Circulars</h2>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-lg-8">
+                <div class="notices-list">
+                    @foreach (var notif in Model.Notifications)
+                    {
+                        <a href="#" class="notice-item">
+                            <div class="notice-date">
+                                <span class="notice-day">@notif.Date.Day</span>
+                                <span class="notice-month">@notif.Date.ToString("MMM")</span>
+                            </div>
+                            <div class="notice-content">
+                                <span class="notice-type type-@notif.Type.ToLower()">@notif.Type</span>
+                                <h6>@notif.Title</h6>
+                                <small><i class="bi bi-clock"></i> Posted on @notif.Date.ToString("dd MMMM yyyy")</small>
+                            </div>
+                            <i class="bi bi-chevron-right notice-arrow"></i>
+                        </a>
+                    }
+                </div>
+                <div class="text-center mt-4">
+                    <a href="#" class="btn btn-outline-primary">
+                        View All Notices <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sidebar-card">
+                    <h5><i class="bi bi-megaphone-fill"></i> Important</h5>
+                    <ul class="quick-links">
+                        <li><a href="#"><i class="bi bi-file-earmark-text"></i> Affiliation Guidelines 2024-25</a></li>
+                        <li><a href="#"><i class="bi bi-file-earmark-pdf"></i> Required Documents List</a></li>
+                        <li><a href="#"><i class="bi bi-file-earmark-spreadsheet"></i> Data Submission Format</a></li>
+                        <li><a href="#"><i class="bi bi-file-earmark-zip"></i> Download Templates</a></li>
+                        <li><a href="#"><i class="bi bi-question-circle"></i> Frequently Asked Questions</a></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-card mt-4">
+                    <h5><i class="bi bi-telephone-fill"></i> Helpline</h5>
+                    <div class="helpline-info">
+                        <p><strong>For Colleges:</strong></p>
+                        <p><i class="bi bi-telephone"></i> 080-XXXXXXX</p>
+                        <p><i class="bi bi-envelope"></i> colleges@kaheportal.gov.in</p>
+                        <hr />
+                        <p><strong>For Public/Students:</strong></p>
+                        <p><i class="bi bi-telephone"></i> 080-YYYYYYY</p>
+                        <p><i class="bi bi-envelope"></i> public@kaheportal.gov.in</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <i class="bi bi-shield-check"></i>
+                        <div>
+                            <h5>Karnataka Affiliation</h5>
+                            <small>Verification Portal</small>
+                        </div>
+                    </div>
+                    <p class="footer-text">
+                        Official portal of Department of Higher Education, Government of Karnataka
+                        for verification of college affiliation data across all faculties.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h6 class="footer-heading">Portal</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#verify">Verify College</a></li>
+                    <li><a href="#faculties">Faculties</a></li>
+                    <li><a href="#process">Process</a></li>
+                    <li><a href="#stats">Statistics</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="footer-heading">For Users</h6>
+                <ul class="footer-links">
+                    <li><a href="#">College Login</a></li>
+                    <li><a href="#">Official Login</a></li>
+                    <li><a href="#">Public Search</a></li>
+                    <li><a href="#">User Manuals</a></li>
+                    <li><a href="#">Circulars</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="footer-heading">Contact</h6>
+                <ul class="footer-contact">
+                    <li>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Department of Higher Education<br />M.S. Building, Bangalore - 560001</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>080-XXXXXXX</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>support@karnatakaaffiliation.gov.in</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <p>&copy; 2024 Government of Karnataka. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-5 text-md-end">
+                    <ul class="footer-bottom-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">RTI</a></li>
+                        <li><a href="#">Sitemap</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

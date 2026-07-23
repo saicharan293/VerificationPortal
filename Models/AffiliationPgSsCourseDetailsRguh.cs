@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace VerificationPortal.Models;
+
+public partial class AffiliationPgSsCourseDetailsRguh
+{
+    public int Id { get; set; }
+
+    public string FacultyCode { get; set; } = null!;
+
+    public string CollegeCode { get; set; } = null!;
+
+    public string TypeOfAffiliation { get; set; } = null!;
+
+    public string CourseName { get; set; } = null!;
+
+    public string CourseLevel { get; set; } = null!;
+
+    public string CourseCode { get; set; } = null!;
+
+    public int? RguhsIntake { get; set; }
+
+    public string? RguhssupportingDocumentPath { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+}
