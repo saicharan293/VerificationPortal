@@ -53,30 +53,96 @@
                     </div>
                 </a>
 
-                <!-- Navbar Actions -->
-                <div class="ms-auto d-flex align-items-center gap-2">
-                    <!-- Theme Toggle Button -->
-                    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
-                        <i class="bi bi-moon-fill moon-icon"></i>
-                        <i class="bi bi-sun-fill sun-icon"></i>
-                    </button>
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#authNavbar" aria-controls="authNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                    <!-- User Info Display -->
-                    <div class="user-info-nav">
-                        <i class="bi bi-person-circle"></i>
-                        <div class="user-info-text">
-                            <strong>@User.Identity.Name</strong>
-                            <small>@User.FindFirst("Designation")?.Value</small>
-                        </div>
-                    </div>
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse" id="authNavbar">
+                    <ul class="navbar-nav me-auto align-items-lg-center gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
 
-                    <!-- Logout Form -->
-                    <form asp-controller="Account" asp-action="Logout" asp-antiforgery="true" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-logout-nav" title="Logout">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span class="d-none d-md-inline">Logout</span>
+                        @* ==================== ADMIN ONLY LINKS ==================== *@
+                        @if (User.IsInRole("Admin") || User.IsInRole("ViceChancellor") || User.IsInRole("Director"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-shield-lock-fill"></i> Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Index">
+                                            <i class="bi bi-diagram-3"></i> College Mappings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Create">
+                                            <i class="bi bi-plus-circle"></i> New Assignment
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="AssignByRange">
+                                            <i class="bi bi-rulers"></i> Assign by Range
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-people-fill"></i> Manage Users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-gear-fill"></i> System Settings
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @* ==================== COMMON LINKS ==================== *@
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-building"></i> Colleges
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-file-earmark-text"></i> Reports
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                        <!-- Theme Toggle Button -->
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                            <i class="bi bi-moon-fill moon-icon"></i>
+                            <i class="bi bi-sun-fill sun-icon"></i>
                         </button>
-                    </form>
+
+                        <!-- User Info Display -->
+                        <div class="user-info-nav">
+                            <i class="bi bi-person-circle"></i>
+                            <div class="user-info-text">
+                                <strong>@User.Identity.Name</strong>
+                                <small>@User.FindFirst("Designation")?.Value</small>
+                            </div>
+                        </div>
+
+                        <!-- Logout Form -->
+                        <form asp-controller="Account" asp-action="Logout" asp-antiforgery="true" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-logout-nav" title="Logout">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="d-none d-md-inline">Logout</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </nav>

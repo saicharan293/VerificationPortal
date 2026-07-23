@@ -131,7 +131,7 @@ namespace VerificationPortal.Controllers
                     new Claim("FullName", user.UserName),
                     new Claim("UserId", user.UserId.ToString()),
                     new Claim("FacultyId", user.Faculty?.ToString() ?? ""),
-                    new Claim("FacultyCode", faculty?.FacultyId.ToString()),
+                    new Claim("FacultyCode", faculty?.FacultyId.ToString() ?? "0"),
                     new Claim("FacultyName", faculty?.FacultyName ?? ""),
                     new Claim("Designation", user.DesignationDescription ?? ""),
                     new Claim(ClaimTypes.Role, userRole),

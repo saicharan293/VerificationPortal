@@ -1,0 +1,450 @@
+﻿@model VerificationPortal.Models.CollegeMappingListViewModel
+@{
+    ViewData["Title"] = "College Mapping - Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+
+    <style>
+        .range-link {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #0d6efd;
+        }
+        .range-link:hover {
+            color: #0b5ed7;
+        }
+        .college-list-modal .modal-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .college-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: default;
+        }
+        .college-item:last-child {
+            border-bottom: none;
+        }
+        .college-item:hover {
+            background-color: #f8f9fa;
+        }
+        .college-code {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+        .range-badge {
+            font-family: monospace;
+            font-size: 1.1em;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 1px solid #90caf9;
+            color: #1565c0;
+        }
+        .college-count-badge {
+            font-size: 0.75em;
+            margin-left: 6px;
+            opacity: 0.8;
+        }
+    </style>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show py-2 small" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+<!-- Page Header -->
+<section class="admin-page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1><i class="bi bi-diagram-3-fill"></i> College Mapping Management</h1>
+                <p>Assign colleges to users (DEO, JR, SO, etc.) for verification workflow</p>
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-md-0">
+                <a asp-action="AssignByRange" class="btn btn-light btn-sm">
+                    <i class="bi bi-rulers"></i> Assign by Range
+                </a>
+                <a asp-action="Create" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-lg"></i> New Assignment
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="admin-stats">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="admin-stat-card">
+                    <i class="bi bi-diagram-3 stat-icon"></i>
+                    <div>
+                        <h3>@Model.TotalMappings</h3>
+                        <p>Total Mappings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="admin-stat-card">
+                    <i class="bi bi-check-circle stat-icon text-success"></i>
+                    <div>
+                        <h3>@Model.ActiveMappings</h3>
+                        <p>Active Mappings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="admin-stat-card">
+                    <i class="bi bi-people stat-icon text-info"></i>
+                    <div>
+                        <h3>@Model.TotalUsers</h3>
+                        <p>Users with Mappings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters -->
+<section class="container my-4">
+    <div class="filter-bar">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Search User</label>
+                <input type="text" name="search" value="@ViewBag.Search"
+                       class="form-control form-control-sm"
+                       placeholder="Search by username..." />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Filter by Faculty</label>
+                <select name="facultyId" class="form-select form-select-sm">
+                    <option value="0">All Faculties</option>
+                    @foreach (var fac in (List<VerificationPortal.Models.Faculty>)ViewBag.Faculties)
+                    {
+                        <option value="@fac.FacultyId"
+                                selected="@(ViewBag.SelectedFaculty == fac.FacultyId)">
+                            @fac.FacultyName
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-x-circle"></i> Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Mappings Table -->
+<section class="container my-4">
+    <div class="admin-table-card">
+        <div class="table-header">
+            <h5><i class="bi bi-list-ul"></i> All College Mappings</h5>
+            <span class="badge bg-primary">@Model.Mappings.Count</span>
+        </div>
+        <div class="table-responsive">
+            <table id="mappingTable" class="table table-sm table-hover w-100">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Designation</th>
+                        <th>Faculty</th>
+                        <th>Range</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Mappings.Any())
+                    {
+                        @foreach (var item in Model.Mappings)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.Mapping.UserName</strong>
+                                    <br />
+                                    <small class="text-muted">ID: @item.Mapping.UserId</small>
+                                </td>
+                                <td>@item.UserDesignation</td>
+                                <td>
+                                    <span class="faculty-badge">@item.FacultyName</span>
+                                </td>
+                                <td>
+                                    <span class="range-badge clickable-range"
+                                          data-mapping-id="@item.Mapping.Id"
+                                          data-faculty-id="@item.Mapping.FacultyCode"
+                                          data-from="@item.Mapping.FromLetter"
+                                          data-to="@item.Mapping.ToLetter"
+                                          title="Click to view colleges in this range">
+                                        <div>
+                                            <strong>@item.Mapping.FromLetter - @item.Mapping.ToLetter</strong>
+                                        </div>
+
+                                        <small>
+                                            @item.Mapping.CollegeFrom → @item.Mapping.CollegeTo
+                                        </small>
+                                        <i class="bi bi-eye ms-1 small"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.Mapping.IsActive == true)
+                                    {
+                                        <span class="status-pill status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small>@item.Mapping.CreatedDate?.ToString("dd MMM yyyy")</small>
+                                    <br />
+                                    <small class="text-muted">by @item.Mapping.CreatedBy</small>
+                                </td>
+                                <td class="text-end">
+                                    <div class="action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@item.Mapping.Id"
+                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-warning toggle-btn"
+                                                data-id="@item.Mapping.Id" title="Toggle Status">
+                                            <i class="bi bi-toggle-on"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                                data-id="@item.Mapping.Id" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="bi bi-inbox display-1 text-muted"></i>
+                                <p class="text-muted mt-3">No college mappings found.</p>
+                                <a asp-action="Create" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-lg"></i> Create First Mapping
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Colleges in Range Modal -->
+<div class="modal fade" id="collegesModal" tabindex="-1" aria-labelledby="collegesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="collegesModalLabel">
+                    <i class="bi bi-building"></i> Colleges in Range <span id="modalRangeDisplay"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="collegesLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading colleges...</p>
+                </div>
+                <div id="collegesContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table id="collegesTable" class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>College Code</th>
+                                    <th>College Name</th>
+                                    <th>Town</th>
+                                </tr>
+                            </thead>
+                            <tbody id="collegesTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="collegesEmpty" class="text-center py-4 text-muted" style="display: none;">
+                        <i class="bi bi-inbox display-1"></i>
+                        <p class="mt-3">No colleges found in this range.</p>
+                    </div>
+                    <div id="collegesError" class="text-center py-4 text-danger" style="display: none;">
+                        <i class="bi bi-exclamation-triangle display-1"></i>
+                        <p class="mt-3">Failed to load colleges. Please try again.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id="collegesCount" class="text-muted small"></span>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+@section Scripts {
+    <script>
+        // Toggle Active Status
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.dataset.id;
+                const response = await fetch(`@Url.Action("ToggleActive")/${id}`, {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
+                });
+                const data = await response.json();
+                if (data.success) location.reload();
+            });
+        });
+
+        // Delete
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                if (!confirm('Are you sure you want to delete this mapping?')) return;
+                const id = this.dataset.id;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `@Url.Action("Delete")/${id}`;
+                const token = document.createElement('input');
+                token.name = '__RequestVerificationToken';
+                token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                form.appendChild(token);
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+
+        // View Colleges in Range Modal
+        document.querySelectorAll('.clickable-range').forEach(element => {
+            element.addEventListener('click', function() {
+                const mappingId = this.dataset.mappingId;
+                const facultyId = this.dataset.facultyId;
+                const fromLetter = this.dataset.from;
+                const toLetter = this.dataset.to;
+
+                // Update modal title
+                document.getElementById('modalRangeDisplay').textContent = `(${fromLetter} - ${toLetter})`;
+
+                // Show loading, hide content
+                document.getElementById('collegesLoading').style.display = 'block';
+                document.getElementById('collegesContent').style.display = 'none';
+                document.getElementById('collegesTableBody').innerHTML = '';
+                document.getElementById('collegesEmpty').style.display = 'none';
+                document.getElementById('collegesError').style.display = 'none';
+                document.getElementById('collegesCount').textContent = '';
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('collegesModal'));
+                modal.show();
+
+                // Fetch colleges
+                fetch(`@Url.Action("GetCollegesByFaculty", "CollegeMapping")?facultyId=${facultyId}&fromLetter=${fromLetter}&toLetter=${toLetter}`)
+                    .then(response => response.json())
+                    .then(colleges => {
+
+                        document.getElementById('collegesLoading').style.display = 'none';
+                        document.getElementById('collegesContent').style.display = 'block';
+
+                        if ($.fn.DataTable.isDataTable('#collegesTable')) {
+                            $('#collegesTable').DataTable().destroy();
+                        }
+
+                        const tbody = document.getElementById('collegesTableBody');
+                        tbody.innerHTML = "";
+
+                        if (colleges.length > 0) {
+
+                            colleges.forEach(college => {
+
+                                tbody.insertAdjacentHTML("beforeend", `
+                                    <tr>
+                                        <td><code>${college.code}</code></td>
+                                        <td>${college.name}</td>
+                                        <td>${college.town || "N/A"}</td>
+                                    </tr>
+                                `);
+
+                            });
+
+                            $('#collegesTable').DataTable({
+
+                                pageLength: 10,
+
+                                lengthMenu: [
+                                    [10,25,50,100,-1],
+                                    [10,25,50,100,"All"]
+                                ],
+
+                                ordering: true,
+
+                                searching: true,
+
+                                responsive: true,
+
+                                autoWidth: false,
+
+                                language: {
+                                    search: "Search:",
+                                    lengthMenu: "Show _MENU_ colleges",
+                                    info: "Showing _START_ to _END_ of _TOTAL_ colleges",
+                                    zeroRecords: "No matching colleges found"
+                                }
+
+                            });
+
+                            document.getElementById('collegesCount').textContent =
+                                `${colleges.length} college(s) found`;
+
+                        }
+                        else {
+
+                            document.getElementById('collegesEmpty').style.display = 'block';
+
+                            document.getElementById('collegesCount').textContent =
+                                '0 college(s) found';
+
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error('Error loading colleges:', error);
+                        document.getElementById('collegesLoading').style.display = 'none';
+                        document.getElementById('collegesError').style.display = 'block';
+                    });
+            });
+        });
+    </script>
+}

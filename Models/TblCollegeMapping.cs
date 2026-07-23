@@ -21,7 +21,11 @@ public partial class TblCollegeMapping
 
     public string? CreatedBy { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
+
+    public string FromLetter { get; set; } = null!;
+
+    public string ToLetter { get; set; } = null!;
 
     public virtual Faculty FacultyCodeNavigation { get; set; } = null!;
 }

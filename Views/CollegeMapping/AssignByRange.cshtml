@@ -1,0 +1,163 @@
+﻿@model VerificationPortal.Models.CollegeMappingRangeViewModel
+@{
+    ViewData["Title"] = "Assign by Range";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<section class="admin-page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="bi bi-rulers"></i> Assign Colleges by Range</h1>
+                <p>Quickly assign a range of colleges (A-M, N-Z, etc.) to a user</p>
+            </div>
+            <a asp-action="Index" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="container my-4">
+    <div class="admin-form-card">
+        <form asp-action="AssignByRange" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="SelectedFacultyId" class="form-label">Faculty *</label>
+                    <select asp-for="SelectedFacultyId" class="form-select">
+                        <option value="0">-- Select Faculty --</option>
+                        @foreach (var fac in Model.AvailableFaculties)
+                        {
+                            <option value="@fac.FacultyId">@fac.FacultyName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="SelectedUserId" class="form-label">User *</label>
+                    <select asp-for="SelectedUserId" class="form-select">
+                        <option value="0">-- Select User --</option>
+                        @foreach (var user in Model.AvailableUsers)
+                        {
+                            <option value="@user.Id">
+                                @user.UserName (@user.DesignationDescription) -
+                                Faculty: @(user.Faculty?.ToString() ?? "N/A")
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="collegeFromSelect" class="form-label">College Name From *</label>
+                    <select id="collegeFromSelect" asp-for="CollegeFrom" class="form-select" name="CollegeFrom">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="G">G</option>
+                        <option value="H">H</option>
+                        <option value="I">I</option>
+                        <option value="J">J</option>
+                        <option value="K">K</option>
+                        <option value="L">L</option>
+                        <option value="M">M</option>
+                        <option value="N">N</option>
+                        <option value="O">O</option>
+                        <option value="P">P</option>
+                        <option value="Q">Q</option>
+                        <option value="R">R</option>
+                        <option value="S">S</option>
+                        <option value="T">T</option>
+                        <option value="U">U</option>
+                        <option value="V">V</option>
+                        <option value="W">W</option>
+                        <option value="X">X</option>
+                        <option value="Y">Y</option>
+                        <option value="Z">Z</option>
+                    </select>
+                    <small class="form-text text-muted">Starting letter (A-Z)</small>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="collegeToSelect" class="form-label">College Name To *</label>
+                    <select id="collegeToSelect" asp-for="CollegeTo" class="form-select" name="CollegeTo">
+                        <!-- Options will be populated dynamically based on College From selection -->
+                    </select>
+                    <small class="form-text text-muted">Ending letter (must be same or after From)</small>
+                </div>
+
+                <div class="col-12">
+                    <div class="range-preview">
+                        <i class="bi bi-info-circle"></i>
+                        This will assign all colleges whose name starts with letters between
+                        <strong id="fromDisplay">A</strong> and <strong id="toDisplay">Z</strong>
+                        to the selected user.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Assign Range
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Generate alphabet options A-Z
+        const alphabetOptions = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter =>
+            `<option value="${letter}">${letter}</option>`).join('');
+
+        // Initialize College To dropdown with all letters
+        const collegeToSelect = document.getElementById('collegeToSelect');
+        collegeToSelect.innerHTML = alphabetOptions;
+        collegeToSelect.value = 'Z';
+
+        // Update College To dropdown when College From changes
+        document.getElementById('collegeFromSelect').addEventListener('change', function() {
+            const fromLetter = this.value;
+            const fromIndex = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(fromLetter);
+
+            // Generate options from selected letter to Z
+            const toOptions = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                .split('')
+                .filter((letter, index) => index >= fromIndex)
+                .map(letter => `<option value="${letter}">${letter}</option>`)
+                .join('');
+
+            collegeToSelect.innerHTML = toOptions;
+            collegeToSelect.value = 'Z'; // Default to Z
+
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            const from = document.getElementById('collegeFromSelect').value.toUpperCase();
+            const to = document.getElementById('collegeToSelect').value.toUpperCase();
+            document.getElementById('fromDisplay').textContent = from || 'A';
+            document.getElementById('toDisplay').textContent = to || 'Z';
+        }
+
+        // Initialize display
+        updateDisplay();
+
+        // Also update display when College To changes
+        document.getElementById('collegeToSelect').addEventListener('change', updateDisplay);
+    </script>
+}

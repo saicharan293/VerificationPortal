@@ -6160,6 +6160,13 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.FromLetter)
+                .HasMaxLength(1)
+                .HasDefaultValue("A");
+            entity.Property(e => e.IsActive).HasDefaultValue(true, "DF_TblCollegeMapping_IsActive");
+            entity.Property(e => e.ToLetter)
+                .HasMaxLength(1)
+                .HasDefaultValue("Z");
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
