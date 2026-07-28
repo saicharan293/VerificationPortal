@@ -122,32 +122,7 @@ namespace VerificationPortal.Controllers
             ViewBag.UserDesignation = GetUserDesignation();
 
             // Fetch role-based verification
-            var verification = await _verificationService
-                .GetVerificationAsync<InstitutionBasicDetail>(
-                    x => x.CollegeCode == collegeCode,
-                    GetUserDesignation());
-
-            ViewData["ExistingRemarks"] = verification.Remarks;
-
-            ViewData["ExistingStatus"] = verification.IsVerified switch
-            {
-                true => "Approved",
-                false => "Rejected",
-                null => "Pending"
-            };
-
-            ViewData["ExistingStatusClass"] = verification.IsVerified switch
-            {
-                true => "bg-success",
-                false => "bg-danger",
-                null => "bg-warning"
-            };
-
-            ViewData["VerifiedBy"] = verification.VerifiedBy;
-            ViewData["VerifiedDate"] = verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
-
-            // Optional - decide whether to show form
-            ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
+            await SetVerificationViewData<InstitutionBasicDetail>(collegeCode);
 
 
             return View(institution);
@@ -181,6 +156,9 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = "TrustMemberDetails";
             ViewBag.UserDesignation = GetUserDesignation();
             ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
+
+
+            await SetVerificationViewData<ContinuationTrustMemberDetail>(collegeCode);
 
             return View(trustMembers);
         }
@@ -292,7 +270,37 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = "DeanDirectorDetails";
             ViewBag.UserDesignation = GetUserDesignation();
 
+            await SetVerificationViewData<AffDeanOrDirectorDetail>(collegeCode);
+
             return View(institution);
+        }
+
+        private async Task SetVerificationViewData<T>(string collegeCode)  where T : class
+        {
+            var verification = await _verificationService
+                .GetVerificationAsync<T>(
+                    x => EF.Property<string>(x, "CollegeCode") == collegeCode,
+                    GetUserDesignation());
+
+            ViewData["ExistingRemarks"] = verification.Remarks;
+
+            ViewData["ExistingStatus"] = verification.IsVerified switch
+            {
+                true => "Approved",
+                false => "Rejected",
+                null => "Pending"
+            };
+
+            ViewData["ExistingStatusClass"] = verification.IsVerified switch
+            {
+                true => "bg-success",
+                false => "bg-danger",
+                null => "bg-warning"
+            };
+
+            ViewData["VerifiedBy"] = verification.VerifiedBy;
+            ViewData["VerifiedDate"] = verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
+            ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
         }
 
         // GET: /VerificationDashboard/PrincipalDetails/{collegeCode}
@@ -561,6 +569,22 @@ namespace VerificationPortal.Controllers
             return View("ComingSoon", institution);
         }
 
+        public static class VerificationRouteMapper
+        {
+            public static readonly Dictionary<string, Type> EntityMappings = new()
+            {
+                ["InstitutionDetails"] = typeof(AffInstitutionsDetail),
+                ["TrustDetails"] = typeof(InstitutionBasicDetail),
+                ["TrustMemberDetails"] = typeof(ContinuationTrustMemberDetail),
+                ["DeanDirectorDetails"] = typeof(AffDeanOrDirectorDetail),
+                ["Principal_Details"] = typeof(AffPrincipalDetail),
+                ["Hostel_Details"] = typeof(AffHostelDetail),
+                ["LandBuilding_Details"] = typeof(DentalCollegeLandBuildingDetail),
+                ["TeachingStaffDepartmentWise"] = typeof(TeachingStaffDepartmentWiseDetail),
+                ["AcademicIntake"] = typeof(CollegeCourseIntakeDetail)
+            };
+        }
+
         // POST: Save verification remarks and status
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -568,69 +592,57 @@ namespace VerificationPortal.Controllers
         {
             try
             {
-                var userDesignation = GetUserDesignation();
                 var request = new VerificationRequest
                 {
-                    Role = userDesignation,
+                    Role = GetUserDesignation(),
                     Status = status,
                     Remarks = remarks,
-                    VerifiedBy = User.Identity?.Name ?? userDesignation
+                    VerifiedBy = User.Identity?.Name ?? GetUserDesignation()
                 };
 
-                switch (tabName)
+                if (!VerificationRouteMapper.EntityMappings.TryGetValue(tabName, out var entityType))
                 {
-                    case "InstitutionDetails":
-                        await _verificationService.SaveVerificationAsync<AffInstitutionsDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "Dean_DirectorDetails":
-                        await _verificationService.SaveVerificationAsync<AffDeanOrDirectorDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "Principal_Details":
-                        await _verificationService.SaveVerificationAsync<AffPrincipalDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "TrustMember_Details":
-                        await _verificationService.SaveVerificationAsync<ContinuationTrustMemberDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "Hostel_Details":
-                        await _verificationService.SaveVerificationAsync<AffHostelDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "LandBuilding_Details":
-                        await _verificationService.SaveVerificationAsync<DentalCollegeLandBuildingDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "TeachingStaffDepartmentWise":
-                        await _verificationService.SaveVerificationAsync<TeachingStaffDepartmentWiseDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    case "AcademicIntake":
-                        await _verificationService.SaveVerificationAsync<CollegeCourseIntakeDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                        break;
-
-                    default:
-                        TempData["ErrorMessage"] = $"Verification is not configured for '{tabName}'.";
-                        return RedirectToAction(tabName, new { collegeCode });
+                    TempData["ErrorMessage"] = $"Verification is not configured for '{tabName}'.";
+                    return RedirectToAction(tabName, new { collegeCode });
                 }
+
+                var verificationHandlers = new Dictionary<string, Func<Task>>
+                {
+                    ["InstitutionDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<AffInstitutionsDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["TrustDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<InstitutionBasicDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["PrincipalDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<AffPrincipalDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["TrustMemberDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<ContinuationTrustMemberDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["DeanDirectorDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<AffDeanOrDirectorDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    // Continue adding the remaining tabs...
+                };
+
+                if (!verificationHandlers.TryGetValue(tabName, out var handler))
+                {
+                    TempData["ErrorMessage"] = $"Verification is not configured for '{tabName}'.";
+                    return RedirectToAction(tabName, new { collegeCode });
+                }
+
+                await handler();
 
                 TempData["SuccessMessage"] = "Verification saved successfully.";
             }

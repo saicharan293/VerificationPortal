@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Reflection;
 using VerificationPortal.DATA;
 using VerificationPortal.Services.Verification.Interfaces;
 using VerificationPortal.Services.Verification.Models;
@@ -17,10 +18,14 @@ namespace VerificationPortal.Services.Verification
             _provider = provider;
         }
 
-        public async Task SaveVerificationAsync<T>( Expression<Func<T, bool>> predicate, VerificationRequest request) where T : class
+        public async Task SaveVerificationAsync<T>(
+            Expression<Func<T, bool>> predicate,
+            VerificationRequest request)
+            where T : class
         {
             // Get the record
-            var entity = await _context.Set<T>().FirstOrDefaultAsync(predicate);
+            var entity = await _context.Set<T>()
+                .FirstOrDefaultAsync(predicate);
 
             if (entity == null)
                 throw new Exception($"{typeof(T).Name} record not found.");
@@ -34,7 +39,7 @@ namespace VerificationPortal.Services.Verification
             // Save changes
             await _context.SaveChangesAsync();
         }
-
+       
         public async Task<VerificationDisplayModel> GetVerificationAsync<T>( Expression<Func<T, bool>> predicate, string role)  where T : class
         {
             var entity = await _context.Set<T>()
