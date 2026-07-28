@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using VerificationPortal.DATA;
+using VerificationPortal.Models;
+using VerificationPortal.Services.Verification;
+using VerificationPortal.Services.Verification.Handlers;
+using VerificationPortal.Services.Verification.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
     .AddDataAnnotationsLocalization();
+
+builder.Services.AddScoped<IVerificationService, VerificationService>();
+
+builder.Services.AddScoped(typeof(IVerificationHandler<>), typeof(GenericVerificationHandler<>));
+
 
 // ===== LOCALIZATION CONFIGURATION =====
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");

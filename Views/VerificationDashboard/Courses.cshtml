@@ -1,0 +1,121 @@
+@model VerificationPortal.Models.AffInstitutionsDetail
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Courses & Intake";
+    ViewData["ActiveTab"] = "Courses";
+    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
+    // Use layout's feedback section
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = Url.Action("Infrastructure", "VerificationDashboard", new { collegeCode = Model?.CollegeCode });
+    ViewData["NextTabLabel"] = "Next: Infrastructure";
+    ViewData["PrevTabAction"] = Url.Action("PrincipalDetails", "VerificationDashboard", new { collegeCode = Model?.CollegeCode });
+    ViewData["PrevTabLabel"] = "Previous: Principal Details";
+}
+
+<div class="verification-page">
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h2 class="verification-card-title">
+                <i class="bi bi-book"></i>
+                Courses & Intake
+            </h2>
+            <div class="verification-card-actions">
+                <span class="badge badge-warning">Planned</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="note-box">
+        <i class="bi bi-info-circle"></i>
+        <div class="note-box-content">
+            <h6>Verification Instructions</h6>
+            <p>Review the courses offered by the institution along with sanctioned intake, actual admissions, and course details. This section will include UG, PG, Diploma, and PhD courses. Provide your remarks and select verification status. Once completed, proceed to <strong>Infrastructure</strong>.</p>
+        </div>
+    </div>
+
+    <div class="verification-card">
+            <div class="verification-card-header">
+                <h3 class="verification-card-title">
+                    <i class="bi bi-book"></i>
+                    Courses Information
+                </h3>
+            </div>
+            <div class="verification-card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Course data will be loaded from the Course Details table.</strong> This is a placeholder view.
+                    The actual implementation would fetch course data from AffCourseDetails table linked by CollegeCode.
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Course Name</th>
+                                <th>Level</th>
+                                <th>Duration</th>
+                                <th>Sanctioned Intake</th>
+                                <th>Actual Admissions</th>
+                                <th>Affiliation Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-database fs-1 d-block mb-2 opacity-50"></i>
+                                    No course data available in current model
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="verification-card">
+            <div class="verification-card-header">
+                <h3 class="verification-card-title">
+                    <i class="bi bi-clipboard-check"></i>
+                    Verification Remarks & Status
+                </h3>
+            </div>
+            <div class="verification-card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Remarks <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="remarks" rows="4" required
+                                  placeholder="Enter your verification remarks for Courses & Intake..."></textarea>
+                        <div class="form-text">Please provide detailed remarks for your verification decision.</div>
+                        <div class="invalid-feedback">Remarks are required for verification.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Verification Status <span class="text-danger">*</span></label>
+                        <select class="form-select" name="status" required>
+                            <option value="">-- Select Status --</option>
+                            <option value="accept">Accept</option>
+                            <option value="reject">Reject</option>
+                            <option value="pending">Pending Review</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a verification status.</div>
+                    </div>
+                </div>
+
+                <div class="verification-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Verification
+                    </button>
+                    <a asp-controller="VerificationDashboard" asp-action="Infrastructure" asp-route-collegeCode="@Model.CollegeCode" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-right"></i> Next: Infrastructure
+                    </a>
+                    <a asp-controller="VerificationDashboard" asp-action="PrincipalDetails" asp-route-collegeCode="@Model.CollegeCode" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Previous: Principal Details
+                    </a>
+                </div>
+            </div>
+        </div>
+</div>

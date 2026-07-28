@@ -1,0 +1,346 @@
+@model VerificationPortal.Models.AffInstitutionsDetail
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Institution Details";
+    ViewData["ActiveTab"] = "InstitutionDetails";
+    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
+    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
+    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
+    // Use layout's feedback section - no duplicate form needed
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity.Name;
+    ViewData["NextTabAction"] = Url.Action("Courses", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
+    ViewData["NextTabLabel"] = "Next: Courses & Intake";
+    ViewData["PrevTabAction"] = Url.Action("MyColleges", "MyColleges", new { });
+    ViewData["PrevTabLabel"] = "Back to My Colleges";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/verification-dashboard.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<!-- Note Box -->
+<div class="note-box">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>Please start verification from this <strong>Institution Details</strong> tab. Review all fields carefully, provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, you can proceed to the next tab: <strong>Courses & Intake</strong>.</p>
+    </div>
+</div>
+
+<!-- Institution Basic Information -->
+<div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-info-circle"></i>
+                Basic Information
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">College Code</label>
+                    <input type="text" class="form-control" value="@Model.CollegeCode" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Faculty Code</label>
+                    <input type="text" class="form-control" value="@Model.FacultyCode" disabled />
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Name of Institution</label>
+                    <input type="text" class="form-control" value="@Model.NameOfInstitution" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Type of Institution</label>
+                    <input type="text" class="form-control" value="@Model.TypeOfInstitution" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Year of Establishment</label>
+                    <input type="text" class="form-control" value="@Model.YearOfEstablishment" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Status of College</label>
+                    <input type="text" class="form-control" value="@Model.StatusOfCollege" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Details -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-geo-alt"></i>
+                Address Details
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" rows="2" disabled>@Model.Address</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Village/Town/City</label>
+                    <input type="text" class="form-control" value="@Model.VillageTownCity" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Taluk</label>
+                    <input type="text" class="form-control" value="@Model.Taluk" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">District</label>
+                    <input type="text" class="form-control" value="@Model.District" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Pin Code</label>
+                    <input type="text" class="form-control" value="@Model.PinCode" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">STD Code</label>
+                    <input type="text" class="form-control" value="@Model.StdCode" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fax</label>
+                    <input type="text" class="form-control" value="@Model.Fax" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-telephone"></i>
+                Contact Information
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.MobileNumber" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email ID</label>
+                    <input type="email" class="form-control" value="@Model.EmailId" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Alternate Landline/Mobile</label>
+                    <input type="text" class="form-control" value="@Model.AltLandlineMobile" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Alternate Email ID</label>
+                    <input type="email" class="form-control" value="@Model.AltEmailId" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Website</label>
+                    <input type="url" class="form-control" value="@Model.Website" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">College URL</label>
+                    <input type="url" class="form-control" value="@Model.CollegeUrl" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Institutional Details -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-building-check"></i>
+                Institutional Details
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Minority Institute</label>
+                    <input type="text" class="form-control" value="@(Model.MinorityInstitute ? "Yes" : "No")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Minority Category</label>
+                    <input type="text" class="form-control" value="@Model.MinorityCategory" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Attached to Medical College</label>
+                    <input type="text" class="form-control" value="@(Model.AttachedToMedicalClg ? "Yes" : "No")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Rural Institute</label>
+                    <input type="text" class="form-control" value="@(Model.RuralInstitute ? "Yes" : "No")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Survey No / PID No</label>
+                    <input type="text" class="form-control" value="@Model.SurveyNoPidNo" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Course Applied</label>
+                    <input type="text" class="form-control" value="@Model.CourseApplied" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Running Course</label>
+                    <input type="text" class="form-control" value="@Model.RunningCourse" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Course Level</label>
+                    <input type="text" class="form-control" value="@Model.CourseLevel" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Financing Authority</label>
+                    <input type="text" class="form-control" value="@Model.FinancingAuthority" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Head of Institution -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-person-badge"></i>
+                Head of Institution
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Head of Institution Name</label>
+                    <input type="text" class="form-control" value="@Model.HeadOfInstitution" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionMobNo" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="@Model.HeadOfInstitutionEmail" disabled />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" rows="2" disabled>@Model.HeadAddress</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nodal Officer -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-person-lines-fill"></i>
+                Nodal Officer Details
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" value="@Model.NodalOfficerName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.NodalOfficerMobNumber" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="@Model.NodalOfficerEmail" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Principal Details (Preview) -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-mortarboard"></i>
+                Principal Details (Preview - Full details in Principal Details tab)
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Principal Name</label>
+                    <input type="text" class="form-control" value="@Model.PrincipalName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.PrincipalMobNo" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="@Model.PrincipalEmail" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dean/Director Details (Preview) -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-person-badge"></i>
+                Dean / Director Details (Preview - Full details in Dean/Director tab)
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Dean Name</label>
+                    <input type="text" class="form-control" value="@Model.DeanName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.DeanMobileNumber" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="@Model.DeanEmailId" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trust Details (Preview) -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-building"></i>
+                Trust Details (Preview - Full details in Trust Details tab)
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Trust Name</label>
+                    <input type="text" class="form-control" value="@Model.TrustName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Trust President</label>
+                    <input type="text" class="form-control" value="@Model.TrustPresidentName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">President Contact</label>
+                    <input type="text" class="form-control" value="@Model.TrustPresidentContactNo" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Trust Address</label>
+                    <input type="text" class="form-control" value="@Model.TrustAddress" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Trust Establishment Date</label>
+                    <input type="text" class="form-control" value="@(Model.TrustEstablishmentDate?.ToString("dd MMM yyyy") ?? "")" disabled />
+                </div>
+            </div>
+        </div>
+    </div>

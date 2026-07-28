@@ -1,0 +1,1035 @@
+/* report-card.css - Report-style card layout for MyColleges and verification pages */
+:root {
+    --primary: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --secondary: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --light: #f8fafc;
+    --dark: #1e293b;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --border-radius: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --transition: all 0.2s ease;
+    --transition-fast: all 0.15s ease;
+}
+
+/* ============================================================
+   REPORT CARD LAYOUT
+============================================================ */
+.report-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.report-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.text-danger{
+    color: var(--danger);
+}
+
+.report-card-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.report-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.report-card-title i {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.report-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.report-card-body {
+    padding: 1.5rem;
+}
+
+/* ============================================================
+   VERIFICATION FEEDBACK SECTION (Report Card Footer)
+============================================================ */
+.verification-feedback-section {
+    background: var(--gray-50);
+    border-top: 2px solid var(--gray-200);
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    margin: 0 -1px -1px -1px;
+    padding: 1.5rem;
+}
+
+.feedback-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.feedback-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.feedback-title i {
+    font-size: 1.25rem;
+    color: var(--primary);
+}
+
+.verifier-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-200);
+}
+
+.verifier-info i {
+    color: var(--primary);
+}
+
+.feedback-body {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+}
+
+.feedback-form .form-label {
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+}
+
+.feedback-form .form-control,
+.feedback-form .form-select {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    padding: 0.625rem 1rem;
+    font-size: 0.9375rem;
+    transition: var(--transition-fast);
+    background: white;
+}
+
+.feedback-form .form-control:focus,
+.feedback-form .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+.feedback-form .form-text {
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+    margin-top: 0.375rem;
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.feedback-display {
+    padding: 1rem;
+}
+
+.feedback-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.feedback-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.feedback-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    margin-bottom: 0.25rem;
+}
+
+.feedback-value {
+    font-size: 0.9375rem;
+    color: var(--gray-900);
+}
+
+/* ============================================================
+   STATUS BADGES
+============================================================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.status-badge.in-progress,
+.status-badge.active {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+}
+
+.status-badge.completed,
+.status-badge.accept {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.status-badge.rejected,
+.status-badge.reject {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+    transition: var(--transition-fast);
+    font-size: 0.9375rem;
+}
+
+.btn i {
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+}
+
+.btn-success {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    border-color: #059669;
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    border-color: var(--gray-400);
+    color: var(--gray-600);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.btn-secondary {
+    background: var(--gray-500);
+    border-color: var(--gray-500);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: var(--gray-600);
+    border-color: var(--gray-600);
+    color: white;
+}
+
+/* ============================================================
+   TABLE STYLES
+============================================================ */
+.college-table {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.college-table thead th {
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-600);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.college-table tbody tr {
+    border-bottom: 1px solid var(--gray-100);
+    transition: var(--transition);
+}
+
+.college-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.college-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.college-table tbody td {
+    padding: 0.875rem 1rem;
+    vertical-align: middle;
+}
+
+.college-number {
+    color: var(--gray-400);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.college-code {
+    font-family: 'SF Mono', 'Fira Code', 'Monospace';
+    font-size: 0.8125rem;
+    background: var(--gray-100);
+    color: var(--primary-dark);
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.college-name {
+    font-weight: 500;
+    color: var(--gray-900);
+    max-width: 400px;
+}
+
+.college-name-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+}
+
+.college-name-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.college-name-link i {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+.college-town {
+    color: var(--gray-500);
+    font-size: 0.8125rem;
+}
+
+/* ============================================================
+   SEARCH BAR
+============================================================ */
+.search-bar {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.search-input {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: var(--gray-400);
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--gray-500);
+}
+
+.empty-state i {
+    font-size: 3.5rem;
+    opacity: 0.4;
+    margin-bottom: 1rem;
+    color: var(--gray-300);
+}
+
+.empty-state h4 {
+    color: var(--gray-700);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin: 0.25rem 0;
+    font-size: 0.9375rem;
+}
+
+.empty-state .small {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+}
+
+/* ============================================================
+   NO MAPPINGS CARD
+============================================================ */
+.no-mappings-card {
+    background: white;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.no-mappings-card:hover {
+    border-color: var(--primary);
+    background: var(--gray-50);
+}
+
+.no-mappings-card i {
+    font-size: 4rem;
+    color: var(--gray-300);
+    margin-bottom: 1.25rem;
+}
+
+.no-mappings-card h4 {
+    color: var(--gray-700);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.no-mappings-card p {
+    color: var(--gray-500);
+    margin: 0.25rem 0;
+}
+
+.no-mappings-card .small {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+}
+
+/* ============================================================
+   STATS CARDS
+============================================================ */
+.stats-row {
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+    height: 100%;
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+}
+
+.stat-number {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+/* ============================================================
+   USER INFO CARD
+============================================================ */
+.user-info-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+}
+
+.user-info-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.user-details h5 {
+    margin: 0 0 0.25rem;
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.user-details small {
+    color: var(--gray-500);
+}
+
+/* ============================================================
+   MAPPING SECTION
+============================================================ */
+.mapping-section {
+    margin-bottom: 1.5rem;
+}
+
+.mapping-header {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.faculty-name {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.badge i {
+    font-size: 0.75em;
+}
+
+.badge-primary {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-dark);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.badge-info {
+    background: rgba(6, 182, 212, 0.1);
+    color: #0e7490;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.badge-secondary {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.meta-badges .badge {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+}
+
+.status-badge {
+    font-weight: 500;
+}
+
+/* ============================================================
+   COLLEGES CONTAINER
+============================================================ */
+.colleges-container {
+    border: 1px solid var(--gray-200);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    max-height: 550px;
+    overflow-y: auto;
+    background: white;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 767.98px) {
+    .mapping-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .badges-row {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .meta-badges {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .college-table {
+        font-size: 0.8125rem;
+    }
+
+    .college-name {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .feedback-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .feedback-actions {
+        flex-direction: column;
+    }
+
+    .feedback-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ============================================================
+   PRINT STYLES
+============================================================ */
+@media print {
+    .search-bar,
+    .stats-row,
+    .feedback-actions,
+    .btn {
+        display: none !important;
+    }
+
+    .colleges-container {
+        max-height: none;
+        overflow: visible;
+        border: 1px solid #000;
+    }
+
+    .mapping-header {
+        border-radius: 0;
+        background: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .college-table thead th {
+        background: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .verification-feedback-section {
+        border: 1px solid #000;
+        page-break-inside: avoid;
+    }
+}
+
+/* ============================================================
+   DARK MODE SUPPORT
+============================================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #3b82f6;
+        --primary-light: #60a5fa;
+        --primary-dark: #2563eb;
+        --light: #1e293b;
+        --dark: #f8fafc;
+        --gray-50: #0f172a;
+        --gray-100: #1e293b;
+        --gray-200: #334155;
+        --gray-300: #475569;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #94a3b8;
+        --gray-700: #e2e8f0;
+        --gray-800: #f1f5f9;
+        --gray-900: #f8fafc;
+    }
+
+    .report-card,
+    .user-info-card,
+    .stat-card,
+    .mapping-header,
+    .colleges-container,
+    .no-mappings-card,
+    .feedback-body,
+    .verifier-info {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+    }
+
+    .search-bar {
+        background: var(--gray-50);
+        border-color: var(--gray-200);
+    }
+
+    .search-input {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+        color: var(--gray-100);
+    }
+
+    .search-input:focus {
+        border-color: var(--primary);
+    }
+
+    .college-table thead th {
+        background: var(--gray-50);
+        border-color: var(--gray-200);
+        color: var(--gray-400);
+    }
+
+    .college-table tbody tr {
+        border-color: var(--gray-200);
+    }
+
+    .college-table tbody tr:hover {
+        background: var(--gray-200);
+    }
+
+    .college-code {
+        background: var(--gray-200);
+        color: var(--primary-light);
+    }
+
+    .college-name {
+        color: var(--gray-100);
+    }
+
+    .college-town {
+        color: var(--gray-400);
+    }
+
+    .empty-state {
+        color: var(--gray-400);
+    }
+
+    .empty-state i {
+        color: var(--gray-300);
+    }
+
+    .empty-state h4 {
+        color: var(--gray-300);
+    }
+
+    .empty-state .small {
+        color: var(--gray-500);
+    }
+
+    .no-mappings-card {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+    }
+
+    .no-mappings-card:hover {
+        background: var(--gray-50);
+        border-color: var(--primary);
+    }
+
+    .no-mappings-card i {
+        color: var(--gray-300);
+    }
+
+    .no-mappings-card h4 {
+        color: var(--gray-300);
+    }
+
+    .meta-badges .badge {
+        background: var(--gray-200);
+        color: var(--gray-300);
+        border-color: var(--gray-300);
+    }
+
+    .feedback-header {
+        border-color: var(--gray-200);
+    }
+
+    .feedback-body {
+        border-color: var(--gray-200);
+    }
+
+    .verification-feedback-section {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+    }
+
+    .feedback-form .form-control,
+    .feedback-form .form-select {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+        color: var(--gray-100);
+    }
+
+    .feedback-form .form-control:focus,
+    .feedback-form .form-select:focus {
+        background: var(--gray-200);
+        color: var(--gray-100);
+    }
+
+    .feedback-form .form-control:disabled,
+    .feedback-form .form-select:disabled {
+        background: var(--gray-50);
+        color: var(--gray-400);
+    }
+
+    .btn-outline-secondary {
+        border-color: var(--gray-300);
+        color: var(--gray-400);
+    }
+
+    .btn-outline-secondary:hover {
+        background: var(--gray-200);
+        color: var(--gray-100);
+    }
+
+    .badge-secondary {
+        background: var(--gray-200);
+        color: var(--gray-300);
+    }
+}
+
+/* ============================================================
+   FOCUS VISIBLE FOR ACCESSIBILITY
+============================================================ */
+*:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+============================================================ */
+.colleges-container::-webkit-scrollbar,
+.report-card-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.colleges-container::-webkit-scrollbar-track,
+.report-card-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.colleges-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.report-card-body::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 4px;
+}
+
+.colleges-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.report-card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.report-card {
+    animation: fadeIn 0.3s ease, slideInRight 0.3s ease;
+}
+
+.mapping-section {
+    animation: fadeIn 0.3s ease, slideInRight 0.3s ease;
+}
+
+.report-card-body {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Stagger animation for mapping sections */
+.mapping-section:nth-child(1) { animation-delay: 0.05s; }
+.mapping-section:nth-child(2) { animation-delay: 0.1s; }
+.mapping-section:nth-child(3) { animation-delay: 0.15s; }
+.mapping-section:nth-child(4) { animation-delay: 0.2s; }
+.mapping-section:nth-child(5) { animation-delay: 0.25s; }
+.mapping-section:nth-child(6) { animation-delay: 0.3s; }

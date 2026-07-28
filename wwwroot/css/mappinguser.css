@@ -1,0 +1,714 @@
+/* mappinguser.css - Styles for user-facing college mapping views */
+/* This is separate from admin.css for non-admin users */
+
+:root {
+    --primary: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --secondary: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --light: #f8fafc;
+    --dark: #1e293b;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --border-radius: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --transition: all 0.2s ease;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.page-header p {
+    color: var(--gray-500);
+    margin: 0;
+}
+
+/* User Info Card */
+.user-info-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+}
+
+.user-info-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.user-info-card .user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.user-info-card .user-details h5 {
+    margin: 0 0 0.25rem;
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.user-info-card .user-details small {
+    color: var(--gray-500);
+}
+
+/* Stats Cards */
+.stats-row {
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+    height: 100%;
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+}
+
+.stat-number {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+/* Mapping Sections */
+.mapping-section {
+    margin-bottom: 1.5rem;
+}
+
+.mapping-header {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mapping-header .faculty-name {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.mapping-header .badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.mapping-header .badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 2rem;
+    font-weight: 500;
+}
+
+.mapping-header .badge-primary {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-dark);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.mapping-header .badge-info {
+    background: rgba(6, 182, 212, 0.1);
+    color: #0e7490;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.mapping-header .badge-secondary {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.mapping-header .meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.mapping-header .meta-badges .badge {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+}
+
+.mapping-header .status-badge {
+    font-weight: 500;
+}
+
+/* Colleges Container */
+.colleges-container {
+    border: 1px solid var(--gray-200);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    max-height: 550px;
+    overflow-y: auto;
+    background: white;
+}
+
+.colleges-container .search-bar {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.colleges-container .search-input {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.colleges-container .search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+.colleges-container .search-input::placeholder {
+    color: var(--gray-400);
+}
+
+/* College Table */
+.college-table {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.college-table thead th {
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--gray-200);
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.college-table tbody tr {
+    border-bottom: 1px solid var(--gray-100);
+    transition: var(--transition);
+}
+
+.college-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.college-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.college-table tbody td {
+    padding: 0.875rem 1rem;
+    vertical-align: middle;
+}
+
+.college-table .college-number {
+    color: var(--gray-400);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.college-table .college-code {
+    font-family: 'SF Mono', 'Fira Code', 'Monospace';
+    font-size: 0.8125rem;
+    background: var(--gray-100);
+    color: var(--primary-dark);
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.college-table .college-name {
+    font-weight: 500;
+    color: var(--gray-900);
+    max-width: 400px;
+}
+
+.college-table .college-name-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+}
+
+.college-table .college-name-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.college-table .college-name-link i {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+.college-table .college-town {
+    color: var(--gray-500);
+    font-size: 0.8125rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--gray-500);
+}
+
+.empty-state i {
+    font-size: 3.5rem;
+    opacity: 0.4;
+    margin-bottom: 1rem;
+    color: var(--gray-300);
+}
+
+.empty-state h4 {
+    color: var(--gray-700);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin: 0.25rem 0;
+    font-size: 0.9375rem;
+}
+
+.empty-state .small {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+}
+
+/* No Mappings Card */
+.no-mappings-card {
+    background: white;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.no-mappings-card:hover {
+    border-color: var(--primary);
+    background: var(--gray-50);
+}
+
+.no-mappings-card i {
+    font-size: 4rem;
+    color: var(--gray-300);
+    margin-bottom: 1.25rem;
+}
+
+.no-mappings-card h4 {
+    color: var(--gray-700);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.no-mappings-card p {
+    color: var(--gray-500);
+    margin: 0.25rem 0;
+}
+
+.no-mappings-card .small {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+}
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.badge i {
+    font-size: 0.75em;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .mapping-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mapping-header .badges-row {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .mapping-header .meta-badges {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .college-table {
+        font-size: 0.8125rem;
+    }
+
+    .college-table .college-name {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .search-bar,
+    .page-header,
+    .stats-row {
+        display: none !important;
+    }
+
+    .colleges-container {
+        max-height: none;
+        overflow: visible;
+        border: 1px solid #000;
+    }
+
+    .mapping-header {
+        border-radius: 0;
+        background: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .college-table thead th {
+        background: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #3b82f6;
+        --primary-light: #60a5fa;
+        --primary-dark: #2563eb;
+        --light: #1e293b;
+        --dark: #f8fafc;
+        --gray-100: #1e293b;
+        --gray-200: #334155;
+        --gray-300: #475569;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #94a3b8;
+        --gray-700: #e2e8f0;
+        --gray-800: #f1f5f9;
+        --gray-900: #f8fafc;
+    }
+
+    .user-info-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-color: #334155;
+    }
+
+    .stat-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .mapping-header {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .colleges-container {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .colleges-container .search-bar {
+        background: #0f172a;
+        border-color: #334155;
+    }
+
+    .colleges-container .search-input {
+        background: #334155;
+        border-color: #475569;
+        color: #f1f5f9;
+    }
+
+    .colleges-container .search-input:focus {
+        border-color: var(--primary);
+    }
+
+    .college-table thead th {
+        background: #0f172a;
+        border-color: #334155;
+        color: #94a3b8;
+    }
+
+    .college-table tbody tr {
+        border-color: #334155;
+    }
+
+    .college-table tbody tr:hover {
+        background: #334155;
+    }
+
+    .college-table .college-code {
+        background: #334155;
+        color: #93c5fd;
+    }
+
+    .college-table .college-name {
+        color: #f8fafc;
+    }
+
+    .college-table .college-town {
+        color: #94a3b8;
+    }
+
+    .no-mappings-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .empty-state {
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        color: #475569;
+    }
+
+    .empty-state h4 {
+        color: #e2e8f0;
+    }
+
+    .empty-state .small {
+        color: #64748b;
+    }
+
+    .mapping-header .meta-badges .badge {
+        background: #334155;
+        color: #e2e8f0;
+        border-color: #475569;
+    }
+}
+
+/* Focus Visible for Accessibility */
+*:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ==========================================================
+   THEME SUPPORT - Uses global theme variables
+   Add this at the END of mappinguser.css
+========================================================== */
+
+.page-header h1,
+.container h1,
+.mapping-header strong,
+.stat-number,
+.college-name {
+    color: var(--text-primary) !important;
+}
+
+.page-header p,
+.stat-label,
+.college-town,
+.text-muted,
+small {
+    color: var(--text-tertiary) !important;
+}
+
+/* Cards */
+.card,
+.stat-card,
+.mapping-header,
+.colleges-container,
+.no-mappings {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+    /* Search section */
+    .colleges-container > .p-3 {
+        background: var(--bg-secondary) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+
+/* Search box */
+.college-search {
+    background: var(--input-bg) !important;
+    color: var(--input-text) !important;
+    border-color: var(--input-border) !important;
+}
+
+    .college-search::placeholder {
+        color: var(--input-placeholder) !important;
+    }
+
+    .college-search:focus {
+        background: var(--input-bg) !important;
+        color: var(--input-text) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px var(--input-focus) !important;
+    }
+
+/* Table */
+.college-table {
+    color: var(--text-secondary) !important;
+}
+
+    .college-table thead th,
+    .table-light th,
+    .table-light td {
+        background: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .college-table tbody td {
+        background: var(--bg-card) !important;
+        color: var(--text-secondary) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .college-table tbody tr:hover td {
+        background: var(--bg-hover) !important;
+    }
+
+/* College Code */
+.college-code {
+    background: var(--bg-tertiary) !important;
+    color: var(--primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+/* College Name */
+.college-name {
+    color: var(--text-primary) !important;
+}
+
+/* College Town */
+.college-town {
+    color: var(--text-tertiary) !important;
+}
+
+/* Empty State */
+.no-mappings,
+.empty-state {
+    background: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+}
+
+    .empty-state h4,
+    .no-mappings h4 {
+        color: var(--text-primary) !important;
+    }
+
+    .empty-state p,
+    .no-mappings p {
+        color: var(--text-tertiary) !important;
+    }
+
+    .empty-state i,
+    .no-mappings i {
+        color: var(--text-muted) !important;
+    }
+
+/* Bootstrap utility overrides */
+.bg-light {
+    background: var(--bg-secondary) !important;
+}
+
+.border-bottom {
+    border-bottom-color: var(--border-color) !important;
+}
+
+.sticky-top {
+    background: var(--bg-secondary) !important;
+}

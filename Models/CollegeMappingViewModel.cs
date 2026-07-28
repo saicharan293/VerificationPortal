@@ -123,4 +123,18 @@ namespace VerificationPortal.Models
         public string Name { get; set; } = "";
         public string DisplayText => $"{Code} - {Name}";
     }
+
+    // View model for user's own college mappings view
+    public class CollegeMappingWithCollegesViewModel
+    {
+        public TblCollegeMapping Mapping { get; set; } = null!;
+        public string FacultyName { get; set; } = "";
+        public string UserDesignation { get; set; } = "";
+        public List<AffiliationCollegeMaster> Colleges { get; set; } = new();
+        public int CollegeCount { get; set; }
+        public string FromLetter { get; set; } = "";
+        public string ToLetter { get; set; } = "";
+        public string CollegeFromCode { get; set; } = "";
+        public string CollegeToCode { get; set; } = "";
+    }
 }

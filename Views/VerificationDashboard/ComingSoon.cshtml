@@ -1,0 +1,196 @@
+@model VerificationPortal.Models.AffInstitutionsDetail
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = (ViewBag.TabTitle ?? "Section") + " - Verification Dashboard";
+    ViewData["ActiveTab"] = ViewBag.ActiveTab ?? "ComingSoon";
+    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
+    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
+    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = false; // No feedback form for coming soon pages
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/verification-dashboard.css" asp-append-version="true" />
+}
+
+@{
+    ViewBag.ActiveTab = ViewBag.ActiveTab ?? "ComingSoon";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="@(ViewBag.TabIcon ?? "bi-clock")"></i>
+        @(ViewBag.TabTitle ?? "Section")
+    </h1>
+    <span class="badge bg-info fs-6 px-3 py-2 align-self-center">Coming Soon</span>
+</div>
+
+<!-- Note Box -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Section Under Development</h6>
+        <p>This verification section (<strong>@ViewBag.TabTitle</strong>) is currently under development.
+        The detailed verification forms and data models for this section will be implemented in the next phase.
+        You can navigate to other available sections using the sidebar on the left.</p>
+    </div>
+</div>
+
+<div class="verification-card mb-4">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-lightning-charge"></i>
+            What's Planned for This Section
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        @switch (ViewBag.ActiveTab)
+        {
+            case "Courses":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Course details (UG/PG/PhD)</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Sanctioned intake per course</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Actual admission numbers</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Course recognition status</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Fee structure per course</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Affiliation type (permanent/temporary)</li>
+                </ul>
+                break;
+            case "Infrastructure":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Land details & ownership</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Building details (blocks, floors, rooms)</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Classrooms, labs, library, seminar halls</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Hostel facilities (boys/girls)</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Sports & recreational facilities</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Fire safety & emergency exits</li>
+                </ul>
+                break;
+            case "Faculty":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Teaching faculty list with qualifications</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Faculty-student ratio verification</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Experience & publications</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Non-teaching staff details</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Salary structure verification</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Faculty development programs</li>
+                </ul>
+                break;
+            case "Clinical":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Hospital bed strength & occupancy</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> OPD/IPD patient statistics</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Department-wise clinical material</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Operation theater details</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Equipment & diagnostic facilities</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Emergency & critical care</li>
+                </ul>
+                break;
+            case "Admin":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Governing body & management details</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Committee compositions (IQAC, Anti-ragging, etc.)</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Academic calendar & examination system</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Student grievance redressal</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Research & innovation activities</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> MOUs & collaborations</li>
+                </ul>
+                break;
+            case "Finance":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Audited financial statements</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Fee collection & utilization</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Scholarship & fee concession details</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Corpus fund & endowment details</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Budget allocation per department</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Financial compliance certificates</li>
+                </ul>
+                break;
+            case "Documents":
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> AICTE/NMC/UGC approval letters</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Affiliation certificates</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Land & building documents</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Faculty appointment letters</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> Equipment purchase bills</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i> All regulatory compliance docs</li>
+                </ul>
+                break;
+            default:
+                <ul class="planned-features">
+                    <li><i class="bi bi-check-circle text-success me-2"></i> This section is planned for future development</li>
+                </ul>
+                break;
+        }
+    </div>
+</div>
+
+<div class="verification-card">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-arrow-left-circle"></i>
+            Navigation
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="d-flex flex-wrap gap-2">
+            @if (ViewBag.ActiveTab != "Institution")
+            {
+                <a asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-building"></i> Institution Details
+                </a>
+            }
+            @if (ViewBag.ActiveTab != "TrustDetails")
+            {
+                <a asp-controller="VerificationDashboard" asp-action="TrustDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-building"></i> Trust Details
+                </a>
+            }
+            @if (ViewBag.ActiveTab != "TrustMemberDetails")
+            {
+                <a asp-controller="VerificationDashboard" asp-action="TrustMemberDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-people"></i> Trust Member Details
+                </a>
+            }
+            @if (ViewBag.ActiveTab != "DeanDirectorDetails")
+            {
+                <a asp-controller="VerificationDashboard" asp-action="DeanDirectorDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-person-badge"></i> Dean / Director Details
+                </a>
+            }
+            @if (ViewBag.ActiveTab != "PrincipalDetails")
+            {
+                <a asp-controller="VerificationDashboard" asp-action="PrincipalDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-mortarboard"></i> Principal Details
+                </a>
+            }
+            @* <a asp-controller="MyColleges" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to My Colleges
+            </a> *@
+        </div>
+    </div>
+</div>
+
+<style>
+    .planned-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .planned-features li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+    }
+    .planned-features li:last-child {
+        border-bottom: none;
+    }
+    .planned-features i {
+        font-size: 1.1rem;
+    }
+</style>

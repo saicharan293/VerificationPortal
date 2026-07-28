@@ -14,6 +14,7 @@
     --text-secondary: #334155;
     --text-tertiary: #64748b;
     --text-muted: #94a3b8;
+    --text-danger: red;
     /* Borders */
     --border-color: #e2e8f0;
     --border-light: #f1f5f9;
@@ -58,6 +59,7 @@
     --text-secondary: #e2e8f0;
     --text-tertiary: #cbd5e1;
     --text-muted: #94a3b8;
+    --text-danger: red;
     /* Borders */
     --border-color: #334155;
     --border-light: #1e293b;
@@ -141,6 +143,10 @@
 
 [data-theme="dark"] .theme-toggle .moon-icon {
     display: none;
+}
+
+.text-danger{
+    color: var(--text-danger) !important;
 }
 
 /* Animated switch style */
@@ -236,19 +242,13 @@ body {
         color: var(--text-secondary) !important;
         border-color: var(--border-color) !important;
     }
+
+    .id-name{
+        color: var(--text-tertiary) !important;
+    }
+
     /* Headings */
-    h1, h2, h3, h4, h5, h6,
-    .section-title,
-    .welcome-name,
-    .brand-title-large,
-    .info-value,
-    .stat-number,
-    .login-header h3,
-    .card-header-dash h5,
-    .card-body-dash h5,
-    .notice-content h6,
-    .brand-title,
-    .navbar-brand .brand-title {
+    h1, h2, h3, h4, h5, h6, .section-title, .welcome-name, .brand-title-large, .info-value, .stat-number, .login-header h3, .card-header-dash h5, .card-body-dash h5, .notice-content h6, .brand-title, .navbar-brand .brand-title {
         color: var(--text-primary) !important;
     }
     /* Paragraphs */

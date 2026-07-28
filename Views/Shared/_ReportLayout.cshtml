@@ -1,0 +1,485 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Karnataka Affiliation Verification Portal - Verification Report" />
+    <meta name="theme-color" content="#1e40af" />
+    <title>@ViewData["Title"] - Karnataka Affiliation Verification Portal</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/report-layout.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="report-body">
+    @* ==================== NAVBAR ==================== *@
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- Authenticated User Navbar -->
+        <nav class="navbar navbar-expand-lg sticky-top report-navbar auth-navbar">
+            <div class="container-fluid">
+                <!-- Brand Logo -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <div class="brand-wrapper">
+                        <div class="brand-logo">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">Karnataka Affiliation</span>
+                            <span class="brand-subtitle">Verification Portal</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#authNavbar" aria-controls="authNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse" id="authNavbar">
+                    <ul class="navbar-nav me-auto align-items-lg-center gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+
+                        @* ==================== ADMIN ONLY LINKS ==================== *@
+                        @if (User.IsInRole("Admin") || User.IsInRole("ViceChancellor") || User.IsInRole("Director"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-shield-lock-fill"></i> Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Index">
+                                            <i class="bi bi-diagram-3"></i> College Mappings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Create">
+                                            <i class="bi bi-plus-circle"></i> New Assignment
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="AssignByRange">
+                                            <i class="bi bi-rulers"></i> Assign by Range
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-people-fill"></i> Manage Users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-gear-fill"></i> System Settings
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @* ==================== COMMON LINKS ==================== *@
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="MyColleges" asp-action="Index">
+                                <i class="bi bi-building"></i> My Colleges
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-file-earmark-text"></i> Reports
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                        <!-- Theme Toggle Button -->
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                            <i class="bi bi-moon-fill moon-icon"></i>
+                            <i class="bi bi-sun-fill sun-icon"></i>
+                        </button>
+
+                        <!-- User Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-user-dropdown dropdown-toggle d-flex align-items-center gap-2 p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle fs-4"></i>
+                                <div class="user-info-text d-none d-md-block text-start">
+                                    <strong>@User.Identity.Name</strong>
+                                    <small class="d-block">@User.FindFirst("Designation")?.Value</small>
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="MyColleges" asp-action="Index">
+                                        <i class="bi bi-building me-2"></i> My Colleges
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Dashboard" asp-action="Profile">
+                                        <i class="bi bi-person-lines-fill me-2"></i> Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" asp-antiforgery="true" method="post" class="d-inline">
+                                        <button type="submit" class="dropdown-item text-danger" style="width: 100%; text-align: left; background: none; border: none; padding: 0.5rem 1rem;">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    }
+    else
+    {
+        <!-- Public/Guest Navbar -->
+        <nav class="navbar navbar-expand-lg sticky-top report-navbar custom-navbar">
+            <div class="container-fluid">
+                <!-- Brand Logo -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <div class="brand-wrapper">
+                        <div class="brand-logo">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">Karnataka Affiliation</span>
+                            <span class="brand-subtitle">Verification Portal</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse" id="publicNavbar">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#verify">
+                                <i class="bi bi-search"></i> Verify
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#faculties">
+                                <i class="bi bi-mortarboard"></i> Faculties
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#stats">
+                                <i class="bi bi-graph-up"></i> Statistics
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2 ms-lg-3 mt-2 mt-lg-0">
+                        <!-- Theme Toggle Button -->
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                            <i class="bi bi-moon-fill moon-icon"></i>
+                            <i class="bi bi-sun-fill sun-icon"></i>
+                        </button>
+
+                        <!-- Login Button -->
+                        <a class="btn btn-login" asp-controller="Account" asp-action="Login">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    }
+
+    @* ==================== REPORT HEADER ==================== *@
+    @if (!string.IsNullOrEmpty(ViewData["InstitutionName"]?.ToString()))
+    {
+        <header class="report-header" data-aos="fade-down" data-aos-duration="600">
+            <div class="container-fluid">
+                <div class="report-header-content">
+                    <div class="report-header-left">
+                        <div class="report-badge">
+                            <i class="bi bi-file-earmark-check"></i>
+                            <span>Verification Report</span>
+                        </div>
+                        <h1 class="report-title">@ViewData["Title"]</h1>
+                        @if (!string.IsNullOrEmpty(ViewData["Subtitle"]?.ToString()))
+                        {
+                            <p class="report-subtitle">@ViewData["Subtitle"]</p>
+                        }
+                    </div>
+                    <div class="report-header-right">
+                        <div class="institution-badge">
+                            <div class="institution-info">
+                                <div class="institution-name">@ViewData["InstitutionName"]</div>
+                                <div class="institution-meta">
+                                    @if (!string.IsNullOrEmpty(ViewData["CollegeCode"]?.ToString()))
+                                    {
+                                        <span class="meta-item">
+                                            <i class="bi bi-hash"></i> Code: @ViewData["CollegeCode"]
+                                        </span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ViewData["FacultyName"]?.ToString()))
+                                    {
+                                        <span class="meta-item">
+                                            <i class="bi bi-mortarboard"></i> @ViewData["FacultyName"]
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                            @if (ViewData["VerificationStatus"] != null)
+                            {
+                                <span class="status-badge @ViewData["StatusBadgeClass"]">@ViewData["VerificationStatus"]</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    }
+
+    @* ==================== PROGRESS STEPPER ==================== *@
+    @if (ViewData["ShowProgressStepper"] != null && (bool)ViewData["ShowProgressStepper"] && ViewData["ProgressSteps"] is List<ProgressStep> steps)
+    {
+        <nav class="progress-stepper" aria-label="Verification progress" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+            <div class="container-fluid">
+                <ol class="stepper-list">
+                    @for (int i = 0; i < steps.Count; i++)
+                    {
+                        var step = steps[i];
+                        var isLast = i == steps.Count - 1;
+                        <li class="stepper-item @step.Status">
+                            <div class="stepper-marker" style="--step-color: @step.Color;">
+                                <span class="stepper-number">@(i + 1)</span>
+                                <i class="bi @step.Icon stepper-icon"></i>
+                            </div>
+                            <div class="stepper-content">
+                                <span class="stepper-label">@step.Label</span>
+                                <span class="stepper-status">@step.StatusText</span>
+                            </div>
+                            @if (!isLast)
+                            {
+                                <div class="stepper-connector"></div>
+                            }
+                        </li>
+                    }
+                </ol>
+            </div>
+        </nav>
+    }
+
+    @* ==================== MAIN CONTENT ==================== *@
+    <main class="report-main" role="main">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </main>
+
+    @* ==================== FEEDBACK & STATUS SECTION ==================== *@
+    @if (ViewData["ShowFeedbackSection"] != null && (bool)ViewData["ShowFeedbackSection"])
+    {
+        <section class="feedback-section" data-aos="fade-up" data-aos-duration="600">
+            <div class="container-fluid">
+                <div class="feedback-card">
+                    <div class="feedback-header">
+                        <h2 class="feedback-title">
+                            <i class="bi bi-clipboard-check"></i>
+                            Verification Feedback & Status
+                        </h2>
+                        @if (ViewData["CurrentVerifier"] != null)
+                        {
+                            <div class="verifier-info">
+                                <i class="bi bi-person-badge"></i>
+                                <span>@ViewData["CurrentVerifier"]</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="feedback-body">
+                        @if (ViewData["ShowFeedbackForm"] != null && (bool)ViewData["ShowFeedbackForm"])
+                        {
+                            <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>
+                                <input type="hidden" name="collegeCode" value="@ViewData["CollegeCode"]" />
+                                <input type="hidden" name="tabName" value="@ViewData["ActiveTab"]" />
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label" for="remarks">Remarks <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="remarks" name="remarks" rows="4" required
+                                                  placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes."></textarea>
+                                        <div class="form-text">Please provide detailed remarks for your verification decision.</div>
+                                        <div class="invalid-feedback">Remarks are required for verification.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="status">Verification Status <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="status" name="status" required>
+                                            <option value="">-- Select Status --</option>
+                                            <option value="accept">Accept</option>
+                                            <option value="reject">Reject</option>
+                                            <option value="pending">Pending Review</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a verification status.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="verificationLevel">Verification Level</label>
+                                        <select class="form-select" id="verificationLevel" name="verificationLevel">
+                                            <option value="">-- Select Level --</option>
+                                            <option value="DEO">DEO (District Education Officer)</option>
+                                            <option value="JR">JR (Joint Registrar)</option>
+                                            <option value="SO">SO (Section Officer)</option>
+                                            <option value="AR">AR (Assistant Registrar)</option>
+                                            <option value="RG">RG (Registrar)</option>
+                                            <option value="RE">RE (Registrar Evaluation)</option>
+                                            <option value="DR">DR (Director)</option>
+                                            <option value="VC">VC (Vice Chancellor)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="feedback-actions">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-save"></i> Save Verification
+                                    </button>
+                                    @if (ViewData["NextTabAction"] != null)
+                                    {
+                                        <a href="@ViewData["NextTabAction"]" class="btn btn-outline-primary btn-lg">
+                                            <i class="bi bi-arrow-right"></i> @ViewData["NextTabLabel"]
+                                        </a>
+                                    }
+                                    @if (ViewData["PrevTabAction"] != null)
+                                    {
+                                        <a href="@ViewData["PrevTabAction"]" class="btn btn-outline-secondary btn-lg">
+                                            <i class="bi bi-arrow-left"></i> @ViewData["PrevTabLabel"]
+                                        </a>
+                                    }
+                                    @* <a asp-controller="MyColleges" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                        <i class="bi bi-arrow-left"></i> Back to My Colleges
+                                    </a> *@
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            @* Display-only feedback status *@
+                            <div class="feedback-display">
+                                @if (ViewData["ExistingRemarks"] != null)
+                                {
+                                    <div class="feedback-item">
+                                        <label class="feedback-label">Previous Remarks</label>
+                                        <div class="feedback-value">@ViewData["ExistingRemarks"]</div>
+                                    </div>
+                                }
+                                @if (ViewData["ExistingStatus"] != null)
+                                {
+                                    <div class="feedback-item">
+                                        <label class="feedback-label">Previous Status</label>
+                                        <div class="feedback-value">
+                                            <span class="status-badge @ViewData["ExistingStatusClass"]">@ViewData["ExistingStatus"]</span>
+                                        </div>
+                                    </div>
+                                }
+                                @if (ViewData["VerifiedBy"] != null)
+                                {
+                                    <div class="feedback-item">
+                                        <label class="feedback-label">Verified By</label>
+                                        <div class="feedback-value">@ViewData["VerifiedBy"]</div>
+                                    </div>
+                                }
+                                @if (ViewData["VerifiedDate"] != null)
+                                {
+                                    <div class="feedback-item">
+                                        <label class="feedback-label">Verified Date</label>
+                                        <div class="feedback-value">@ViewData["VerifiedDate"]</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    @* ==================== FOOTER ==================== *@
+    <footer class="report-footer">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="text-muted small">&copy; 2025 Karnataka Affiliation Verification Portal</span>
+                <div class="footer-links">
+                    <a href="#" class="text-muted small me-3">Privacy Policy</a>
+                    <a href="#" class="text-muted small me-3">Terms of Use</a>
+                    <a href="#" class="text-muted small">Help</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    @* ==================== SCRIPTS ==================== *@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/report-layout.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Initialize AOS animations
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 600,
+                    easing: 'ease-out-cubic',
+                    once: true,
+                    offset: 50
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+@* ==================== HELPER CLASSES ==================== *@
+@functions {
+    public class ProgressStep
+    {
+        public string Label { get; set; }
+        public string Icon { get; set; }
+        public string Status { get; set; } // pending, active, completed
+        public string StatusText { get; set; }
+        public string Color { get; set; }
+    }
+}

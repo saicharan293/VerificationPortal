@@ -1,0 +1,107 @@
+@model List<VerificationPortal.Models.AffiliationPgSsCourseDetail>
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "PG / Super Specialty Course Details - Verification Dashboard";
+    ViewData["ActiveTab"] = "PgCourseDetails";
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+    ViewData["VerificationStatus"] = "Pending";
+    ViewData["StatusBadgeClass"] = "pending";
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = ViewBag.NextTabAction;
+    ViewData["NextTabLabel"] = ViewBag.NextTabLabel;
+    ViewData["PrevTabAction"] = ViewBag.PrevTabAction;
+    ViewData["PrevTabLabel"] = ViewBag.PrevTabLabel;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/verification-dashboard.css" asp-append-version="true" />
+}
+
+<!-- Note Box -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>Review the PG / Super Specialty course details below including intake, LOP, recognition by NMC/DCI, and course codes. Provide your remarks and select verification status. Once completed, proceed to the next tab: <strong>Infrastructure</strong>.</p>
+    </div>
+</div>
+
+<!-- PG/SS Courses Table Card -->
+<div class="verification-card mb-4">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-mortarboard"></i>
+            PG / Super Specialty Course Details
+        </h3>
+        <span class="badge bg-primary ms-2">@Model?.Count ?? 0 Courses</span>
+    </div>
+    <div class="verification-card-body">
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Type of Affiliation</th>
+                            <th>Course Level</th>
+                            <th>Course Prefix</th>
+                            <th>Present Intake</th>
+                            <th>RGUHS Intake</th>
+                            <th>LOP Date</th>
+                            <th>Recognition by NMC</th>
+                            <th>Recognition by DCI</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var course = Model[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td><code>@course.CourseCode</code></td>
+                                <td><strong>@course.CourseName</strong></td>
+                                <td><span class="badge bg-secondary">@course.TypeOfAffiliation</span></td>
+                                <td>
+                                    @{
+                                        var levelBadge = course.CourseLevel switch
+                                        {
+                                            "SS" => "bg-danger",
+                                            "PG" => "bg-warning text-dark",
+                                            _ => "bg-info text-dark"
+                                        };
+                                    }
+                                    <span class="badge @levelBadge">@course.CourseLevel</span>
+                                </td>
+                                <td>@course.CoursePrefix</td>
+                                <td>@course.PresentIntake</td>
+                                <td>@course.RguhsIntake</td>
+                                <td>@(course.Lopdate?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td>@(course.DateofRecognitionByNmc?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td>@(course.DateofRecognitionByDci?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td>@course.CreatedAt.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center py-4">
+                <i class="bi bi-database fs-1 d-block mb-2 opacity-50"></i>
+                <strong>No PG/SS course data found</strong> for this college.
+                <p class="mb-0 text-muted">PG / Super Specialty courses will appear here when available in the AffiliationPgSsCourseDetails table.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Verification Remarks & Status (rendered by layout) -->

@@ -1,0 +1,169 @@
+@model List<VerificationPortal.Models.ContinuationTrustMemberDetail>
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Trust Member Details - Verification Dashboard";
+    ViewData["ActiveTab"] = "TrustMemberDetails";
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["VerificationStatus"] = "Pending";
+    ViewData["StatusBadgeClass"] = "pending";
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = Url.Action("DeanDirectorDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+    ViewData["NextTabLabel"] = "Next: Dean / Director Details";
+    ViewData["PrevTabAction"] = Url.Action("TrustDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+    ViewData["PrevTabLabel"] = "Previous: Trust Details";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/verification-dashboard.css" asp-append-version="true" />
+}
+
+@{
+    ViewBag.ActiveTab = "TrustMemberDetails";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-people"></i>
+        Trust Member Details
+    </h1>
+    <p class="text-muted mb-0">Review and verify trust member information for this institution</p>
+</div>
+
+<!-- Note Box -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>Review the trust member details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, you can proceed to the next tab: <strong>Dean / Director Details</strong>.</p>
+    </div>
+</div>
+
+    <div class="verification-card mb-4">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-people"></i>
+                Trust Members
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Member Name</th>
+                                <th>Designation</th>
+                                <th>Qualification</th>
+                                <th>Mobile Number</th>
+                                <th>Age</th>
+                                <th>Joining Date</th>
+                                <th>Verification Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var member in Model)
+                            {
+                                <tr>
+                                    <td>@member.SlNo</td>
+                                    <td>@member.TrustMemberName</td>
+                                    <td>@member.Designation</td>
+                                    <td>@member.Qualification</td>
+                                    <td>@member.MobileNumber</td>
+                                    <td>@(member.Age?.ToString() ?? "-")</td>
+                                    <td>@(member.JoiningDate?.ToString("dd MMM yyyy") ?? "-")</td>
+                                    <td>
+                                        @{
+                                            var statusBadge = GetVerificationStatusBadge(member);
+                                            @Html.Raw(statusBadge)
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No trust member records found for this institution.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Verification Remarks & Status -->
+    <div class="verification-card mb-4">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-clipboard-check"></i>
+                Verification Remarks & Status
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Remarks <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="remarks" rows="4" required
+                              placeholder="Enter your verification remarks for Trust Member Details..."></textarea>
+                    <div class="form-text">Please provide detailed remarks for your verification decision.</div>
+                    <div class="invalid-feedback">Remarks are required for verification.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Verification Status <span class="text-danger">*</span></label>
+                    <select class="form-select" name="status" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="accept">Accept</option>
+                        <option value="reject">Reject</option>
+                        <option value="pending">Pending Review</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a verification status.</div>
+                </div>
+            </div>
+
+            <div class="verification-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Verification
+                </button>
+                <a asp-controller="VerificationDashboard" asp-action="DeanDirectorDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-right"></i> Next: Dean / Director Details
+                </a>
+                <a asp-controller="VerificationDashboard" asp-action="TrustDetails" asp-route-collegeCode="@ViewBag.CollegeCode" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Previous: Trust Details
+                </a>
+            </div>
+        </div>
+    </div>
+
+@functions {
+    private string GetVerificationStatusBadge(VerificationPortal.Models.ContinuationTrustMemberDetail member)
+    {
+        // Check the highest verification level
+        if (member.IsVcVerified == true) return "<span class=\"badge bg-success\"><i class=\"bi bi-check-circle me-1\"></i>VC Verified</span>";
+        if (member.IsDrVerified == true) return "<span class=\"badge bg-primary\"><i class=\"bi bi-check-circle me-1\"></i>Director Verified</span>";
+        if (member.IsReVerified == true) return "<span class=\"badge bg-info\"><i class=\"bi bi-check-circle me-1\"></i>Registrar Eval Verified</span>";
+        if (member.IsRgVerified == true) return "<span class=\"badge bg-info\"><i class=\"bi bi-check-circle me-1\"></i>Registrar Verified</span>";
+        if (member.IsArVerified == true) return "<span class=\"badge bg-secondary\"><i class=\"bi bi-check-circle me-1\"></i>AR Verified</span>";
+        if (member.IsSoVerified == true) return "<span class=\"badge bg-warning text-dark\"><i class=\"bi bi-check-circle me-1\"></i>SO Verified</span>";
+        if (member.IsJrVerified == true) return "<span class=\"badge bg-warning text-dark\"><i class=\"bi bi-check-circle me-1\"></i>JR Verified</span>";
+        if (member.IsDeoVerified == true) return "<span class=\"badge bg-warning text-dark\"><i class=\"bi bi-check-circle me-1\"></i>DEO Verified</span>";
+
+        if (member.IsDeoVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by DEO</span>";
+        if (member.IsJrVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by JR</span>";
+        if (member.IsSoVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by SO</span>";
+        if (member.IsArVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by AR</span>";
+        if (member.IsRgVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by Registrar</span>";
+        if (member.IsReVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by Registrar Eval</span>";
+        if (member.IsDrVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by Director</span>";
+        if (member.IsVcVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by VC</span>";
+
+        return "<span class=\"badge bg-secondary\"><i class=\"bi bi-hourglass-split me-1\"></i>Pending</span>";
+    }
+}

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
-using VerificationPortal.Models.ViewModels;
+using System.Security.Claims;
 
 namespace VerificationPortal.Controllers
 {
@@ -328,6 +328,88 @@ namespace VerificationPortal.Controllers
                 $"Successfully assigned {collegesInRange.Count} colleges ({model.CollegeFrom}-{model.CollegeTo}) to {user.UserName}.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /CollegeMapping/MyMappings
+        // For regular users to view their own college mappings
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> MyMappings()
+        {
+            // Get current user's ID from claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return RedirectToAction("Login", "Account");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // Get the user details
+            var user = await _context.TblRguhsFacultyUsers
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return NotFound("User not found");
+
+            // Get all mappings for this user
+            var mappings = await _context.TblCollegeMappings
+                .Include(m => m.FacultyCodeNavigation)
+                .Where(m => m.UserId == user.UserId && m.IsActive == true)
+                .ToListAsync();
+
+            if (!mappings.Any())
+            {
+                ViewBag.Message = "No college mappings assigned to you.";
+                return View(new List<CollegeMappingWithCollegesViewModel>());
+            }
+
+            // For each mapping, get the colleges in the assigned range
+            var result = new List<CollegeMappingWithCollegesViewModel>();
+
+            foreach (var mapping in mappings)
+            {
+                var faculty = await _context.Faculties
+                    .FirstOrDefaultAsync(f => f.FacultyId == mapping.FacultyCode);
+
+                // Get colleges in the assigned range (using CollegeFrom and CollegeTo as code range)
+                var colleges = await _context.AffiliationCollegeMasters
+                    .Where(c => c.FacultyCode == mapping.FacultyCode.ToString()
+                             && c.Status == true
+                             && c.CollegeCode != null)
+                    .OrderBy(c => c.CollegeCode)
+                    .ToListAsync();
+
+                // Filter colleges within the code range
+                var fromCode = mapping.CollegeFrom?.ToUpper().Trim() ?? "";
+                var toCode = mapping.CollegeTo?.ToUpper().Trim() ?? "";
+
+                var collegesInRange = colleges
+                    .Where(c =>
+                    {
+                        var code = c.CollegeCode?.ToUpper().Trim() ?? "";
+                        return string.Compare(code, fromCode, StringComparison.OrdinalIgnoreCase) >= 0
+                            && string.Compare(code, toCode, StringComparison.OrdinalIgnoreCase) <= 0;
+                    })
+                    .ToList();
+
+                result.Add(new CollegeMappingWithCollegesViewModel
+                {
+                    Mapping = mapping,
+                    FacultyName = faculty?.FacultyName ?? "Unknown Faculty",
+                    UserDesignation = user.DesignationDescription ?? "",
+                    Colleges = collegesInRange,
+                    CollegeCount = collegesInRange.Count,
+                    FromLetter = mapping.FromLetter,
+                    ToLetter = mapping.ToLetter,
+                    CollegeFromCode = mapping.CollegeFrom,
+                    CollegeToCode = mapping.CollegeTo
+                });
+            }
+
+            ViewBag.UserName = user.UserName;
+            ViewBag.UserDesignation = user.DesignationDescription;
+            ViewBag.FacultyId = user.Faculty;
+
+            return View(result);
         }
 
         // GET: /CollegeMapping/Edit/5

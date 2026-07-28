@@ -108,8 +108,8 @@
 
                         @* ==================== COMMON LINKS ==================== *@
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-building"></i> Colleges
+                            <a class="nav-link" asp-controller="MyColleges" asp-action="Index">
+                                <i class="bi bi-building"></i> My Colleges
                             </a>
                         </li>
                         <li class="nav-item">
@@ -126,22 +126,36 @@
                             <i class="bi bi-sun-fill sun-icon"></i>
                         </button>
 
-                        <!-- User Info Display -->
-                        <div class="user-info-nav">
-                            <i class="bi bi-person-circle"></i>
-                            <div class="user-info-text">
-                                <strong>@User.Identity.Name</strong>
-                                <small>@User.FindFirst("Designation")?.Value</small>
-                            </div>
-                        </div>
-
-                        <!-- Logout Form -->
-                        <form asp-controller="Account" asp-action="Logout" asp-antiforgery="true" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-logout-nav" title="Logout">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span class="d-none d-md-inline">Logout</span>
+                        <!-- User Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-user-dropdown dropdown-toggle d-flex align-items-center gap-2 p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle fs-4"></i>
+                                <div class="user-info-text d-none d-md-block text-start">
+                                    <strong class="id-name">@User.Identity.Name</strong>
+                                    <small class="d-block">@User.FindFirst("Designation")?.Value</small>
+                                </div>
                             </button>
-                        </form>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="MyColleges" asp-action="Index">
+                                        <i class="bi bi-building me-2"></i> My Colleges
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Dashboard" asp-action="Profile">
+                                        <i class="bi bi-person-lines-fill me-2 id-name"></i> Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" asp-antiforgery="true" method="post" class="d-inline">
+                                        <button type="submit" class="dropdown-item text-danger" style="width: 100%; text-align: left; background: none; border: none; padding: 0.5rem 1rem;">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,139 @@
+@model VerificationPortal.Models.AffInstitutionsDetail
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Principal Details - Verification Dashboard";
+    ViewData["ActiveTab"] = "PrincipalDetails";
+    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
+    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
+    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = Url.Action("Courses", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
+    ViewData["NextTabLabel"] = "Next: Courses & Intake";
+    ViewData["PrevTabAction"] = Url.Action("DeanDirectorDetails", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
+    ViewData["PrevTabLabel"] = "Previous: Dean / Director Details";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/verification-dashboard.css" asp-append-version="true" />
+}
+
+@{
+    ViewBag.ActiveTab = "PrincipalDetails";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-mortarboard"></i>
+        Principal Details
+    </h1>
+    <p class="text-muted mb-0">Review and verify Principal information for this institution</p>
+</div>
+
+<!-- Note Box -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>Review the Principal details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, proceed to the next tab: <strong>Courses & Intake</strong>.</p>
+    </div>
+</div>
+
+    <div class="verification-card mb-4">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-mortarboard"></i>
+                Principal Information
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Principal Name</label>
+                    <input type="text" class="form-control" value="@Model.PrincipalName" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Principal Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.PrincipalMobileNumber" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Principal Email ID</label>
+                    <input type="email" class="form-control" value="@Model.PrincipalEmailId" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dean Name</label>
+                    <input type="text" class="form-control" value="@Model.DeanName" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dean Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.DeanMobileNumber" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dean Email ID</label>
+                    <input type="email" class="form-control" value="@Model.DeanEmailId" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Head of Institution</label>
+                    <input type="text" class="form-control" value="@Model.HeadOfInstitution" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Head Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionMobNo" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Head Email</label>
+                    <input type="email" class="form-control" value="@Model.HeadOfInstitutionEmail" disabled />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Head Address</label>
+                    <textarea class="form-control" rows="2" disabled>@Model.HeadAddress</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="verification-card mb-4">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-clipboard-check"></i>
+                Verification Remarks & Status
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Remarks <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="remarks" rows="4" required
+                              placeholder="Enter your verification remarks for Principal Details..."></textarea>
+                    <div class="form-text">Please provide detailed remarks for your verification decision.</div>
+                    <div class="invalid-feedback">Remarks are required for verification.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Verification Status <span class="text-danger">*</span></label>
+                    <select class="form-select" name="status" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="accept">Accept</option>
+                        <option value="reject">Reject</option>
+                        <option value="pending">Pending Review</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a verification status.</div>
+                </div>
+            </div>
+
+            <div class="verification-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Verification
+                </button>
+                <a asp-controller="VerificationDashboard" asp-action="Courses" asp-route-collegeCode="@Model.CollegeCode" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-right"></i> Next: Courses & Intake
+                </a>
+                <a asp-controller="VerificationDashboard" asp-action="DeanDirectorDetails" asp-route-collegeCode="@Model.CollegeCode" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Previous: Dean / Director Details
+                </a>
+            </div>
+        </div>
+    </div>

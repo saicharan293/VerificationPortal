@@ -1,0 +1,128 @@
+@model List<VerificationPortal.Models.AffiliationCourseDetail>
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "UG Course Details - Verification Dashboard";
+    ViewData["ActiveTab"] = "UgCourseDetails";
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+    ViewData["VerificationStatus"] = "Pending";
+    ViewData["StatusBadgeClass"] = "pending";
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = ViewBag.NextTabAction;
+    ViewData["NextTabLabel"] = ViewBag.NextTabLabel;
+    ViewData["PrevTabAction"] = ViewBag.PrevTabAction;
+    ViewData["PrevTabLabel"] = ViewBag.PrevTabLabel;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/verification-dashboard.css" asp-append-version="true" />
+}
+
+<!-- Note Box -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>Review the UG course details below including sanctioned intake, LOP, recognition, EC/FC, affiliations, and inspections. Provide your remarks and select verification status. Once completed, proceed to the next tab: <strong>PG / Super Specialty Course Details</strong>.</p>
+    </div>
+</div>
+
+<!-- UG Courses Table Card -->
+<div class="verification-card mb-4">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-book"></i>
+            UG Course Details
+        </h3>
+        <span class="badge bg-primary ms-2">@Model?.Count ?? 0 Courses</span>
+    </div>
+    <div class="verification-card-body">
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Course ID</th>
+                            <th>Course Name</th>
+                            <th>Intake 2025-26</th>
+                            <th>Intake Slab</th>
+                            <th>Permission Type</th>
+                            <th>Year of LOP</th>
+                            <th>LOP Renewal (GOI/MCI)</th>
+                            <th>Sanctioned Intake</th>
+                            <th>Date of Recognition</th>
+                            <th>Year of EC/FC</th>
+                            <th>EC/FC Sanctioned Intake</th>
+                            <th>Last Affiliation (RGUHS)</th>
+                            <th>Sanctioned Intake (Last Affiliation)</th>
+                            <th>Previous LIC Inspection</th>
+                            <th>Action on Deficiencies</th>
+                            <th>Documents</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var course = Model[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@course.CourseId</td>
+                                <td><strong>@course.CourseName</strong></td>
+                                <td>@course.IntakeDuring202526</td>
+                                <td>@course.IntakeSlab</td>
+                                <td><span class="badge bg-info text-dark">@course.Typeofpermission</span></td>
+                                <td>@(course.YearofLop?.ToString("yyyy") ?? "-")</td>
+                                <td>@course.DateOfLoprenewalGoimci</td>
+                                <td>@course.SanctionedIntakePermission</td>
+                                <td>@course.Dateofrecognition</td>
+                                <td>@(course.YearofObtainingEcandFc?.ToString("yyyy") ?? "-")</td>
+                                <td>@course.SannctionedIntakeEcFc</td>
+                                <td>@course.YearOfLastAffiliationRguhs</td>
+                                <td>@course.SanctionedIntakeLastAffiliation</td>
+                                <td>@(course.DateOfPreviousLicinspection?.ToString("dd MMM yyyy") ?? "-")</td>
+                                <td class="text-truncate" style="max-width: 200px;" title="@course.ActionTakenOnDeficiencies">@course.ActionTakenOnDeficiencies</td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        @if (!string.IsNullOrEmpty(course.GokorderPath))
+                                        {
+                                            <a href="@course.GokorderPath" class="btn btn-sm btn-outline-primary" target="_blank" title="GOK Order">
+                                                <i class="bi bi-file-earmark-text"></i> GOK Order
+                                            </a>
+                                        }
+                                        @if (!string.IsNullOrEmpty(course.PreviousNotificationFilesPath))
+                                        {
+                                            <a href="@course.PreviousNotificationFilesPath" class="btn btn-sm btn-outline-secondary" target="_blank" title="Previous Notifications">
+                                                <i class="bi bi-file-earmark"></i> Prev Notif
+                                            </a>
+                                        }
+                                        @if (!string.IsNullOrEmpty(course.LastAffiliationRguhsfilePath))
+                                        {
+                                            <a href="@course.LastAffiliationRguhsfilePath" class="btn btn-sm btn-outline-success" target="_blank" title="Last Affiliation">
+                                                <i class="bi bi-file-check"></i> Last Affil
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center py-4">
+                <i class="bi bi-database fs-1 d-block mb-2 opacity-50"></i>
+                <strong>No UG course data found</strong> for this college.
+                <p class="mb-0 text-muted">UG courses will appear here when available in the AffiliationCourseDetails table.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Verification Remarks & Status (rendered by layout) -->

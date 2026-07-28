@@ -1,0 +1,362 @@
+@model List<VerificationPortal.Models.CollegeMappingWithCollegesViewModel>
+@{
+    ViewData["Title"] = "My College Mappings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/report-card.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Add search/filter functionality for college tables
+            const searchInputs = document.querySelectorAll('.college-search');
+
+            searchInputs.forEach(input => {
+                input.addEventListener('keyup', function () {
+                    const filter = this.value.toUpperCase();
+                    const table = this.closest('.colleges-container').querySelector('table');
+                    const rows = table.querySelectorAll('tbody tr');
+
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        let match = false;
+                        cells.forEach(cell => {
+                            if (cell.textContent.toUpperCase().includes(filter)) {
+                                match = true;
+                            }
+                        });
+                        row.style.display = match ? '' : 'none';
+                    });
+                });
+            });
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Page Header -->
+    <div class="report-page-header mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary" title="Back to Dashboard">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+                <div>
+                    <h1 class="report-page-title mb-1">
+                        <i class="bi bi-building me-2 text-primary"></i>
+                        My College Mappings
+                    </h1>
+                    <p class="report-page-subtitle mb-0">View your assigned college ranges and verification progress</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge bg-primary fs-6 px-3 py-2 align-self-center d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle me-1"></i> @ViewBag.UserDesignation
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Info Card -->
+    <div class="report-card user-info-card mb-4">
+        <div class="report-card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="user-avatar">
+                            <i class="bi bi-person-badge fs-1"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">@ViewBag.UserName</h5>
+                            <small class="text-muted">@ViewBag.UserDesignation</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            <i class="bi bi-building me-1"></i> Faculty ID: @ViewBag.FacultyId
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <!-- No Mappings State -->
+        <div class="report-card no-mappings-card">
+            <div class="report-card-body text-center py-5">
+                <i class="bi bi-building-x fs-1 mb-3 opacity-50"></i>
+                <h4 class="mb-2">No College Mappings Assigned</h4>
+                <p class="text-muted mb-0">You don't have any active college mappings assigned to you yet.</p>
+                <p class="text-muted small mt-2">Contact your administrator to get college assignments.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Statistics Row -->
+        <div class="row stats-row mb-4">
+            <div class="col-md-4">
+                <div class="report-card stat-card">
+                    <div class="report-card-body text-center">
+                        <div class="stat-number">@Model.Count</div>
+                        <div class="stat-label">Active Mappings</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="report-card stat-card">
+                    <div class="report-card-body text-center">
+                        <div class="stat-number">@Model.Sum(m => m.CollegeCount)</div>
+                        <div class="stat-label">Total Colleges Assigned</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="report-card stat-card">
+                    <div class="report-card-body text-center">
+                        <div class="stat-number">@Model.Select(m => m.FacultyName).Distinct().Count()</div>
+                        <div class="stat-label">Faculties</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mappings List - Report Style Cards -->
+        @foreach (var item in Model)
+        {
+            <div class="report-card college-report-card mb-4" data-mapping-id="@item.Mapping.Id">
+                <!-- Report Card Header -->
+                <div class="report-card-header">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="faculty-badge">
+                                <i class="bi bi-building"></i>
+                                <strong>@item.FacultyName</strong>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-primary fs-6 px-3 py-2 d-flex align-items-center gap-1">
+                                <i class="bi bi-hash me-1"></i> @item.CollegeCount Colleges
+                            </span>
+                            <span class="badge bg-info fs-6 px-3 py-2 d-flex align-items-center gap-1">
+                                <i class="bi bi-alpha me-1"></i> Range: @item.FromLetter - @item.ToLetter
+                            </span>
+                            <span class="badge bg-secondary fs-6 px-3 py-2 d-flex align-items-center gap-1">
+                                <i class="bi bi-code me-1"></i> Codes: @item.CollegeFromCode - @item.CollegeToCode
+                            </span>
+                        </div>
+                    </div>
+                    <div class="report-card-meta mt-3 d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border px-3 py-2 d-flex align-items-center gap-1">
+                            <i class="bi bi-calendar me-1"></i> Created: @item.Mapping.CreatedDate?.ToString("dd MMM yyyy")
+                        </span>
+                        <span class="badge @(item.Mapping.IsActive ? "bg-success" : "bg-danger") px-3 py-2 d-flex align-items-center gap-1">
+                            <i class="bi bi-toggle@(item.Mapping.IsActive ? "2-on" : "2-off") me-1"></i> @(item.Mapping.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Colleges Table Section -->
+                <div class="report-card-body p-0">
+                    @if (item.Colleges.Count > 0)
+                    {
+                        <div class="colleges-container">
+                            <div class="p-3 border-bottom bg-light">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <input type="text"
+                                               class="form-control form-control-sm college-search"
+                                               placeholder="Search colleges... (type to filter)"
+                                               aria-label="Search colleges">
+                                    </div>
+                                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                        <small class="text-muted">
+                                            Showing <strong>@item.Colleges.Count</strong> colleges
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover college-table mb-0">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th style="width: 5%;">#</th>
+                                            <th style="width: 15%;">College Code</th>
+                                            <th>College Name</th>
+                                            <th style="width: 20%;">Town</th>
+                                            <th style="width: 12%;">Verification Status</th>
+                                            <th style="width: 10%;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < item.Colleges.Count; i++)
+                                        {
+                                            var college = item.Colleges[i];
+                                            <tr>
+                                                <td class="text-center text-muted">@(i + 1)</td>
+                                                <td>
+                                                    <span class="college-code">@college.CollegeCode</span>
+                                                </td>
+                                                <td>
+                                                    <a asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@college.CollegeCode"
+                                                       class="college-name-link" title="Verify this college">
+                                                        <i class="bi bi-arrow-right-circle me-1"></i> @college.CollegeName
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="college-town">@(college.CollegeTown ?? "-")</span>
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        // Get verification status for this college (placeholder - would come from database)
+                                                        var statusClass = "pending";
+                                                        var statusText = "Pending";
+                                                    }
+                                                    <span class="status-badge @statusClass">
+                                                        <i class="bi bi-hourglass-split me-1"></i> @statusText
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@college.CollegeCode"
+                                                           class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Verify">
+                                                            <i class="bi bi-clipboard-check"></i>
+                                                        </a>
+                                                        <a asp-controller="VerificationDashboard" asp-action="TrustDetails" asp-route-collegeCode="@college.CollegeCode"
+                                                           class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Trust Details">
+                                                            <i class="bi bi-building"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-building-x fs-1 mb-2 d-block opacity-50"></i>
+                            <p class="mb-0">No colleges found in the assigned range for this faculty.</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Verification Feedback & Status Section (Report Format - Bottom of Each Card) -->
+                <div class="report-card-footer verification-feedback-section">
+                    <div class="feedback-header">
+                        <h3 class="feedback-title">
+                            <i class="bi bi-clipboard-check"></i>
+                            Verification Feedback & Status
+                        </h3>
+                        <div class="verifier-info">
+                            <i class="bi bi-person-badge"></i>
+                            <span>@ViewBag.UserDesignation - @ViewBag.UserName</span>
+                        </div>
+                    </div>
+                    <div class="feedback-body">
+                        <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>
+                            <input type="hidden" name="collegeCode" value="" id="feedback-college-code" />
+                            <input type="hidden" name="tabName" value="InstitutionDetails" />
+
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label" for="remarks">Remarks <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="remarks" name="remarks" rows="3" required
+                                              placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes."></textarea>
+                                    <div class="form-text">Please provide detailed remarks for your verification decision.</div>
+                                    <div class="invalid-feedback">Remarks are required for verification.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="status">Verification Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="status" name="status" required>
+                                        <option value="">-- Select Status --</option>
+                                        <option value="accept">Accept</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="pending">Pending Review</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a verification status.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="verificationLevel">Verification Level</label>
+                                    <select class="form-select" id="verificationLevel" name="verificationLevel">
+                                        <option value="">-- Select Level --</option>
+                                        <option value="DEO">DEO (District Education Officer)</option>
+                                        <option value="JR">JR (Joint Registrar)</option>
+                                        <option value="SO">SO (Section Officer)</option>
+                                        <option value="AR">AR (Assistant Registrar)</option>
+                                        <option value="RG">RG (Registrar)</option>
+                                        <option value="RE">RE (Registrar Evaluation)</option>
+                                        <option value="DR">DR (Director)</option>
+                                        <option value="VC">VC (Vice Chancellor)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            @* <div class="feedback-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Save Verification
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetFeedbackForm(this)">
+                                    <i class="bi bi-x-circle"></i> Clear
+                                </button>
+                            </div> *@
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<script>
+    // Set college code in feedback form when verify button is clicked
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.college-name-link, .btn-outline-primary[data-bs-toggle="tooltip"]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // The link will navigate, but we can also pre-fill if using modal
+                const collegeCode = this.getAttribute('asp-route-collegeCode') ||
+                                   this.closest('tr')?.querySelector('.college-code')?.textContent?.trim();
+                if (collegeCode) {
+                    document.getElementById('feedback-college-code').value = collegeCode;
+                }
+            });
+        });
+
+        // Auto-set college code when clicking verify in table
+        document.querySelectorAll('.college-table tbody tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (!e.target.closest('a') && !e.target.closest('button')) {
+                    const collegeCode = this.querySelector('.college-code')?.textContent?.trim();
+                    if (collegeCode) {
+                        document.getElementById('feedback-college-code').value = collegeCode;
+                    }
+                }
+            });
+        });
+    });
+
+    function resetFeedbackForm(btn) {
+        const form = btn.closest('form');
+        if (form) {
+            form.reset();
+            form.classList.remove('was-validated');
+        }
+    }
+</script>

@@ -171,5 +171,171 @@ DEFAULT (1) FOR IsActive;
 
 
 SELECT * FROM Affiliation_College_Master
-WHERE FacultyCode=2
+WHERE FacultyCode=2 order by CollegeName desc
 
+select * from [dbo].[AFF_InstitutionsDetails]
+where facultycode = 2 and CollegeCode='d038'
+
+ALTER TABLE AFF_InstitutionsDetails
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG (Registrar)
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE (Registrar Evaluation / Relevant Role)
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR (Director)
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC (Vice Chancellor)
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL;
+
+
+ALTER TABLE InstitutionBasicDetails
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,a
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+
+
+
+ALTER TABLE CONTINUATION_TrustMemberDetails
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
