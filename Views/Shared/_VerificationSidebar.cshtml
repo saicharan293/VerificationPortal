@@ -73,6 +73,29 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link @(activeTab == "UGCourseDetails" ? "active" : "")"
+                       asp-controller="VerificationDashboard" asp-action="UGCourseDetails" asp-route-collegeCode="@collegeCode">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Ug Course Details</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(activeTab == "PgCourseDetails" ? "active" : "")"
+                       asp-controller="VerificationDashboard" asp-action="PgCourseDetails" asp-route-collegeCode="@collegeCode">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Pg Course Details</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(activeTab == "SSCourseDetails" ? "active" : "")"
+                       asp-controller="VerificationDashboard" asp-action="SSCourseDetails" asp-route-collegeCode="@collegeCode">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>SS Course Details</span>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
                     <a class="nav-link @(activeTab == "Courses" ? "active" : "")"
                        asp-controller="VerificationDashboard" asp-action="Courses" asp-route-collegeCode="@collegeCode">
                         <i class="bi bi-book"></i>
@@ -83,7 +106,7 @@
                     <a class="nav-link @(activeTab == "Infrastructure" ? "active" : "")"
                        asp-controller="VerificationDashboard" asp-action="Infrastructure" asp-route-collegeCode="@collegeCode">
                         <i class="bi bi-houses"></i>
-                        <span>Infrastructure</span>
+                        <span>Classroom & Laboratory</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -245,7 +268,7 @@
                             <div class="summary-card">
                                 <div class="summary-card-header">
                                     <i class="bi bi-houses text-dark"></i>
-                                    <h6>Infrastructure</h6>
+                                    <h6>Classroom & Laboratory</h6>
                                 </div>
                                 <div class="summary-progress">
                                     <div class="progress" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">

@@ -1,8 +1,8 @@
-@model List<VerificationPortal.Models.AffiliationPgSsCourseDetail>
+﻿@model List<VerificationPortal.Models.AffiliationPgSsCourseDetail>
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
-    ViewData["Title"] = "PG Course Details - Verification Dashboard";
-    ViewData["ActiveTab"] = "PgCourseDetails";
+    ViewData["Title"] = "Super Specialty Course Details - Verification Dashboard";
+    ViewData["ActiveTab"] = "SSCourseDetails";
     ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
     ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
     ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
@@ -26,7 +26,7 @@
     <i class="bi bi-info-circle"></i>
     <div class="note-box-content">
         <h6>Verification Instructions</h6>
-        <p>Review the PG / Super Specialty course details below including intake, LOP, recognition by NMC/DCI, and course codes. Provide your remarks and select verification status. Once completed, proceed to the next tab: <strong>Infrastructure</strong>.</p>
+        <p>Review the Super Specialty course details below including intake, LOP, recognition by NMC/DCI, and course codes. Provide your remarks and select verification status. Once completed, proceed to the next tab: <strong>Infrastructure</strong>.</p>
     </div>
 </div>
 
@@ -35,9 +35,9 @@
     <div class="verification-card-header">
         <h3 class="verification-card-title">
             <i class="bi bi-mortarboard"></i>
-            PG / Super Specialty Course Details
+            Super Specialty Course Details
         </h3>
-        <span class="badge bg-primary ms-2">@(Model?.Count ?? 0) Courses</span>
+        <span class="badge bg-primary ms-2">@Model?.Count ?? 0 Courses</span>
     </div>
     <div class="verification-card-body">
         @if (Model != null && Model.Count > 0)
@@ -51,7 +51,7 @@
                             <th>Course Name</th>
                             <th>Type of Affiliation</th>
                             <th>Course Level</th>
-                            @* <th>Course Prefix</th> *@
+                            <th>Course Prefix</th>
                             <th>Present Intake</th>
                             <th>RGUHS Intake</th>
                             <th>LOP Date</th>
@@ -80,7 +80,7 @@
                                     }
                                     <span class="badge @levelBadge">@course.CourseLevel</span>
                                 </td>
-                                @* <td>@course.CoursePrefix</td> *@
+                                <td>@course.CoursePrefix</td>
                                 <td>@course.PresentIntake</td>
                                 <td>@course.RguhsIntake</td>
                                 <td>@(course.Lopdate?.ToString("dd MMM yyyy") ?? "-")</td>
@@ -95,10 +95,10 @@
         }
         else
         {
-            <div class="alert alert-info text-center py-4 flex-box">
+            <div class="alert alert-info text-center py-4">
                 <i class="bi bi-database fs-1 d-block mb-2 opacity-50"></i>
-                <strong>No PG/SS course data found</strong> for this college.
-                <p class="mb-0 text-muted">PG / Super Specialty courses will appear here when available in the AffiliationPgSsCourseDetails table.</p>
+                <strong>No SS course data found</strong> for this college.
+                <p class="mb-0 text-muted">Super Specialty courses will appear here when available in the AffiliationPgSsCourseDetails table.</p>
             </div>
         }
     </div>

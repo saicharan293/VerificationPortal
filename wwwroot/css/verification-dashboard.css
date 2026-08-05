@@ -94,6 +94,16 @@ body {
     overflow: hidden;
 }
 
+.table-responsive table {
+    width: max-content;
+    min-width: 100%;
+}
+
+.table-responsive th,
+.table-responsive td {
+    white-space: nowrap;
+}
+
 .sidebar-brand i {
     font-size: 1.5rem;
     color: var(--primary-light);
@@ -273,6 +283,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-width: 0;
     transition: var(--transition);
 }
 
@@ -280,6 +291,12 @@ body {
     margin-left: var(--sidebar-collapsed-width);
 }
 
+.flex-box {
+    display: flex;
+    align-items: center !important;
+    justify-content: center;
+    flex-direction: column;
+}
 /* Top Bar */
 .top-bar {
     position: sticky;

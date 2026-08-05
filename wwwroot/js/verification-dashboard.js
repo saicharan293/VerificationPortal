@@ -1,6 +1,39 @@
 // verification-dashboard.js - JavaScript for the verification dashboard
 
+
 document.addEventListener('DOMContentLoaded', function () {
+
+
+    const status = document.getElementById("status");
+    const remarks = document.getElementById("remarks");
+    const form = document.querySelector(".feedback-form");
+
+    function toggleRemarksValidation() {
+
+        if (status.value === "reject" || status.value === "pending") {
+            remarks.required = true;
+        } else {
+            remarks.required = false;
+            remarks.setCustomValidity("");
+        }
+    }
+
+    status.addEventListener("change", toggleRemarksValidation);
+
+    toggleRemarksValidation();
+
+    form.addEventListener("submit", function (e) {
+
+        toggleRemarksValidation();
+
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        form.classList.add("was-validated");
+    });
+
     // Elements
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');

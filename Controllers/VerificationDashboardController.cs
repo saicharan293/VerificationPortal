@@ -277,9 +277,16 @@ namespace VerificationPortal.Controllers
 
         private async Task SetVerificationViewData<T>(string collegeCode)  where T : class
         {
+            var property = typeof(T).GetProperties()
+                .FirstOrDefault(p =>
+                    p.Name.Equals("CollegeCode", StringComparison.OrdinalIgnoreCase));
+
+            if (property == null)
+                throw new Exception($"{typeof(T).Name} does not contain a CollegeCode property.");
+
             var verification = await _verificationService
                 .GetVerificationAsync<T>(
-                    x => EF.Property<string>(x, "CollegeCode") == collegeCode,
+                    x => EF.Property<string>(x, property.Name) == collegeCode,
                     GetUserDesignation());
 
             ViewData["ExistingRemarks"] = verification.Remarks;
@@ -328,6 +335,8 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = "PrincipalDetails";
             ViewBag.UserDesignation = GetUserDesignation();
 
+            await SetVerificationViewData<AffPrincipalDetail>(collegeCode);
+
             return View(institution);
         }
 
@@ -358,38 +367,38 @@ namespace VerificationPortal.Controllers
         }
 
         // GET: /VerificationDashboard/UgCourseDetails/{collegeCode}
-        [HttpGet]
-        public async Task<IActionResult> UgCourseDetails(string collegeCode)
-        {
-            if (string.IsNullOrEmpty(collegeCode))
-                return NotFound("College code is required");
+        //[HttpGet]
+        //public async Task<IActionResult> UgCourseDetails(string collegeCode)
+        //{
+        //    if (string.IsNullOrEmpty(collegeCode))
+        //        return NotFound("College code is required");
 
-            // Get UG courses for the college (AffiliationCourseDetail table)
-            var courses = await _context.AffiliationCourseDetails
-                .Where(c => c.Collegecode == collegeCode)
-                .OrderBy(c => c.CourseName)
-                .ToListAsync();
+        //    // Get UG courses for the college (AffiliationCourseDetail table)
+        //    var courses = await _context.AffiliationCourseDetails
+        //        .Where(c => c.Collegecode == collegeCode)
+        //        .OrderBy(c => c.CourseName)
+        //        .ToListAsync();
 
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+        //    var college = await _context.AffiliationCollegeMasters
+        //        .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+        //    var institution = await _context.AffInstitutionsDetails
+        //        .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = "UgCourseDetails";
-            ViewBag.TabTitle = "UG Course Details";
-            ViewBag.TabIcon = "bi-book";
-            ViewBag.UserDesignation = GetUserDesignation();
-            ViewBag.NextTabAction = Url.Action("PgCourseDetails", new { collegeCode });
-            ViewBag.NextTabLabel = "Next: PG Course Details";
-            ViewBag.PrevTabAction = Url.Action("PrincipalDetails", new { collegeCode });
-            ViewBag.PrevTabLabel = "Previous: Principal Details";
+        //    ViewBag.CollegeCode = collegeCode;
+        //    ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
+        //    ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
+        //    ViewBag.ActiveTab = "UgCourseDetails";
+        //    ViewBag.TabTitle = "UG Course Details";
+        //    ViewBag.TabIcon = "bi-book";
+        //    ViewBag.UserDesignation = GetUserDesignation();
+        //    ViewBag.NextTabAction = Url.Action("PgCourseDetails", new { collegeCode });
+        //    ViewBag.NextTabLabel = "Next: PG Course Details";
+        //    ViewBag.PrevTabAction = Url.Action("PrincipalDetails", new { collegeCode });
+        //    ViewBag.PrevTabLabel = "Previous: Principal Details";
 
-            return View(courses);
-        }
+        //    return View(courses);
+        //}
 
         // GET: /VerificationDashboard/PgCourseDetails/{collegeCode}
         [HttpGet]
@@ -423,6 +432,38 @@ namespace VerificationPortal.Controllers
             ViewBag.PrevTabLabel = "Previous: UG Course Details";
 
             return View(courses);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> SSCourseDetails(string collegeCode)
+        {
+            if (string.IsNullOrEmpty(collegeCode))
+            {
+                return NotFound("College code is required");
+            }
+
+            var ssCourses = await _context.AffiliationPgSsCourseDetails
+                .Where(x => x.CollegeCode == collegeCode && x.CourseLevel == "SS")
+                .OrderBy(x => x.CourseName)
+                .ToListAsync();
+
+            if (!ssCourses.Any())
+            {
+                return RedirectToAction(nameof(PgCourseDetails), new { collegeCode });
+            }
+
+            var college = await _context.AffiliationCollegeMasters
+                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
+            ViewBag.ActiveTab = "SSCourseDetails";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            await SetVerificationViewData<AffiliationPgSsCourseDetail>(collegeCode);
+
+            return View(ssCourses);
         }
 
         [HttpGet]
@@ -577,12 +618,49 @@ namespace VerificationPortal.Controllers
                 ["TrustDetails"] = typeof(InstitutionBasicDetail),
                 ["TrustMemberDetails"] = typeof(ContinuationTrustMemberDetail),
                 ["DeanDirectorDetails"] = typeof(AffDeanOrDirectorDetail),
-                ["Principal_Details"] = typeof(AffPrincipalDetail),
+                ["PrincipalDetails"] = typeof(AffPrincipalDetail),
+                ["UgCourseDetails"] = typeof(AffiliationCourseDetail),
+                ["PgCourseDetails"] = typeof(AffiliationPgSsCourseDetail),
                 ["Hostel_Details"] = typeof(AffHostelDetail),
                 ["LandBuilding_Details"] = typeof(DentalCollegeLandBuildingDetail),
                 ["TeachingStaffDepartmentWise"] = typeof(TeachingStaffDepartmentWiseDetail),
                 ["AcademicIntake"] = typeof(CollegeCourseIntakeDetail)
             };
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UGCourseDetails(string collegeCode)
+        {
+            if (string.IsNullOrEmpty(collegeCode))
+            {
+                return NotFound("College code is required");
+            }
+
+            var ugCourses = await _context.AffiliationCourseDetails
+                .Where(x => x.Collegecode == collegeCode)
+                .OrderBy(x => x.CourseName)
+                .ToListAsync();
+
+            if (!ugCourses.Any())
+            {
+                return NotFound($"UG Course details not found for college code: {collegeCode}");
+            }
+
+            var college = await _context.AffiliationCollegeMasters
+                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.CollegeName = college?.CollegeName+", "+college?.CollegeTown ?? "Unknown College";
+            ViewBag.ActiveTab = "UGCourseDetails";
+            ViewBag.NextTabAction = Url.Action("PgCourseDetails", new { collegeCode });
+            ViewBag.NextTabLabel = "Next: PG Course Details";
+            ViewBag.PrevTabAction = Url.Action("PrincipalDetails", new { collegeCode });
+            ViewBag.PrevTabLabel = "Previous: Principal Details";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            await SetVerificationViewData<AffiliationCourseDetail>(collegeCode);
+
+            return View(ugCourses);
         }
 
         // POST: Save verification remarks and status
@@ -630,6 +708,16 @@ namespace VerificationPortal.Controllers
 
                     ["DeanDirectorDetails"] = () =>
                         _verificationService.SaveVerificationAsync<AffDeanOrDirectorDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["UgCourseDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<AffiliationCourseDetail>(
+                            x => x.Collegecode == collegeCode,
+                            request),
+
+                    ["PgCourseDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<AffiliationPgSsCourseDetail>(
                             x => x.CollegeCode == collegeCode,
                             request),
 

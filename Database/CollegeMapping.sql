@@ -6,6 +6,25 @@
 
 BEGIN TRANSACTION;
 
+----- INSERT QUERY FOR COMMITTEE NAMES FOR DENTAL FACULTY ----------
+
+INSERT INTO CA_MST_Med_CommitteeNames
+(
+    CommitteeName,
+    FacultyCode,
+    SubFacultyCode,
+    CourseLevel
+)
+VALUES
+('Academic council details',        2, NULL, 'ALL'),
+('Anti-ragging committee',          2, NULL, 'ALL'),
+('Gender harassment committee',     2, NULL, 'ALL'),
+('Institutional ethical committee', 2, NULL, 'ALL'),
+('POSH Committee',                  2, NULL, 'ALL'),
+('Pharmacovigilance Committee',     2, NULL, 'UG'),
+('Curriculum Committee',            2, NULL, 'UG'),
+('IACE (Institutional Animal Ethics Committee)', 2, NULL, 'ALL');
+
 -- 1. Data Entry Operator (DEO)
 INSERT INTO TblRguhsFacultyUser 
     (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
@@ -171,7 +190,7 @@ DEFAULT (1) FOR IsActive;
 
 
 SELECT * FROM Affiliation_College_Master
-WHERE FacultyCode=2 order by CollegeName desc
+WHERE FacultyCode=1 order by CollegeName desc
 
 select * from [dbo].[AFF_InstitutionsDetails]
 where facultycode = 2 and CollegeCode='d038'
@@ -341,9 +360,6 @@ ADD
     LastUpdatedDate DATETIME NULL;
 
 
-    
-
-
 ALTER TABLE [Aff_DeanOrDirectorDetails]
 ADD
     -- DEO
@@ -400,13 +416,238 @@ ADD
     LastUpdatedDate DATETIME NULL;
 
 
+ALTER TABLE Aff_PrincipalDetails
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+
+ALTER TABLE [dbo].[Affiliation_CourseDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+
+ALTER TABLE [dbo].[Affiliation_PgSsCourseDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
 
 select * from TblRguhsFacultyUser;
 
 SELECT * FROM [dbo].[AFF_InstitutionsDetails] WHERE CollegeCode='D008';
 
 SELECT * FROM Affiliation_College_Master
+WHERE FacultyCode=2
 WHERE CollegeCode = 'D008';
 
+SELECT * FROM CollegeCourseIntakeDetails
+WHERE FacultyCode=2;
+
+SELECT * FROM AcademicIntake
+WHERE FacultyCode=2 and CollegeCode = 'D008';
+
 SELECT * FROM InstitutionBasicDetails
-WHERE CollegeCode = 'DO38'
+WHERE CollegeCode = 'DO38';
+
+
+select * from Aff_DeanOrDirectorDetails
+where CollegeCode = 'd038';
+
+SELECT * FROM Aff_PrincipalDetails
+WHERE CollegeCode = 'D038';
+
+select * from [dbo].[Affiliation_CourseDetails]
+where facultycode = 2 and Collegecode = 'd038';
+
+SELECT * FROM [dbo].[CA_Progress]
+WHERE CollegeCode = 'd007' and StepKey like '%veh%' and courselevel like '%UG%'
+
+SELECT * FROM [dbo].[CA_Med_LibraryEquipments]
+WHERE FacultyCode = 2 AND CollegeCode = 'D008'
+
+SELECT * FROM CA_MST_Med_LibraryEquipments;
+
+SELECT * FROM [dbo].[CA_MST_Med_CommitteeNames]
+
+SELECT * FROM CA_ExaminationScheme
+
+SELECT * FROM HospitalDetailsForAffiliation
+where FacultyCode= 2 and CollegeCode = 'd037';
+
+
+SELECT* FROM DentalWardBedDistribution
+WHERE CollegeCode = 'D038'
+
+select * from Medical_UGBedDistribution
+where collegecode = 'd038'
+
+SELECT * FROM MstDentalBedDistribution
+where SeatSlab = 50;
+
+SELECT * FROM DentalInfrastructure;
+
+select * from MstDentalInfrastructure;
+
+SELECT * FROM Medical_DepartmentOfficesMeu
+WHERE FacultyCode=2 AND CollegeCode='D038';
+
+SELECT * FROM [dbo].[FacultyDetails]
+where FacultyCode = 2 and CollegeCode='d038'
+
+SELECT * FROM DesignationMaster
+WHERE FacultyCode = 2
+
+SELECT * FROM DepartmentMaster
+WHERE FacultyCode=2
