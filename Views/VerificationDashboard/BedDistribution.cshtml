@@ -1,0 +1,283 @@
+﻿@model VerificationPortal.Models.MedicalUGBedDistributionVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Medical UG Bed Distribution";
+    ViewData["ActiveTab"] = "BedDistribution";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action(
+        "ChairDistribution",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] = "Previous : Chair Distribution";
+
+    ViewData["NextTabAction"] = Url.Action(
+        "HospitalDetails",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] = "Next : Hospital Details";
+}
+
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-hospital"></i>
+        Medical UG Bed Distribution
+    </h1>
+
+    <p class="text-muted mb-0">
+        Review and verify the bed distribution details.
+    </p>
+</div>
+
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+
+        <p>
+            Verify the available bed distribution against the prescribed
+            norms before approving this section.
+        </p>
+    </div>
+</div>
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-hospital"></i>
+            Beds Distribution
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if ((ViewBag.FacultyCode?.ToString() ?? "") == "2")
+        {
+            <!-- ================= DENTAL ================= -->
+
+            <div class="section">
+
+                <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 mb-4">
+                    Oral &amp; Maxillofacial Surgery
+                </h5>
+
+                <div class="d-flex justify-content-between align-items-center py-3">
+
+                    <div class="fw-semibold fs-6">
+                        Oral Maxillofacial Surgery Beds
+                    </div>
+
+                    <div style="width:180px;">
+                        <input class="form-control text-center fw-bold"
+                               value="@Model.OralMaxillofacialSurgery"
+                               disabled />
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center border-top py-3 px-3 mt-2">
+
+                    <strong>Total Beds</strong>
+
+                    <strong class="text-primary fs-5">
+                        @(Model.OralMaxillofacialSurgery ?? 0)
+                    </strong>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <!-- ================= MEDICAL ================= -->
+            <!-- A. Medicine & Allied -->
+
+            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 mb-4">
+                A. Medicine &amp; Allied
+            </h5>
+
+            <div class="row g-3 mb-3">
+
+                <div class="col-md-3">
+                    <label class="form-label">General Medicine</label>
+                    <input class="form-control" value="@Model.GenMedicine" disabled />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Paediatrics</label>
+                    <input class="form-control" value="@Model.Paediatrics" disabled />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Skin &amp; VD</label>
+                    <input class="form-control" value="@Model.SkinVD" disabled />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Psychiatry</label>
+                    <input class="form-control" value="@Model.Psychiatry" disabled />
+                </div>
+
+            </div>
+
+            <!-- B. Surgery -->
+
+            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
+                B. Surgery &amp; Allied
+            </h5>
+
+            <div class="row g-3 mb-3">
+
+                <div class="col-md-3">
+                    <label class="form-label">General Surgery</label>
+                    <input class="form-control" value="@Model.GenSurgery" disabled />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Orthopaedics</label>
+                    <input class="form-control" value="@Model.Orthopaedics" disabled />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Ophthalmology</label>
+                    <input class="form-control" value="@Model.Ophthalmology" disabled />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">ENT</label>
+                    <input class="form-control" value="@Model.ENT" disabled />
+                </div>
+
+            </div>
+
+            <!-- C. OBG -->
+
+            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
+                C. Obstetrics &amp; Gynaecology
+            </h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-4">
+                    <label class="form-label">Obstetrics &amp; ANC</label>
+                    <input class="form-control" value="@Model.ObstetricsANC" disabled />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Gynaecology</label>
+                    <input class="form-control" value="@Model.Gynaecology" disabled />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Postpartum</label>
+                    <input class="form-control" value="@Model.Postpartum" disabled />
+                </div>
+
+            </div>
+
+            <!-- Grand Total -->
+
+            <div class="alert alert-light border d-flex justify-content-between align-items-center mb-5">
+
+                <strong>GRAND TOTAL BEDS (Clinical)</strong>
+
+                <strong class="text-primary fs-5">
+                    @(
+                        (Model.GenMedicine ?? 0) +
+                        (Model.Paediatrics ?? 0) +
+                        (Model.SkinVD ?? 0) +
+                        (Model.Psychiatry ?? 0) +
+                        (Model.GenSurgery ?? 0) +
+                        (Model.Orthopaedics ?? 0) +
+                        (Model.Ophthalmology ?? 0) +
+                        (Model.ENT ?? 0) +
+                        (Model.ObstetricsANC ?? 0) +
+                        (Model.Gynaecology ?? 0) +
+                        (Model.Postpartum ?? 0)
+                    )
+                </strong>
+
+            </div>
+
+            <!-- Operation Theatre -->
+
+            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
+                II. Operation Theatres
+            </h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label class="form-label">Major OT</label>
+                    <input class="form-control" value="@Model.MajorOT" disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Minor OT</label>
+                    <input class="form-control" value="@Model.MinorOT" disabled />
+                </div>
+
+            </div>
+
+            <!-- ICU -->
+
+            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
+                III. Intensive Care Facilities
+            </h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-2">
+                    <label class="form-label">ICCU</label>
+                    <input class="form-control" value="@Model.ICCU" disabled />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">ICU</label>
+                    <input class="form-control" value="@Model.ICU" disabled />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">PICU / NICU</label>
+                    <input class="form-control" value="@Model.PICU_NICU" disabled />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">SICU</label>
+                    <input class="form-control" value="@Model.SICU" disabled />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Total ICU Beds</label>
+                    <input class="form-control" value="@Model.TotalICUBeds" disabled />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Casualty Beds</label>
+                    <input class="form-control" value="@Model.CasualtyBeds" disabled />
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>

@@ -3,6 +3,10 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    AOS.init({
+        duration: 600,
+        once: true
+    });
 
     const status = document.getElementById("status");
     const remarks = document.getElementById("remarks");
@@ -18,9 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    status.addEventListener("change", toggleRemarksValidation);
-
-    toggleRemarksValidation();
+    if (status) {
+        status.addEventListener("change", toggleRemarksValidation);
+        toggleRemarksValidation();
+    }
 
     form.addEventListener("submit", function (e) {
 
@@ -381,6 +386,34 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.appendChild(container);
         }
         return container;
+    }
+
+    const editBtn = document.getElementById("btnEditVerification");
+    const cancelBtn = document.getElementById("btnCancelEdit");
+
+    const display = document.getElementById("verificationDisplay");
+    const editform = document.getElementById("verificationEditForm");
+
+    if (editBtn) {
+
+        editBtn.addEventListener("click", function () {
+
+            display.style.display = "none";
+            editform.style.display = "block";
+
+        });
+
+    }
+
+    if (cancelBtn) {
+
+        cancelBtn.addEventListener("click", function () {
+
+            editform.style.display = "none";
+            display.style.display = "block";
+
+        });
+
     }
 
     // Expose functions globally for use in views

@@ -1,0 +1,460 @@
+@model List<VerificationPortal.Models.DentalInfrastructure>
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Classroom & Laboratory - Verification Dashboard";
+    ViewData["ActiveTab"] = "ClassroomAndLaboratory";
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+    ViewData["VerificationStatus"] = "Pending";
+    ViewData["StatusBadgeClass"] = "pending";
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = Url.Action("Faculty", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+    ViewData["NextTabLabel"] = "Next: Faculty Details";
+    ViewData["PrevTabAction"] = Url.Action("PgCourseDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+    ViewData["PrevTabLabel"] = "Previous: PG Course Details";
+}
+
+@section Styles {
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+@{
+    ViewBag.ActiveTab = "Infrastructure";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-houses"></i>
+        Classroom & Laboratory
+    </h1>
+    <p class="text-muted mb-0">Review and verify classroom and laboratory infrastructure for this institution</p>
+</div>
+
+<!-- Note Box -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>Review the Classroom & Laboratory infrastructure details below. Verify that the Required Area (sq.ft) matches the Available Area (sq.ft) for each requirement. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, proceed to the next tab: <strong>Faculty Details</strong>.</p>
+    </div>
+</div>
+
+<!-- Summary Cards Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-primary mb-1">@ViewBag.SeatIntake</h4>
+                <small class="text-muted">Seat Intake</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-primary mb-1">@ViewBag.SeatSlab</h4>
+                <small class="text-muted">Seat Slab</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-success mb-1">@Model.Count</h4>
+                <small class="text-muted">Infrastructure Items</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-info mb-1">@(ViewBag.PreClinicalLabRequirements?.Count ?? 0)</h4>
+                <small class="text-muted">Pre-Clinical Labs</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Land & Building Details Section -->
+@if (ViewBag.LandBuildingDetail != null)
+{
+    var landBuilding = ViewBag.LandBuildingDetail as VerificationPortal.Models.DentalCollegeLandBuildingDetail;
+    <div class="verification-card mb-4">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-building"></i>
+                Land & Building Details
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <!-- Land Details -->
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-geo-alt"></i> Land Details</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Total Land Area (Acres)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.TotalLandAreaAcres?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Land Ownership Type</label>
+                    <input type="text" class="form-control" value="@(landBuilding.LandOwnershipType ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Land Category</label>
+                    <input type="text" class="form-control" value="@(landBuilding.LandCategory ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Tier 2 / Hilly Area</label>
+                    <input type="text" class="form-control" value="@(landBuilding.IsTier2OrHilly ? "Yes" : "No")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Future Expansion Space</label>
+                    <input type="text" class="form-control" value="@(landBuilding.HasFutureExpansionSpace == true ? "Yes" : (landBuilding.HasFutureExpansionSpace == false ? "No" : "N/A"))" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Land in Two Pieces</label>
+                    <input type="text" class="form-control" value="@(landBuilding.IsLandInTwoPieces == true ? "Yes" : (landBuilding.IsLandInTwoPieces == false ? "No" : "N/A"))" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Distance College-Hospital (Km)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.DistanceBetweenCollegeAndHospitalKm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Latitude</label>
+                    <input type="text" class="form-control" value="@(landBuilding.Latitude?.ToString("N6") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Longitude</label>
+                    <input type="text" class="form-control" value="@(landBuilding.Longitude?.ToString("N6") ?? "N/A")" disabled />
+                </div>
+            </div>
+
+            <!-- Land Documents -->
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-file-earmark-text"></i> Land Documents</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Sale Deed Document</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.SaleDeedDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Encumbrance Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.EncumbranceCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Land Use Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.LandUseCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Approved Layout Plan</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.ApprovedLayoutPlanDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Land Sketch</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.LandSketchDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Distance Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.DistanceCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+            </div>
+
+            <!-- Building Details -->
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-building"></i> Building Details</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Total Built-up Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Approved Building Plan</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.ApprovedBuildingPlanDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Completion Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.CompletionCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Structural Stability Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.StructuralStabilityCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Fire Safety NOC</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.FireSafetyNocDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Lift License</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.LiftLicenseDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Electrical Safety Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.ElectricalSafetyCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Water Supply Certificate</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.WaterSupplyCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Sewage/Sanitation Approval</label>
+                    <input type="text" class="form-control" value="@(string.IsNullOrEmpty(landBuilding.SewageSanitationApprovalDocumentPath) ? "Not Uploaded" : "Uploaded")" disabled />
+                </div>
+            </div>
+
+            <!-- Teaching Areas -->
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-mortarboard"></i> Teaching Areas</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Lecture Hall Count</label>
+                    <input type="text" class="form-control" value="@(landBuilding.LectureHallCount?.ToString() ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Lecture Hall Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.LectureHallAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Lecture Hall Seating Capacity</label>
+                    <input type="text" class="form-control" value="@(landBuilding.LectureHallSeatingCapacity?.ToString() ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Examination Hall Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Library Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.LibraryAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Hospital Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.HospitalAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Museum/Demo Rooms Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Department-wise Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Preclinical/Skill Lab Area (sq.m)</label>
+                    <input type="text" class="form-control" value="@(landBuilding.PreclinicalSkillLabAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(landBuilding.Remarks))
+            {
+                <hr class="my-3" />
+                <h5 class="fw-bold mb-2"><i class="bi bi-chat-text"></i> Remarks</h5>
+                <div class="alert alert-secondary">
+                    @landBuilding.Remarks
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Medical Skills Laboratory Section -->
+@if (ViewBag.MedicalSkillsLaboratory != null)
+{
+    var skillsLab = ViewBag.MedicalSkillsLaboratory as VerificationPortal.Models.MedicalSkillsLaboratory;
+    <div class="verification-card mb-4">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-clipboard2-pulse"></i>
+                Medical Skills Laboratory
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Total Area Required (sq.m)</label>
+                    <input type="text" class="form-control" value="@skillsLab.TotalAreaRequiredSqm.ToString("N2")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Total Area Available (sq.m)</label>
+                    <input type="text" class="form-control" value="@skillsLab.TotalAreaAvailableSqm.ToString("N2")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Total Area Deficiency (sq.m)</label>
+                    <input type="text" class="form-control" value="@skillsLab.TotalAreaDeficiencySqm.ToString("N2")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Annual MBBS Intake</label>
+                    <input type="text" class="form-control" value="@(skillsLab.AnnualMbbsIntake?.ToString() ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Annual BDS Intake</label>
+                    <input type="text" class="form-control" value="@(skillsLab.AnnualBdsIntake?.ToString() ?? "N/A")" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Affiliation Type</label>
+                    <input type="text" class="form-control" value="@(skillsLab.AffiliationType?.TypeDescription ?? "N/A")" disabled />
+                </div>
+            </div>
+
+            <hr class="my-3" />
+
+            <h6 class="fw-bold mb-3">Facilities & Equipment</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.SixWeeksTrainingCompletedBeforeClinical ? "checked" : "") disabled />
+                        <label class="form-check-label">6 Weeks Training Before Clinical</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasMinFourExamRooms ? "checked" : "") disabled />
+                        <label class="form-check-label">Min 4 Examination Rooms (@skillsLab.NumberOfExaminationRooms)</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasDemoRoomSmallGroups ? "checked" : "") disabled />
+                        <label class="form-check-label">Demo Room for Small Groups</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasDebriefArea ? "checked" : "") disabled />
+                        <label class="form-check-label">Debrief Area</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasFacultyCoordinatorRoom ? "checked" : "") disabled />
+                        <label class="form-check-label">Faculty Coordinator Room</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasSupportStaffRoom ? "checked" : "") disabled />
+                        <label class="form-check-label">Support Staff Room</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasStorageForMannequins ? "checked" : "") disabled />
+                        <label class="form-check-label">Storage for Mannequins</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasVideoRecordingFacility ? "checked" : "") disabled />
+                        <label class="form-check-label">Video Recording Facility</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasGroupAndIndividualStations ? "checked" : "") disabled />
+                        <label class="form-check-label">Group & Individual Stations (@skillsLab.NumberOfSkillStations)</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasRequiredTrainersAndMannequins ? "checked" : "") disabled />
+                        <label class="form-check-label">Required Trainers & Mannequins</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasDedicatedTechnicalOfficer ? "checked" : "") disabled />
+                        <label class="form-check-label">Dedicated Technical Officer</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.HasAdequateSupportStaff ? "checked" : "") disabled />
+                        <label class="form-check-label">Adequate Support Staff</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.TeachingAreasHaveAv ? "checked" : "") disabled />
+                        <label class="form-check-label">Teaching Areas Have AV</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.TeachingAreasHaveInternet ? "checked" : "") disabled />
+                        <label class="form-check-label">Teaching Areas Have Internet</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @(skillsLab.SkillsLabEnabledForElearning ? "checked" : "") disabled />
+                        <label class="form-check-label">Skills Lab Enabled for E-Learning</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Pre-Clinical & Skills Laboratory Area Requirements -->
+@if (ViewBag.PreClinicalLabRequirements != null)
+{
+    var preClinicalItems = ViewBag.PreClinicalLabRequirements as List<VerificationPortal.Models.DentalPreClinicalAndSkillsLabAreaReq>;
+    if (preClinicalItems != null && preClinicalItems.Any())
+    {
+        <div class="verification-card mb-4">
+            <div class="verification-card-header">
+                <h3 class="verification-card-title">
+                    <i class="bi bi-flask"></i>
+                    Pre-Clinical & Skills Laboratory Area Requirements
+                </h3>
+            </div>
+            <div class="verification-card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover verification-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sl. No</th>
+                                <th>Section</th>
+                                <th>Laboratory Name</th>
+                                <th>Required Area (sq.ft)</th>
+                                <th>Existing Area (sq.ft)</th>
+                                <th>Compliance</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < preClinicalItems.Count; i++)
+                            {
+                                var item = preClinicalItems[i];
+                                var compliance = item.ExistingAreaSqFt >= item.RequiredAreaSqFt ? "Compliant" : "Non-Compliant";
+                                var complianceClass = item.ExistingAreaSqFt >= item.RequiredAreaSqFt ? "badge bg-success" : "badge bg-danger";
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@item.Lab?.LaboratorySection</td>
+                                    <td>
+                                        <strong>@item.LabName</strong>
+                                    </td>
+                                    <td>@item.RequiredAreaSqFt.ToString("N2")</td>
+                                    <td>@((item.ExistingAreaSqFt ?? 0).ToString("N2"))</td>
+                                    <td><span class="@complianceClass">@compliance</span></td>
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+

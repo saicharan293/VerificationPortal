@@ -1,0 +1,338 @@
+﻿@model VerificationPortal.Models.DentalCollegeLandBuildingDetail
+
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Land & Building Details - Verification Dashboard";
+    ViewData["ActiveTab"] = "LandAndBuildingDetails";
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action(
+        "PgCourseDetails",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] = "Previous: PG Course Details";
+
+    ViewData["NextTabAction"] = Url.Action(
+        "ClassroomAndLaboratory",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] = "Next: Classroom & Laboratory";
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-building"></i>
+        Land & Building Details
+    </h1>
+    <p class="text-muted mb-0">
+        Review and verify the institution's land and building information.
+    </p>
+</div>
+
+<!-- Note -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+        <p>
+            Verify the land ownership, building approvals, statutory certificates,
+            teaching areas and supporting documents before accepting or rejecting
+            this section.
+        </p>
+    </div>
+</div>
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-building"></i>
+            Land & Building Details
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <!-- Land Details -->
+
+        <h5 class="fw-bold mb-3 border-bottom pb-2">
+            <i class="bi bi-geo-alt"></i>
+            Land Details
+        </h5>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Total Land Area (Acres)</label>
+                <input class="form-control"
+                       value="@(Model.TotalLandAreaAcres?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Land Ownership Type</label>
+                <input class="form-control"
+                       value="@(Model.LandOwnershipType ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Land Category</label>
+                <input class="form-control"
+                       value="@(Model.LandCategory ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Tier 2 / Hilly Area</label>
+                <input class="form-control"
+                       value="@(Model.IsTier2OrHilly ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Future Expansion Space</label>
+                <input class="form-control"
+                       value="@(Model.HasFutureExpansionSpace == true ? "Yes" : (Model.HasFutureExpansionSpace == false ? "No" : "N/A"))"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Land in Two Pieces</label>
+                <input class="form-control"
+                       value="@(Model.IsLandInTwoPieces == true ? "Yes" : (Model.IsLandInTwoPieces == false ? "No" : "N/A"))"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Distance College-Hospital (Km)</label>
+                <input class="form-control"
+                       value="@(Model.DistanceBetweenCollegeAndHospitalKm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Latitude</label>
+                <input class="form-control"
+                       value="@(Model.Latitude?.ToString("N6") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Longitude</label>
+                <input class="form-control"
+                       value="@(Model.Longitude?.ToString("N6") ?? "N/A")"
+                       disabled />
+            </div>
+
+        </div>
+
+        <!-- Documents -->
+
+        <h5 class="fw-bold mb-3 border-bottom pb-2">
+            <i class="bi bi-file-earmark-text"></i>
+            Land Documents
+        </h5>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Sale Deed</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.SaleDeedDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Encumbrance Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.EncumbranceCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Land Use Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.LandUseCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Approved Layout Plan</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.ApprovedLayoutPlanDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Land Sketch</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.LandSketchDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Distance Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.DistanceCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+        </div>
+
+        <!-- Building -->
+
+        <h5 class="fw-bold mb-3 border-bottom pb-2">
+            <i class="bi bi-house"></i>
+            Building Details
+        </h5>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Total Built-up Area (Sq.m)</label>
+                <input class="form-control"
+                       value="@(Model.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Approved Building Plan</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.ApprovedBuildingPlanDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Completion Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.CompletionCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Structural Stability Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.StructuralStabilityCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Fire Safety NOC</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.FireSafetyNocDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Lift License</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.LiftLicenseDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Electrical Safety Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.ElectricalSafetyCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Water Supply Certificate</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.WaterSupplyCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Sewage/Sanitation Approval</label>
+                <input class="form-control"
+                       value="@(string.IsNullOrEmpty(Model.SewageSanitationApprovalDocumentPath) ? "Not Uploaded" : "Uploaded")"
+                       disabled />
+            </div>
+
+        </div>
+
+        <!-- Teaching Areas -->
+
+        <h5 class="fw-bold mb-3 border-bottom pb-2">
+            <i class="bi bi-mortarboard"></i>
+            Teaching Areas
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Lecture Hall Count</label>
+                <input class="form-control" value="@(Model.LectureHallCount ?? 0)" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Lecture Hall Area (Sq.m)</label>
+                <input class="form-control" value="@(Model.LectureHallAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Lecture Hall Seating Capacity</label>
+                <input class="form-control" value="@(Model.LectureHallSeatingCapacity ?? 0)" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Examination Hall Area</label>
+                <input class="form-control" value="@(Model.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Library Area</label>
+                <input class="form-control" value="@(Model.LibraryAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Hospital Area</label>
+                <input class="form-control" value="@(Model.HospitalAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Museum/Demo Rooms</label>
+                <input class="form-control" value="@(Model.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Department-wise Area</label>
+                <input class="form-control" value="@(Model.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")" disabled />
+            </div>
+
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+        {
+            <hr />
+
+            <h5 class="fw-bold">
+                <i class="bi bi-chat-left-text"></i>
+                Remarks
+            </h5>
+
+            <div class="alert alert-secondary">
+                @Model.Remarks
+            </div>
+        }
+
+    </div>
+
+</div>

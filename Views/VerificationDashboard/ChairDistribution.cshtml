@@ -1,0 +1,148 @@
+﻿@model List<VerificationPortal.Models.DentalChairVm>
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Chair Distribution - Verification Dashboard";
+    ViewData["ActiveTab"] = "ChairDistribution";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action(
+        "ClassroomAndLaboratory",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] = "Previous: Classroom & Laboratory";
+
+    ViewData["NextTabAction"] = Url.Action(
+        "TeachingStaffDepartmentWise",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] = "Next: Teaching Staff Department Wise";
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-grid-3x3-gap"></i>
+        Chair Distribution
+    </h1>
+
+    <p class="text-muted mb-0">
+        Verify the number of dental chairs available against the required chairs for each course.
+    </p>
+</div>
+
+<!-- Instructions -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+
+        <p>
+            Verify the required dental chairs based on seat slab and ensure
+            that the existing chairs are adequate for each course.
+        </p>
+    </div>
+</div>
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-grid-3x3-gap"></i>
+            Chair Distribution Details
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:60px;">#</th>
+                            <th>Course</th>
+                            <th>Level</th>
+                            <th>Seat Slab</th>
+                            <th>Required Chairs</th>
+                            <th>Existing Chairs</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            int sl = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>@sl</td>
+
+                                <td>@item.CourseName</td>
+
+                                <td>@item.CourseLevel</td>
+
+                                <td>@item.SeatSlab</td>
+
+                                <td>
+                                    <span class="badge bg-primary">
+                                        @item.ChairsRequired
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (item.ChairsExisting >= item.ChairsRequired)
+                                    {
+                                        <span class="badge bg-success">
+                                            @item.ChairsExisting
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            @item.ChairsExisting
+                                        </span>
+                                    }
+                                </td>
+
+                            </tr>
+
+                            sl++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                No chair distribution details available.
+            </div>
+        }
+
+    </div>
+
+</div>

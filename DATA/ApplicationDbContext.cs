@@ -3307,6 +3307,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasName("PK__DentalCh__3214EC07A9346B59")
                 .HasFillFactor(80);
 
+            entity.Property(e => e.ArName).HasMaxLength(200);
+            entity.Property(e => e.ArRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ArVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.CollegeCode).HasMaxLength(100);
             entity.Property(e => e.CourseLevel)
                 .HasMaxLength(10)
@@ -3314,9 +3317,33 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CourseName)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.CurrentVerificationLevel).HasMaxLength(50);
+            entity.Property(e => e.DeoName).HasMaxLength(200);
+            entity.Property(e => e.DeoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DeoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.DrName).HasMaxLength(200);
+            entity.Property(e => e.DrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.JrName).HasMaxLength(200);
+            entity.Property(e => e.JrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.JrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
+            entity.Property(e => e.OverallStatus).HasMaxLength(30);
+            entity.Property(e => e.ReName).HasMaxLength(200);
+            entity.Property(e => e.ReRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ReVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.RgName).HasMaxLength(200);
+            entity.Property(e => e.RgRemarks).HasMaxLength(1000);
+            entity.Property(e => e.RgVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.SeatSlabId)
                 .HasMaxLength(10)
                 .IsUnicode(false);
+            entity.Property(e => e.SoName).HasMaxLength(200);
+            entity.Property(e => e.SoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.SoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.VcName).HasMaxLength(200);
+            entity.Property(e => e.VcRemarks).HasMaxLength(1000);
+            entity.Property(e => e.VcVerifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.AffiliationType).WithMany(p => p.DentalChairs)
                 .HasForeignKey(d => d.AffiliationTypeId)
@@ -3374,6 +3401,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.ApprovedLayoutPlanDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.ArName).HasMaxLength(200);
+            entity.Property(e => e.ArRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ArVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.CollegeCode).HasMaxLength(100);
             entity.Property(e => e.CompletionCertificateDocumentPath)
                 .HasMaxLength(255)
@@ -3384,11 +3414,18 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.CurrentVerificationLevel).HasMaxLength(50);
+            entity.Property(e => e.DeoName).HasMaxLength(200);
+            entity.Property(e => e.DeoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DeoVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.DepartmentWiseAreaSqm).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.DistanceBetweenCollegeAndHospitalKm).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.DistanceCertificateDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.DrName).HasMaxLength(200);
+            entity.Property(e => e.DrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DrVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.ElectricalSafetyCertificateDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -3400,6 +3437,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.HospitalAreaSqm).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.JrName).HasMaxLength(200);
+            entity.Property(e => e.JrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.JrVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.LandCategory)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -3410,6 +3450,7 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.LandUseCertificateDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");
             entity.Property(e => e.LectureHallAreaSqm).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.LibraryAreaSqm).HasColumnType("decimal(10, 2)");
@@ -3419,18 +3460,31 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
             entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
             entity.Property(e => e.MuseumDemoRoomsAreaSqm).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.OverallStatus).HasMaxLength(30);
             entity.Property(e => e.PreclinicalSkillLabAreaSqm).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.ReName).HasMaxLength(200);
+            entity.Property(e => e.ReRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ReVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.RgName).HasMaxLength(200);
+            entity.Property(e => e.RgRemarks).HasMaxLength(1000);
+            entity.Property(e => e.RgVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.SaleDeedDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.SewageSanitationApprovalDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.SoName).HasMaxLength(200);
+            entity.Property(e => e.SoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.SoVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.StructuralStabilityCertificateDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.TotalBuiltupAreaSqm).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.TotalLandAreaAcres).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.VcName).HasMaxLength(200);
+            entity.Property(e => e.VcRemarks).HasMaxLength(1000);
+            entity.Property(e => e.VcVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.WaterSupplyCertificateDocumentPath)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -3462,6 +3516,9 @@ public partial class ApplicationDbContext : DbContext
                 .IsUnique()
                 .HasFillFactor(80);
 
+            entity.Property(e => e.ArName).HasMaxLength(200);
+            entity.Property(e => e.ArRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ArVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.AvailableAreaSqFt).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.CollegeCode).HasMaxLength(100);
             entity.Property(e => e.CourseLevel)
@@ -3470,8 +3527,32 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.CurrentVerificationLevel).HasMaxLength(50);
+            entity.Property(e => e.DeoName).HasMaxLength(200);
+            entity.Property(e => e.DeoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DeoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.DrName).HasMaxLength(200);
+            entity.Property(e => e.DrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.JrName).HasMaxLength(200);
+            entity.Property(e => e.JrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.JrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.OverallStatus).HasMaxLength(30);
+            entity.Property(e => e.ReName).HasMaxLength(200);
+            entity.Property(e => e.ReRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ReVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.RequiredAreaSqFt).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.RgName).HasMaxLength(200);
+            entity.Property(e => e.RgRemarks).HasMaxLength(1000);
+            entity.Property(e => e.RgVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.SoName).HasMaxLength(200);
+            entity.Property(e => e.SoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.SoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.VcName).HasMaxLength(200);
+            entity.Property(e => e.VcRemarks).HasMaxLength(1000);
+            entity.Property(e => e.VcVerifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.AffiliationType).WithMany(p => p.DentalInfrastructures)
                 .HasForeignKey(d => d.AffiliationTypeId)
@@ -5172,6 +5253,9 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("Medical_UGBedDistribution");
 
+            entity.Property(e => e.ArName).HasMaxLength(200);
+            entity.Property(e => e.ArRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ArVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.CollegeCode)
                 .HasMaxLength(10)
                 .IsUnicode(false);
@@ -5181,19 +5265,43 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.CurrentVerificationLevel).HasMaxLength(50);
+            entity.Property(e => e.DeoName).HasMaxLength(200);
+            entity.Property(e => e.DeoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DeoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.DrName).HasMaxLength(200);
+            entity.Property(e => e.DrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DrVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.Ent).HasColumnName("ENT");
             entity.Property(e => e.FacultyCode)
                 .HasMaxLength(10)
                 .IsUnicode(false);
             entity.Property(e => e.Iccu).HasColumnName("ICCU");
             entity.Property(e => e.Icu).HasColumnName("ICU");
+            entity.Property(e => e.JrName).HasMaxLength(200);
+            entity.Property(e => e.JrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.JrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.MajorOt).HasColumnName("MajorOT");
             entity.Property(e => e.MinorOt).HasColumnName("MinorOT");
             entity.Property(e => e.ObstetricsAnc).HasColumnName("ObstetricsANC");
+            entity.Property(e => e.OverallStatus).HasMaxLength(30);
             entity.Property(e => e.PicuNicu).HasColumnName("PICU_NICU");
+            entity.Property(e => e.ReName).HasMaxLength(200);
+            entity.Property(e => e.ReRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ReVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.RgName).HasMaxLength(200);
+            entity.Property(e => e.RgRemarks).HasMaxLength(1000);
+            entity.Property(e => e.RgVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.Sicu).HasColumnName("SICU");
             entity.Property(e => e.SkinVd).HasColumnName("SkinVD");
+            entity.Property(e => e.SoName).HasMaxLength(200);
+            entity.Property(e => e.SoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.SoVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.TotalIcubeds).HasColumnName("TotalICUBeds");
+            entity.Property(e => e.VcName).HasMaxLength(200);
+            entity.Property(e => e.VcRemarks).HasMaxLength(1000);
+            entity.Property(e => e.VcVerifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.AffiliationType).WithMany(p => p.MedicalUgbedDistributions)
                 .HasForeignKey(d => d.AffiliationTypeId)

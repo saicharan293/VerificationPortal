@@ -1,0 +1,421 @@
+﻿@model VerificationPortal.Models.ClassroomAndLaboratoryViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Classroom & Laboratory";
+    ViewData["ActiveTab"] = "ClassroomAndLaboratory";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName;
+    ViewData["CollegeCode"] = ViewBag.CollegeCode;
+
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["ShowFeedbackForm"] = ViewData["ShowFeedbackForm"];
+    ViewData["CurrentVerifier"] = $"{User.Identity?.Name} - {ViewBag.UserDesignation}";
+
+    ViewData["PrevTabAction"] = Url.Action(
+        "LandAndBuildingDetails",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] = "Previous: Land & Building";
+
+    ViewData["NextTabAction"] = Url.Action("TeachingStaffDepartmentWise", new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] = "Next: Teaching Staff";
+}
+
+@section Scripts
+{
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<!-- Header -->
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-building"></i>
+        Classroom & Laboratory
+    </h1>
+
+    <p class="text-muted mb-0">
+        Review the classroom and laboratory infrastructure before verification.
+    </p>
+</div>
+
+<!-- Instructions -->
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+
+    <div class="note-box-content">
+
+        <h6>Verification Instructions</h6>
+
+        <p class="mb-0">
+            Verify that the available area satisfies the required norms for each
+            classroom and laboratory requirement. Mark the verification status
+            after reviewing all entries.
+        </p>
+
+    </div>
+</div>
+
+<!-- Summary -->
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-primary">@Model.SeatIntake</h4>
+                <small>Seat Intake</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-primary">@Model.SeatSlab</h4>
+                <small>Seat Slab</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="verification-card text-center">
+            <div class="verification-card-body">
+                <h4 class="text-success">
+                    @Model.InfrastructureDetails.Count
+                </h4>
+                <small>Infrastructure Items</small>
+            </div>
+        </div>
+    </div>
+
+    
+
+</div>
+
+<!-- Infrastructure Table -->
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-table"></i>
+            Classroom & Laboratory Infrastructure
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.InfrastructureDetails.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:70px;">Sl.No</th>
+                            <th>Requirement</th>
+                            <th>Description</th>
+                            <th class="text-center">Required Area (Sq.Ft)</th>
+                            <th class="text-center">Available Area (Sq.Ft)</th>
+                            <th class="text-center">Difference</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.InfrastructureDetails)
+                        {
+                            var difference = item.AvailableAreaSqFt - item.RequiredAreaSqFt;
+                            bool compliant = difference >= 0;
+
+                            <tr>
+
+                                <td>@item.SlNo</td>
+
+                                <td>
+                                    <strong>@item.RequirementName</strong>
+                                </td>
+
+                                <td>@item.RequirementDescription</td>
+
+                                <td class="text-end">
+                                    @item.RequiredAreaSqFt.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @item.AvailableAreaSqFt.ToString("N2")
+                                </td>
+
+                                <td class="text-end @(compliant ? "text-success" : "text-danger")">
+                                    @difference.ToString("N2")
+                                </td>
+
+                                <td class="text-center">
+
+                                    @if (compliant)
+                                    {
+                                        <span class="badge bg-success">
+                                            Compliant
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Deficient
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                No classroom and laboratory infrastructure details are available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@if (Model.LandBuildingDetails != null)
+{
+    <div class="verification-card mt-4">
+
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-building"></i>
+                Classroom & Building Details
+            </h3>
+        </div>
+
+        <div class="verification-card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Lecture Hall Count</label>
+                    <div>@Model.LandBuildingDetails.LectureHallCount</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Lecture Hall Area</label>
+                    <div>@Model.LandBuildingDetails.LectureHallAreaSqm Sq.m</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Lecture Hall Seating Capacity</label>
+                    <div>@Model.LandBuildingDetails.LectureHallSeatingCapacity</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Examination Hall Area</label>
+                    <div>@Model.LandBuildingDetails.ExaminationHallAreaSqm Sq.m</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Library Area</label>
+                    <div>@Model.LandBuildingDetails.LibraryAreaSqm Sq.m</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Hospital Area</label>
+                    <div>@Model.LandBuildingDetails.HospitalAreaSqm Sq.m</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Museum / Demo Rooms Area</label>
+                    <div>@Model.LandBuildingDetails.MuseumDemoRoomsAreaSqm Sq.m</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Department-wise Area</label>
+                    <div>@Model.LandBuildingDetails.DepartmentWiseAreaSqm Sq.m</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold">Pre Clinical Skill Lab Area</label>
+                    <div>@Model.LandBuildingDetails.PreclinicalSkillLabAreaSqm Sq.m</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@if (Model.MedicalSkillsLaboratory != null)
+{
+    <div class="verification-card mt-4">
+
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-hospital"></i>
+                Medical Skills Laboratory
+            </h3>
+        </div>
+
+        <div class="verification-card-body">
+
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">
+                        Required Area (Sq.m)
+                    </label>
+                    <div>
+                        @Model.MedicalSkillsLaboratory.TotalAreaRequiredSqm
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">
+                        Available Area (Sq.m)
+                    </label>
+                    <div>
+                        @Model.MedicalSkillsLaboratory.TotalAreaAvailableSqm
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">
+                        Deficiency (Sq.m)
+                    </label>
+                    <div>
+                        @Model.MedicalSkillsLaboratory.TotalAreaDeficiencySqm
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">
+                        Skill Stations
+                    </label>
+                    <div>
+                        @Model.MedicalSkillsLaboratory.NumberOfSkillStations
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <table class="table table-sm table-bordered">
+
+                        <tbody>
+
+                            <tr>
+                                <th>Training Before Clinical</th>
+                                <td>@(Model.MedicalSkillsLaboratory.SixWeeksTrainingCompletedBeforeClinical ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Examination Rooms</th>
+                                <td>@Model.MedicalSkillsLaboratory.NumberOfExaminationRooms</td>
+                            </tr>
+
+                            <tr>
+                                <th>Minimum Four Exam Rooms</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasMinFourExamRooms ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Demo Room</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasDemoRoomSmallGroups ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Debrief Area</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasDebriefArea ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Faculty Coordinator Room</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasFacultyCoordinatorRoom ? "Yes" : "No")</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+
+                    <table class="table table-sm table-bordered">
+
+                        <tbody>
+
+                            <tr>
+                                <th>Support Staff Room</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasSupportStaffRoom ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Storage for Mannequins</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasStorageForMannequins ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Video Recording Facility</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasVideoRecordingFacility ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Required Trainers & Mannequins</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasRequiredTrainersAndMannequins ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Dedicated Technical Officer</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasDedicatedTechnicalOfficer ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Adequate Support Staff</th>
+                                <td>@(Model.MedicalSkillsLaboratory.HasAdequateSupportStaff ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Teaching Areas AV Enabled</th>
+                                <td>@(Model.MedicalSkillsLaboratory.TeachingAreasHaveAv ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Internet Facility</th>
+                                <td>@(Model.MedicalSkillsLaboratory.TeachingAreasHaveInternet ? "Yes" : "No")</td>
+                            </tr>
+
+                            <tr>
+                                <th>E-learning Enabled</th>
+                                <td>@(Model.MedicalSkillsLaboratory.SkillsLabEnabledForElearning ? "Yes" : "No")</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
