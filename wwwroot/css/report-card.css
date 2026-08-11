@@ -217,6 +217,12 @@
     color: var(--gray-900);
 }
 
+.feedback-value.small{
+    font-size: 0.775em;
+    letter-spacing: 0.7px;
+    color: lightslategray;
+}
+
 /* ============================================================
    STATUS BADGES
 ============================================================ */

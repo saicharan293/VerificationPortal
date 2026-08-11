@@ -1,0 +1,393 @@
+﻿@model VerificationPortal.Models.AffHostelDetailsCreateVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Hostel Details";
+    ViewData["ActiveTab"] = "HostelDetails";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action(
+        "BedDistribution",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] = "Previous : Bed Distribution";
+
+    ViewData["NextTabAction"] = Url.Action(
+        "HospitalDetails",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] = "Next : Hospital Details";
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="bi bi-house-door"></i>
+        Hostel Details
+    </h1>
+
+    <p class="text-muted mb-0">
+        Review and verify the hostel infrastructure details.
+    </p>
+</div>
+
+<div class="note-box mb-4">
+    <i class="bi bi-info-circle"></i>
+
+    <div class="note-box-content">
+        <h6>Verification Instructions</h6>
+
+        <p>
+            Verify the hostel infrastructure, accommodation capacity and
+            facilities before approving this section.
+        </p>
+    </div>
+</div>
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-building"></i>
+            Hostel Information
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Hostel Type
+                </label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.HostelType"
+                       disabled />
+            </div>
+
+            @* <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Ownership
+                </label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.OwnOrRented"
+                       disabled />
+            </div> *@
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Built-up Area (Sq. Ft.)
+                </label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.BuiltUpAreaSqFt"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Space per Student
+                </label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.SpacePerStudent"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Separate Hostel Available
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.Hostel.HasSeparateHostel ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Separate Provision for Male/Female
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.Hostel.SeparateProvisionMaleFemale ? "Yes" : "No")"
+                       disabled />
+            </div>
+            @if (Model.Hostel.HasSeparateHostel)
+            {
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Men Hostel Area (Sq. Ft.)
+                    </label>
+
+                    <input class="form-control"
+                           value="@Model.Hostel.MenHostelAreaSqFt"
+                           disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Women Hostel Area (Sq. Ft.)
+                    </label>
+
+                    <input class="form-control"
+                           value="@Model.Hostel.WomenHostelAreaSqFt"
+                           disabled />
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Hostel.PossessionProofPath))
+            {
+                <div class="verification-card mt-4 d-flex">
+
+                    <div class="verification-card-header">
+                        <h3 class="verification-card-title">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            Possession Proof
+                        </h3>
+                    </div>
+
+                    <div class="verification-card-body">
+
+                        <a asp-action="DownloadPossessionProof"
+                           asp-route-collegeCode="@Model.Hostel.CollegeCode"
+                           asp-route-facultyCode="@Model.Hostel.FacultyCode"
+                           class="btn btn-outline-primary"
+                           target="_blank">
+                            <i class="bi bi-download"></i>
+                            View PDF
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-people"></i>
+            Student Accommodation
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-3">
+                <label>Total Male Students</label>
+                <input class="form-control"
+                       value="@Model.Hostel.TotalMaleStudents"
+                       disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label>Total Male Rooms</label>
+                <input class="form-control"
+                       value="@Model.Hostel.TotalMaleRooms"
+                       disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label>Total Female Students</label>
+                <input class="form-control"
+                       value="@Model.Hostel.TotalFemaleStudents"
+                       disabled />
+            </div>
+
+            <div class="col-md-3">
+                <label>Total Female Rooms</label>
+                <input class="form-control"
+                       value="@Model.Hostel.TotalFemaleRooms"
+                       disabled />
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-door-open"></i>
+            Common Room Facilities
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label>Common Room for Men</label>
+
+                <input class="form-control"
+                       value="@(Model.Hostel.CommonRoomMen == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label>Common Room for Women</label>
+
+                <input class="form-control"
+                       value="@(Model.Hostel.CommonRoomWomen == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-12">
+                <label>Any Other Facility</label>
+
+                <textarea class="form-control"
+                          rows="3"
+                          disabled>@Model.Hostel.AnyOtherFacility</textarea>
+            </div>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-12">
+                <label>Hostel Facility Details</label>
+
+                <textarea class="form-control"
+                          rows="3"
+                          disabled>@Model.Hostel.HostelFacilityDetails</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label>Hostel Capacity (Men)</label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.HostelMenCount"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label>Hostel Capacity (Women)</label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.HostelWomenCount"
+                       disabled />
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-check2-square"></i>
+            Hostel Facilities
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <strong>Sleeping Furniture</strong><br />
+                <span class="badge @(Model.Hostel.SleepingFurniture == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.SleepingFurniture == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Sanitary & Bathing Facilities</strong><br />
+                <span class="badge @(Model.Hostel.SanitaryBathing == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.SanitaryBathing == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Dining Hall</strong><br />
+                <span class="badge @(Model.Hostel.DiningHall == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.DiningHall == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Common Room</strong><br />
+                <span class="badge @(Model.Hostel.HostelCommonRoom == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.HostelCommonRoom == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Visitors Room</strong><br />
+                <span class="badge @(Model.Hostel.VisitorsRoom == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.VisitorsRoom == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Kitchen & Pantry</strong><br />
+                <span class="badge @(Model.Hostel.KitchenPantry == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.KitchenPantry == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Warden Office</strong><br />
+                <span class="badge @(Model.Hostel.WardenOffice == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.WardenOffice == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Reception Counter</strong><br />
+                <span class="badge @(Model.Hostel.ReceptionCounter == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.ReceptionCounter == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Games & Recreation</strong><br />
+                <span class="badge @(Model.Hostel.GamesRecreation == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.GamesRecreation == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Medical Facilities</strong><br />
+                <span class="badge @(Model.Hostel.MedicalFacilities == true ? "bg-success" : "bg-danger")">
+                    @(Model.Hostel.MedicalFacilities == true ? "Available" : "Not Available")
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

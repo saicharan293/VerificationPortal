@@ -140,11 +140,22 @@
                                         @* Display-only feedback status *@
                                         <div id="verificationDisplay">
 
-                                            @if (ViewData["ExistingRemarks"] != null)
+                                            @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
                                             {
                                                 <div class="feedback-item">
                                                     <label class="feedback-label">Previous Remarks</label>
-                                                    <div class="feedback-value">@ViewData["ExistingRemarks"]</div>
+                                                    <div class="feedback-value">
+                                                        @ViewData["ExistingRemarks"]
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="feedback-item">
+                                                    <label class="feedback-label">Previous Remarks</label>
+                                                    <div class="feedback-value small">
+                                                        No previous remarks available.
+                                                    </div>
                                                 </div>
                                             }
 

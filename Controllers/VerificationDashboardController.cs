@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
@@ -927,10 +928,13 @@ namespace VerificationPortal.Controllers
                 { "PrincipalDetails", typeof(AffPrincipalDetail) },
                 { "UgCourseDetails", typeof(AffiliationCourseDetail) },
                 { "PgCourseDetails", typeof(AffiliationPgSsCourseDetail) },
-                { "Hostel_Details", typeof(AffHostelDetail) },
                 { "LandAndBuildingDetails", typeof(DentalCollegeLandBuildingDetail) },
                 { "ChairDistribution", typeof(DentalChair) },
                 { "BedDistribution", typeof(MedicalUgbedDistribution) },
+
+                { "HostelDetails", typeof(AffHostelDetail) },
+
+                { "DepartmentOfficesAndEducationalUnit", typeof(MedicalDepartmentOfficesMeu) },
 
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
                 { "TeachingStaffDepartmentWise", typeof(TeachingStaffDepartmentWiseDetail) },
@@ -1154,6 +1158,30 @@ namespace VerificationPortal.Controllers
             return View(model);
         }
 
+        private async Task<VerificationPageContext> GetPageContextAsync(string collegeCode)
+        {
+            var institution = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+            if (institution == null)
+                throw new Exception($"Institution not found for college code '{collegeCode}'.");
+
+            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
+                throw new Exception("Faculty code not found.");
+
+            return new VerificationPageContext
+            {
+                Institution = institution
+            };
+        }
+
+        private void PopulateCommonViewBags(VerificationPageContext context)
+        {
+            ViewBag.InstitutionName = context.InstitutionName;
+            ViewBag.CollegeCode = context.CollegeCode;
+            ViewBag.FacultyCode = context.FacultyCode;
+        }
 
         [HttpGet]
         public async Task<IActionResult> BedDistribution(string collegeCode)
@@ -1164,16 +1192,11 @@ namespace VerificationPortal.Controllers
             var college = await _context.AffiliationCollegeMasters
                 .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            var context = await GetPageContextAsync(collegeCode);
 
-            if (institution == null)
-                return NotFound($"Institution not found for college code: {collegeCode}");
+            PopulateCommonViewBags(context);
 
-            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
-                return NotFound("Faculty code not found.");
-
-            int facultyCode = Convert.ToInt32(institution.FacultyCode);
+            int facultyCode = context.FacultyCodeInt;
 
             var existing = await _context.MedicalUgbedDistributions
                 .FirstOrDefaultAsync(x =>
@@ -1225,7 +1248,7 @@ namespace VerificationPortal.Controllers
             ViewBag.FacultyCode = facultyCode;
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = institution.NameOfInstitution ?? "Unknown Institution";
+            ViewBag.InstitutionName = context.InstitutionName ?? "Unknown Institution";
             ViewBag.ActiveTab = "BedDistribution";
             ViewBag.UserDesignation = GetUserDesignation();
 
@@ -1233,6 +1256,238 @@ namespace VerificationPortal.Controllers
 
             return View(vm);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> HostelDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            PopulateCommonViewBags(context);
+
+            ViewBag.ActiveTab = "HostelDetails";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
+
+            var hostel = await _context.AffHostelDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == context.FacultyCode);
+
+            if (hostel != null && !string.IsNullOrWhiteSpace(hostel.OwnOrRented))
+                hostel.OwnOrRented = hostel.OwnOrRented.Trim();
+
+            var vm = new AffHostelDetailsCreateVm
+            {
+                Hostel = hostel ?? new AffHostelDetail
+                {
+                    CollegeCode = collegeCode,
+                    FacultyCode = context.FacultyCode
+                }
+            };
+
+            await SetVerificationViewData<AffHostelDetail>(collegeCode);
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DepartmentOfficesAndEducationalUnit(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction(nameof(Index));
+
+            // Get common verification context
+            var context = await GetPageContextAsync(collegeCode);
+
+            // Populate common ViewBags
+            PopulateCommonViewBags(context);
+
+            ViewBag.ActiveTab = "DepartmentOfficesAndEducationalUnit";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            // Use FacultyCode from VerificationPageContext
+            var facultyCode = context.FacultyCode;
+
+            var entity = await _context.MedicalDepartmentOfficesMeus
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == context.CollegeCode &&
+                    x.FacultyCode == facultyCode);
+
+            if (entity == null)
+                return NotFound();
+
+            var vm = new DepartmentOfficesMeuViewModel
+            {
+                CourseLevel = entity.CourseLevel,
+
+                // Common Department / Office details
+                HasHodRoomWithOfficeAndRecords =
+                    entity.HasHodRoomWithOfficeAndRecords,
+
+                HasRoomsForFacultyAndResidents =
+                    entity.HasRoomsForFacultyAndResidents,
+
+                FacultyRoomsHaveCommunicationComputerInternet =
+                    entity.FacultyRoomsHaveCommunicationComputerInternet,
+
+                HasRoomsForNonTeachingStaff =
+                    entity.HasRoomsForNonTeachingStaff
+            };
+
+            // ==========================================
+            // DENTAL EDUCATION UNIT
+            // ==========================================
+            if (facultyCode == "2")
+            {
+                vm.HasDentalEducationUnit =
+                    entity.HasDentalEducationUnit;
+
+                vm.DentalEducationUnitAreaSqm =
+                    entity.DentalEducationUnitAreaSqm;
+
+                vm.DentalEducationUnitHasAudioVisual =
+                    entity.DentalEducationUnitHasAudioVisual;
+
+                vm.DentalEducationUnitHasInternet =
+                    entity.DentalEducationUnitHasInternet;
+
+                vm.DeuCoordinatorName =
+                    entity.DeuCoordinatorName;
+
+                vm.DeuCoordinatorDesignationDepartment =
+                    entity.DeuCoordinatorDesignationDepartment;
+
+                vm.DeuCoordinatorPhone =
+                    entity.DeuCoordinatorPhone;
+
+                vm.DeuCoordinatorEmail =
+                    entity.DeuCoordinatorEmail;
+
+                vm.DeuActivitiesLastAcademicYear =
+                    entity.DeuActivitiesLastAcademicYear;
+
+                vm.HasDeuMembersListFile =
+                    !string.IsNullOrWhiteSpace(entity.DeuMembersListFilePath);
+            }
+
+            // ==========================================
+            // MEDICAL EDUCATION UNIT
+            // ==========================================
+            else
+            {
+                vm.HasMedicalEducationUnit =
+                    entity.HasMedicalEducationUnit;
+
+                vm.MedicalEducationUnitAreaSqm =
+                    entity.MedicalEducationUnitAreaSqm;
+
+                vm.MedicalEducationUnitHasAudioVisual =
+                    entity.MedicalEducationUnitHasAudioVisual;
+
+                vm.MedicalEducationUnitHasInternet =
+                    entity.MedicalEducationUnitHasInternet;
+
+                vm.MeuCoordinatorName =
+                    entity.MeuCoordinatorName;
+
+                vm.MeuCoordinatorDesignationDepartment =
+                    entity.MeuCoordinatorDesignationDepartment;
+
+                vm.MeuCoordinatorPhone =
+                    entity.MeuCoordinatorPhone;
+
+                vm.MeuCoordinatorEmail =
+                    entity.MeuCoordinatorEmail;
+
+                vm.MeuActivitiesLastAcademicYear =
+                    entity.MeuActivitiesLastAcademicYear;
+
+                vm.HasMeuMembersListFile =
+                    !string.IsNullOrWhiteSpace(entity.MeuMembersListFilePath);
+            }
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewDeuMembersList(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            // Get common verification context
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.FacultyCode;
+
+            var entity = await _context.MedicalDepartmentOfficesMeus
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == context.CollegeCode &&
+                    x.FacultyCode == facultyCode);
+
+            if (entity == null)
+                return NotFound("Department / Educational Unit details not found.");
+
+            if (string.IsNullOrWhiteSpace(entity.DeuMembersListFilePath))
+                return NotFound("DEU Members List file not found.");
+
+            if (!System.IO.File.Exists(entity.DeuMembersListFilePath))
+                return NotFound("DEU Members List file does not exist.");
+
+            // Open PDF directly in browser
+            Response.Headers["Content-Disposition"] = "inline";
+
+            return PhysicalFile(
+                entity.DeuMembersListFilePath,
+                "application/pdf"
+            );
+        }
+
+        private async Task PopulateCommonViewBags(string collegeCode)
+        {
+            var institution = await _context.AffInstitutionsDetails
+                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = HttpContext.Session.GetString("FacultyCode");
+
+            if (institution != null)
+            {
+                ViewBag.InstitutionName = institution.NameOfInstitution;
+            }
+
+            ViewBag.UserDesignation = HttpContext.Session.GetString("UserDesignation");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadPossessionProof(string collegeCode, string facultyCode)
+        {
+            var hostel = await _context.AffHostelDetails
+                .FirstOrDefaultAsync(h => h.CollegeCode == collegeCode && h.FacultyCode == facultyCode);
+
+            if (hostel == null ||
+                string.IsNullOrEmpty(hostel.PossessionProofPath) ||
+                !System.IO.File.Exists(hostel.PossessionProofPath))
+                return NotFound("File not found");
+
+            // 🔥 INLINE VIEW (NOT DOWNLOAD)
+            Response.Headers["Content-Disposition"] = "inline";
+
+            return PhysicalFile(hostel.PossessionProofPath, "application/pdf");
+        }
+
 
         // POST: Save verification remarks and status
         [HttpPost]
@@ -1309,6 +1564,16 @@ namespace VerificationPortal.Controllers
 
                     ["BedDistribution"] = () =>
                         _verificationService.SaveVerificationAsync<MedicalUgbedDistribution>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["HostelDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<AffHostelDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["DepartmentOfficesAndEducationalUnit"] = () =>
+                        _verificationService.SaveVerificationAsync<MedicalDepartmentOfficesMeu>(
                             x => x.CollegeCode == collegeCode,
                             request),
 
