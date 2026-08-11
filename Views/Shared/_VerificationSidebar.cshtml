@@ -169,6 +169,50 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a asp-controller="VerificationDashboard"
+                       asp-action="EquipmentList"
+                       asp-route-collegeCode="@ViewBag.CollegeCode"
+                       class="nav-link @(ViewBag.ActiveTab == "EquipmentList" ? "active" : "")">
+
+                        <i class="bi bi-tools"></i>
+                        <span>Equipment List</span>
+
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="VerificationDashboard"
+                       asp-action="CA_VehicleDetails"
+                       asp-route-collegeCode="@ViewBag.CollegeCode"
+                       class="nav-link @(ViewBag.ActiveTab == "CAVehicleDetails" ? "active" : "")">
+
+                        <i class="bi bi-car-front"></i>
+                        <span>Vehicle Details</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="VerificationDashboard"
+                       asp-action="UgAcademicMatters"
+                       asp-route-collegeCode="@ViewBag.CollegeCode"
+                       class="nav-link @(ViewBag.ActiveTab == "UgAcademicMatters" ? "active" : "")">
+
+                        <i class="bi bi-mortarboard"></i>
+
+                        <span>UG Academic Matters</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="VerificationDashboard"
+                       asp-action="PgAcademicMatters"
+                       asp-route-collegeCode="@ViewBag.CollegeCode"
+                       class="nav-link @(ViewBag.ActiveTab == "PgAcademicMatters" ? "active" : "")">
+
+                        <i class="bi bi-mortarboard"></i>
+                        <span>PG Academic Matters</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link @(activeTab == "Clinical" ? "active" : "")"
                        asp-controller="VerificationDashboard" asp-action="Clinical" asp-route-collegeCode="@collegeCode">
                         <i class="bi bi-hospital"></i>

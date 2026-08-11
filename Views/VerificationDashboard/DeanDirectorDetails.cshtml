@@ -42,54 +42,54 @@
     </div>
 </div>
 
-    <div class="verification-card mb-4">
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-person-badge"></i>
-                Dean / Director Information
-            </h3>
+<div class="verification-card mb-4">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge"></i>
+            Dean / Director Information
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Dean Name</label>
+                <input type="text" class="form-control" value="@Model.DeanName" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Dean Mobile Number</label>
+                <input type="text" class="form-control" value="@Model.DeanMobileNumber" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Dean Email ID</label>
+                <input type="email" class="form-control" value="@Model.DeanEmailId" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Director Name</label>
+                <input type="text" class="form-control" value="@Model.DeanName" disabled />
+                <div class="form-text">Same as Dean in this model</div>
+            </div>
         </div>
-        <div class="verification-card-body">
+
+        <div class="form-section mt-4">
+            <h5 class="form-section-title"><i class="bi bi-person-lines-fill me-2"></i>Head of Institution Details</h5>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Dean Name</label>
-                    <input type="text" class="form-control" value="@Model.DeanName" disabled />
+                    <label class="form-label">Head of Institution Name</label>
+                    <input type="text" class="form-control" value="@Model.HeadOfInstitution" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Dean Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.DeanMobileNumber" disabled />
+                    <label class="form-label">Head Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionMobNo" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Dean Email ID</label>
-                    <input type="email" class="form-control" value="@Model.DeanEmailId" disabled />
+                    <label class="form-label">Head Email</label>
+                    <input type="email" class="form-control" value="@Model.HeadOfInstitutionEmail" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Director Name</label>
-                    <input type="text" class="form-control" value="@Model.DeanName" disabled />
-                    <div class="form-text">Same as Dean in this model</div>
-                </div>
-            </div>
-
-            <div class="form-section mt-4">
-                <h5 class="form-section-title"><i class="bi bi-person-lines-fill me-2"></i>Head of Institution Details</h5>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Head of Institution Name</label>
-                        <input type="text" class="form-control" value="@Model.HeadOfInstitution" disabled />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Head Mobile Number</label>
-                        <input type="text" class="form-control" value="@Model.HeadOfInstitutionMobNo" disabled />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Head Email</label>
-                        <input type="email" class="form-control" value="@Model.HeadOfInstitutionEmail" disabled />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Head Address</label>
-                        <input type="text" class="form-control" value="@Model.HeadAddress" disabled />
-                    </div>
+                    <label class="form-label">Head Address</label>
+                    <input type="text" class="form-control" value="@Model.HeadAddress" disabled />
                 </div>
             </div>
         </div>
     </div>
+</div>

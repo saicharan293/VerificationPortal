@@ -15,6 +15,7 @@ namespace VerificationPortal.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IVerificationService _verificationService;
+        private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
 
         public VerificationDashboardController(ApplicationDbContext context, IVerificationService verificationService)
         {
@@ -434,19 +435,35 @@ namespace VerificationPortal.Controllers
             return View(model);
         }
 
-        private async Task SetVerificationViewData<T>(string collegeCode)  where T : class
+        private async Task SetVerificationViewData<T>(string collegeCode)
+    where T : class
         {
             var property = typeof(T).GetProperties()
                 .FirstOrDefault(p =>
-                    p.Name.Equals("CollegeCode", StringComparison.OrdinalIgnoreCase));
+                    p.Name.Equals(
+                        "CollegeCode",
+                        StringComparison.OrdinalIgnoreCase));
 
             if (property == null)
-                throw new Exception($"{typeof(T).Name} does not contain a CollegeCode property.");
+                throw new Exception(
+                    $"{typeof(T).Name} does not contain a CollegeCode property.");
 
             var verification = await _verificationService
                 .GetVerificationAsync<T>(
                     x => EF.Property<string>(x, property.Name) == collegeCode,
                     GetUserDesignation());
+
+            if (verification == null)
+            {
+                ViewData["ExistingRemarks"] = null;
+                ViewData["ExistingStatus"] = "Pending";
+                ViewData["ExistingStatusClass"] = "bg-warning";
+                ViewData["VerifiedBy"] = null;
+                ViewData["VerifiedDate"] = null;
+                ViewData["ShowFeedbackForm"] = true;
+
+                return;
+            }
 
             ViewData["ExistingRemarks"] = verification.Remarks;
 
@@ -465,8 +482,12 @@ namespace VerificationPortal.Controllers
             };
 
             ViewData["VerifiedBy"] = verification.VerifiedBy;
-            ViewData["VerifiedDate"] = verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
-            ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
+
+            ViewData["VerifiedDate"] =
+                verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
+
+            ViewData["ShowFeedbackForm"] =
+                verification.IsVerified == null;
         }
 
         // GET: /VerificationDashboard/PrincipalDetails/{collegeCode}
@@ -936,6 +957,14 @@ namespace VerificationPortal.Controllers
 
                 { "DepartmentOfficesAndEducationalUnit", typeof(MedicalDepartmentOfficesMeu) },
 
+                { "EquipmentList", typeof(DentalCollegeEquipmentDetail) },
+
+                { "CAVehicleDetails", typeof(CaVehicleDetail) },
+
+                { "UgAcademicMatters", typeof(CaAcademicPerformance) },
+
+                { "PgAcademicMatters",typeof(CaAcademicPerformance) },
+
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
                 { "TeachingStaffDepartmentWise", typeof(TeachingStaffDepartmentWiseDetail) },
                 { "AcademicIntake", typeof(CollegeCourseIntakeDetail) }
@@ -1158,6 +1187,114 @@ namespace VerificationPortal.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> EquipmentList(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            var institution = await _context.AffInstitutionsDetails
+                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+            if (institution == null)
+                return NotFound($"Institution not found for college code: {collegeCode}");
+
+            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
+                return NotFound("Faculty code not found.");
+
+            var facultyCode = Convert.ToInt32(institution.FacultyCode);
+
+            // Department master
+            var departments = await _context.MstEquipmentDepartments
+                .Where(x =>
+                    x.FacultyCode == facultyCode &&
+                    x.IsActive)
+                .ToListAsync();
+
+            var departmentLookup = departments
+                .GroupBy(x => x.DepartmentCode)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.First().DepartmentName
+                );
+
+            // Master equipment
+            var masterEquipment = await _context.MstEquipmentDeptWises
+                .Where(x =>
+                    x.FacultyCode == facultyCode &&
+                    x.IsActive)
+                .OrderBy(x => x.DepartmentCode)
+                .ThenBy(x => x.EquipmentName)
+                .ToListAsync();
+
+            // Existing college equipment
+            var savedEquipment = await _context.DentalCollegeEquipmentDetails
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.IsActive)
+                .ToListAsync();
+
+            var savedLookup = savedEquipment
+                .GroupBy(x => x.EquipmentId)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.First()
+                );
+
+            var equipments = masterEquipment
+                .Select(item =>
+                {
+                    savedLookup.TryGetValue(item.Id, out var saved);
+
+                    departmentLookup.TryGetValue(
+                        item.DepartmentCode,
+                        out var departmentName);
+
+                    return new EquipmentRowVM
+                    {
+                        EquipmentId = item.Id,
+
+                        DepartmentCode = item.DepartmentCode,
+
+                        DepartmentName =
+                            departmentName ?? item.DepartmentCode,
+
+                        EquipmentName = item.EquipmentName,
+
+                        Specification = item.Specification,
+
+                        OneUnitReq = item.OneUnitRequirement,
+
+                        TwoUnitReq = item.TwoUnitRequirement,
+
+                        OneUnitExisting = saved?.OneUnitExisting,
+
+                        TwoUnitExisting = saved?.TwoUnitExisting
+                    };
+                })
+                .ToList();
+
+            var vm = new EquipmentPageVM
+            {
+                CollegeCode = collegeCode,
+                FacultyCode = facultyCode,
+                Equipments = equipments
+            };
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.InstitutionName =
+                institution.NameOfInstitution ?? "Unknown Institution";
+
+            ViewBag.ActiveTab = "EquipmentList";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            await SetVerificationViewData<DentalCollegeEquipmentDetail>(
+                collegeCode);
+
+            return View(vm);
+        }
         private async Task<VerificationPageContext> GetPageContextAsync(string collegeCode)
         {
             var institution = await _context.AffInstitutionsDetails
@@ -1489,6 +1626,512 @@ namespace VerificationPortal.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> CA_VehicleDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            // Get institution information
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var institution = pageContext.Institution;
+            var facultyCode = institution.FacultyCode!.Trim();
+
+
+            // Get vehicle details
+            var vehicles = await _context.CaVehicleDetails
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode)
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+
+            // Map to ViewModel
+            var vm = new CA_VehicleDetailsViewModel
+            {
+                CollegeCode = collegeCode,
+                FacultyCode = facultyCode,
+                RegistrationNo = vehicles
+                    .FirstOrDefault()?.RegistrationNo,
+
+                ExistingList = vehicles.Select(x => new CA_VehicleDetailsViewModel
+                {
+                    Id = x.Id,
+                    CollegeCode = x.CollegeCode,
+                    FacultyCode = x.FacultyCode,
+                    RegistrationNo = x.RegistrationNo,
+
+                    VehicleRegNo = x.VehicleRegNo,
+                    VehicleForCode = x.VehicleForCode,
+                    SeatingCapacity = x.SeatingCapacity,
+
+                    // DateOnly -> DateTime for ViewModel
+                    ValidityDate = x.ValidityDate.HasValue
+                        ? x.ValidityDate.Value.ToDateTime(TimeOnly.MinValue)
+                        : null,
+
+                    RcBookStatus = x.RcBookStatus,
+                    InsuranceStatus = x.InsuranceStatus,
+                    DrivingLicenseStatus = x.DrivingLicenseStatus
+
+                }).ToList()
+            };
+
+            // Common verification page data
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.InstitutionName = institution.NameOfInstitution ?? "Unknown Institution";
+            ViewBag.UserDesignation = GetUserDesignation();
+            ViewBag.ActiveTab = "CAVehicleDetails";
+
+            await SetVerificationViewData<CaVehicleDetail>(collegeCode);
+
+            return View(vm);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> UgAcademicMatters(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            // Common verification page context
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var institution = pageContext.Institution;
+
+            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(institution.FacultyCode.Trim(), out int facultyId))
+                return NotFound("Invalid faculty code.");
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+            var model = new CA_Aff_AcademicMattersViewModel
+            {
+                CollegeCode = collegeCode,
+                FacultyId = facultyId,
+                AffiliationType = affiliationType
+            };
+
+            // ============================================================
+            // 1. ACADEMIC PERFORMANCE
+            // ============================================================
+
+            var academics = await _context.CaAcademicPerformances
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.AffiliationType == affiliationType &&
+                    x.YearOfStudyId != null &&
+                    _yearIds.Contains(x.YearOfStudyId.Value))
+                .ToListAsync();
+
+            var yearMaster = await _context.CaMstYearOfStudies
+                .AsNoTracking()
+                .Where(y => _yearIds.Contains(y.YearOfStudyId))
+                .ToDictionaryAsync(
+                    y => y.YearOfStudyId,
+                    y => y.YearName);
+
+            var academicRows = new List<AcademicPerformanceViewModel>();
+
+            foreach (var yearId in _yearIds)
+            {
+                if (!yearId.HasValue)
+                    continue;
+
+                var existing = academics
+                    .FirstOrDefault(x => x.YearOfStudyId == yearId.Value);
+
+                academicRows.Add(new AcademicPerformanceViewModel
+                {
+                    AcademicPerformanceId =
+                        existing?.AcademicPerformanceId ?? 0,
+
+                    YearOfStudyId = yearId.Value,
+
+                    YearName = yearMaster.TryGetValue(
+                        yearId.Value,
+                        out var yearName)
+                            ? yearName
+                            : "",
+
+                    RegularStudents = existing?.RegularStudents,
+                    RepeaterStudents = existing?.RepeaterStudents,
+                    NumberOfStudentsPassed = existing?.NumberOfStudentsPassed,
+                    PassPercentage = existing?.PassPercentage,
+                    FirstClassCount = existing?.FirstClassCount,
+                    DistinctionCount = existing?.DistinctionCount,
+                    Remarks = existing?.Remarks
+                });
+            }
+
+            model.AcademicRows = academicRows;
+
+
+            // ============================================================
+            // 2. COURSE CURRICULUM
+            // ============================================================
+
+            var curriculumMasters = await _context.CaMstCourseCurricula
+                .AsNoTracking()
+                .Where(x => x.IsActive != false)
+                .OrderBy(x => x.CurriculumId)
+                .ToListAsync();
+
+            var savedCurriculums = await _context.CaCourseCurricula
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.AffiliationType == affiliationType)
+                .ToListAsync();
+
+            model.CourseCurriculums = curriculumMasters
+                .Select(master =>
+                {
+                    var saved = savedCurriculums
+                        .FirstOrDefault(x =>
+                            x.CurriculumId == master.CurriculumId);
+
+                    return new CourseCurriculumViewModel
+                    {
+                        CourseCurriculumId =
+                            saved?.CourseCurriculumId,
+
+                        CurriculumId =
+                            master.CurriculumId,
+
+                        CurriculumName =
+                            master.CurriculumName,
+
+                        CurriculumDetails =
+                            saved?.CurriculumDetails,
+
+                        HasPdf =
+                            saved != null &&
+                            !string.IsNullOrWhiteSpace(
+                                saved.CurriculumPdfPath)
+                    };
+                })
+                .ToList();
+
+
+            // ============================================================
+            // 3. EXAMINATION SCHEMES
+            // ============================================================
+
+            var savedSchemes = await _context.CaExaminationSchemes
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.AffiliationType == affiliationType)
+                .ToListAsync();
+
+            var schemeMasters = await _context.CaMstExaminationSchemes
+                .AsNoTracking()
+                .OrderBy(x => x.SchemeId)
+                .ToListAsync();
+
+            model.ExaminationSchemess = schemeMasters
+                .Select(master =>
+                {
+                    var saved = savedSchemes
+                        .FirstOrDefault(x =>
+                            x.SchemeId == master.SchemeId);
+
+                    return new ExaminationSchemeRowViewModel
+                    {
+                        SchemeId = master.SchemeId,
+                        SchemeCode = master.SchemeCode,
+                        NumberOfStudents =
+                            saved?.NumberOfStudents
+                    };
+                })
+                .ToList();
+
+
+            // ============================================================
+            // 4. STUDENT REGISTER RECORDS
+            // ============================================================
+
+            var registerMasters = await _context.CaMstRegisterRecords
+                .AsNoTracking()
+                .OrderBy(x => x.RegisterRecordId)
+                .ToListAsync();
+
+            var savedRegisters = await _context.CaStudentRegisterRecords
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.AffiliationType == affiliationType)
+                .ToListAsync();
+
+            model.StudentRegisterRecords = registerMasters
+                .Select(master =>
+                {
+                    var saved = savedRegisters
+                        .FirstOrDefault(x =>
+                            x.RegisterRecordId ==
+                            master.RegisterRecordId);
+
+                    return new StudentRegisterRecordViewModel
+                    {
+                        StudentRegisterRecordId =
+                            saved?.StudentRegisterRecordId,
+
+                        RegisterRecordId =
+                            master.RegisterRecordId,
+
+                        RegisterName =
+                            master.RegisterName,
+
+                        IsMaintained =
+                            saved?.IsMaintained
+                    };
+                })
+                .ToList();
+
+
+            // ============================================================
+            // 5. COMMON VIEW DATA
+            // ============================================================
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = institution.FacultyCode;
+            ViewBag.InstitutionName =
+                institution.NameOfInstitution ?? "Unknown Institution";
+
+            ViewBag.ActiveTab = "UgAcademicMatters";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            // Existing verification information
+            await SetVerificationViewData<CaAcademicPerformance>(
+                collegeCode);
+
+
+            return View("UgAcademicMatters", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PgAcademicMatters(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction(nameof(Index));
+
+            // --------------------------------------------------
+            // Common verification page context
+            // --------------------------------------------------
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var institution = pageContext.Institution;
+
+            var facultyCode = institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(facultyCode, out var facultyId))
+                return NotFound("Invalid faculty code.");
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+            const string courseLevel = "PG";
+
+            // --------------------------------------------------
+            // Subject Master
+            // --------------------------------------------------
+            var subjects = await (
+                from c in _context.MstCourses
+                join i in _context.CollegeCourseIntakeDetails
+                    on c.CourseCode.ToString() equals i.CourseCode
+                where c.CourseLevel == courseLevel
+                      && i.CollegeCode == collegeCode
+                      && i.FacultyCode == facultyId
+                group c by new
+                {
+                    c.CourseCode,
+                    c.SubjectName
+                }
+                into g
+                orderby g.Key.SubjectName
+                select new SelectListItem
+                {
+                    Value = g.Key.CourseCode.ToString(),
+                    Text = g.Key.SubjectName
+                }
+            ).ToListAsync();
+
+            // --------------------------------------------------
+            // Fallback subject lookup
+            // --------------------------------------------------
+            if (!subjects.Any())
+            {
+                subjects = await (
+                    from ai in _context.AcademicIntakes
+                    join c in _context.MstCourses
+                        on ai.Courses equals c.CourseCode.ToString()
+                    where ai.CollegeCode == collegeCode
+                          && c.CourseLevel == courseLevel
+                    group c by new
+                    {
+                        c.CourseCode,
+                        c.SubjectName
+                    }
+                    into g
+                    orderby g.Key.SubjectName
+                    select new SelectListItem
+                    {
+                        Value = g.Key.CourseCode.ToString(),
+                        Text = g.Key.SubjectName
+                    }
+                ).ToListAsync();
+            }
+
+            var subjectLookup = subjects
+                .ToDictionary(
+                    x => x.Value,
+                    x => x.Text
+                );
+            // --------------------------------------------------
+            // Main ViewModel
+            // --------------------------------------------------
+            var model = new CA_Aff_PgAcademicMattersViewModel
+            {
+                CollegeCode = collegeCode,
+                FacultyId = facultyId,
+                AffiliationType = affiliationType,
+                Subjects = subjects
+            };
+
+            // --------------------------------------------------
+            // Year Master
+            // --------------------------------------------------
+            var yearMaster = await _context.CaMstYearOfStudies
+                .AsNoTracking()
+                .Take(3)
+                .OrderBy(y => y.YearOfStudyId)
+                .ToListAsync();
+
+            ViewBag.YearList = yearMaster;
+
+            // --------------------------------------------------
+            // Existing PG Academic Performance
+            // --------------------------------------------------
+            var academics = await _context.CaAcademicPerformances
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.AffiliationType == affiliationType &&
+                    x.CourseLevel == courseLevel)
+                .ToListAsync();
+
+            // --------------------------------------------------
+            // Group by Subject
+            // --------------------------------------------------
+            var sections = new List<PgSubjectSectionVM>();
+
+            var grouped = academics
+                .Where(x => !string.IsNullOrWhiteSpace(x.Subject))
+                .GroupBy(x => x.Subject!);
+
+            foreach (var subjectGroup in grouped)
+            {
+                var section = new PgSubjectSectionVM
+                {
+                    Subject = subjectLookup.TryGetValue(subjectGroup.Key, out var subjectName)
+                        ? subjectName
+                        : subjectGroup.Key,
+                    YearData = new List<YearDataVM>()
+                };
+
+                foreach (var year in yearMaster)
+                {
+                    var existing = subjectGroup
+                        .FirstOrDefault(x =>
+                            x.YearOfStudyId == year.YearOfStudyId);
+
+                    section.YearData.Add(new YearDataVM
+                    {
+                        YearOfStudyId = year.YearOfStudyId,
+                        YearName = year.YearName,
+
+                        RegularStudents =
+                            existing?.RegularStudents,
+
+                        RepeaterStudents =
+                            existing?.RepeaterStudents,
+
+                        NumberOfStudentsPassed =
+                            existing?.NumberOfStudentsPassed,
+
+                        PassPercentage =
+                            existing?.PassPercentage,
+
+                        FirstClassCount =
+                            existing?.FirstClassCount,
+
+                        DistinctionCount =
+                            existing?.DistinctionCount,
+
+                        Remarks =
+                            existing?.Remarks
+                    });
+                }
+
+                sections.Add(section);
+            }
+
+            // --------------------------------------------------
+            // If no saved data exists, create empty sections
+            // for the available PG subjects
+            // --------------------------------------------------
+            if (!sections.Any())
+            {
+                foreach (var subject in subjects)
+                {
+                    sections.Add(new PgSubjectSectionVM
+                    {
+                        Subject = subject.Text,
+                        YearData = yearMaster
+                            .Select(y => new YearDataVM
+                            {
+                                YearOfStudyId = y.YearOfStudyId,
+                                YearName = y.YearName
+                            })
+                            .ToList()
+                    });
+                }
+            }
+
+            model.Sections = sections;
+
+            // --------------------------------------------------
+            // Verification View Data
+            // --------------------------------------------------
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.InstitutionName =
+                institution.NameOfInstitution ?? "Unknown Institution";
+            ViewBag.ActiveTab = "PgAcademicMatters";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            await SetVerificationViewData<CaAcademicPerformance>(
+                collegeCode);
+
+            return View("PgAcademicMatters", model);
+        }
+
         // POST: Save verification remarks and status
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1509,6 +2152,16 @@ namespace VerificationPortal.Controllers
                     TempData["ErrorMessage"] = $"Verification is not configured for '{tabName}'.";
                     return RedirectToAction(tabName, new { collegeCode });
                 }
+
+                var institution = await _context.AffInstitutionsDetails.FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+                if (institution == null || string.IsNullOrWhiteSpace(institution.FacultyCode))
+                {
+                    TempData["ErrorMessage"] = "Faculty code not found.";
+                    return RedirectToAction(tabName, new { collegeCode });
+                }
+
+                var facultyCode = Convert.ToInt32(institution.FacultyCode);
 
                 var verificationHandlers = new Dictionary<string, Func<Task>>
                 {
@@ -1574,6 +2227,27 @@ namespace VerificationPortal.Controllers
 
                     ["DepartmentOfficesAndEducationalUnit"] = () =>
                         _verificationService.SaveVerificationAsync<MedicalDepartmentOfficesMeu>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["EquipmentList"] = () =>
+                        _verificationService.SaveVerificationAsync<DentalCollegeEquipmentDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode,
+                            request),
+
+                    ["CA_VehicleDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<CaVehicleDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["UgAcademicMatters"] = () =>
+                        _verificationService.SaveVerificationAsync<CaAcademicPerformance>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["PgAcademicMatters"] = () =>
+                        _verificationService.SaveVerificationAsync<CaAcademicPerformance>(
                             x => x.CollegeCode == collegeCode,
                             request),
 

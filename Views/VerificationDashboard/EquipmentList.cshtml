@@ -1,0 +1,430 @@
+﻿@model VerificationPortal.Models.EquipmentPageVM
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Equipment List";
+    ViewData["ActiveTab"] = "EquipmentList";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    // Update these according to your actual sidebar order
+    ViewData["PrevTabAction"] = Url.Action(
+        "DepartmentOfficesAndEducationalUnit",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Department Offices";
+
+    ViewData["NextTabAction"] = Url.Action(
+        "NextActionName",
+        "VerificationDashboard",
+        new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next";
+}
+
+<style>
+    /* ================================
+       Equipment Table Container
+       ================================ */
+
+    .equipment-table-wrapper {
+        width: 100%;
+        max-height: 440px;
+
+        overflow-x: auto;
+        overflow-y: auto;
+
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+
+        /* Better touch scrolling */
+        -webkit-overflow-scrolling: touch;
+
+        /* Prevent the table from affecting page width */
+        max-width: 100%;
+
+        /* Smooth scrolling */
+        scroll-behavior: smooth;
+    }
+
+
+    /* ================================
+       Table
+       ================================ */
+
+    .equipment-table-wrapper table {
+        width: 100%;
+        min-width: 950px;
+        margin-bottom: 0;
+
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+
+    /* ================================
+       Header
+       ================================ */
+
+    .equipment-table-wrapper thead th {
+        position: sticky;
+        top: 0;
+
+        z-index: 10;
+
+        background: #f8f9fa;
+
+        white-space: nowrap;
+
+        font-size: 0.82rem;
+        font-weight: 600;
+
+        padding: 12px 10px;
+
+        vertical-align: middle;
+
+        border-bottom: 2px solid #dee2e6;
+    }
+
+
+    /* ================================
+       Table Body
+       ================================ */
+
+    .equipment-table-wrapper tbody td {
+        vertical-align: middle;
+
+        padding: 10px;
+
+        font-size: 0.82rem;
+
+        word-break: normal;
+        overflow-wrap: anywhere;
+    }
+
+
+    /* ================================
+       Department
+       ================================ */
+
+    .equipment-table-wrapper td:first-child {
+        min-width: 180px;
+
+        font-weight: 500;
+    }
+
+
+    /* ================================
+       Equipment Name
+       ================================ */
+
+    /* .equipment-table-wrapper td:nth-child(2) {
+        min-width: 220px;
+    } */
+
+
+    /* ================================
+       Specification
+       ================================ */
+
+    /* .equipment-table-wrapper td:nth-child(3) {
+        min-width: 240px;
+
+        white-space: normal;
+
+        line-height: 1.45;
+    } */
+
+
+    /* ================================
+       Numeric Columns
+       ================================ */
+
+    /* .equipment-table-wrapper th:nth-child(n+4),
+    .equipment-table-wrapper td:nth-child(n+4) {
+        min-width: 130px;
+
+        text-align: center;
+
+        white-space: nowrap;
+    } */
+
+
+    /* ================================
+       Hover
+       ================================ */
+
+    .equipment-table-wrapper tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+
+    /* ================================
+       Mobile / Tablet
+       ================================ */
+
+    @@media (max-width: 992px) {
+
+        .equipment-table-wrapper {
+            max-height: 420px;
+
+            border-radius: 6px;
+        }
+
+        .equipment-table-wrapper table {
+            min-width: 900px;
+        }
+
+        .equipment-table-wrapper thead th {
+            font-size: 0.76rem;
+            padding: 9px 8px;
+        }
+
+        .equipment-table-wrapper tbody td {
+            font-size: 0.76rem;
+            padding: 8px;
+        }
+    }
+
+
+    /* ================================
+       Small Mobile
+       ================================ */
+
+    @@media (max-width: 576px) {
+
+        .equipment-table-wrapper {
+            max-height: 380px;
+
+            border-radius: 5px;
+
+            /*
+             * Prevent horizontal scroll from
+             * affecting the complete page.
+             */
+            overscroll-behavior-x: contain;
+        }
+
+        .equipment-table-wrapper table {
+            min-width: 850px;
+        }
+
+        .equipment-table-wrapper thead th {
+            font-size: 0.72rem;
+
+            padding: 8px 7px;
+        }
+
+        .equipment-table-wrapper tbody td {
+            font-size: 0.72rem;
+
+            padding: 7px;
+        }
+
+        .equipment-table-wrapper td:first-child {
+            min-width: 150px;
+        }
+
+        .equipment-table-wrapper td:nth-child(2) {
+            min-width: 190px;
+        }
+
+        .equipment-table-wrapper td:nth-child(3) {
+            min-width: 210px;
+        }
+
+        .equipment-table-wrapper th:nth-child(n+4),
+        .equipment-table-wrapper td:nth-child(n+4) {
+            min-width: 115px;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+}
+
+<div class="page-header mb-4">
+
+    <h1 class="page-title">
+        <i class="bi bi-tools"></i>
+        Equipment List
+    </h1>
+
+    <p class="text-muted mb-0">
+        Review the equipment requirements and equipment available
+        in the institution.
+    </p>
+
+</div>
+
+<div class="note-box mb-4">
+
+    <i class="bi bi-info-circle"></i>
+
+    <div class="note-box-content">
+
+        <h6>Verification Instructions</h6>
+
+        <p>
+            Review the prescribed equipment requirements against the
+            equipment available in the institution. Verify the
+            quantities reported by the college before approving
+            this section.
+        </p>
+
+    </div>
+
+</div>
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-tools"></i>
+            Equipment Details
+        </h3>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.Equipments != null && Model.Equipments.Any())
+        {
+            <div class="table-responsive equipment-table-wrapper">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:60px;">
+                                Sl No.
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th>
+                                Equipment
+                            </th>
+
+                            <th>
+                                Specification
+                            </th>
+
+                            <th class="text-center"
+                                style="min-width:130px;">
+                                1 Unit<br />
+                                Requirement
+                            </th>
+
+                            <th class="text-center"
+                                style="min-width:130px;">
+                                2 Unit<br />
+                                Requirement
+                            </th>
+
+                            <th class="text-center"
+                                style="min-width:130px;">
+                                1 Unit<br />
+                                Existing
+                            </th>
+
+                            <th class="text-center"
+                                style="min-width:130px;">
+                                2 Unit<br />
+                                Existing
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            int serialNo = 1;
+                            string? previousDepartment = null;
+                        }
+
+                        @foreach (var item in Model.Equipments)
+                        {
+                            <tr>
+
+                                <td class="text-center">
+                                    @serialNo
+                                </td>
+
+                                <td>
+                                    @item.DepartmentName
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @item.EquipmentName
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.Specification)
+                                        ? "N/A"
+                                        : item.Specification)
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.OneUnitReq?.ToString() ?? "-")
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.TwoUnitReq?.ToString() ?? "-")
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.OneUnitExisting?.ToString() ?? "-")
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.TwoUnitExisting?.ToString() ?? "-")
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                No equipment details are available for this institution.
+            </div>
+        }
+
+    </div>
+
+</div>

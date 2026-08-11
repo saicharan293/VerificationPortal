@@ -1,0 +1,194 @@
+﻿@model VerificationPortal.Models.CA_Aff_PgAcademicMattersViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "PG Academic Matters";
+    ViewData["ActiveTab"] = "PgAcademicMatters";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "AcademicIntake",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode }
+        );
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Academic Intake";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode }
+        );
+
+    ViewData["NextTabLabel"] =
+        "Next : Next Section";
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<!-- =========================
+     PAGE HEADER
+     ========================= -->
+
+<div class="verification-page-header">
+
+    <div>
+        <h2 class="verification-page-title">
+            <i class="bi bi-mortarboard-fill"></i>
+            PG Academic Matters
+        </h2>
+
+        <p class="verification-page-subtitle">
+            Academic performance details for postgraduate courses
+        </p>
+    </div>
+
+    <div>
+        <span class="badge bg-primary">
+            Postgraduate
+        </span>
+    </div>
+
+</div>
+
+
+<!-- =========================
+     PG ACADEMIC PERFORMANCE
+     ========================= -->
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-bar-chart-line"></i>
+            PG Academic Performance
+        </h3>
+
+        <span class="badge bg-primary">
+            Postgraduate
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.Sections != null && Model.Sections.Any())
+        {
+            foreach (var section in Model.Sections)
+            {
+                <div class="mb-4">
+
+                    <h5 class="fw-semibold mb-3">
+                        <i class="bi bi-book me-2"></i>
+                        @(section.Subject)
+                    </h5>
+
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-hover align-middle mb-0">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Regular Students</th>
+                                    <th>Repeater Students</th>
+                                    <th>Students Passed</th>
+                                    <th>Pass %</th>
+                                    <th>First Class</th>
+                                    <th>Distinction</th>
+                                    <th>Remarks</th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @foreach (var year in section.YearData)
+                                {
+                                    <tr>
+
+                                        <td class="fw-semibold text-nowrap">
+                                            @year.YearName
+                                        </td>
+
+                                        <td>
+                                            @(year.RegularStudents?.ToString() ?? "-")
+                                        </td>
+
+                                        <td>
+                                            @(year.RepeaterStudents?.ToString() ?? "-")
+                                        </td>
+
+                                        <td>
+                                            @(year.NumberOfStudentsPassed?.ToString() ?? "-")
+                                        </td>
+
+                                        <td>
+                                            @(
+                                                year.PassPercentage.HasValue
+                                                    ? year.PassPercentage.Value.ToString("0.##") + "%"
+                                                    : "-"
+                                            )
+                                        </td>
+
+                                        <td>
+                                            @(year.FirstClassCount?.ToString() ?? "-")
+                                        </td>
+
+                                        <td>
+                                            @(year.DistinctionCount?.ToString() ?? "-")
+                                        </td>
+
+                                        <td class="remarks-cell">
+                                            @(string.IsNullOrWhiteSpace(year.Remarks)
+                                                ? "-"
+                                                : year.Remarks)
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                No PG academic performance data available.
+            </div>
+        }
+
+    </div>
+
+</div>
