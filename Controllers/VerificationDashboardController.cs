@@ -231,6 +231,41 @@ namespace VerificationPortal.Controllers
             };
         }
 
+        protected async Task<List<string>> GetSortedCourseLevels(string collegeCode)
+        {
+
+            var order = new List<string> { "UG", "PG", "SS" };
+
+            var levels = await (
+                from ai in _context.AcademicIntakes
+                join mc in _context.MstCourses
+                    on ai.Courses equals mc.CourseCode.ToString()
+                where ai.CollegeCode == collegeCode && ai.Ay2026TotalIntake > 0
+                      && !string.IsNullOrEmpty(ai.Courses)
+                select mc.CourseLevel
+            )
+            .Distinct()
+            .ToListAsync();
+
+            levels = levels
+                .Where(l => !string.IsNullOrWhiteSpace(l))
+                .Select(l => l.Trim().ToUpper())
+                .Distinct()
+                .OrderBy(l => order.Contains(l)
+                    ? order.IndexOf(l)
+                    : int.MaxValue)
+                .ThenBy(l => l)
+                .ToList();
+
+            // fallback
+            if (!levels.Any())
+            {
+                levels.Add("UG");
+            }
+
+            return levels;
+        }
+
         [HttpGet]
         public async Task<IActionResult> ViewDocument(int id, string facultyCode, string document)
         {
@@ -435,8 +470,7 @@ namespace VerificationPortal.Controllers
             return View(model);
         }
 
-        private async Task SetVerificationViewData<T>(string collegeCode)
-    where T : class
+        private async Task SetVerificationViewData<T>(string collegeCode) where T : class
         {
             var property = typeof(T).GetProperties()
                 .FirstOrDefault(p =>
@@ -891,30 +925,6 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Finance(string collegeCode)
-        {
-            if (string.IsNullOrEmpty(collegeCode))
-                return NotFound("College code is required");
-
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
-            if (institution == null)
-                return NotFound($"Institution not found for college code: {collegeCode}");
-
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
-
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.ActiveTab = "Finance";
-            ViewBag.ComingSoon = true;
-            ViewBag.TabTitle = "Finance & Fees";
-            ViewBag.TabIcon = "bi-cash-stack";
-
-            return View("ComingSoon", institution);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Documents(string collegeCode)
         {
             if (string.IsNullOrEmpty(collegeCode))
@@ -965,9 +975,18 @@ namespace VerificationPortal.Controllers
 
                 { "PgAcademicMatters",typeof(CaAcademicPerformance) },
 
+                { "FinanceDetails", typeof(MedCaAccountAndFeeDetail) },
+
+                { "StaffPayScale", typeof(MedCaStaffParticular) },
+                { "StaffOtherDetails", typeof(CaMedStaffParticularsOther) },
+                { "LibraryServices", typeof(CaMedicalLibraryService) },
+
+                { "LibraryDetails", typeof(CaMedLibraryGeneral) },
+
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
                 { "TeachingStaffDepartmentWise", typeof(TeachingStaffDepartmentWiseDetail) },
-                { "AcademicIntake", typeof(CollegeCourseIntakeDetail) }
+                { "AcademicIntake", typeof(CollegeCourseIntakeDetail) },
+                { "ResearchPublications", typeof(CaMedResearchPublicationsDetail) }
             };
         }
 
@@ -2132,6 +2151,552 @@ namespace VerificationPortal.Controllers
             return View("PgAcademicMatters", model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> LibraryServices( string collegeCode, string? courseLevel)
+        {
+            // ---------------------------------------------------------
+            // COLLEGE CODE
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+            {
+                collegeCode = HttpContext.Session.GetString("CollegeCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyCodeString =
+                pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCodeString))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(facultyCodeString, out var facultyCode))
+                return NotFound("Invalid faculty code.");
+
+
+            // ---------------------------------------------------------
+            // AFFILIATION TYPE
+            // ---------------------------------------------------------
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+
+            // ---------------------------------------------------------
+            // COURSE LEVELS
+            // ---------------------------------------------------------
+
+            var levels = await GetSortedCourseLevels(collegeCode);
+
+            if (!levels.Any())
+            {
+                levels = new List<string> { "UG" };
+            }
+
+            levels = levels
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim().ToUpper())
+                .Distinct()
+                .ToList();
+
+
+            // ---------------------------------------------------------
+            // SELECT COURSE LEVEL
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(courseLevel))
+            {
+                courseLevel =
+                    levels.FirstOrDefault(x =>
+                        x.Equals(
+                            "UG",
+                            StringComparison.OrdinalIgnoreCase))
+                    ?? levels.First();
+            }
+
+            courseLevel = courseLevel.Trim().ToUpper();
+
+
+            // Make sure requested level actually exists
+            if (!levels.Contains(
+                    courseLevel,
+                    StringComparer.OrdinalIgnoreCase))
+            {
+                return BadRequest(
+                    $"Course level '{courseLevel}' is not available.");
+            }
+
+
+            // ---------------------------------------------------------
+            // VIEW MODEL
+            // ---------------------------------------------------------
+
+            var model = new MedicalLibraryVerificationViewModel
+            {
+                CollegeCode = collegeCode,
+                FacultyCode = facultyCode,
+                AffiliationType = affiliationType,
+                CourseLevel = courseLevel
+            };
+
+
+            // =========================================================
+            // 1. DEPARTMENT MASTER
+            // =========================================================
+            //
+            // Used only to resolve DepartmentCode -> DepartmentName
+            // for the verification UI.
+            //
+            // =========================================================
+
+            var departmentMasters =
+                await _context.DepartmentMasters
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.FacultyCode == facultyCode)
+                    .OrderBy(x => x.DepartmentName)
+                    .ToListAsync();
+
+
+            // =========================================================
+            // 2. DEPARTMENT LIBRARY
+            // =========================================================
+
+            var savedDepartments =
+                await _context.CaMedicalDepartmentLibraries
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCode &&
+                        x.AffiliationType == affiliationType)
+                    .OrderBy(x => x.DepartmentalLibraryId)
+                    .ToListAsync();
+
+
+            model.DepartmentLibraries =
+                savedDepartments
+                    .Select(x =>
+                    {
+                        var staff1 = "";
+                        var staff2 = "";
+
+                        if (!string.IsNullOrWhiteSpace(x.LibraryStaff))
+                        {
+                            var parts =
+                                x.LibraryStaff.Split(
+                                    '|',
+                                    StringSplitOptions.RemoveEmptyEntries);
+
+                            if (parts.Length > 0)
+                                staff1 = parts[0].Trim();
+
+                            if (parts.Length > 1)
+                                staff2 = parts[1].Trim();
+                        }
+
+                        return new DepartmentLibraryVerificationRow
+                        {
+                            DepartmentCode = x.DepartmentCode,
+
+                            TotalBooks = x.TotalBooks,
+
+                            BooksAddedInYear =
+                                x.BooksAddedInYear,
+
+                            CurrentJournals =
+                                x.CurrentJournals,
+
+                            LibraryStaff1 = staff1,
+
+                            LibraryStaff2 = staff2,
+
+                            Titles = x.Titles,
+
+                            InternationalJournals =
+                                x.InternationalJournals,
+
+                            BackVolumes =
+                                x.BackVolumes,
+
+                            PrintJournalPercentage =
+                                x.PrintJournalPercentage
+                        };
+                    })
+                    .ToList();
+
+
+            // =========================================================
+            // 3. DENTAL LIBRARY RECORD MASTER
+            // =========================================================
+
+            if (facultyCode == 2)
+            {
+                var masterRecords =
+                    await _context.CaMstDentalLibraryRecords
+                        .AsNoTracking()
+                        .OrderBy(x => x.DisplayOrder)
+                        .ToListAsync();
+
+
+                // =====================================================
+                // 4. DENTAL LIBRARY UPLOADED RECORDS
+                // =====================================================
+
+                var uploadedRecords =
+                    await _context.CaDentalLibraryRecords
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.CollegeCode == collegeCode &&
+                            x.FacultyCode == facultyCode &&
+                            x.AffiliationType == affiliationType)
+                        .ToListAsync();
+
+
+                model.DentalLibraryRecords =
+                    masterRecords
+                        .Select(master =>
+                        {
+                            var uploaded =
+                                uploadedRecords.FirstOrDefault(x =>
+                                    x.RecordId == master.RecordId);
+
+                            return new DentalLibraryVerificationRow
+                            {
+                                RecordId = master.RecordId,
+
+                                RecordName = master.RecordName,
+
+                                ExistingFileName =
+                                    uploaded?.FileName
+                            };
+                        })
+                        .ToList();
+            }
+
+
+            // =========================================================
+            // COMMON VIEW DATA
+            // =========================================================
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode =
+                collegeCode;
+
+            ViewBag.FacultyCode =
+                facultyCode;
+
+            ViewBag.AffiliationType =
+                affiliationType;
+
+            ViewBag.CourseLevel =
+                courseLevel;
+
+            ViewBag.CourseLevels =
+                levels;
+
+            ViewBag.IsDentalFaculty =
+                facultyCode == 2;
+
+            ViewBag.DepartmentMasters =
+                departmentMasters;
+
+
+            // =========================================================
+            // VERIFICATION DATA
+            // =========================================================
+
+            await SetVerificationViewData<CaMedicalDepartmentLibrary>(
+                collegeCode);
+
+
+            return View("LibraryServices", model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ResearchPublications(string collegeCode)
+        {
+            // ---------------------------------------------------------
+            // COLLEGE CODE
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+            {
+                collegeCode = HttpContext.Session.GetString("CollegeCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyCodeString =
+                pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCodeString))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(facultyCodeString, out var facultyCode))
+                return NotFound("Invalid faculty code.");
+
+
+            // ---------------------------------------------------------
+            // AFFILIATION TYPE
+            // ---------------------------------------------------------
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+
+            // =========================================================
+            // 1. MAIN RESEARCH & PUBLICATIONS
+            // =========================================================
+
+            var researchRecord =
+                await _context.CaMedResearchPublicationsDetails
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderByDescending(x => x.SlNo)
+                    .FirstOrDefaultAsync();
+
+
+            // =========================================================
+            // 2. DEPARTMENT-WISE PUBLICATIONS
+            // =========================================================
+
+            var departmentPublications =
+                await _context.DeptWisePublications
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCode)
+                    .OrderBy(x => x.DeptName)
+                    .ToListAsync();
+
+
+            // =========================================================
+            // 3. BUILD VERIFICATION VIEW MODEL
+            // =========================================================
+
+            var model = new ResearchPublicationsVerificationViewModel
+            {
+                CollegeCode = collegeCode,
+
+                FacultyCode = facultyCode,
+
+                AffiliationType = affiliationType,
+
+                // Main research details
+                PublicationsNo =
+                    researchRecord?.PublicationsNo,
+
+                PublicationsPdfName =
+                    researchRecord?.PublicationsPdfName,
+
+                ClinicalTrialsPdfName =
+                    researchRecord?.ClinicalTrialsPdfName,
+
+                StudentsRGUHSFunded =
+                    researchRecord?.StudentsRguhsfunded,
+
+                StudentsExternalBodyFunding =
+                    researchRecord?.StudentsExternalBodyFunding,
+
+                StudentsProjectsPdfName =
+                    researchRecord?.StudentsProjectsPdfName,
+
+                FacultyRGUHSFunded =
+                    researchRecord?.FacultyRguhsfunded,
+
+                FacultyExternalBodyFunding =
+                    researchRecord?.FacultyExternalBodyFunding,
+
+                FacultyProjectsPdfName =
+                    researchRecord?.FacultyProjectsPdfName,
+
+                // Department-wise publications
+                DepartmentWisePublications =
+                    departmentPublications
+                        .Select(x => new DepartmentWisePublicationVerificationRow
+                        {
+                            Id = x.Id,
+
+                            DeptCode =
+                                x.DeptCode,
+
+                            DeptName =
+                                x.DeptName,
+
+                            PublicationsCount =
+                                x.PublicationsCount,
+
+                            PublicationPath =
+                                x.PublicationPath
+                        })
+                        .ToList()
+            };
+
+
+            // =========================================================
+            // 4. COMMON VIEW DATA
+            // =========================================================
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode =
+                collegeCode;
+
+            ViewBag.FacultyCode =
+                facultyCode;
+
+            ViewBag.AffiliationType =
+                affiliationType;
+
+
+            // =========================================================
+            // 5. VERIFICATION DATA
+            // =========================================================
+
+            await SetVerificationViewData<CaMedResearchPublicationsDetail>(
+                collegeCode);
+
+
+            return View("ResearchPublications", model);
+
+        }
+
+
+        [HttpGet] public async Task<IActionResult> ViewResearchPublicationPdf(string collegeCode) => await GetPdf(collegeCode, "Publications");
+        [HttpGet] public async Task<IActionResult> ViewStudentsProjectsPdf(string collegeCode) => await GetPdf(collegeCode, "StudentsProjects");
+        [HttpGet] public async Task<IActionResult> ViewFacultyProjectsPdf(string collegeCode) => await GetPdf(collegeCode, "FacultyProjects");
+        [HttpGet] public async Task<IActionResult> ViewClinicalTrialsPdf(string collegeCode) => await GetPdf(collegeCode, "ClinicalTrials");
+
+        private async Task<IActionResult> GetPdf(string collegeCode, string fileType)
+        {
+
+            // FIX: query "ALL" (matches how data is saved), fallback to any row
+            var record = await _context.CaMedResearchPublicationsDetails
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode)
+                ?? await _context.CaMedResearchPublicationsDetails
+                    .FirstOrDefaultAsync(x =>
+                        x.CollegeCode == collegeCode);
+
+            if (record == null) return NotFound("Record not found.");
+
+            string? filePath = fileType switch
+            {
+                "Publications" => record.PublicationsPdfPath,
+                "StudentsProjects" => record.StudentsProjectsPdfPath,
+                "FacultyProjects" => record.FacultyProjectsPdfPath,
+                "ClinicalTrials" => record.ClinicalTrialsPdfPath,
+                _ => null
+            };
+
+            string? name = fileType switch
+            {
+                "Publications" => record.PublicationsPdfName,
+                "StudentsProjects" => record.StudentsProjectsPdfName,
+                "FacultyProjects" => record.FacultyProjectsPdfName,
+                "ClinicalTrials" => record.ClinicalTrialsPdfName,
+                _ => null
+            };
+
+            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+                return NotFound("File not found on server. Please re-upload.");
+
+            var fileName = string.IsNullOrEmpty(name) ? Path.GetFileName(filePath) : name;
+
+            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out string contentType))
+                contentType = "application/octet-stream";
+
+            Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
+            return PhysicalFile(filePath, contentType);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewDepartmentPublicationPdf(string collegeCode, int id)
+        {
+
+            var publication = await _context.DeptWisePublications
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CollegeCode == collegeCode);
+
+            if (publication == null ||
+                string.IsNullOrWhiteSpace(publication.PublicationPath))
+            {
+                return NotFound("PDF not found.");
+            }
+
+            if (!System.IO.File.Exists(publication.PublicationPath))
+            {
+                return NotFound("File does not exist on server.");
+            }
+
+            var stream = new FileStream(
+                publication.PublicationPath,
+                FileMode.Open,
+                FileAccess.Read);
+
+            return File(stream, "application/pdf");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewDentalLibraryRecord(string collegeCode, int recordId)
+        {
+
+            int affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+
+            var record =
+                await _context.CaDentalLibraryRecords
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.AffiliationType == affiliationType &&
+                    x.RecordId == recordId);
+
+            if (record == null ||
+                string.IsNullOrEmpty(record.FilePath))
+            {
+                return NotFound();
+            }
+
+            if (!System.IO.File.Exists(record.FilePath))
+            {
+                return NotFound();
+            }
+
+            return PhysicalFile(
+                record.FilePath,
+                "application/pdf"
+            );
+        }
+
+
         // POST: Save verification remarks and status
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -2251,6 +2816,86 @@ namespace VerificationPortal.Controllers
                             x => x.CollegeCode == collegeCode,
                             request),
 
+                    ["FinanceDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<MedCaAccountAndFeeDetail>(
+                            x => x.CollegeCode == collegeCode,
+                            request),
+
+                    ["StaffPayScale"] = () =>
+                        _verificationService.SaveVerificationAsync<MedCaStaffParticular>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request),
+
+                    ["StaffOtherDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<CaMedStaffParticularsOther>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request),
+
+                    ["LibraryServices"] = async () =>
+                    {
+                        // Department Library verification
+                        await _verificationService.SaveVerificationAsync<CaMedicalDepartmentLibrary>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode,
+                            request);
+
+                        // Dental Library Records verification
+                        await _verificationService.SaveVerificationAsync<CaDentalLibraryRecord>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode,
+                            request);
+                    },
+
+                    ["ResearchPublications"] = async () =>
+                    {
+                        // Main Research & Publications details
+                        await _verificationService.SaveVerificationAsync<CaMedResearchPublicationsDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+
+                        // Department-wise Publications
+                        await _verificationService.SaveVerificationAsync<DeptWisePublication>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode,
+                            request);
+                    },
+
+                    ["LibraryDetails"] = async () =>
+                    {
+                        await _verificationService.SaveVerificationAsync<CaMedLibraryGeneral>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<CaMedLibraryItem>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<CaMedLibraryBuilding>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<CaMedLibTechnicalProcess>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<CaMedLibraryEquipment>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<CaMedLibraryFinance>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request);
+                    },
+
                     // Continue adding the remaining tabs...
                 };
 
@@ -2272,6 +2917,758 @@ namespace VerificationPortal.Controllers
             return RedirectToAction(tabName, new { collegeCode });
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> FinanceDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction(nameof(Index));
+
+            try
+            {
+                // Reusable page context
+                var pageContext = await GetPageContextAsync(collegeCode);
+
+                var institution = pageContext.Institution;
+                var facultyCode = institution.FacultyCode!.Trim();
+
+                // Get available course levels
+                var levels = await (
+                    from cc in _context.CollegeCourseIntakeDetails
+                    join cm in _context.MstCourses
+                        on cc.CourseCode equals cm.CourseCode.ToString()
+                    where cc.CollegeCode == collegeCode
+                    select cm.CourseLevel
+                )
+                .Distinct()
+                .ToListAsync();
+
+                // Fallback if no levels are found
+                if (!levels.Any())
+                {
+                    levels = await GetSortedCourseLevels(collegeCode);
+                }
+
+                // Keep the desired order
+                levels = levels
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Select(x => x.Trim().ToUpper())
+                    .Distinct()
+                    .OrderBy(x => x == "UG" ? 1 :
+                                  x == "PG" ? 2 :
+                                  x == "SS" ? 3 : 99)
+                    .ToList();
+
+                // Load all saved finance records
+                var financeRecords = await _context.MedCaAccountAndFeeDetails
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCode)
+                    .ToListAsync();
+
+                var vm = new Med_CA_AccountAndFeeDetailsPageVM();
+
+                // Build one section for each course level
+                foreach (var level in levels)
+                {
+                    var data = financeRecords.FirstOrDefault(x =>
+                        !string.IsNullOrWhiteSpace(x.CourseLevel) &&
+                        x.CourseLevel.Trim().Equals(level, StringComparison.OrdinalIgnoreCase));
+
+                    vm.Sections.Add(new Med_CA_AccountAndFeeDetailsViewModel
+                    {
+                        CollegeCode = collegeCode,
+                        FacultyCode = facultyCode,
+                        CourseLevel = level,
+
+                        AuthorityNameAddress = data?.AuthorityNameAddress ?? "",
+                        AuthorityContact = data?.AuthorityContact ?? "",
+
+                        RecurrentAnnual = data?.RecurrentAnnual,
+                        NonRecurrentAnnual = data?.NonRecurrentAnnual,
+                        Deposits = data?.Deposits,
+
+                        TuitionFee = data?.TuitionFee,
+                        SportsFee = data?.SportsFee,
+                        UnionFee = data?.UnionFee,
+                        LibraryFee = data?.LibraryFee,
+                        OtherFee = data?.OtherFee,
+
+                        TotalFee = data?.TotalFee ?? 0,
+
+                        AccountBooksMaintained =
+                            data?.AccountBooksMaintained ?? "",
+
+                        AccountsAudited =
+                            data?.AccountsAudited ?? "",
+
+                        DonationLevied =
+                            data?.DonationLevied ?? "",
+
+                        GoverningCouncilPdfName =
+                            data?.GoverningCouncilPdfName,
+
+                        AccountSummaryPdfName =
+                            data?.AccountSummaryPdfName,
+
+                        AuditedStatementPdfName =
+                            data?.AuditedStatementPdfName,
+
+                        DonationPdfName =
+                            data?.DonationPdfName
+                    });
+                }
+
+                // Common verification page data
+                ViewBag.CollegeCode = collegeCode;
+                ViewBag.FacultyCode = facultyCode;
+                ViewBag.InstitutionName =
+                    institution.NameOfInstitution ?? "Unknown Institution";
+
+                ViewBag.ActiveTab = "FinanceDetails";
+                ViewBag.UserDesignation = GetUserDesignation();
+
+                // Verification feedback
+                await SetVerificationViewData<MedCaAccountAndFeeDetail>(collegeCode);
+
+                return View("FinanceDetails", vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
+        // View PDF actions (keep these)
+        [HttpGet]
+        public async Task<IActionResult> ViewGoverningCouncilPdf(string courseLevel, string collegeCode, int facultyCode)
+        {
+            return await GetPdf("GoverningCouncil", courseLevel, collegeCode, facultyCode);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewAccountSummaryPdf(string courseLevel, string collegeCode, int facultyCode)
+        {
+            return await GetPdf("AccountSummary", courseLevel, collegeCode, facultyCode);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewAuditedStatementPdf(string courseLevel, string collegeCode, int facultyCode)
+        {
+            return await GetPdf("AuditedStatement", courseLevel, collegeCode, facultyCode);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewDonationPdf(string courseLevel, string collegeCode, int facultyCode)
+        {
+            return await GetPdf("Donation", courseLevel, collegeCode, facultyCode);
+        }
+
+        private async Task<IActionResult> GetPdf(string type, string courseLevel, string collegeCode, int facultyCode)
+        {
+
+            if (string.IsNullOrEmpty(courseLevel))
+                return NotFound("Course level not specified.");
+
+            var record = await _context.MedCaAccountAndFeeDetails
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode.ToString() &&
+                    x.CourseLevel == courseLevel);
+
+            if (record == null) return NotFound("Record not found.");
+
+            string? filePath = type switch
+            {
+                "GoverningCouncil" => record.GoverningCouncilPdfPath,
+                "AccountSummary" => record.AccountSummaryPdfPath,
+                "AuditedStatement" => record.AuditedStatementPdfPath,
+                "Donation" => record.DonationPdfPath,
+                _ => null
+            };
+
+            string? name = type switch
+            {
+                "GoverningCouncil" => record.GoverningCouncilPdfName,
+                "AccountSummary" => record.AccountSummaryPdfName,
+                "AuditedStatement" => record.AuditedStatementPdfName,
+                "Donation" => record.DonationPdfName,
+                _ => null
+            };
+
+            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+                return NotFound("File not found on server.");
+
+            var fileName = string.IsNullOrEmpty(name) ? Path.GetFileName(filePath) : name;
+            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out string contentType))
+                contentType = "application/octet-stream";
+
+            Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
+            return PhysicalFile(filePath, contentType);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> StaffPayScale(string collegeCode)
+        {
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not found.");
+
+            // Course levels
+            var levels = await GetSortedCourseLevels(collegeCode);
+
+            if (!levels.Any())
+                levels = new List<string> { "UG" };
+
+            // Staff designation master
+            var designations = await _context.MedCaMstStaffDesignations
+                .AsNoTracking()
+                .Where(x => x.FacultyCode == facultyCode)
+                .OrderBy(x => x.SlNo)
+                .ToListAsync();
+
+            // Saved pay scale records
+            var savedPayScales = await _context.MedCaStaffParticulars
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode)
+                .ToListAsync();
+
+            // Prefer UG
+            var selectedLevel = levels.Contains(
+                "UG",
+                StringComparer.OrdinalIgnoreCase)
+                ? "UG"
+                : levels.FirstOrDefault() ?? "UG";
+
+            var payScaleList = designations
+                .Select(d =>
+                {
+                    var saved = savedPayScales.FirstOrDefault(x =>
+                        x.DesignationSlNo == d.SlNo &&
+                        !string.IsNullOrWhiteSpace(x.CourseLevel) &&
+                        x.CourseLevel.Trim()
+                            .Equals(
+                                selectedLevel,
+                                StringComparison.OrdinalIgnoreCase));
+
+                    return new Med_CA_StaffParticularsVM
+                    {
+                        DesignationSlNo = d.SlNo,
+                        Designation = d.Designation,
+                        PayScale = saved?.PayScale
+                    };
+                })
+                .ToList();
+
+            var vm = new StaffDetailsCombinedViewModel
+            {
+                CollegeCode = collegeCode,
+                FacultyCode = facultyCode,
+                StaffPayScaleList = payScaleList,
+                ExistingCourseLevels = levels
+            };
+
+            // Verification data for THIS section only
+            await SetVerificationViewData<MedCaStaffParticular>(
+                collegeCode);
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+
+            return View("StaffPayScale", vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> StaffOtherDetails(string collegeCode)
+        {
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not found.");
+
+            // Course levels
+            var levels = await GetSortedCourseLevels(collegeCode);
+
+            if (!levels.Any())
+                levels = new List<string> { "UG" };
+
+            // Existing staff-other record
+            var otherDetails = await _context.CaMedStaffParticularsOthers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode);
+
+            var staffOther = new CA_Med_StaffParticularsOtherVM();
+
+            if (otherDetails != null)
+            {
+                staffOther.Id = otherDetails.Id;
+
+                staffOther.CollegeCode = otherDetails.CollegeCode;
+                staffOther.FacultyCode = otherDetails.FacultyCode;
+                staffOther.RegistrationNo = otherDetails.RegistrationNo;
+                staffOther.SubFacultyCode = otherDetails.SubFacultyCode;
+                staffOther.CourseLevel = otherDetails.CourseLevel;
+
+                staffOther.TeachersUpdatedInEMS =
+                    otherDetails.TeachersUpdatedInEms;
+
+                staffOther.ExaminerDetailsAttached =
+                    otherDetails.ExaminerDetailsAttached;
+
+                staffOther.ServiceRegisterMaintained =
+                    otherDetails.ServiceRegisterMaintained;
+
+                staffOther.AcquittanceRegisterMaintained =
+                    otherDetails.AcquittanceRegisterMaintained;
+
+                staffOther.ExaminerDetailsPdfName =
+                    otherDetails.ExaminerDetailsPdfName;
+
+                staffOther.ExaminerDetailsPdfName2 =
+                    otherDetails.ExaminerDetailsPdfName2;
+
+                staffOther.ExaminerDetailsPdfName3 =
+                    otherDetails.ExaminerDetailsPdfName3;
+
+                staffOther.ExaminerDetailsPdfName4 =
+                    otherDetails.ExaminerDetailsPdfName4;
+
+                staffOther.ExaminerDetailsPdfName5 =
+                    otherDetails.ExaminerDetailsPdfName5;
+
+                staffOther.AEBASLastThreeMonthsPdfName =
+                    otherDetails.AebaslastThreeMonthsPdfName;
+
+                staffOther.AEBASInspectionDayPdfName =
+                    otherDetails.AebasinspectionDayPdfName;
+
+                staffOther.ProvidentFundPdfName =
+                    otherDetails.ProvidentFundPdfName;
+
+                staffOther.ESIPdfName =
+                    otherDetails.EsipdfName;
+            }
+
+            var vm = new StaffDetailsCombinedViewModel
+            {
+                CollegeCode = collegeCode,
+                FacultyCode = facultyCode,
+                StaffOther = staffOther,
+                ExistingCourseLevels = levels
+            };
+
+            // Verification data for THIS section only
+            await SetVerificationViewData<CaMedStaffParticularsOther>(
+                collegeCode);
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+
+            return View("StaffOtherDetails", vm);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewStaffOtherPdf(string collegeCode, string fileType)
+        {
+
+            if (string.IsNullOrEmpty(collegeCode))
+                return NotFound();
+
+            // Changes by Ram on 23/04/2026
+            // Common records are loaded from UG master
+            var courseLevel = "UG";
+
+            var record = await _context.CaMedStaffParticularsOthers
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.CourseLevel == courseLevel);
+
+            if (record == null)
+                return NotFound();
+
+            string? filePath = null;
+            string? fileName = null;
+
+            switch (fileType)
+            {
+                case "Examiner":
+                    filePath = record.ExaminerDetailsPdfPath;
+                    fileName = record.ExaminerDetailsPdfName;
+                    break;
+
+                case "Examiner2":
+                    filePath = record.ExaminerDetailsPdfPath2;
+                    fileName = record.ExaminerDetailsPdfName2;
+                    break;
+
+                case "Examiner3":
+                    filePath = record.ExaminerDetailsPdfPath3;
+                    fileName = record.ExaminerDetailsPdfName3;
+                    break;
+
+                case "Examiner4":
+                    filePath = record.ExaminerDetailsPdfPath4;
+                    fileName = record.ExaminerDetailsPdfName4;
+                    break;
+
+                case "Examiner5":
+                    filePath = record.ExaminerDetailsPdfPath5;
+                    fileName = record.ExaminerDetailsPdfName5;
+                    break;
+
+                case "AEBAS3Months":
+                    filePath = record.AebaslastThreeMonthsPdfPath;
+                    fileName = record.AebaslastThreeMonthsPdfName;
+                    break;
+
+                case "AEBASInspection":
+                    filePath = record.AebasinspectionDayPdfPath;
+                    fileName = record.AebasinspectionDayPdfName;
+                    break;
+
+                case "PF":
+                    filePath = record.ProvidentFundPdfPath;
+                    fileName = record.ProvidentFundPdfName;
+                    break;
+
+                case "ESI":
+                    filePath = record.EsipdfPath;
+                    fileName = record.EsipdfName;
+                    break;
+
+                default:
+                    return NotFound();
+            }
+
+            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+                return NotFound("File not found");
+
+            var finalName =
+                string.IsNullOrEmpty(fileName)
+                ? Path.GetFileName(filePath)
+                : fileName;
+
+            var provider =
+               new Microsoft.AspNetCore.StaticFiles
+                  .FileExtensionContentTypeProvider();
+
+            if (!provider.TryGetContentType(
+                filePath,
+                out string contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+
+            //if (mode == "download")
+            //{
+            //    return PhysicalFile(
+            //        filePath,
+            //        contentType,
+            //        finalName);
+            //}
+
+            Response.Headers["Content-Disposition"] =
+              $"inline; filename=\"{finalName}\"";
+
+            return PhysicalFile(filePath, contentType);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> LibraryDetails(string collegeCode)
+        {
+            // ---------------------------------------------------------
+            // COLLEGE CODE
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+            {
+                collegeCode = HttpContext.Session.GetString("CollegeCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var pageContext =
+                await GetPageContextAsync(collegeCode);
+
+            var facultyCodeString =
+                pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCodeString))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(facultyCodeString, out var facultyCode))
+                return NotFound("Invalid faculty code.");
+
+
+            // ---------------------------------------------------------
+            // AFFILIATION TYPE
+            // ---------------------------------------------------------
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+
+            // =========================================================
+            // 1. GENERAL LIBRARY DETAILS
+            // =========================================================
+
+            var general =
+                await _context.CaMedLibraryGenerals
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderByDescending(x => x.SlNo)
+                    .FirstOrDefaultAsync();
+
+
+            // =========================================================
+            // 2. LIBRARY ITEMS
+            // =========================================================
+
+            var itemRows =
+                await _context.CaMedLibraryItems
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderBy(x => x.SlNo)
+                    .ToListAsync();
+
+            var items = itemRows
+                .GroupBy(x => x.SlNo)
+                .Select(g => g.First())
+                .OrderBy(x => x.SlNo)
+                .ToList();
+
+            // =========================================================
+            // 3. LIBRARY BUILDING
+            // =========================================================
+
+            var building =
+                await _context.CaMedLibraryBuildings
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderByDescending(x => x.SlNo)
+                    .FirstOrDefaultAsync();
+
+
+            // =========================================================
+            // 4. TECHNICAL PROCESSES
+            // =========================================================
+
+            var technicalProcessRows =
+                await _context.CaMedLibTechnicalProcesses
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderBy(x => x.SlNo)
+                    .ToListAsync();
+
+            var technicalProcesses = technicalProcessRows
+                .GroupBy(x => x.SlNo)
+                .Select(g => g.First())
+                .OrderBy(x => x.SlNo)
+                .ToList();
+
+            // =========================================================
+            // 5. EQUIPMENT
+            // =========================================================
+
+            var equipmentRows =
+                await _context.CaMedLibraryEquipments
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderBy(x => x.SlNo)
+                    .ToListAsync();
+
+            var equipments = equipmentRows
+                .GroupBy(x => x.SlNo)
+                .Select(g => g.First())
+                .OrderBy(x => x.SlNo)
+                .ToList();
+
+
+            // =========================================================
+            // 6. FINANCE
+            // =========================================================
+
+            var finance =
+                await _context.CaMedLibraryFinances
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString)
+                    .OrderBy(x => x.SlNo)
+                    .FirstOrDefaultAsync();
+
+
+            // =========================================================
+            // VIEW MODEL
+            // =========================================================
+
+            var model =
+                new LibraryDetailsVerificationViewModel
+                {
+                    CollegeCode = collegeCode,
+
+                    FacultyCode = facultyCode,
+
+                    AffiliationType = affiliationType,
+
+                    General = general == null
+                        ? null
+                        : new LibraryGeneralVerification
+                        {
+                            LibraryEmailId =
+                                general.LibraryEmailId,
+
+                            DigitalLibrary =
+                                general.DigitalLibrary,
+
+                            HelinetServices =
+                                general.HelinetServices,
+
+                            DepartmentWiseLibrary =
+                                general.DepartmentWiseLibrary
+                        },
+
+                    Items = items
+                        .Select(x => new LibraryItemVerificationRow
+                        {
+                            SlNo = x.SlNo,
+
+                            ItemName = x.ItemName,
+
+                            CurrentForeign =
+                                x.CurrentForeign,
+
+                            CurrentIndian =
+                                x.CurrentIndian,
+
+                            PreviousForeign =
+                                x.PreviousForeign,
+
+                            PreviousIndian =
+                                x.PreviousIndian
+                        })
+                        .ToList(),
+
+                    Building = building == null
+                        ? null
+                        : new LibraryBuildingVerification
+                        {
+                            IsIndependent =
+                                building.IsIndependent,
+
+                            AreaSqMtrs =
+                                building.AreaSqMtrs
+                        },
+
+                    TechnicalProcesses = technicalProcesses
+                        .Select(x => new LibraryTechnicalProcessVerificationRow
+                        {
+                            SlNo = x.SlNo,
+
+                            ProcessName = x.ProcessName,
+
+                            Value = x.Value
+                        })
+                        .ToList(),
+
+                    Equipments = equipments
+                        .Select(x => new LibraryEquipmentVerificationRow
+                        {
+                            SlNo = x.SlNo,
+
+                            EquipmentName = x.EquipmentName,
+
+                            HasEquipment = x.HasEquipment
+                        })
+                        .ToList(),
+
+                    Finance = finance == null
+                        ? null
+                        : new LibraryFinanceVerification
+                        {
+                            TotalBudgetLakhs =
+                                finance.TotalBudgetLakhs,
+
+                            ExpenditureBooksLakhs =
+                                finance.ExpenditureBooksLakhs
+                        }
+
+                };
+
+
+            // ---------------------------------------------------------
+            // COMMON VIEW DATA
+            // ---------------------------------------------------------
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode =
+                collegeCode;
+
+            ViewBag.FacultyCode =
+                facultyCode;
+
+            ViewBag.AffiliationType =
+                affiliationType;
+
+
+            // ---------------------------------------------------------
+            // VERIFICATION DATA
+            // ---------------------------------------------------------
+
+            await SetVerificationViewData<CaMedLibraryGeneral>(
+                collegeCode);
+
+
+            return View("LibraryDetails", model);
+        }
 
         // Helper method to get current user's designation
         private string GetUserDesignation()

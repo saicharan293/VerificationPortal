@@ -1,0 +1,426 @@
+﻿
+@model VerificationPortal.Models.MedicalLibraryVerificationViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Library Services";
+    ViewData["ActiveTab"] = "LibraryServices";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "StaffOtherDetails",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode }
+        );
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Staff Other Details";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode }
+        );
+
+    ViewData["NextTabLabel"] =
+        "Next : Next Section";
+
+    bool isDentalFaculty = ViewBag.IsDentalFaculty == true;
+
+    var departmentMasters =
+        ViewBag.DepartmentMasters
+        as List<VerificationPortal.Models.DepartmentMaster>
+        ?? new List<VerificationPortal.Models.DepartmentMaster>();
+}
+
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Library Services
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Library and departmental library details
+    </p>
+
+</div>
+
+
+@* ============================================================
+   DEPARTMENT LIBRARY DETAILS
+   ============================================================ *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-book me-2"></i>
+            Department Library Details
+        </h3>
+
+        <span class="badge bg-primary">
+            @(isDentalFaculty ? "Dental" : "Medical")
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.DepartmentLibraries != null &&
+             Model.DepartmentLibraries.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead>
+                        <tr>
+
+                            <th>
+                                Sl. No
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th>
+                                Total Books
+                            </th>
+
+                            <th>
+                                Books Added This Year
+                            </th>
+
+                            <th>
+                                Current Journals
+                            </th>
+
+                            @if (isDentalFaculty)
+                            {
+                                <th>
+                                    Titles
+                                </th>
+
+                                <th>
+                                    International Journals
+                                </th>
+
+                                <th>
+                                    Back Volumes
+                                </th>
+
+                                <th>
+                                    Print Journal %
+                                </th>
+                            }
+
+                            <th>
+                                Library Staff
+                            </th>
+
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (int i = 0;
+                             i < Model.DepartmentLibraries.Count;
+                             i++)
+                        {
+                            var row = Model.DepartmentLibraries[i];
+
+                            var departmentName =
+                                departmentMasters
+                                    .FirstOrDefault(x =>
+                                        x.DepartmentCode ==
+                                        row.DepartmentCode)
+                                    ?.DepartmentName
+                                ?? row.DepartmentCode
+                                ?? "-";
+
+
+                            <tr>
+
+                                <td>
+                                    @(i + 1)
+                                </td>
+
+
+                                <td>
+                                    <strong>
+                                        @departmentName
+                                    </strong>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        row.DepartmentCode))
+                                    {
+                                        <div class="small text-muted">
+                                            @row.DepartmentCode
+                                        </div>
+                                    }
+                                </td>
+
+
+                                <td>
+                                    @row.TotalBooks
+                                </td>
+
+
+                                <td>
+                                    @row.BooksAddedInYear
+                                </td>
+
+
+                                <td>
+                                    @row.CurrentJournals
+                                </td>
+
+
+                                @if (isDentalFaculty)
+                                {
+                                    <td>
+                                        @(row.Titles?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(row.InternationalJournals?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(row.BackVolumes?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(row.PrintJournalPercentage?.ToString() ?? "-")
+                                    </td>
+                                }
+
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        row.LibraryStaff1))
+                                    {
+                                        <div>
+                                            <strong>Staff 1:</strong>
+                                            @row.LibraryStaff1
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        row.LibraryStaff2))
+                                    {
+                                        <div class="mt-1">
+                                            <strong>Staff 2:</strong>
+                                            @row.LibraryStaff2
+                                        </div>
+                                    }
+
+                                    @if (string.IsNullOrWhiteSpace(
+                                            row.LibraryStaff1) &&
+                                        string.IsNullOrWhiteSpace(
+                                            row.LibraryStaff2))
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-muted text-center py-4">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                No departmental library details available.
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@* ============================================================
+   DENTAL LIBRARY RECORDS
+   ============================================================ *@
+
+@if (isDentalFaculty)
+{
+    <div class="verification-card mt-4">
+
+        <div class="verification-card-header">
+
+            <h3 class="verification-card-title">
+                <i class="bi bi-folder-check me-2"></i>
+                Library Records
+            </h3>
+
+            <span class="badge bg-primary">
+                Dental Library
+            </span>
+
+        </div>
+
+
+        <div class="verification-card-body">
+
+            @if (Model.DentalLibraryRecords != null &&
+                 Model.DentalLibraryRecords.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    Sl. No
+                                </th>
+
+                                <th>
+                                    Record
+                                </th>
+
+                                <th>
+                                    Uploaded File
+                                </th>
+
+                                <th class="text-center">
+                                    Action
+                                </th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+
+                            @for (int i = 0;
+                                 i < Model.DentalLibraryRecords.Count;
+                                 i++)
+                            {
+                                var record =
+                                    Model.DentalLibraryRecords[i];
+
+
+                                <tr>
+
+                                    <td>
+                                        @(i + 1)
+                                    </td>
+
+
+                                    <td>
+                                        <strong>
+                                            @record.RecordName
+                                        </strong>
+                                    </td>
+
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            record.ExistingFileName))
+                                        {
+                                            <span>
+                                                @record.ExistingFileName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No file uploaded
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <td class="text-center">
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            record.ExistingFileName))
+                                        {
+                                            <a asp-controller="VerificationDashboard"
+                                               asp-action="ViewDentalLibraryRecord"
+                                               asp-route-collegeCode="@Model.CollegeCode"
+                                               asp-route-recordId="@record.RecordId"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-primary">
+
+                                                <i class="bi bi-eye me-1"></i>
+                                                View File
+
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-muted text-center py-4">
+
+                    <i class="bi bi-info-circle me-2"></i>
+
+                    No library records available.
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+}
+
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}

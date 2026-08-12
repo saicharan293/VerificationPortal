@@ -1,0 +1,525 @@
+﻿@model VerificationPortal.Models.LibraryDetailsVerificationViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Library Details";
+    ViewData["ActiveTab"] = "LibraryDetails";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "ResearchPublications",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Research & Publications";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next : Next Section";
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Library Details
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Library facilities, resources, infrastructure and equipment
+    </p>
+
+</div>
+
+
+@* =========================================================
+   GENERAL LIBRARY DETAILS
+   ========================================================= *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-book me-2"></i>
+            General Library Details
+        </h3>
+
+        <span class="badge bg-primary">
+            Library
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Library Email ID
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(Model.General?.LibraryEmailId)
+                            ? "-"
+                            : Model.General.LibraryEmailId)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Digital Library
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(Model.General?.DigitalLibrary)
+                            ? "-"
+                            : Model.General.DigitalLibrary)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        HELINET Services
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(Model.General?.HelinetServices)
+                            ? "-"
+                            : Model.General.HelinetServices)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Department-wise Library
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(Model.General?.DepartmentWiseLibrary)
+                            ? "-"
+                            : Model.General.DepartmentWiseLibrary)
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   LIBRARY ITEMS
+   ========================================================= *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-journals me-2"></i>
+            Library Items
+        </h3>
+
+        <span class="badge bg-primary">
+            Items
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-center">
+                                Current Foreign
+                            </th>
+                            <th class="text-center">
+                                Current Indian
+                            </th>
+                            <th class="text-center">
+                                Previous Foreign
+                            </th>
+                            <th class="text-center">
+                                Previous Indian
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.ItemName
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.CurrentForeign ?? 0)
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.CurrentIndian ?? 0)
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.PreviousForeign ?? 0)
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.PreviousIndian ?? 0)
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="verification-value">
+                No library item details available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   LIBRARY BUILDING
+   ========================================================= *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-building me-2"></i>
+            Library Building
+        </h3>
+
+        <span class="badge bg-primary">
+            Infrastructure
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Independent Library Building
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(Model.Building?.IsIndependent)
+                            ? "-"
+                            : Model.Building.IsIndependent)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Area (Sq. Mtrs.)
+                    </label>
+
+                    <div class="verification-value">
+                        @(Model.Building?.AreaSqMtrs?.ToString("0.##") ?? "-")
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   TECHNICAL PROCESSES
+   ========================================================= *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-gear me-2"></i>
+            Technical Processes
+        </h3>
+
+        <span class="badge bg-primary">
+            Technical
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.TechnicalProcesses != null &&
+             Model.TechnicalProcesses.Any())
+        {
+            <div class="row g-4">
+
+                @foreach (var process in Model.TechnicalProcesses)
+                {
+                    <div class="col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                @process.ProcessName
+                            </label>
+
+                            <div class="verification-value">
+                                @(string.IsNullOrWhiteSpace(process.Value)
+                                    ? "-"
+                                    : process.Value)
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="verification-value">
+                No technical process details available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   LIBRARY EQUIPMENT
+   ========================================================= *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-pc-display me-2"></i>
+            Library Equipment
+        </h3>
+
+        <span class="badge bg-primary">
+            Equipment
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.Equipments != null &&
+             Model.Equipments.Any())
+        {
+            <div class="row g-4">
+
+                @foreach (var equipment in Model.Equipments)
+                {
+                    <div class="col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                @equipment.EquipmentName
+                            </label>
+
+                            <div class="verification-value">
+                                @(string.IsNullOrWhiteSpace(equipment.HasEquipment)
+                                    ? "-"
+                                    : equipment.HasEquipment)
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="verification-value">
+                No library equipment details available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   LIBRARY FINANCE
+   ========================================================= *@
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-currency-rupee me-2"></i>
+            Library Finance
+        </h3>
+
+        <span class="badge bg-primary">
+            Finance
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.Finance != null)
+        {
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Total Budget
+                        </label>
+
+                        <div class="verification-value">
+                            @(Model.Finance.TotalBudgetLakhs.HasValue
+                                ? $"{Model.Finance.TotalBudgetLakhs:N2} Lakhs"
+                                : "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Expenditure on Books
+                        </label>
+
+                        <div class="verification-value">
+                            @(Model.Finance.ExpenditureBooksLakhs.HasValue
+                                ? $"{Model.Finance.ExpenditureBooksLakhs:N2} Lakhs"
+                                : "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="verification-field">
+
+                <div class="verification-value">
+                    No finance details available.
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+
+}

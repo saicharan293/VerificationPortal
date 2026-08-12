@@ -1,0 +1,561 @@
+﻿@model VerificationPortal.Models.ResearchPublicationsVerificationViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Research & Publications";
+    ViewData["ActiveTab"] = "ResearchPublications";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "LibraryServices",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode }
+        );
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Library Services";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode }
+        );
+
+    ViewData["NextTabLabel"] = "Next : Next Section";
+}
+
+<!-- ========================================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================================= -->
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Research & Publications
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Research publications, funding and department-wise publication details
+    </p>
+</div>
+
+<!-- ========================================================= -->
+<!-- RESEARCH & PUBLICATION DETAILS -->
+<!-- ========================================================= -->
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-journal-richtext me-2"></i>
+            Research & Publication Details
+        </h3>
+
+        <span class="badge bg-primary">
+            Research Details
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+
+            <!-- Publications -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Number of Publications
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.PublicationsNo?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Students RGUHS Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Students – RGUHS Funded
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.StudentsRGUHSFunded?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Students External Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Students – External Body Funding
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.StudentsExternalBodyFunding?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Faculty RGUHS Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Faculty – RGUHS Funded
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.FacultyRGUHSFunded?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Faculty External Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Faculty – External Body Funding
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.FacultyExternalBodyFunding?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- UPLOADED DOCUMENTS -->
+        <!-- ================================================= -->
+
+        <hr class="my-4" />
+
+        <h5 class="fw-semibold mb-3">
+            Uploaded Documents
+        </h5>
+
+
+        <div class="row g-3">
+
+
+            <!-- Publications Document -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Publications Document
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.PublicationsPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span class="text-truncate">
+                                    @Model.PublicationsPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewResearchPublicationPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Clinical Trials Document -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Clinical Trials Document
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.ClinicalTrialsPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span class="text-truncate">
+                                    @Model.ClinicalTrialsPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewResearchPublicationPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Students Projects Document -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Students Projects Document
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.StudentsProjectsPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span class="text-truncate">
+                                    @Model.StudentsProjectsPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewResearchPublicationPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Faculty Projects Document -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Faculty Projects Document
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.FacultyProjectsPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span class="text-truncate">
+                                    @Model.FacultyProjectsPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewResearchPublicationPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</div>
+
+<!-- ========================================================= -->
+<!-- DEPARTMENT-WISE PUBLICATIONS -->
+<!-- ========================================================= -->
+
+<div class="verification-card mt-4">
+
+    
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+
+            <i class="bi bi-building me-2"></i>
+
+            Department Wise Publications
+
+        </h3>
+
+        <span class="badge bg-secondary">
+            Department Details
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.DepartmentWisePublications != null &&
+             Model.DepartmentWisePublications.Any())
+        {
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:80px;">
+                                Sl. No
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th class="text-center">
+                                Publications Count
+                            </th>
+
+                            <th>
+                                Publication Document
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (int i = 0;
+                              i < Model.DepartmentWisePublications.Count;
+                              i++)
+                        {
+                            var row =
+                                Model.DepartmentWisePublications[i];
+
+                            <tr>
+
+                                <td class="text-center fw-semibold">
+                                    @(i + 1)
+                                </td>
+
+
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @(string.IsNullOrWhiteSpace(row.DeptName)
+                                            ? "-"
+                                            : row.DeptName)
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(row.DeptCode))
+                                    {
+                                        <small class="text-muted">
+                                            @row.DeptCode
+                                        </small>
+                                    }
+
+                                </td>
+
+
+                                <td class="text-center">
+
+                                    @row.PublicationsCount
+
+                                </td>
+
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        row.PublicationPath))
+                                    {
+                                        <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                            @* <span class="text-truncate">
+
+                                                @System.IO.Path.GetFileName(
+                                                    row.PublicationPath)
+
+                                            </span> *@
+
+                                            <a asp-controller="VerificationDashboard"
+                                               asp-action="ViewDepartmentPublicationPdf"
+                                               asp-route-collegeCode="@Model.CollegeCode"
+                                               asp-route-id="@row.Id"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-primary">
+
+                                                <i class="bi bi-eye me-1"></i>
+                                                View File
+
+                                            </a>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+        else
+        {
+
+            <div class="text-center text-muted py-4">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                No department-wise publication details available.
+
+            </div>
+
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true">
+    </script>
+
+}

@@ -46,7 +46,7 @@ namespace VerificationPortal.Services.Verification
                 .FirstOrDefaultAsync(predicate);
 
             if (entity == null)
-                throw new Exception("{typeof(T).Name} record not found.");
+                throw new Exception($"{typeof(T).Name} record not found.");
 
             var handler =
                 _provider.GetRequiredService<IVerificationHandler<T>>();

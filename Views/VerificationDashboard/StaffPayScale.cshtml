@@ -1,0 +1,119 @@
+﻿
+@model VerificationPortal.Models.StaffDetailsCombinedViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Staff Pay Scale";
+    ViewData["ActiveTab"] = "StaffPayScale";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action( "FinanceDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] = "Previous : Finance Details";
+
+    ViewData["NextTabAction"] = Url.Action( "StaffOtherDetails", "VerificationDashboard",  new { collegeCode = ViewBag.CollegeCode } );
+
+    ViewData["NextTabLabel"] = "Next : Staff Other Details";
+}
+
+<div class="verification-page-header">
+    <h2 class="verification-page-title">
+        Staff Pay Scale
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Designation-wise pay scale details of the institution
+    </p>
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-cash-stack me-2"></i>
+            Staff Pay Scale
+        </h3>
+
+        <span class="badge bg-primary">
+            Staff Details
+        </span>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.StaffPayScaleList != null &&
+             Model.StaffPayScaleList.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 100px;">
+                                Sl. No.
+                            </th>
+
+                            <th>
+                                Designation
+                            </th>
+
+                            <th>
+                                Pay Scale
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.StaffPayScaleList)
+                        {
+                            <tr>
+
+                                <td class="fw-semibold">
+                                    @item.DesignationSlNo
+                                </td>
+
+                                <td>
+                                    @item.Designation
+                                </td>
+
+                                <td>
+                                    @(item.PayScale.HasValue
+                                        ? item.PayScale.Value.ToString("0.00")
+                                        : "-")
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                No staff pay scale details available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,368 @@
+﻿@model VerificationPortal.Models.StaffDetailsCombinedViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Staff Other Details";
+    ViewData["ActiveTab"] = "StaffOtherDetails";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =  ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =  ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =  User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action( "StaffPayScale", "VerificationDashboard",  new { collegeCode = ViewBag.CollegeCode } );
+
+    ViewData["PrevTabLabel"] = "Previous : Staff Pay Scale";
+
+    ViewData["NextTabAction"] = Url.Action( "NextTab", "VerificationDashboard",  new { collegeCode = ViewBag.CollegeCode } );
+
+    ViewData["NextTabLabel"] = "Next : Next Section";
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Staff Other Details
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Additional staff, examiner and service-register details
+    </p>
+
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-people me-2"></i>
+            Staff Other Details
+        </h3>
+
+        <span class="badge bg-primary">
+            Staff Details
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Teachers Updated in EMS
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.TeachersUpdatedInEMS)
+                            ? "-"
+                            : Model.StaffOther.TeachersUpdatedInEMS)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Examiner Details Attached
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.ExaminerDetailsAttached)
+                            ? "-"
+                            : Model.StaffOther.ExaminerDetailsAttached)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Service Register Maintained
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.ServiceRegisterMaintained)
+                            ? "-"
+                            : Model.StaffOther.ServiceRegisterMaintained)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Acquittance Register Maintained
+                    </label>
+
+                    <div class="verification-value">
+                        @(string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.AcquittanceRegisterMaintained)
+                            ? "-"
+                            : Model.StaffOther.AcquittanceRegisterMaintained)
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @* Uploaded Documents *@
+
+        <hr class="my-4" />
+
+        <h5 class="fw-semibold mb-3">
+            Uploaded Documents
+        </h5>
+
+        <div class="row g-3">
+
+            @* Examiner Details *@
+            <div class="col-md-6">
+                <div class="verification-field">
+                    <label class="verification-label">
+                        Examiner Details
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.ExaminerDetailsPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span>
+                                    @Model.StaffOther.ExaminerDetailsPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewStaffOtherPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   asp-route-fileType="Examiner"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+
+            @* AEBAS Last Three Months *@
+            <div class="col-md-6">
+                <div class="verification-field">
+                    <label class="verification-label">
+                        AEBAS – Last Three Months
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.AEBASLastThreeMonthsPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span>
+                                    @Model.StaffOther.AEBASLastThreeMonthsPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewStaffOtherPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   asp-route-fileType="AEBAS3Months"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+
+            @* AEBAS Inspection Day *@
+            <div class="col-md-6">
+                <div class="verification-field">
+                    <label class="verification-label">
+                        AEBAS – Inspection Day
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.AEBASInspectionDayPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span>
+                                    @Model.StaffOther.AEBASInspectionDayPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewStaffOtherPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   asp-route-fileType="AEBASInspection"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+
+            @* Provident Fund *@
+            <div class="col-md-6">
+                <div class="verification-field">
+                    <label class="verification-label">
+                        Provident Fund
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.ProvidentFundPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span>
+                                    @Model.StaffOther.ProvidentFundPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewStaffOtherPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   asp-route-fileType="PF"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+
+            @* ESI *@
+            <div class="col-md-6">
+                <div class="verification-field">
+                    <label class="verification-label">
+                        ESI
+                    </label>
+
+                    <div class="verification-value">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.StaffOther?.ESIPdfName))
+                        {
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+
+                                <span>
+                                    @Model.StaffOther.ESIPdfName
+                                </span>
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="ViewStaffOtherPdf"
+                                   asp-route-collegeCode="@Model.CollegeCode"
+                                   asp-route-fileType="ESI"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View File
+
+                                </a>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}

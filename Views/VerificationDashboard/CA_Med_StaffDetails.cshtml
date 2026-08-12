@@ -1,0 +1,660 @@
+﻿@model VerificationPortal.Models.StaffDetailsCombinedViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Staff Details";
+    ViewData["ActiveTab"] = "StaffDetails";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action("FinanceDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode } );
+
+    ViewData["PrevTabLabel"] = "Previous : Finance Details";
+
+    ViewData["NextTabAction"] = Url.Action( "NextTab", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode } );
+
+    ViewData["NextTabLabel"] =  "Next : Next Section";
+}
+
+<div class="verification-page-header">
+    <div>
+        <h1 class="verification-page-title">
+            Staff Details
+        </h1>
+
+        <p class="verification-page-subtitle">
+            Staff pay scale and other staff-related details
+        </p>
+    </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- STAFF PAY SCALE -->
+<!-- ========================================================= -->
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-cash-stack"></i>
+            Staff Pay Scale
+        </h3>
+
+        <span class="badge bg-primary">
+            Pay Scale
+        </span>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.StaffPayScaleList != null &&
+             Model.StaffPayScaleList.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 80px;">Sl. No.</th>
+                            <th>Designation</th>
+                            <th>Pay Scale</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.StaffPayScaleList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.DesignationSlNo
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @item.Designation
+                                </td>
+
+                                <td>
+                                    @(item.PayScale.HasValue
+                                        ? item.PayScale.Value.ToString("N2")
+                                        : "-")
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                No staff pay scale details available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- STAFF PAY SCALE VERIFICATION -->
+<!-- ========================================================= -->
+
+<div class="verification-feedback-section mt-3"
+     data-tab-name="StaffPayScale">
+
+    <div class="verification-card">
+
+        <div class="verification-card-header">
+
+            <h3 class="verification-card-title">
+                <i class="bi bi-shield-check"></i>
+                Staff Pay Scale Verification
+            </h3>
+
+        </div>
+
+        <div class="verification-card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="verification-label">
+                        Verification Status
+                    </label>
+
+                    <div class="verification-value">
+                        @(
+                            ViewData["StaffPayScaleStatus"] ??
+                            ViewData["ExistingStatus"] ??
+                            "Pending"
+                        )
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="verification-label">
+                        Verified By
+                    </label>
+
+                    <div class="verification-value">
+                        @(
+                            ViewData["StaffPayScaleVerifiedBy"] ??
+                            ViewData["VerifiedBy"] ??
+                            "-"
+                        )
+                    </div>
+
+                </div>
+
+                <div class="col-12">
+
+                    <label class="verification-label">
+                        Remarks
+                    </label>
+
+                    <div class="verification-value">
+
+                        @{
+                            var payScaleRemarks =
+                                ViewData["StaffPayScaleRemarks"] ??
+                                ViewData["ExistingRemarks"];
+                        }
+
+                        @(string.IsNullOrWhiteSpace(
+                            payScaleRemarks?.ToString())
+                            ? "-"
+                            : payScaleRemarks)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- STAFF OTHER DETAILS -->
+<!-- ========================================================= -->
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-vcard"></i>
+            Staff Other Details
+        </h3>
+
+        <span class="badge bg-secondary">
+            Staff Particulars
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.StaffOther != null)
+        {
+            <div class="row g-4">
+
+                <!-- Teachers Updated in EMS -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Teachers Updated in EMS
+                        </label>
+
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(
+                                Model.StaffOther.TeachersUpdatedInEMS)
+                                ? "-"
+                                : Model.StaffOther.TeachersUpdatedInEMS)
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Examiner Details -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Examiner Details Attached
+                        </label>
+
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(
+                                Model.StaffOther.ExaminerDetailsAttached)
+                                ? "-"
+                                : Model.StaffOther.ExaminerDetailsAttached)
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Service Register -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Service Register Maintained
+                        </label>
+
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(
+                                Model.StaffOther.ServiceRegisterMaintained)
+                                ? "-"
+                                : Model.StaffOther.ServiceRegisterMaintained)
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Acquittance Register -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Acquittance Register Maintained
+                        </label>
+
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(
+                                Model.StaffOther.AcquittanceRegisterMaintained)
+                                ? "-"
+                                : Model.StaffOther.AcquittanceRegisterMaintained)
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Examiner PDF 1 -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Examiner Details PDF
+                        </label>
+
+                        <div class="verification-value">
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                Model.StaffOther.ExaminerDetailsPdfName))
+                            {
+                                <span>
+                                    @Model.StaffOther.ExaminerDetailsPdfName
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    No file uploaded
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Examiner PDF 2 -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Examiner Details PDF 2
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.ExaminerDetailsPdfName2)
+                                ? "-"
+                                : Model.StaffOther.ExaminerDetailsPdfName2
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Examiner PDF 3 -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Examiner Details PDF 3
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.ExaminerDetailsPdfName3)
+                                ? "-"
+                                : Model.StaffOther.ExaminerDetailsPdfName3
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Examiner PDF 4 -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Examiner Details PDF 4
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.ExaminerDetailsPdfName4)
+                                ? "-"
+                                : Model.StaffOther.ExaminerDetailsPdfName4
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Examiner PDF 5 -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Examiner Details PDF 5
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.ExaminerDetailsPdfName5)
+                                ? "-"
+                                : Model.StaffOther.ExaminerDetailsPdfName5
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AEBAS -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            AEBAS Last Three Months
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.AEBASLastThreeMonthsPdfName)
+                                ? "-"
+                                : Model.StaffOther.AEBASLastThreeMonthsPdfName
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AEBAS Inspection -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            AEBAS Inspection Day
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.AEBASInspectionDayPdfName)
+                                ? "-"
+                                : Model.StaffOther.AEBASInspectionDayPdfName
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Provident Fund -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Provident Fund
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.ProvidentFundPdfName)
+                                ? "-"
+                                : Model.StaffOther.ProvidentFundPdfName
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ESI -->
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            ESI
+                        </label>
+
+                        <div class="verification-value">
+
+                            @(
+                                string.IsNullOrWhiteSpace(
+                                    Model.StaffOther.ESIPdfName)
+                                ? "-"
+                                : Model.StaffOther.ESIPdfName
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                No other staff details available.
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- STAFF OTHER DETAILS VERIFICATION -->
+<!-- ========================================================= -->
+
+<div class="verification-feedback-section mt-3"
+     data-tab-name="StaffOtherDetails">
+
+    <div class="verification-card">
+
+        <div class="verification-card-header">
+
+            <h3 class="verification-card-title">
+                <i class="bi bi-shield-check"></i>
+                Staff Other Details Verification
+            </h3>
+
+        </div>
+
+        <div class="verification-card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="verification-label">
+                        Verification Status
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(
+                            ViewData["StaffOtherDetailsStatus"] ??
+                            ViewData["ExistingStatus"] ??
+                            "Pending"
+                        )
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="verification-label">
+                        Verified By
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(
+                            ViewData["StaffOtherDetailsVerifiedBy"] ??
+                            ViewData["VerifiedBy"] ??
+                            "-"
+                        )
+
+                    </div>
+
+                </div>
+
+                <div class="col-12">
+
+                    <label class="verification-label">
+                        Remarks
+                    </label>
+
+                    <div class="verification-value">
+
+                        @{
+                            var otherRemarks =
+                                ViewData["StaffOtherDetailsRemarks"] ??
+                                ViewData["ExistingRemarks"];
+                        }
+
+                        @(string.IsNullOrWhiteSpace(
+                            otherRemarks?.ToString())
+                            ? "-"
+                            : otherRemarks)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+}

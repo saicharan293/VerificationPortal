@@ -1,0 +1,755 @@
+﻿@model VerificationPortal.Models.Med_CA_AccountAndFeeDetailsPageVM
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Finance Details";
+    ViewData["ActiveTab"] = "FinanceDetails";
+
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] = Url.Action(
+        "PgAcademicMatters",
+        "VerificationDashboard",
+        new
+        {
+            collegeCode = ViewBag.CollegeCode
+        });
+
+    ViewData["PrevTabLabel"] = "Previous : PG Academic Matters";
+
+    ViewData["NextTabAction"] = Url.Action(
+        "NextTab",
+        "VerificationDashboard",
+        new
+        {
+            collegeCode = ViewBag.CollegeCode
+        });
+
+    ViewData["NextTabLabel"] = "Next : Next Section";
+}
+
+
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
+
+<div class="verification-page-header">
+
+    <h1 class="verification-page-title">
+        Finance Details
+    </h1>
+
+    <p class="verification-page-subtitle">
+        Financial, fee and account-related details of the institution
+    </p>
+
+</div>
+
+
+@if (Model.Sections != null && Model.Sections.Any())
+{
+    foreach (var section in Model.Sections)
+    {
+        <!-- =========================================================
+             AUTHORITY & ACCOUNT DETAILS
+        ========================================================== -->
+
+        <div class="verification-card mt-4">
+
+            <div class="verification-card-header" style="justify-content: start;">
+
+                <h3 class="verification-card-title">
+                    <i class="bi bi-building"></i>
+                    Authority & Account Details
+                </h3>
+
+                <span class="badge bg-primary">
+                    @(section.CourseLevel)
+                </span>
+
+            </div>
+
+
+            <div class="verification-card-body">
+
+                <div class="row g-4">
+
+                    <!-- Authority Name & Address -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Authority Name & Address
+                            </label>
+
+                            <div class="verification-value">
+                                @(string.IsNullOrWhiteSpace(section.AuthorityNameAddress)
+                                    ? "-"
+                                    : section.AuthorityNameAddress)
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Authority Contact -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Authority Contact
+                            </label>
+
+                            <div class="verification-value">
+                                @(string.IsNullOrWhiteSpace(section.AuthorityContact)
+                                    ? "-"
+                                    : section.AuthorityContact)
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+             ANNUAL FINANCIAL DETAILS
+        ========================================================== -->
+
+        <div class="verification-card mt-4">
+
+            <div class="verification-card-header">
+
+                <h3 class="verification-card-title">
+                    <i class="bi bi-currency-rupee"></i>
+                    Annual Financial Details
+                </h3>
+
+                <span class="badge bg-secondary">
+                    @(section.CourseLevel)
+                </span>
+
+            </div>
+
+
+            <div class="verification-card-body">
+
+                <div class="row g-4">
+
+                    <!-- Recurrent Annual -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Recurrent Annual
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.RecurrentAnnual.HasValue
+                                    ? $"₹ {section.RecurrentAnnual.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Non-Recurrent Annual -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Non-Recurrent Annual
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.NonRecurrentAnnual.HasValue
+                                    ? $"₹ {section.NonRecurrentAnnual.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Deposits -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Deposits
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.Deposits.HasValue
+                                    ? $"₹ {section.Deposits.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Tuition Fee -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Tuition Fee
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.TuitionFee.HasValue
+                                    ? $"₹ {section.TuitionFee.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Sports Fee -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Sports Fee
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.SportsFee.HasValue
+                                    ? $"₹ {section.SportsFee.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Union Fee -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Union Fee
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.UnionFee.HasValue
+                                    ? $"₹ {section.UnionFee.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Library Fee -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Library Fee
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.LibraryFee.HasValue
+                                    ? $"₹ {section.LibraryFee.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Other Fee -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Other Fee
+                            </label>
+
+                            <div class="verification-value">
+                                @(section.OtherFee.HasValue
+                                    ? $"₹ {section.OtherFee.Value:N2}"
+                                    : "-")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Total Fee -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Total Fee
+                            </label>
+
+                            <div class="verification-value fw-bold">
+                                ₹ @(section.TotalFee.ToString("N2"))
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+             ACCOUNT & AUDIT DETAILS
+        ========================================================== -->
+
+        <div class="verification-card mt-4">
+
+            <div class="verification-card-header">
+
+                <h3 class="verification-card-title">
+                    <i class="bi bi-journal-check"></i>
+                    Account & Audit Details
+                </h3>
+
+            </div>
+
+
+            <div class="verification-card-body">
+
+                <div class="row g-4">
+
+                    <!-- Account Books -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Account Books Maintained
+                            </label>
+
+                            <div class="verification-value">
+
+                                @if (string.Equals(
+                                    section.AccountBooksMaintained?.Trim(),
+                                    "Y",
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-success">
+                                        Yes
+                                    </span>
+                                }
+                                else if (string.Equals(
+                                    section.AccountBooksMaintained?.Trim(),
+                                    "N",
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-danger">
+                                        No
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Accounts Audited -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Accounts Audited
+                            </label>
+
+                            <div class="verification-value">
+
+                                @if (string.Equals(
+                                    section.AccountsAudited?.Trim(),
+                                    "Y",
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-success">
+                                        Yes
+                                    </span>
+                                }
+                                else if (string.Equals(
+                                    section.AccountsAudited?.Trim(),
+                                    "N",
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-danger">
+                                        No
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Donation - PG only -->
+                    @if (section.IsPG)
+                    {
+                        <div class="col-12 col-md-6">
+
+                            <div class="verification-field">
+
+                                <label class="verification-label">
+                                    Donation Levied
+                                </label>
+
+                                <div class="verification-value">
+
+                                    @if (string.Equals(
+                                        section.DonationLevied?.Trim(),
+                                        "Y",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="badge bg-success">
+                                            Yes
+                                        </span>
+                                    }
+                                    else if (string.Equals(
+                                        section.DonationLevied?.Trim(),
+                                        "N",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="badge bg-danger">
+                                            No
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+             SUPPORTING DOCUMENTS
+        ========================================================== -->
+
+        <div class="verification-card mt-4">
+
+            <div class="verification-card-header">
+
+                <h3 class="verification-card-title">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    Supporting Documents
+                </h3>
+
+            </div>
+
+
+            <div class="verification-card-body">
+
+                <div class="row g-3">
+
+                    <!-- Governing Council -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="border rounded p-3 h-100">
+
+                            <div class="d-flex align-items-center justify-content-between gap-3">
+
+                                <div class="d-flex align-items-center">
+
+                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+
+                                    <div>
+                                        <div class="fw-semibold">
+                                            Governing Council
+                                        </div>
+
+                                        <small class="text-muted">
+                                            @(string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName)
+                                                ? "No document uploaded"
+                                                : section.GoverningCouncilPdfName)
+                                        </small>
+                                    </div>
+
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName))
+                                {
+                                    <a href="@Url.Action(
+                                        "ViewGoverningCouncilPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = section.CollegeCode,
+                                            courseLevel = section.CourseLevel,
+                                            facultyCode = ViewBag.FacultyCode
+                                        })"
+                                       target="_blank"
+                                       class="btn btn-outline-primary btn-sm flex-shrink-0">
+
+                                        <i class="bi bi-eye"></i>
+                                        View
+
+                                    </a>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Account Summary -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="border rounded p-3 h-100">
+
+                            <div class="d-flex align-items-center justify-content-between gap-3">
+
+                                <div class="d-flex align-items-center">
+
+                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+
+                                    <div>
+                                        <div class="fw-semibold">
+                                            Account Summary
+                                        </div>
+
+                                        <small class="text-muted">
+                                            @(string.IsNullOrWhiteSpace(section.AccountSummaryPdfName)
+                                                ? "No document uploaded"
+                                                : section.AccountSummaryPdfName)
+                                        </small>
+                                    </div>
+
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(section.AccountSummaryPdfName))
+                                {
+                                    <a href="@Url.Action(
+                                        "ViewAccountSummaryPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = section.CollegeCode,
+                                            courseLevel = section.CourseLevel,
+                                            facultyCode = ViewBag.FacultyCode
+                                        })"
+                                       target="_blank"
+                                       class="btn btn-outline-primary btn-sm flex-shrink-0">
+
+                                        <i class="bi bi-eye"></i>
+                                        View
+
+                                    </a>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Audited Statement -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="border rounded p-3 h-100">
+
+                            <div class="d-flex align-items-center justify-content-between gap-3">
+
+                                <div class="d-flex align-items-center">
+
+                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+
+                                    <div>
+                                        <div class="fw-semibold">
+                                            Audited Statement
+                                        </div>
+
+                                        <small class="text-muted">
+                                            @(string.IsNullOrWhiteSpace(section.AuditedStatementPdfName)
+                                                ? "No document uploaded"
+                                                : section.AuditedStatementPdfName)
+                                        </small>
+                                    </div>
+
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(section.AuditedStatementPdfName))
+                                {
+                                    <a href="@Url.Action(
+                                        "ViewAuditedStatementPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = section.CollegeCode,
+                                            courseLevel = section.CourseLevel,
+                                            facultyCode = ViewBag.FacultyCode
+                                        })"
+                                       target="_blank"
+                                       class="btn btn-outline-primary btn-sm flex-shrink-0">
+
+                                        <i class="bi bi-eye"></i>
+                                        View
+
+                                    </a>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Donation PDF - PG only -->
+                    @if (section.IsPG)
+                    {
+                        <div class="col-12 col-md-6">
+
+                            <div class="border rounded p-3 h-100">
+
+                                <div class="d-flex align-items-center justify-content-between gap-3">
+
+                                    <div class="d-flex align-items-center">
+
+                                        <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+
+                                        <div>
+                                            <div class="fw-semibold">
+                                                Donation Document
+                                            </div>
+
+                                            <small class="text-muted">
+                                                @(string.IsNullOrWhiteSpace(section.DonationPdfName)
+                                                    ? "No document uploaded"
+                                                    : section.DonationPdfName)
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(section.DonationPdfName))
+                                    {
+                                        <a href="@Url.Action(
+                                            "ViewDonationPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = section.CollegeCode,
+                                                courseLevel = section.CourseLevel,
+                                                facultyCode = ViewBag.FacultyCode
+                                            })"
+                                           target="_blank"
+                                           class="btn btn-outline-primary btn-sm flex-shrink-0">
+
+                                            <i class="bi bi-eye"></i>
+                                            View
+
+                                        </a>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+}
+else
+{
+    <!-- =========================================================
+         NO DATA
+    ========================================================== -->
+
+    <div class="verification-card mt-4">
+
+        <div class="verification-card-body">
+
+            <div class="alert alert-warning mb-0">
+
+                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                No finance details available for this institution.
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+}
