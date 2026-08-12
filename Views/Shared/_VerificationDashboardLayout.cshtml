@@ -140,60 +140,69 @@
                                         @* Display-only feedback status *@
                                         <div id="verificationDisplay">
 
-                                            @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Previous Remarks</label>
-                                                    <div class="feedback-value">
-                                                        @ViewData["ExistingRemarks"]
+                                            <div class="footer-top">
+
+
+                                                @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Previous Remarks</label>
+                                                        <div class="feedback-value">
+                                                            @ViewData["ExistingRemarks"]
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Previous Remarks</label>
-                                                    <div class="feedback-value small">
-                                                        No previous remarks available.
+                                                }
+                                                else
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Previous Remarks</label>
+                                                        <div class="feedback-value small">
+                                                            No previous remarks available.
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            }
+                                                }
 
-                                            @if (ViewData["ExistingStatus"] != null)
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Previous Status</label>
-                                                    <div class="feedback-value">
-                                                        <span class="status-badge @ViewData["ExistingStatusClass"]">
-                                                            @ViewData["ExistingStatus"]
-                                                        </span>
+                                            </div>
+
+                                            <div class="footer-bottom">
+
+                                                @if (ViewData["ExistingStatus"] != null)
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Previous Status</label>
+                                                        <div class="feedback-value">
+                                                            <span class="status-badge @ViewData["ExistingStatusClass"]">
+                                                                @ViewData["ExistingStatus"]
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            }
+                                                }
 
-                                            @if (ViewData["VerifiedBy"] != null)
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Verified By</label>
-                                                    <div class="feedback-value">@ViewData["VerifiedBy"]</div>
-                                                </div>
-                                            }
+                                                @if (ViewData["VerifiedBy"] != null)
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Verified By</label>
+                                                        <div class="feedback-value">@ViewData["VerifiedBy"]</div>
+                                                    </div>
+                                                }
 
-                                            @if (ViewData["VerifiedDate"] != null)
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Verified Date</label>
-                                                    <div class="feedback-value">@ViewData["VerifiedDate"]</div>
-                                                </div>
-                                            }
+                                                @if (ViewData["VerifiedDate"] != null)
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Verified Date</label>
+                                                        <div class="feedback-value">@ViewData["VerifiedDate"]</div>
+                                                    </div>
+                                                }
 
-                                            <div class="mt-4">
-                                                <button type="button"
-                                                        class="btn btn-warning"
-                                                        id="btnEditVerification">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                    Edit Verification
-                                                </button>
+                                                <div class="mt-4">
+                                                    <button type="button"
+                                                            class="btn btn-warning"
+                                                            id="btnEditVerification">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                        Edit Verification
+                                                    </button>
+                                                </div>
+
                                             </div>
 
                                         </div>

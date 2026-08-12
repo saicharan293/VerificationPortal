@@ -368,12 +368,12 @@ body {
     padding: 1.5rem;
 }
 
-.verification-feedback-section {
+/*.verification-feedback-section {
     padding: 1rem 1.5rem;
-}
+}*/
 
 .feedback-actions {
-    padding: 1.5rem;
+/*    padding: 1.5rem;*/
     display: flex;
     justify-content: space-evenly;
     align-items: center;
