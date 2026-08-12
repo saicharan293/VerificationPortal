@@ -1862,13 +1862,233 @@ ADD
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
 
+ALTER TABLE [dbo].[FacultyDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+ALTER TABLE [dbo].[TeachingStaffDepartmentWiseDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+ALTER TABLE [dbo].[HospitalDetailsForAffiliation]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+
+ALTER TABLE [dbo].[DentalServices]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
 
 select * from TblRguhsFacultyUser;
 
 SELECT * FROM [dbo].[AFF_InstitutionsDetails] WHERE CollegeCode='D008';
 
 SELECT * FROM Affiliation_College_Master
-WHERE FacultyCode=2
 WHERE CollegeCode = 'D008';
 
 SELECT * FROM CollegeCourseIntakeDetails
@@ -1945,13 +2165,12 @@ where FacultyCode = 2
 
 ----- part 2
 
-SELECT * FROM CA_MST_DentalLibraryRecords
+SELECT * FROM CA_MST_DentalLibraryRecords;
 
 SELECT * FROM CA_DentalLibraryRecords
-WHERE CollegeCode = 'D038'
+WHERE CollegeCode = 'D038';
 
 ----- RESEARCH AND PUBLICATIONS -------
-CaMedResearchPublicationsDetails
 
 --- PART 1
 SELECT * FROM CA_Med_ResearchPublicationsDetails
@@ -1973,7 +2192,7 @@ SELECT * FROM CA_Med_LibraryBuilding
 WHERE CollegeCode = 'D038'
 
 SELECT * FROM CA_MST_Med_LibTechnicalProcess
-WHERE FacultyCode=2
+WHERE FacultyCode=2;
 
 SELECT * FROM CA_Med_LibTechnicalProcess
 WHERE CollegeCode = 'D038'
@@ -1985,4 +2204,19 @@ SELECT * FROM CA_Med_LibraryEquipments
 WHERE CollegeCode = 'D038';
 
 SELECT * FROM CA_Med_LibraryFinance
+WHERE CollegeCode = 'D038';
+
+SELECT * FROM TeachingStaffDepartmentWiseDetails
+WHERE CollegeCode = 'd038';
+
+
+SELECT * FROM MedicalAlliedDisciplineDetail
+WHERE CollegeCode='D038' ORDER BY DisciplineName;
+
+SELECT * FROM DentalServices
+WHERE CollegeCode = 'd038' and SectionCode = 1;
+
+SELECT * FROM MstDentalServices;
+
+SELECT * FROM DentalWardBedDistribution
 WHERE CollegeCode = 'D038'

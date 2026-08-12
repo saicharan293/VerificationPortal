@@ -1,0 +1,375 @@
+﻿@model VerificationPortal.Models.FacultyDetailsVerificationViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Faculty Details";
+    ViewData["ActiveTab"] = "FacultyDetails";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "LibraryDetails",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Library Details";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next : Next Section";
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Faculty Details
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Faculty information, recognition and supporting documents
+    </p>
+
+</div>
+
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge me-2"></i>
+            Faculty Details
+        </h3>
+
+        <span class="badge bg-primary">
+            @(Model.FacultyDetails?.Count ?? 0) Faculty
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.FacultyDetails == null ||
+             !Model.FacultyDetails.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No faculty details found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Faculty Name
+                            </th>
+
+                            <th>
+                                Designation
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th>
+                                Recognized PG Teacher
+                            </th>
+
+                            <th>
+                                Recognized PhD Teacher
+                            </th>
+
+                            <th>
+                                Examiner
+                            </th>
+
+                            <th>
+                                Examiner For
+                            </th>
+
+                            <th>
+                                Litigation Pending
+                            </th>
+
+                            <th>
+                                Mobile
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                PAN
+                            </th>
+
+                            <th>
+                                Aadhaar
+                            </th>
+
+                            <th>
+                                Validity From
+                            </th>
+
+                            <th>
+                                Validity To
+                            </th>
+
+                            <th>
+                                PG Recognition
+                            </th>
+
+                            <th>
+                                PhD Recognition
+                            </th>
+
+                            <th>
+                                Litigation Document
+                            </th>
+
+                            <th>
+                                Remarks
+                            </th>
+
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var faculty in Model.FacultyDetails)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serialNo
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.NameOfFaculty)
+                                        ? "-"
+                                        : faculty.NameOfFaculty)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.Designation)
+                                        ? "-"
+                                        : faculty.Designation)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.DepartmentDetails)
+                                        ? "-"
+                                        : faculty.DepartmentDetails)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.RecognizedPgTeacher)
+                                        ? "-"
+                                        : faculty.RecognizedPgTeacher)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.RecognizedPhDteacher)
+                                        ? "-"
+                                        : faculty.RecognizedPhDteacher)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.IsExaminer)
+                                        ? "-"
+                                        : faculty.IsExaminer)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.ExaminerFor)
+                                        ? "-"
+                                        : faculty.ExaminerFor)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.LitigationPending)
+                                        ? "-"
+                                        : faculty.LitigationPending)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.Mobile)
+                                        ? "-"
+                                        : faculty.Mobile)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.Email)
+                                        ? "-"
+                                        : faculty.Email)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.Pan)
+                                        ? "-"
+                                        : faculty.Pan)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.Aadhaar)
+                                        ? "-"
+                                        : faculty.Aadhaar)
+                                </td>
+
+                                <td>
+                                    @(faculty.From?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(faculty.To?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+
+                                @* PG Recognition *@
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        faculty.GuideRecognitionDocPath))
+                                    {
+                                        <a href="@faculty.GuideRecognitionDocPath"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            <i class="bi bi-eye me-1"></i>
+                                            View
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+
+                                @* PhD Recognition *@
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        faculty.PhDrecognitionDocPath))
+                                    {
+                                        <a href="@faculty.PhDrecognitionDocPath"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            <i class="bi bi-eye me-1"></i>
+                                            View
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+
+                                @* Litigation Document *@
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        faculty.LitigationDocPath))
+                                    {
+                                        <a href="@faculty.LitigationDocPath"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            <i class="bi bi-eye me-1"></i>
+                                            View
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+
+                                </td>
+
+
+                                @* Remarks *@
+                                <td>
+
+                                    @(string.IsNullOrWhiteSpace(
+                                        faculty.RemoveRemarks)
+                                        ? "-"
+                                        : faculty.RemoveRemarks)
+
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+}

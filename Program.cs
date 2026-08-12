@@ -17,6 +17,7 @@ builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization();
 
 builder.Services.AddScoped<IVerificationService, VerificationService>();
+builder.Services.AddScoped<IClinicalFacilitiesCompositeService, ClinicalFacilitiesCompositeService>();
 
 builder.Services.AddScoped(typeof(IVerificationHandler<>), typeof(GenericVerificationHandler<>));
 

@@ -1,0 +1,127 @@
+﻿@model List<VerificationPortal.Models.DisciplineVm>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-diagram-3 me-2"></i>
+            Discipline Details
+        </h3>
+
+        <span class="badge bg-primary">
+            @(Model?.Count ?? 0) Disciplines
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No discipline details found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            @* <th>
+                                Discipline Code
+                            </th> *@
+
+                            <th>
+                                Discipline Name
+                            </th>
+
+                            @* <th>
+                                Seat Intake
+                            </th> *@
+
+                            @* <th>
+                                Seat Slab
+                            </th> *@
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var discipline in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serialNo
+                                </td>
+
+                                @* <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        discipline.DisciplineCode)
+                                        ? "-"
+                                        : discipline.DisciplineCode)
+                                </td> *@
+
+                                <td class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(
+                                        discipline.DisciplineName)
+                                        ? "-"
+                                        : discipline.DisciplineName)
+                                </td>
+
+                                @* <td>
+                                    @discipline.SeatIntake
+                                </td>
+
+                                <td>
+                                    @discipline.SeatSlab
+                                </td> *@
+
+                                <td>
+                                    @if (discipline.IsSelected)
+                                    {
+                                        <span class="badge bg-success">
+                                            Selected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Not Selected
+                                        </span>
+                                    }
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>

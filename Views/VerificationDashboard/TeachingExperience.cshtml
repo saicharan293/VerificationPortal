@@ -1,0 +1,341 @@
+﻿@model VerificationPortal.Models.TeachingExperienceVerificationViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Teaching Experience";
+    ViewData["ActiveTab"] = "TeachingExperience";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "FacultyDetails",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Faculty Details";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next : Next Section";
+}
+
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Teaching Experience
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Department-wise teaching experience and faculty service details
+    </p>
+
+</div>
+
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-workspace me-2"></i>
+            Teaching Experience
+        </h3>
+
+        <span class="badge bg-primary">
+            Faculty Experience
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.FacultyRows == null ||
+             !Model.FacultyRows.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No teaching experience records found.
+            </div>
+        }
+        else
+        {
+            foreach (var faculty in Model.FacultyRows)
+            {
+                <div class="verification-card mb-4">
+
+                    <!-- FACULTY HEADER -->
+
+                    <div class="verification-card-header">
+
+                        <div>
+                            <h4 class="verification-card-title mb-1">
+
+                                <i class="bi bi-person-circle me-2"></i>
+
+                                @(string.IsNullOrWhiteSpace(
+                                    faculty.NameOfFaculty)
+                                    ? "Faculty"
+                                    : faculty.NameOfFaculty)
+
+                            </h4>
+
+                            <small class="text-muted">
+                                Teaching Experience Details
+                            </small>
+                        </div>
+
+
+                        <span class="badge bg-success">
+
+                            Total Experience:
+                            @(faculty.TotalExperience?.ToString("0.##") ?? "0")
+
+                            Years
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="verification-card-body p-0">
+
+                        @if (faculty.Departments == null ||
+                             !faculty.Departments.Any())
+                        {
+                            <div class="alert alert-light m-3">
+                                No department-wise experience records
+                                found for this faculty.
+                            </div>
+                        }
+                        else
+                        {
+                            foreach (var department in faculty.Departments)
+                            {
+                                <div class="px-3 pt-3">
+
+                                    <div class="d-flex justify-content-between
+                                                align-items-center mb-2">
+
+                                        <h5 class="fw-semibold mb-0">
+
+                                            <i class="bi bi-building me-2"></i>
+
+                                            @(string.IsNullOrWhiteSpace(
+                                                department.DepartmentName)
+                                                ? "-"
+                                                : department.DepartmentName)
+
+                                        </h5>
+
+                                        <span class="badge bg-secondary">
+
+                                            @(string.IsNullOrWhiteSpace(
+                                                department.CourseLevel)
+                                                ? "-"
+                                                : department.CourseLevel)
+
+                                        </span>
+
+                                    </div>
+
+
+                                    @if (department.Experiences == null ||
+                                         !department.Experiences.Any())
+                                    {
+                                        <div class="alert alert-light">
+                                            No experience records available.
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="table-responsive">
+
+                                            <table class="table table-bordered
+                                                          table-hover
+                                                          align-middle mb-4">
+
+                                                <thead class="table-light">
+
+                                                    <tr>
+
+                                                        <th style="width: 50px;"> Sl No </th>
+
+                                                        <th> Designation </th>
+
+                                                        <th> Course Level </th>
+
+                                                        <th> College </th>
+
+                                                        <th> From </th>
+
+                                                        <th> To </th>
+
+                                                        <th> Experience </th>
+
+                                                    </tr>
+
+                                                </thead>
+
+
+                                               <tbody>
+
+                                                    @{
+                                                        var rowNumber = 1;
+                                                    }
+
+                                                    @foreach (var experience in department.Experiences)
+                                                    {
+                                                        var isUg =
+                                                            string.Equals(
+                                                                experience.CourseLevel,
+                                                                "UG",
+                                                                StringComparison.OrdinalIgnoreCase);
+
+                                                        var collegeName =
+                                                            isUg
+                                                                ? experience.UgCollegeName
+                                                                : experience.PgCollegeName;
+
+                                                        var fromDate =
+                                                            isUg
+                                                                ? experience.UgFrom
+                                                                : experience.PgFrom;
+
+                                                        var toDate =
+                                                            isUg
+                                                                ? experience.UgTo
+                                                                : experience.PgTo;
+
+
+                                                        <tr>
+
+                                                            <td>
+                                                                @rowNumber
+                                                            </td>
+
+
+                                                            <td>
+                                                                @if (!string.IsNullOrWhiteSpace(
+                                                                    experience.DesignationName))
+                                                                {
+                                                                    @experience.DesignationName
+                                                                }
+                                                                else if (!string.IsNullOrWhiteSpace(
+                                                                    experience.DesignationCode))
+                                                                {
+                                                                    @experience.DesignationCode
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </td>
+
+
+                                                            <td>
+                                                                @if (!string.IsNullOrWhiteSpace(
+                                                                    experience.CourseLevel))
+                                                                {
+                                                                    <span class="badge bg-info text-dark">
+                                                                        @experience.CourseLevel
+                                                                    </span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </td>
+
+
+                                                            <td>
+                                                                @if (!string.IsNullOrWhiteSpace(collegeName))
+                                                                {
+                                                                    @collegeName
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </td>
+
+
+                                                            <td>
+                                                                @(fromDate?.ToString("dd-MM-yyyy") ?? "-")
+                                                            </td>
+
+
+                                                            <td>
+                                                                @(toDate?.ToString("dd-MM-yyyy") ?? "-")
+                                                            </td>
+
+
+                                                            <td>
+                                                                @if (experience.TotalExperience.HasValue)
+                                                                {
+                                                                    <strong>
+                                                                        @experience.TotalExperience.Value.ToString("0.##")
+                                                                    </strong>
+
+                                                                    <span class="text-muted">
+                                                                        years
+                                                                    </span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </td>
+
+                                                        </tr>
+
+                                                        rowNumber++;
+                                                    }
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                        }
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+
+}

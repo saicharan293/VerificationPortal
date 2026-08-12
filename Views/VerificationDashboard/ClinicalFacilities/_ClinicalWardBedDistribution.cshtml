@@ -1,0 +1,118 @@
+﻿@model List<VerificationPortal.Models.DentalWardBedDistributionVm>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-hospital me-2"></i>
+            Ward-wise Bed Distribution in Attached Hospital
+        </h3>
+
+        <span class="badge bg-primary">
+            @(Model?.Count ?? 0) Wards
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No ward-wise bed distribution details found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Ward Name
+                            </th>
+
+                            <th>
+                                Seat Slab
+                            </th>
+
+                            <th>
+                                Beds Required
+                            </th>
+
+                            <th>
+                                Beds Present
+                            </th>
+
+                            <th>
+                                Difference
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var ward in Model)
+                        {
+                            var bedsPresent =
+                                ward.BedsPresent ?? 0;
+
+                            var difference =
+                                bedsPresent - ward.BedsRequired;
+
+                            <tr>
+
+                                <td>
+                                    @serialNo
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(ward.WardName)
+                                        ? "-"
+                                        : ward.WardName)
+                                </td>
+
+                                <td>
+                                    @ward.SeatSlab
+                                </td>
+
+                                <td>
+                                    @ward.BedsRequired
+                                </td>
+
+                                <td>
+                                    @bedsPresent
+                                </td>
+
+                                <td>
+                                    @difference
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>

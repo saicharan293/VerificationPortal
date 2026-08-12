@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
+using VerificationPortal.Services.Verification;
 using VerificationPortal.Services.Verification.Interfaces;
 using VerificationPortal.Services.Verification.Models;
 using VerificationPortal.ViewModels;
@@ -15,12 +17,14 @@ namespace VerificationPortal.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IVerificationService _verificationService;
+        private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
         private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
 
-        public VerificationDashboardController(ApplicationDbContext context, IVerificationService verificationService)
+        public VerificationDashboardController(ApplicationDbContext context, IVerificationService verificationService, IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService)
         {
             _context = context;
             _verificationService = verificationService;
+            _clinicalFacilitiesCompositeService = clinicalFacilitiesCompositeService;
         }
 
         protected string BaseMedicalPath
@@ -982,6 +986,12 @@ namespace VerificationPortal.Controllers
                 { "LibraryServices", typeof(CaMedicalLibraryService) },
 
                 { "LibraryDetails", typeof(CaMedLibraryGeneral) },
+
+                { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
+
+                { "FacultyDetails", typeof(FacultyDetail) },
+
+                { "TeachingExperience", typeof(TeachingStaffDepartmentWiseDetail) },
 
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
                 { "TeachingStaffDepartmentWise", typeof(TeachingStaffDepartmentWiseDetail) },
@@ -2896,6 +2906,28 @@ namespace VerificationPortal.Controllers
                             request);
                     },
 
+                    ["FacultyDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<FacultyDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request),
+
+
+                    ["TeachingExperience"] = async () =>
+                    {
+                        await _verificationService.SaveVerificationAsync<TeachingStaffDepartmentWiseDetail>(
+                            x =>
+                                x.CollegeCode == collegeCode &&
+                                x.FacultyCode == facultyCode.ToString(),
+                            request);
+                    },
+
+                    ["ClinicalFacilities"] = async() =>
+                        await _verificationService.SaveVerificationAsync<HospitalDetailsForAffiliation>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request),
+
                     // Continue adding the remaining tabs...
                 };
 
@@ -3669,6 +3701,633 @@ namespace VerificationPortal.Controllers
 
             return View("LibraryDetails", model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> FacultyDetails(string collegeCode)
+        {
+            // ---------------------------------------------------------
+            // COLLEGE CODE
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+            {
+                collegeCode =
+                    HttpContext.Session.GetString("CollegeCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var pageContext =
+                await GetPageContextAsync(collegeCode);
+
+            var facultyCodeString =
+                pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCodeString))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(facultyCodeString, out var facultyCode))
+                return NotFound("Invalid faculty code.");
+
+
+            // ---------------------------------------------------------
+            // AFFILIATION TYPE
+            // ---------------------------------------------------------
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+
+            // =========================================================
+            // FACULTY DETAILS
+            // =========================================================
+
+            var facultyDetails =
+                await _context.FacultyDetails
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString &&
+                        x.IsRemoved != true)
+                    .OrderBy(x => x.NameOfFaculty)
+                    .ToListAsync();
+
+            // =========================================================
+            // 2. DESIGNATION MASTER
+            // =========================================================
+
+            var designationMasters =
+                await _context.DesignationMasters
+                    .AsNoTracking()
+                    .Where(x => x.FacultyCode == facultyCode)
+                    .ToListAsync();
+
+            var designationDictionary =
+                designationMasters
+                    .GroupBy(x => x.DesignationCode)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.First().DesignationName);
+
+
+            // =========================================================
+            // 3. DEPARTMENT / SUBJECT MASTER
+            // =========================================================
+
+            var courseMasters =
+                await _context.MstCourses
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.FacultyCode.ToString() == facultyCodeString &&
+                        x.SubjectName != null)
+                    .ToListAsync();
+
+            var departmentDictionary =
+                courseMasters
+                    .GroupBy(x => new
+                    {
+                        x.SubjectName,
+                        x.CourseLevel
+                    })
+                    .ToDictionary(
+                        g => g.First().CourseCode.ToString(),
+                        g => g.Key.SubjectName!);
+
+            // =========================================================
+            // VIEW MODEL
+            // =========================================================
+
+            var model =
+                new FacultyDetailsVerificationViewModel
+                {
+                    CollegeCode = collegeCode,
+
+                    FacultyCode = facultyCode,
+
+                    AffiliationType = affiliationType,
+
+                    FacultyDetails =
+                        facultyDetails
+                            .Select(x =>
+                            {
+                                designationDictionary.TryGetValue(
+                                    x.Designation ?? "",
+                                    out var designationName);
+
+                                departmentDictionary.TryGetValue(
+                                    x.DepartmentDetails ?? "",
+                                    out var departmentName);
+
+                                return new FacultyDetailsVerificationRow
+                                {
+                                    Id = x.Id,
+
+                                    NameOfFaculty =
+                                        x.NameOfFaculty,
+
+                                    Designation =
+                                        designationName
+                                        ?? x.Designation,
+
+                                    DepartmentDetails =
+                                        departmentName
+                                        ?? x.DepartmentDetails,
+
+                                    RecognizedPgTeacher =
+                                        x.RecognizedPgTeacher,
+
+                                    Mobile =
+                                        x.Mobile,
+
+                                    Email =
+                                        x.Email,
+
+                                    Pan =
+                                        x.Pan,
+
+                                    Aadhaar =
+                                        x.Aadhaar,
+
+                                    RecognizedPhDteacher =
+                                        x.RecognizedPhDteacher,
+
+                                    LitigationPending =
+                                        x.LitigationPending,
+
+                                    IsExaminer =
+                                        x.IsExaminer,
+
+                                    ExaminerFor =
+                                        x.ExaminerFor,
+
+                                    GuideRecognitionDocPath =
+                                        x.GuideRecognitionDocPath,
+
+                                    PhDrecognitionDocPath =
+                                        x.PhDrecognitionDocPath,
+
+                                    LitigationDocPath =
+                                        x.LitigationDocPath,
+
+                                    From =
+                                        x.From,
+
+                                    To =
+                                        x.To,
+
+                                    RemoveRemarks =
+                                        x.RemoveRemarks
+                                };
+                            })
+                            .ToList()
+                };
+
+
+            // ---------------------------------------------------------
+            // COMMON VIEW DATA
+            // ---------------------------------------------------------
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode =
+                collegeCode;
+
+            ViewBag.FacultyCode =
+                facultyCode;
+
+            ViewBag.AffiliationType =
+                affiliationType;
+
+
+            // ---------------------------------------------------------
+            // VERIFICATION DATA
+            // ---------------------------------------------------------
+
+            await SetVerificationViewData<FacultyDetail>(
+                collegeCode);
+
+
+            return View("FacultyDetails", model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> TeachingExperience(string collegeCode)
+        {
+            // ---------------------------------------------------------
+            // COLLEGE CODE
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+            {
+                collegeCode =
+                    HttpContext.Session.GetString("CollegeCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var pageContext =
+                await GetPageContextAsync(collegeCode);
+
+            var facultyCodeString =
+                pageContext.Institution.FacultyCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(facultyCodeString))
+                return NotFound("Faculty code not found.");
+
+            if (!int.TryParse(facultyCodeString, out var facultyCode))
+                return NotFound("Invalid faculty code.");
+
+
+            // ---------------------------------------------------------
+            // AFFILIATION TYPE
+            // ---------------------------------------------------------
+
+            var affiliationType =
+                HttpContext.Session.GetInt32("AffiliationType") ?? 2;
+
+
+            // =========================================================
+            // 1. TEACHING EXPERIENCE
+            // =========================================================
+
+            var teachingRecords =
+                await _context.TeachingStaffDepartmentWiseDetails
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCodeString &&
+                        !string.IsNullOrWhiteSpace(x.NameOfFaculty))
+                    .OrderBy(x => x.NameOfFaculty)
+                    .ThenBy(x => x.DepartmentCode)
+                    .ThenBy(x => x.CourseLevel)
+                    .ThenBy(x => x.DesignationName)
+                    .ToListAsync();
+
+            var collegeMasters =
+                await _context.AffiliationCollegeMasters
+                    .AsNoTracking()
+                    .Where(x => x.FacultyCode == facultyCodeString)
+                    .ToListAsync();
+
+            var otherCollegeMasters =
+                await _context.AffiliationOthersCollegeMasters
+                    .AsNoTracking()
+                    .Where(x => x.FacultyCode == facultyCode)
+                    .ToListAsync();
+
+            var collegeDictionary =
+                collegeMasters
+                    .Where(x => !string.IsNullOrWhiteSpace(x.CollegeCode))
+                    .Select(x => new
+                    {
+                        Code = x.CollegeCode,
+                        Name = x.CollegeName ?? x.CollegeCode
+                    })
+                    .Concat(
+                        otherCollegeMasters
+                            .Where(x => !string.IsNullOrWhiteSpace(x.CollegeCode))
+                            .Select(x => new
+                            {
+                                Code = x.CollegeCode,
+                                Name = x.CollegeName ?? x.CollegeCode
+                            })
+                    )
+                    .GroupBy(x => x.Code)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.First().Name,
+                        StringComparer.OrdinalIgnoreCase);
+
+
+            // =========================================================
+            // 2. DEPARTMENT MASTER
+            // =========================================================
+
+            var courseMasters =
+                await _context.MstCourses
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.FacultyCode == facultyCode)
+                    .ToListAsync();
+
+            var departmentDictionary =
+                courseMasters
+                    .Where(x => x.CourseCode != null)
+                    .GroupBy(x => x.CourseCode.ToString())
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.First().CourseName);
+
+
+            // =========================================================
+            // 3. DESIGNATION MASTER
+            // =========================================================
+
+            var designationMasters =
+                await _context.DesignationMasters
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.FacultyCode == facultyCode)
+                    .ToListAsync();
+
+            var designationDictionary =
+                designationMasters
+                    .GroupBy(x => x.DesignationCode)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.First().DesignationName);
+
+
+            // =========================================================
+            // 4. VIEW MODEL
+            // =========================================================
+
+            var model =
+                new TeachingExperienceVerificationViewModel
+                {
+                    CollegeCode = collegeCode,
+
+                    FacultyCode = facultyCode,
+
+                    AffiliationType = affiliationType,
+
+                    FacultyRows =
+                        teachingRecords
+                            .GroupBy(x => x.NameOfFaculty!.Trim())
+                            .OrderBy(g => g.Key)
+                            .Select(facultyGroup =>
+                            {
+                                var facultyVm =
+                                    new TeachingExperienceFacultyRow
+                                    {
+                                        NameOfFaculty =
+                                            facultyGroup.Key
+                                    };
+
+
+                                // -----------------------------------------
+                                // GROUP BY DEPARTMENT + COURSE LEVEL
+                                // -----------------------------------------
+
+                                facultyVm.Departments =
+                                    facultyGroup
+                                        .GroupBy(x => new
+                                        {
+                                            x.DepartmentCode,
+                                            x.CourseLevel
+                                        })
+                                        .OrderBy(g => g.Key.DepartmentCode)
+                                        .ThenBy(g => g.Key.CourseLevel)
+                                        .Select(departmentGroup =>
+                                        {
+                                            departmentDictionary.TryGetValue(
+                                                departmentGroup.Key.DepartmentCode ?? "",
+                                                out var departmentName);
+
+                                            var departmentVm =
+                                                new TeachingExperienceDepartmentRow
+                                                {
+                                                    DepartmentCode =
+                                                        departmentGroup.Key.DepartmentCode,
+
+                                                    DepartmentName =
+                                                        departmentName
+                                                        ?? departmentGroup.Key.DepartmentCode,
+
+                                                    CourseLevel =
+                                                        departmentGroup.Key.CourseLevel
+                                                };
+
+
+                                            // ---------------------------------
+                                            // EXPERIENCE RECORDS
+                                            // ---------------------------------
+
+                                            departmentVm.Experiences =
+                                                departmentGroup
+                                                    .Select(x =>
+                                                    {
+                                                        designationDictionary.TryGetValue(
+                                                            x.DesignationCode ?? "",
+                                                            out var designationName);
+
+                                                        var experience =
+                                                            new TeachingExperienceDetailRow
+                                                            {
+                                                                Id = x.Id,
+
+                                                                DesignationCode =
+                                                                    x.DesignationCode,
+
+                                                                DesignationName =
+                                                                    designationName
+                                                                    ?? x.DesignationName,
+
+                                                                CourseLevel =
+                                                                    x.CourseLevel,
+
+                                                                UgFrom =
+                                                                    x.Ugfrom,
+
+                                                                UgTo =
+                                                                    x.Ugto,
+
+                                                                PgFrom =
+                                                                    x.Pgfrom,
+
+                                                                PgTo =
+                                                                    x.Pgto,
+
+                                                                // -----------------------------------------
+                                                                // UG COLLEGE
+                                                                // -----------------------------------------
+
+                                                                UgCollegeCode =
+                                                                    x.UgcollegeCode,
+
+                                                                UgCollegeName =
+                                                                    !string.IsNullOrWhiteSpace(x.UgcollegeCode) &&
+                                                                    collegeDictionary.TryGetValue(
+                                                                        x.UgcollegeCode,
+                                                                        out var ugCollegeName)
+                                                                        ? ugCollegeName
+                                                                        : x.UgcollegeCode,
+
+                                                                // -----------------------------------------
+                                                                // PG COLLEGE
+                                                                // -----------------------------------------
+
+                                                                PgCollegeCode =
+                                                                    x.PgcollegeCode,
+
+                                                                PgCollegeName =
+                                                                    !string.IsNullOrWhiteSpace(x.PgcollegeCode) &&
+                                                                    collegeDictionary.TryGetValue(
+                                                                        x.PgcollegeCode,
+                                                                        out var pgCollegeName)
+                                                                        ? pgCollegeName
+                                                                        : x.PgcollegeCode,
+
+                                                                TotalExperience =
+                                                                    x.TotalExperience,
+
+                                                                FacultyDetailId =
+                                                                    x.FacultyDetailId
+                                                            };
+
+                                                        return experience;
+                                                    })
+                                                    .ToList();
+
+                                            return departmentVm;
+                                        })
+                                        .ToList();
+
+
+                                // -----------------------------------------
+                                // TOTAL EXPERIENCE
+                                // -----------------------------------------
+
+                                var dates =
+                                    facultyGroup
+                                        .SelectMany(x =>
+                                            new[]
+                                            {
+                                        x.Ugfrom,
+                                        x.Pgfrom
+                                            })
+                                        .Where(x => x.HasValue)
+                                        .Select(x =>
+                                            x!.Value.ToDateTime(
+                                                TimeOnly.MinValue))
+                                        .ToList();
+
+                                if (dates.Any())
+                                {
+                                    var fromDate = dates.Min();
+
+                                    var toDates =
+                                        facultyGroup
+                                            .SelectMany(x =>
+                                                new[]
+                                                {
+                                            x.Ugto,
+                                            x.Pgto
+                                                })
+                                            .Where(x => x.HasValue)
+                                            .Select(x =>
+                                                x!.Value.ToDateTime(
+                                                    TimeOnly.MinValue))
+                                            .ToList();
+
+                                    var toDate =
+                                        toDates.Any()
+                                            ? toDates.Max()
+                                            : DateTime.Today;
+
+                                    facultyVm.TotalExperience =
+                                        CalculateExperience(
+                                            fromDate,
+                                            toDate);
+                                }
+
+                                return facultyVm;
+                            })
+                            .ToList()
+                };
+
+
+            // ---------------------------------------------------------
+            // COMMON VIEW DATA
+            // ---------------------------------------------------------
+
+            ViewBag.InstitutionName =
+                pageContext.Institution.NameOfInstitution;
+
+            ViewBag.CollegeCode =
+                collegeCode;
+
+            ViewBag.FacultyCode =
+                facultyCode;
+
+            ViewBag.AffiliationType =
+                affiliationType;
+
+
+            // ---------------------------------------------------------
+            // VERIFICATION DATA
+            // ---------------------------------------------------------
+
+            await SetVerificationViewData<TeachingStaffDepartmentWiseDetail>(
+                collegeCode);
+
+
+            return View("TeachingExperience", model);
+        }
+
+        private decimal CalculateExperience(DateTime from, DateTime to)
+        {
+            int years = to.Year - from.Year;
+            int months = to.Month - from.Month;
+
+            if (to.Day < from.Day)
+                months--;
+
+            if (months < 0)
+            {
+                years--;
+                months += 12;
+            }
+
+            return years + (months / 12m);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ClinicalFacilities(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            // Same common setup as HostelDetails
+            PopulateCommonViewBags(context);
+
+            ViewBag.ActiveTab = "ClinicalFacilities";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            // Build Clinical Facilities model
+            var model =
+                await _clinicalFacilitiesCompositeService
+                    .GetClinicalFacilitiesAsync(
+                        collegeCode,
+                        context);
+
+            // IMPORTANT:
+            // This loads existing verification status / remarks
+            // and sets the ViewData required by the feedback form.
+            await SetVerificationViewData<HospitalDetailsForAffiliation>(
+                collegeCode);
+
+            return View(model);
+        }
+
+
 
         // Helper method to get current user's designation
         private string GetUserDesignation()

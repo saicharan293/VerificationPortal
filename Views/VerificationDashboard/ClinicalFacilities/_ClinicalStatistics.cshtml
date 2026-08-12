@@ -1,0 +1,194 @@
+﻿@model VerificationPortal.Models.ClinicalCapacityFormVM
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-bar-chart-line me-2"></i>
+            Clinical Statistics
+        </h3>
+
+        <span class="badge bg-primary">
+            Capacity & Statistics
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null)
+        {
+            <div class="alert alert-info mb-0">
+                No clinical statistics found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                Clinical Statistics
+                            </th>
+
+                            <th>
+                                Details
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Dental Chairs Count
+                            </td>
+                            <td>
+                                @(Model.DentalChairsCount?.ToString() ?? "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Total Beds
+                            </td>
+                            <td>
+                                @(Model.TotalBeds?.ToString() ?? "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                OPD Per Day
+                            </td>
+                            <td>
+                                @(Model.OpdperDay?.ToString() ?? "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                24 Hour Emergency
+                            </td>
+                            <td>
+                                @if (Model.Has24HourEmergency.HasValue)
+                                {
+                                    <span class="badge @(Model.Has24HourEmergency.Value
+                                                                                ? "bg-success"
+                                                                                : "bg-secondary")">
+
+                                        @(Model.Has24HourEmergency.Value
+                                            ? "Yes"
+                                            : "No")
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Critical Care Services
+                            </td>
+                            <td>
+                                @if (Model.HasCriticalCareServices.HasValue)
+                                {
+                                    <span class="badge @(Model.HasCriticalCareServices.Value
+                                                                                ? "bg-success"
+                                                                                : "bg-secondary")">
+
+                                        @(Model.HasCriticalCareServices.Value
+                                            ? "Yes"
+                                            : "No")
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                IPD Bed Occupancy
+                            </td>
+                            <td>
+                                @(Model.IpdbedOccupancyPercent.HasValue
+                                    ? $"{Model.IpdbedOccupancyPercent.Value:0.##}%"
+                                    : "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Annual OPD - Previous Year
+                            </td>
+                            <td>
+                                @(Model.AnnualOpdprevYear?.ToString() ?? "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Annual IPD - Previous Year
+                            </td>
+                            <td>
+                                @(Model.AnnualIpdprevYear?.ToString() ?? "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Distance Between College and Hospital
+                            </td>
+                            <td>
+                                @(Model.DistanceBetweenCollegeAndHospitalKm.HasValue
+                                    ? $"{Model.DistanceBetweenCollegeAndHospitalKm.Value:0.##} km"
+                                    : "-")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Is Owner a Member of Trust
+                            </td>
+                            <td>
+                                @if (Model.IsOwnerAmemberOfTrust.HasValue)
+                                {
+                                    <span class="badge @(Model.IsOwnerAmemberOfTrust.Value
+                                                                                ? "bg-success"
+                                                                                : "bg-secondary")">
+
+                                        @(Model.IsOwnerAmemberOfTrust.Value
+                                            ? "Yes"
+                                            : "No")
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>

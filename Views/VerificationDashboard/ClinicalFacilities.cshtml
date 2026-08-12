@@ -1,0 +1,85 @@
+﻿@model ClinicalFacilitiesVerificationViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Clinical Facilities";
+    ViewData["ActiveTab"] = "ClinicalFacilities";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? Model?.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? Model?.FacultyCode.ToString() ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "LibraryDetails",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Library Details";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "NextTab",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next : Next Section";
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Clinical Facilities
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Clinical hospital details, facilities and related requirements
+    </p>
+
+</div>
+
+<div class="container-fluid">
+
+    @await Html.PartialAsync(
+        "ClinicalFacilities/_ClinicalHospitalDetails",
+        Model.HospitalDetails)
+
+    @await Html.PartialAsync(
+        "ClinicalFacilities/_ClinicalStatistics",
+        Model.ClinicalStatistics)
+
+    @await Html.PartialAsync(
+        "ClinicalFacilities/_DisciplineDetails",
+        Model.Disciplines)
+
+    @await Html.PartialAsync(
+        "ClinicalFacilities/_NPTARequirements",
+        Model.NptaRequirementPostvm)
+
+    @await Html.PartialAsync(
+        "ClinicalFacilities/_EngAlliedRequirements",
+        Model.EngAlliedRequirementPostvm)
+
+    @await Html.PartialAsync(
+        "ClinicalFacilities/_ClinicalWardBedDistribution",
+        Model.DentalWardBedDistribution)
+
+</div>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+}

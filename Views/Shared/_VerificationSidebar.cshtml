@@ -144,13 +144,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(activeTab == "Faculty" ? "active" : "")"
-                       asp-controller="VerificationDashboard" asp-action="Faculty" asp-route-collegeCode="@collegeCode">
-                        <i class="bi bi-people"></i>
-                        <span>Faculty Details</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="HostelDetails"
                        asp-route-collegeCode="@ViewBag.CollegeCode"
@@ -265,10 +258,35 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(activeTab == "Clinical" ? "active" : "")"
-                       asp-controller="VerificationDashboard" asp-action="Clinical" asp-route-collegeCode="@collegeCode">
-                        <i class="bi bi-hospital"></i>
-                        <span>Clinical Material</span>
+                    <a href="@Url.Action("FacultyDetails", "VerificationDashboard",
+                                    new { collegeCode = ViewBag.CollegeCode })"
+                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "FacultyDetails" ? "active" : "")">
+
+                        <i class="bi bi-person-badge"></i>
+                        <span>Faculty Details</span>
+
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       asp-controller="VerificationDashboard"
+                       asp-action="TeachingExperience"
+                       asp-route-collegeCode="@ViewBag.CollegeCode">
+
+                        <i class="bi bi-clock-history me-2"></i>
+
+                        <span>Teaching Experience</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       asp-controller="VerificationDashboard"
+                       asp-action="ClinicalFacilities"
+                       asp-route-collegeCode="@ViewBag.CollegeCode">
+
+                        <i class="bi bi-hospital me-2"></i>
+
+                        <span>Clinical Facilities</span>
                     </a>
                 </li>
                 <li class="nav-item">

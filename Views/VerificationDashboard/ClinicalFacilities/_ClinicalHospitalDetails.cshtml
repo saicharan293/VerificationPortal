@@ -1,0 +1,179 @@
+﻿@model VerificationPortal.Models.ClinicalHospitalVerificationRow
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-hospital me-2"></i>
+            Clinical Hospital Details
+        </h3>
+
+        <span class="badge bg-primary">
+            Hospital Details
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null ||
+             string.IsNullOrWhiteSpace(Model.HospitalName))
+        {
+            <div class="alert alert-info mb-0">
+                No clinical hospital details found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                Field
+                            </th>
+
+                            <th>
+                                Details
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Hospital Name
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.HospitalName)
+                                    ? "-"
+                                    : Model.HospitalName)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Hospital Type
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.HospitalType)
+                                    ? "-"
+                                    : Model.HospitalType)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Hospital Owned By
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.HospitalOwnedBy)
+                                    ? "-"
+                                    : Model.HospitalOwnedBy)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Hospital Owner Name
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.HospitalOwnerName)
+                                    ? "-"
+                                    : Model.HospitalOwnerName)
+                            </td>
+                        </tr>
+
+                        @* <tr>
+                            <td class="fw-semibold">
+                                Parent Medical College Exists
+                            </td>
+                            <td>
+                                @(Model.ParentMedicalCollegeExists.HasValue
+                                    ? (Model.ParentMedicalCollegeExists.Value
+                                        ? "Yes"
+                                        : "No")
+                                    : "-")
+                            </td>
+                        </tr> *@
+
+                        <tr>
+                            <td class="fw-semibold">
+                                District
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.HospitalDistrict)
+                                    ? "-"
+                                    : Model.HospitalDistrict)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Taluk
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.HospitalTaluk)
+                                    ? "-"
+                                    : Model.HospitalTaluk)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Location
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.Location)
+                                    ? "-"
+                                    : Model.Location)
+                            </td>
+                        </tr>
+
+                        @* <tr>
+                            <td class="fw-semibold">
+                                Parent Hospital For Other Nursing Institution
+                            </td>
+                            <td>
+                                @(Model.IsParentHospitalForOtherNursingInstitution.HasValue
+                                    ? (Model.IsParentHospitalForOtherNursingInstitution.Value
+                                        ? "Yes"
+                                        : "No")
+                                    : "-")
+                            </td>
+                        </tr> *@
+
+                        <tr>
+                            <td class="fw-semibold">
+                                Supporting Document
+                            </td>
+                            <td>
+                                @if (Model.SupportingDocumentExists)
+                                {
+                                    <span class="badge bg-success">
+                                        Available
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Not Available
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>
