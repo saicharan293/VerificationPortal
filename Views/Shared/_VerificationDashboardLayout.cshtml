@@ -140,69 +140,61 @@
                                         @* Display-only feedback status *@
                                         <div id="verificationDisplay">
 
-                                            <div class="footer-top">
 
-
-                                                @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
-                                                {
-                                                    <div class="feedback-item">
-                                                        <label class="feedback-label">Previous Remarks</label>
-                                                        <div class="feedback-value">
-                                                            @ViewData["ExistingRemarks"]
-                                                        </div>
+                                            @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
+                                            {
+                                                <div class="feedback-item">
+                                                    <label class="feedback-label">Previous Remarks</label>
+                                                    <div class="feedback-value">
+                                                        @ViewData["ExistingRemarks"]
                                                     </div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="feedback-item">
-                                                        <label class="feedback-label">Previous Remarks</label>
-                                                        <div class="feedback-value small">
-                                                            No previous remarks available.
-                                                        </div>
-                                                    </div>
-                                                }
-
-                                            </div>
-
-                                            <div class="footer-bottom">
-
-                                                @if (ViewData["ExistingStatus"] != null)
-                                                {
-                                                    <div class="feedback-item">
-                                                        <label class="feedback-label">Previous Status</label>
-                                                        <div class="feedback-value">
-                                                            <span class="status-badge @ViewData["ExistingStatusClass"]">
-                                                                @ViewData["ExistingStatus"]
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                }
-
-                                                @if (ViewData["VerifiedBy"] != null)
-                                                {
-                                                    <div class="feedback-item">
-                                                        <label class="feedback-label">Verified By</label>
-                                                        <div class="feedback-value">@ViewData["VerifiedBy"]</div>
-                                                    </div>
-                                                }
-
-                                                @if (ViewData["VerifiedDate"] != null)
-                                                {
-                                                    <div class="feedback-item">
-                                                        <label class="feedback-label">Verified Date</label>
-                                                        <div class="feedback-value">@ViewData["VerifiedDate"]</div>
-                                                    </div>
-                                                }
-
-                                                <div class="mt-4">
-                                                    <button type="button"
-                                                            class="btn btn-warning"
-                                                            id="btnEditVerification">
-                                                        <i class="bi bi-pencil-square"></i>
-                                                        Edit Verification
-                                                    </button>
                                                 </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="feedback-item">
+                                                    <label class="feedback-label">Previous Remarks</label>
+                                                    <div class="feedback-value small">
+                                                        No previous remarks available.
+                                                    </div>
+                                                </div>
+                                            }
 
+                                            @if (ViewData["ExistingStatus"] != null)
+                                            {
+                                                <div class="feedback-item">
+                                                    <label class="feedback-label">Previous Status</label>
+                                                    <div class="feedback-value">
+                                                        <span class="status-badge @ViewData["ExistingStatusClass"]">
+                                                            @ViewData["ExistingStatus"]
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            @if (ViewData["VerifiedBy"] != null)
+                                            {
+                                                <div class="feedback-item">
+                                                    <label class="feedback-label">Verified By</label>
+                                                    <div class="feedback-value">@ViewData["VerifiedBy"]</div>
+                                                </div>
+                                            }
+
+                                            @if (ViewData["VerifiedDate"] != null)
+                                            {
+                                                <div class="feedback-item">
+                                                    <label class="feedback-label">Verified Date</label>
+                                                    <div class="feedback-value">@ViewData["VerifiedDate"]</div>
+                                                </div>
+                                            }
+
+                                            <div class="mt-4">
+                                                <button type="button"
+                                                        class="btn btn-warning"
+                                                        id="btnEditVerification">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                    Edit Verification
+                                                </button>
                                             </div>
 
                                         </div>
@@ -432,10 +424,13 @@
         </div>
     </div>
 
+    @await Html.PartialAsync("_DocumentViewer")
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/document-viewer.js" asp-append-version="true"></script>
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)

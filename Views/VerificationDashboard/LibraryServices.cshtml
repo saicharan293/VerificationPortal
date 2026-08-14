@@ -305,36 +305,20 @@
 
                         <thead>
                             <tr>
-
-                                <th>
-                                    Sl. No
-                                </th>
-
-                                <th>
-                                    Record
-                                </th>
-
-                                <th>
-                                    Uploaded File
-                                </th>
-
-                                <th class="text-center">
-                                    Action
-                                </th>
-
+                                <th>Sl. No</th>
+                                <th>Record</th>
+                                <th>Uploaded File</th>
+                                <th class="text-center">Action</th>
                             </tr>
                         </thead>
-
 
                         <tbody>
 
                             @for (int i = 0;
-                                 i < Model.DentalLibraryRecords.Count;
-                                 i++)
+                                  i < Model.DentalLibraryRecords.Count;
+                                  i++)
                             {
-                                var record =
-                                    Model.DentalLibraryRecords[i];
-
+                                var record = Model.DentalLibraryRecords[i];
 
                                 <tr>
 
@@ -342,18 +326,14 @@
                                         @(i + 1)
                                     </td>
 
-
                                     <td>
                                         <strong>
                                             @record.RecordName
                                         </strong>
                                     </td>
 
-
                                     <td>
-
-                                        @if (!string.IsNullOrWhiteSpace(
-                                            record.ExistingFileName))
+                                        @if (!string.IsNullOrWhiteSpace(record.ExistingFileName))
                                         {
                                             <span>
                                                 @record.ExistingFileName
@@ -365,26 +345,26 @@
                                                 No file uploaded
                                             </span>
                                         }
-
                                     </td>
-
 
                                     <td class="text-center">
 
-                                        @if (!string.IsNullOrWhiteSpace(
-                                            record.ExistingFileName))
+                                        @if (!string.IsNullOrWhiteSpace(record.ExistingFileName))
                                         {
-                                            <a asp-controller="VerificationDashboard"
-                                               asp-action="ViewDentalLibraryRecord"
-                                               asp-route-collegeCode="@Model.CollegeCode"
-                                               asp-route-recordId="@record.RecordId"
-                                               target="_blank"
-                                               class="btn btn-sm btn-outline-primary">
-
-                                                <i class="bi bi-eye me-1"></i>
-                                                View File
-
-                                            </a>
+                                            @await Html.PartialAsync(
+                                                "_DocumentViewerButton",
+                                                new DocumentViewerVm
+                                                {
+                                                    Url = Url.Action(
+                                                        "ViewDentalLibraryRecord",
+                                                        "VerificationDashboard",
+                                                        new
+                                                        {
+                                                            collegeCode = Model.CollegeCode,
+                                                            recordId = record.RecordId
+                                                        })!,
+                                                    Title = record.RecordName
+                                                })
                                         }
                                         else
                                         {

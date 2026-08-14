@@ -51,54 +51,64 @@ namespace VerificationPortal.Controllers
         [HttpGet]
         public async Task<IActionResult> InstitutionDetails(string collegeCode)
         {
-            if (string.IsNullOrEmpty(collegeCode))
-            {
-                return NotFound("College code is required");
-            }
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
 
-            // Get institution details for the college
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var context =
+                await GetPageContextAsync(collegeCode);
+
+            PopulateCommonViewBags(context);
+
+            ViewBag.ActiveTab = "InstitutionDetails";
+            ViewBag.UserDesignation = GetUserDesignation();
+
+
+            // ---------------------------------------------------------
+            // COLLEGE
+            // ---------------------------------------------------------
+
+            var college =
+                await _context.AffiliationCollegeMasters
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c =>
+                        c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeName =
+                college?.CollegeName ?? "Unknown College";
+
+
+            // ---------------------------------------------------------
+            // INSTITUTION DETAILS
+            // ---------------------------------------------------------
+
+            var institution =
+                await _context.AffInstitutionsDetails
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.CollegeCode == collegeCode);
 
             if (institution == null)
             {
-                return NotFound($"Institution details not found for college code: {collegeCode}");
+                return NotFound(
+                    $"Institution details not found for college code: {collegeCode}");
             }
 
-            // Get college basic info
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.ActiveTab = "Institution";
-            ViewBag.UserDesignation = GetUserDesignation();
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
 
-            var verification = await _verificationService.GetVerificationAsync<AffInstitutionsDetail>( x => x.CollegeCode == collegeCode, GetUserDesignation());
-
-            ViewData["ExistingRemarks"] = verification.Remarks;
-
-            ViewData["ExistingStatus"] = verification.IsVerified switch
-            {
-                true => "Approved",
-                false => "Rejected",
-                null => "Pending"
-            };
-
-            ViewData["ExistingStatusClass"] = verification.IsVerified switch
-            {
-                true => "bg-success",
-                false => "bg-danger",
-                null => "bg-warning"
-            };
-
-            ViewData["VerifiedBy"] = verification.VerifiedBy;
-
-            ViewData["VerifiedDate"] =
-                verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
+            await SetVerificationViewData<AffInstitutionsDetail>(
+                collegeCode);
 
 
-            ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
+            // ---------------------------------------------------------
+            // VIEW
+            // ---------------------------------------------------------
 
             return View(institution);
         }
@@ -107,32 +117,125 @@ namespace VerificationPortal.Controllers
         [HttpGet]
         public async Task<IActionResult> TrustDetails(string collegeCode)
         {
-            if (string.IsNullOrEmpty(collegeCode))
-            {
-                return NotFound("College code is required");
-            }
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
 
-            var institution = await _context.InstitutionBasicDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            var context =
+                await GetPageContextAsync(collegeCode);
 
-            if (institution == null)
-            {
-                return NotFound($"Institution details not found for college code: {collegeCode}");
-            }
+            PopulateCommonViewBags(context);
 
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
-
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.ActiveTab = "TrustDetails";
             ViewBag.UserDesignation = GetUserDesignation();
 
-            // Fetch role-based verification
-            await SetVerificationViewData<InstitutionBasicDetail>(collegeCode);
+            var institution =
+                await _context.InstitutionBasicDetails
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(i =>
+                        i.CollegeCode == collegeCode);
 
+            if (institution == null)
+            {
+                return NotFound(
+                    $"Institution details not found for college code: {collegeCode}");
+            }
+
+            var college =
+                await _context.AffiliationCollegeMasters
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c =>
+                        c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeName =
+                college?.CollegeName ?? "Unknown College";
+
+            await SetVerificationViewData<InstitutionBasicDetail>(
+                collegeCode);
 
             return View(institution);
+        }
+
+        public IActionResult ViewGokOrderDocument(int id, string documentType)
+        {
+            var institution = _context.InstitutionBasicDetails
+                .FirstOrDefault(x => x.InstitutionId == id);
+
+            if (institution == null)
+                return NotFound();
+
+            string? storedPath = documentType switch
+            {
+                "AmendedDoc" =>
+                    institution.GokOrderExistingCoursesFilePath,
+
+                "Panfile" =>
+                    institution.PanfilePath,
+
+                "BankStatement" =>
+                    institution.BankStatementFilePath,
+
+                "RegistrationCertificate" =>
+                    institution.RegistrationCertificateFilePath,
+
+                "AuditStatement" =>
+                    institution.AuditStatementFilePath,
+
+                _ => null
+            };
+
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return NotFound();
+
+            var filePath = ResolveDocumentPath(storedPath);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile(
+                filePath,
+                GetDocumentContentType(filePath));
+        }
+
+        private string ResolveDocumentPath(string? filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                return string.Empty;
+
+            filePath = filePath.Replace('/', '\\');
+
+            // Existing absolute path
+            if (Path.IsPathRooted(filePath) &&
+                System.IO.File.Exists(filePath))
+            {
+                return filePath;
+            }
+
+            // Remove the stored BaseDentalPath if it is already included
+            var basePath = BaseDentalPath.TrimEnd('\\');
+
+            if (filePath.StartsWith(
+                basePath,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                filePath = filePath.Substring(basePath.Length)
+                                   .TrimStart('\\');
+            }
+
+            return Path.Combine(BaseDentalPath, filePath);
+        }
+
+        private string GetDocumentContentType(string filePath)
+        {
+            return Path.GetExtension(filePath).ToLowerInvariant() switch
+            {
+                ".pdf" => "application/pdf",
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".webp" => "image/webp",
+                _ => "application/octet-stream"
+            };
         }
 
         // GET: /VerificationDashboard/TrustMemberDetails/{collegeCode}
@@ -164,12 +267,56 @@ namespace VerificationPortal.Controllers
             ViewBag.UserDesignation = GetUserDesignation();
             ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
 
+            var trustMemberDocument =
+                await _context.ContinuationTrustMemberDocuments
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.CollegeCode == collegeCode);
+
+
+            ViewBag.RegisteredTrustMemberDetailsPath = trustMemberDocument?.RegisteredTrustMemberDetailsPath;
+
 
             await SetVerificationViewData<ContinuationTrustMemberDetail>(collegeCode);
 
             return View(trustMembers);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> ViewTrustMemberDocument(
+            string collegeCode,
+            string documentType)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound();
+
+            if (documentType != "RegisteredTrustMemberDetails")
+                return NotFound();
+
+            var document =
+                await _context.ContinuationTrustMemberDocuments
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.CollegeCode == collegeCode);
+
+            if (document == null)
+                return NotFound();
+
+            var filePath = document.RegisteredTrustMemberDetailsPath;
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound();
+
+            var resolvedPath = ResolveDocumentPath(filePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound();
+
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
+        }
 
         private async Task<IActionResult> ServeFileFromPath(int id, string facultyCode, Func<InstitutionBasicDetail, string?> pathSelector)
         {
@@ -270,22 +417,6 @@ namespace VerificationPortal.Controllers
             return levels;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ViewDocument(int id, string facultyCode, string document)
-        {
-            var property = typeof(InstitutionBasicDetail).GetProperty(document);
-
-            if (property == null || property.PropertyType != typeof(string))
-            {
-                return BadRequest("Invalid document.");
-            }
-
-            return await ServeFileFromPath(
-                id,
-                facultyCode,
-                entity => property.GetValue(entity) as string
-            );
-        }
 
         // GET: /VerificationDashboard/DeanDirectorDetails/{collegeCode}
         [HttpGet]
@@ -622,32 +753,104 @@ namespace VerificationPortal.Controllers
         [HttpGet]
         public async Task<IActionResult> PgCourseDetails(string collegeCode)
         {
-            if (string.IsNullOrEmpty(collegeCode))
-                return NotFound("College code is required");
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
 
-            // Get PG/SS courses for the college (AffiliationPgSsCourseDetail table)
-            var courses = await _context.AffiliationPgSsCourseDetails
-                .Where(c => c.CollegeCode == collegeCode)
-                .OrderBy(c => c.CourseName)
-                .ToListAsync();
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
 
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+            var context = await GetPageContextAsync(collegeCode);
 
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            PopulateCommonViewBags(context);
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
             ViewBag.ActiveTab = "PgCourseDetails";
-            ViewBag.TabTitle = "PG / Super Specialty Course Details";
-            ViewBag.TabIcon = "bi-mortarboard";
             ViewBag.UserDesignation = GetUserDesignation();
-            ViewBag.NextTabAction = Url.Action("Infrastructure", new { collegeCode });
-            ViewBag.NextTabLabel = "Next: Infrastructure";
-            ViewBag.PrevTabAction = Url.Action("UgCourseDetails", new { collegeCode });
-            ViewBag.PrevTabLabel = "Previous: UG Course Details";
+
+
+            // ---------------------------------------------------------
+            // PG / SUPER SPECIALTY COURSES
+            // ---------------------------------------------------------
+
+            var courses =
+                await _context.AffiliationPgSsCourseDetails
+                    .AsNoTracking()
+                    .Where(c => c.CollegeCode == collegeCode)
+                    .OrderBy(c => c.CourseName)
+                    .ToListAsync();
+
+
+            // ---------------------------------------------------------
+            // COLLEGE
+            // ---------------------------------------------------------
+
+            var college =
+                await _context.AffiliationCollegeMasters
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c =>
+                        c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeName =
+                college?.CollegeName
+                ?? "Unknown College";
+
+
+            // ---------------------------------------------------------
+            // INSTITUTION
+            // ---------------------------------------------------------
+
+            var institution =
+                await _context.AffInstitutionsDetails
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(i =>
+                        i.CollegeCode == collegeCode);
+
+            ViewBag.InstitutionName =
+                institution?.NameOfInstitution
+                ?? "Unknown Institution";
+
+
+            // ---------------------------------------------------------
+            // PAGE INFORMATION
+            // ---------------------------------------------------------
+
+            ViewBag.TabTitle =
+                "PG / Super Specialty Course Details";
+
+            ViewBag.TabIcon =
+                "bi-mortarboard";
+
+
+            // ---------------------------------------------------------
+            // NAVIGATION
+            // ---------------------------------------------------------
+
+            ViewBag.NextTabAction =
+                Url.Action(
+                    "Infrastructure",
+                    "VerificationDashboard",
+                    new { collegeCode });
+
+            ViewBag.NextTabLabel =
+                "Next: Infrastructure";
+
+            ViewBag.PrevTabAction =
+                Url.Action(
+                    "UgCourseDetails",
+                    "VerificationDashboard",
+                    new { collegeCode });
+
+            ViewBag.PrevTabLabel =
+                "Previous: UG Course Details";
+
+
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
+
+            await SetVerificationViewData<AffiliationPgSsCourseDetail>(
+                collegeCode);
+
 
             return View(courses);
         }
@@ -1041,50 +1244,187 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
 
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
 
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            var context = await GetPageContextAsync(collegeCode);
 
-            var landBuilding = await _context.DentalCollegeLandBuildingDetails
-                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+            PopulateCommonViewBags(context);
 
-            if (landBuilding == null)
-                return NotFound($"Land & Building details not found for college code: {collegeCode}");
-
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
             ViewBag.ActiveTab = "LandAndBuildingDetails";
             ViewBag.UserDesignation = GetUserDesignation();
 
-            var verification = await _verificationService.GetVerificationAsync<DentalCollegeLandBuildingDetail>(
-                x => x.CollegeCode == collegeCode,
-                GetUserDesignation());
 
-            ViewData["ExistingRemarks"] = verification?.Remarks ?? "";
-            ViewData["ExistingStatus"] = verification?.IsVerified switch
+            // ---------------------------------------------------------
+            // COLLEGE
+            // ---------------------------------------------------------
+
+            var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c =>
+                    c.CollegeCode == collegeCode);
+
+            ViewBag.CollegeName =
+                college?.CollegeName ?? "Unknown College";
+
+
+            // ---------------------------------------------------------
+            // INSTITUTION
+            // ---------------------------------------------------------
+
+            var institution = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i =>
+                    i.CollegeCode == collegeCode);
+
+            ViewBag.InstitutionName =
+                institution?.NameOfInstitution
+                ?? "Unknown Institution";
+
+
+            // ---------------------------------------------------------
+            // LAND & BUILDING
+            // ---------------------------------------------------------
+
+            var landBuilding =
+                await _context.DentalCollegeLandBuildingDetails
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.CollegeCode == collegeCode);
+
+            if (landBuilding == null)
             {
-                true => "Approved",
-                false => "Rejected",
-                _ => "Pending"
-            };
+                return NotFound(
+                    $"Land & Building details not found for college code: {collegeCode}");
+            }
 
-            ViewData["ExistingStatusClass"] = verification?.IsVerified switch
-            {
-                true => "bg-success",
-                false => "bg-danger",
-                _ => "bg-warning"
-            };
 
-            ViewData["VerifiedBy"] = verification?.VerifiedBy ?? "";
-            ViewData["VerifiedDate"] = verification?.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt") ?? "";
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
 
-            // Only show the form if there is NO verification at all
-            ViewData["ShowFeedbackForm"] = verification == null;
+            await SetVerificationViewData<DentalCollegeLandBuildingDetail>(
+                collegeCode);
+
+
+            // ---------------------------------------------------------
+            // NAVIGATION
+            // ---------------------------------------------------------
+
+            ViewBag.PrevTabAction = Url.Action(
+                "PgCourseDetails",
+                "VerificationDashboard",
+                new { collegeCode });
+
+            ViewBag.PrevTabLabel =
+                "Previous: PG Course Details";
+
+            ViewBag.NextTabAction = Url.Action(
+                "ClassroomAndLaboratory",
+                "VerificationDashboard",
+                new { collegeCode });
+
+            ViewBag.NextTabLabel =
+                "Next: Classroom & Laboratory";
+
 
             return View(landBuilding);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewLandBuildingDocument(
+                int id,
+                string documentType)
+        {
+            var record = await _context.DentalCollegeLandBuildingDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (record == null)
+                return NotFound();
+
+            string? filePath = documentType switch
+            {
+                "SaleDeed" =>
+                    record.SaleDeedDocumentPath,
+
+                "EncumbranceCertificate" =>
+                    record.EncumbranceCertificateDocumentPath,
+
+                "LandUseCertificate" =>
+                    record.LandUseCertificateDocumentPath,
+
+                "ApprovedLayoutPlan" =>
+                    record.ApprovedLayoutPlanDocumentPath,
+
+                "LandSketch" =>
+                    record.LandSketchDocumentPath,
+
+                "DistanceCertificate" =>
+                    record.DistanceCertificateDocumentPath,
+
+                "ApprovedBuildingPlan" =>
+                    record.ApprovedBuildingPlanDocumentPath,
+
+                "CompletionCertificate" =>
+                    record.CompletionCertificateDocumentPath,
+
+                "StructuralStabilityCertificate" =>
+                    record.StructuralStabilityCertificateDocumentPath,
+
+                "FireSafetyNoc" =>
+                    record.FireSafetyNocDocumentPath,
+
+                "LiftLicense" =>
+                    record.LiftLicenseDocumentPath,
+
+                "ElectricalSafetyCertificate" =>
+                    record.ElectricalSafetyCertificateDocumentPath,
+
+                "WaterSupplyCertificate" =>
+                    record.WaterSupplyCertificateDocumentPath,
+
+                "SewageSanitationApproval" =>
+                    record.SewageSanitationApprovalDocumentPath,
+
+                _ => null
+            };
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("Document not available.");
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Document file not found.");
+
+            return PhysicalFile(
+                filePath,
+                GetContentType(filePath),
+                enableRangeProcessing: true);
+        }
+
+
+        private static string GetContentType(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+            return extension switch
+            {
+                ".pdf" => "application/pdf",
+
+                ".jpg" or ".jpeg" => "image/jpeg",
+
+                ".png" => "image/png",
+
+                ".gif" => "image/gif",
+
+                ".webp" => "image/webp",
+
+                ".txt" => "text/plain",
+
+                _ => "application/octet-stream"
+            };
         }
 
         [HttpGet]
@@ -1464,6 +1804,40 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffHostelDetail>(collegeCode);
 
             return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewHostelDocument(
+            string collegeCode,
+            string documentType)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound();
+
+            if (documentType != "PossessionProof")
+                return NotFound();
+
+            var hostel = await _context.AffHostelDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode);
+
+            if (hostel == null)
+                return NotFound();
+
+            var filePath = hostel.PossessionProofPath;
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound();
+
+            var resolvedPath = ResolveDocumentPath(filePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound();
+
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
         }
 
         [HttpGet]
@@ -2595,117 +2969,204 @@ namespace VerificationPortal.Controllers
         }
 
 
-        [HttpGet] public async Task<IActionResult> ViewResearchPublicationPdf(string collegeCode) => await GetPdf(collegeCode, "Publications");
-        [HttpGet] public async Task<IActionResult> ViewStudentsProjectsPdf(string collegeCode) => await GetPdf(collegeCode, "StudentsProjects");
-        [HttpGet] public async Task<IActionResult> ViewFacultyProjectsPdf(string collegeCode) => await GetPdf(collegeCode, "FacultyProjects");
-        [HttpGet] public async Task<IActionResult> ViewClinicalTrialsPdf(string collegeCode) => await GetPdf(collegeCode, "ClinicalTrials");
+        [HttpGet] public async Task<IActionResult> ViewResearchPublicationPdf(string collegeCode) => await GetResearchPdf(collegeCode, "Publications");
+        [HttpGet] public async Task<IActionResult> ViewStudentsProjectsPdf(string collegeCode) => await GetResearchPdf(collegeCode, "StudentsProjects");
+        [HttpGet] public async Task<IActionResult> ViewFacultyProjectsPdf(string collegeCode) => await GetResearchPdf(collegeCode, "FacultyProjects");
+        [HttpGet] public async Task<IActionResult> ViewClinicalTrialsPdf(string collegeCode) => await GetResearchPdf(collegeCode, "ClinicalTrials");
 
-        private async Task<IActionResult> GetPdf(string collegeCode, string fileType)
+        [HttpGet]
+        public IActionResult ViewFacultyDocument(
+            int id,
+            string type,
+            string mode = "view")
         {
+            var faculty = _context.FacultyDetails
+                .AsNoTracking()
+                .FirstOrDefault(f => f.Id == id);
 
-            // FIX: query "ALL" (matches how data is saved), fallback to any row
-            var record = await _context.CaMedResearchPublicationsDetails
-                .FirstOrDefaultAsync(x =>
-                    x.CollegeCode == collegeCode)
-                ?? await _context.CaMedResearchPublicationsDetails
+            if (faculty == null)
+                return NotFound();
+
+            if (string.IsNullOrWhiteSpace(type))
+                return BadRequest("Document type is required.");
+
+            string? filePath = type.ToLowerInvariant() switch
+            {
+                "pg" => faculty.GuideRecognitionDocPath,
+                "phd" => faculty.PhDrecognitionDocPath,
+                "litig" => faculty.LitigationDocPath,
+                _ => null
+            };
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("Document not uploaded.");
+
+            // Resolve old/new stored paths against the configured document root
+            var resolvedPath = ResolveDocumentPath(filePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound("Document not found on server.");
+
+            var fileName = Path.GetFileName(resolvedPath);
+
+            var contentType = GetDocumentContentType(resolvedPath);
+
+            // Explicit download request
+            if (string.Equals(
+                mode,
+                "download",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return PhysicalFile(
+                    resolvedPath,
+                    contentType,
+                    fileName);
+            }
+
+            // Normal request:
+            // Global document viewer fetches this URL and displays it in the popup.
+            return PhysicalFile(
+                resolvedPath,
+                contentType);
+        }
+
+        private async Task<IActionResult> GetResearchPdf(
+            string collegeCode,
+            string fileType)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound();
+
+            var record =
+                await _context.CaMedResearchPublicationsDetails
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x =>
                         x.CollegeCode == collegeCode);
 
-            if (record == null) return NotFound("Record not found.");
+            if (record == null)
+                return NotFound("Record not found.");
 
             string? filePath = fileType switch
             {
-                "Publications" => record.PublicationsPdfPath,
-                "StudentsProjects" => record.StudentsProjectsPdfPath,
-                "FacultyProjects" => record.FacultyProjectsPdfPath,
-                "ClinicalTrials" => record.ClinicalTrialsPdfPath,
+                "Publications" =>
+                    record.PublicationsPdfPath,
+
+                "StudentsProjects" =>
+                    record.StudentsProjectsPdfPath,
+
+                "FacultyProjects" =>
+                    record.FacultyProjectsPdfPath,
+
+                "ClinicalTrials" =>
+                    record.ClinicalTrialsPdfPath,
+
                 _ => null
             };
 
-            string? name = fileType switch
+            string? fileName = fileType switch
             {
-                "Publications" => record.PublicationsPdfName,
-                "StudentsProjects" => record.StudentsProjectsPdfName,
-                "FacultyProjects" => record.FacultyProjectsPdfName,
-                "ClinicalTrials" => record.ClinicalTrialsPdfName,
+                "Publications" =>
+                    record.PublicationsPdfName,
+
+                "StudentsProjects" =>
+                    record.StudentsProjectsPdfName,
+
+                "FacultyProjects" =>
+                    record.FacultyProjectsPdfName,
+
+                "ClinicalTrials" =>
+                    record.ClinicalTrialsPdfName,
+
                 _ => null
             };
 
-            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
-                return NotFound("File not found on server. Please re-upload.");
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("Document path not found.");
 
-            var fileName = string.IsNullOrEmpty(name) ? Path.GetFileName(filePath) : name;
+            var resolvedPath =
+                ResolveDocumentPath(filePath);
 
-            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(filePath, out string contentType))
-                contentType = "application/octet-stream";
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound(
+                    "File not found on server.");
 
-            Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
-            return PhysicalFile(filePath, contentType);
+            var finalName =
+                string.IsNullOrWhiteSpace(fileName)
+                    ? Path.GetFileName(resolvedPath)
+                    : fileName;
+
+            Response.Headers["Content-Disposition"] =
+                $"inline; filename=\"{finalName}\"";
+
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> ViewDepartmentPublicationPdf(string collegeCode, int id)
+        public async Task<IActionResult> ViewDepartmentPublicationPdf(
+    string collegeCode,
+    int id)
         {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound();
 
             var publication = await _context.DeptWisePublications
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.Id == id &&
                     x.CollegeCode == collegeCode);
 
-            if (publication == null ||
-                string.IsNullOrWhiteSpace(publication.PublicationPath))
-            {
+            if (publication == null)
+                return NotFound("Publication not found.");
+
+            if (string.IsNullOrWhiteSpace(publication.PublicationPath))
                 return NotFound("PDF not found.");
-            }
 
-            if (!System.IO.File.Exists(publication.PublicationPath))
-            {
+            var resolvedPath = ResolveDocumentPath(
+                publication.PublicationPath);
+
+            if (!System.IO.File.Exists(resolvedPath))
                 return NotFound("File does not exist on server.");
-            }
 
-            var stream = new FileStream(
-                publication.PublicationPath,
-                FileMode.Open,
-                FileAccess.Read);
-
-            return File(stream, "application/pdf");
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> ViewDentalLibraryRecord(string collegeCode, int recordId)
+        public async Task<IActionResult> ViewDentalLibraryRecord(
+    string collegeCode,
+    int recordId)
         {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound();
 
-            int affiliationType =
+            var affiliationType =
                 HttpContext.Session.GetInt32("AffiliationType") ?? 2;
 
-
-            var record =
-                await _context.CaDentalLibraryRecords
+            var record = await _context.CaDentalLibraryRecords
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode &&
                     x.AffiliationType == affiliationType &&
                     x.RecordId == recordId);
 
-            if (record == null ||
-                string.IsNullOrEmpty(record.FilePath))
-            {
+            if (record == null)
                 return NotFound();
-            }
 
-            if (!System.IO.File.Exists(record.FilePath))
-            {
+            if (string.IsNullOrWhiteSpace(record.FilePath))
                 return NotFound();
-            }
+
+            var resolvedPath = ResolveDocumentPath(record.FilePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound();
 
             return PhysicalFile(
-                record.FilePath,
-                "application/pdf"
-            );
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
         }
-
 
         // POST: Save verification remarks and status
         [HttpPost]
@@ -3076,42 +3537,81 @@ namespace VerificationPortal.Controllers
 
         // View PDF actions (keep these)
         [HttpGet]
-        public async Task<IActionResult> ViewGoverningCouncilPdf(string courseLevel, string collegeCode, int facultyCode)
+        public async Task<IActionResult> ViewGoverningCouncilPdf(
+    string collegeCode,
+    string courseLevel,
+    string facultyCode)
         {
-            return await GetPdf("GoverningCouncil", courseLevel, collegeCode, facultyCode);
+            return await GetPdf(
+                "GoverningCouncil",
+                collegeCode,
+                facultyCode,
+                courseLevel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewAccountSummaryPdf(string courseLevel, string collegeCode, int facultyCode)
+        public async Task<IActionResult> ViewAccountSummaryPdf(
+            string collegeCode,
+            string courseLevel,
+            string facultyCode)
         {
-            return await GetPdf("AccountSummary", courseLevel, collegeCode, facultyCode);
+            return await GetPdf(
+                "AccountSummary",
+                collegeCode,
+                facultyCode,
+                courseLevel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewAuditedStatementPdf(string courseLevel, string collegeCode, int facultyCode)
+        public async Task<IActionResult> ViewAuditedStatementPdf(
+            string collegeCode,
+            string courseLevel,
+            string facultyCode)
         {
-            return await GetPdf("AuditedStatement", courseLevel, collegeCode, facultyCode);
+            return await GetPdf(
+                "AuditedStatement",
+                collegeCode,
+                facultyCode,
+                courseLevel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewDonationPdf(string courseLevel, string collegeCode, int facultyCode)
+        public async Task<IActionResult> ViewDonationPdf(
+            string collegeCode,
+            string courseLevel,
+            string facultyCode)
         {
-            return await GetPdf("Donation", courseLevel, collegeCode, facultyCode);
+            return await GetPdf(
+                "Donation",
+                collegeCode,
+                facultyCode,
+                courseLevel);
         }
 
-        private async Task<IActionResult> GetPdf(string type, string courseLevel, string collegeCode, int facultyCode)
+        private async Task<IActionResult> GetPdf(
+    string type,
+    string collegeCode,
+    string facultyCode,
+    string courseLevel)
         {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code not specified.");
 
-            if (string.IsNullOrEmpty(courseLevel))
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not specified.");
+
+            if (string.IsNullOrWhiteSpace(courseLevel))
                 return NotFound("Course level not specified.");
 
             var record = await _context.MedCaAccountAndFeeDetails
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode &&
-                    x.FacultyCode == facultyCode.ToString() &&
+                    x.FacultyCode == facultyCode &&
                     x.CourseLevel == courseLevel);
 
-            if (record == null) return NotFound("Record not found.");
+            if (record == null)
+                return NotFound("Record not found.");
 
             string? filePath = type switch
             {
@@ -3122,7 +3622,7 @@ namespace VerificationPortal.Controllers
                 _ => null
             };
 
-            string? name = type switch
+            string? fileName = type switch
             {
                 "GoverningCouncil" => record.GoverningCouncilPdfName,
                 "AccountSummary" => record.AccountSummaryPdfName,
@@ -3131,18 +3631,25 @@ namespace VerificationPortal.Controllers
                 _ => null
             };
 
-            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("File path not found.");
+
+            var resolvedPath = ResolveDocumentPath(filePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
                 return NotFound("File not found on server.");
 
-            var fileName = string.IsNullOrEmpty(name) ? Path.GetFileName(filePath) : name;
-            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(filePath, out string contentType))
-                contentType = "application/octet-stream";
+            var finalName = string.IsNullOrWhiteSpace(fileName)
+                ? Path.GetFileName(resolvedPath)
+                : fileName;
 
-            Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
-            return PhysicalFile(filePath, contentType);
+            Response.Headers["Content-Disposition"] =
+                $"inline; filename=\"{finalName}\"";
+
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
         }
-
 
         [HttpGet]
         public async Task<IActionResult> StaffPayScale(string collegeCode)
@@ -3329,17 +3836,17 @@ namespace VerificationPortal.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> ViewStaffOtherPdf(string collegeCode, string fileType)
+        public async Task<IActionResult> ViewStaffOtherPdf(
+             string collegeCode,
+             string fileType)
         {
-
-            if (string.IsNullOrEmpty(collegeCode))
+            if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
 
-            // Changes by Ram on 23/04/2026
-            // Common records are loaded from UG master
             var courseLevel = "UG";
 
             var record = await _context.CaMedStaffParticularsOthers
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode &&
                     x.CourseLevel == courseLevel);
@@ -3347,91 +3854,49 @@ namespace VerificationPortal.Controllers
             if (record == null)
                 return NotFound();
 
-            string? filePath = null;
-            string? fileName = null;
-
-            switch (fileType)
+            string? filePath = fileType switch
             {
-                case "Examiner":
-                    filePath = record.ExaminerDetailsPdfPath;
-                    fileName = record.ExaminerDetailsPdfName;
-                    break;
+                "Examiner" =>
+                    record.ExaminerDetailsPdfPath,
 
-                case "Examiner2":
-                    filePath = record.ExaminerDetailsPdfPath2;
-                    fileName = record.ExaminerDetailsPdfName2;
-                    break;
+                "Examiner2" =>
+                    record.ExaminerDetailsPdfPath2,
 
-                case "Examiner3":
-                    filePath = record.ExaminerDetailsPdfPath3;
-                    fileName = record.ExaminerDetailsPdfName3;
-                    break;
+                "Examiner3" =>
+                    record.ExaminerDetailsPdfPath3,
 
-                case "Examiner4":
-                    filePath = record.ExaminerDetailsPdfPath4;
-                    fileName = record.ExaminerDetailsPdfName4;
-                    break;
+                "Examiner4" =>
+                    record.ExaminerDetailsPdfPath4,
 
-                case "Examiner5":
-                    filePath = record.ExaminerDetailsPdfPath5;
-                    fileName = record.ExaminerDetailsPdfName5;
-                    break;
+                "Examiner5" =>
+                    record.ExaminerDetailsPdfPath5,
 
-                case "AEBAS3Months":
-                    filePath = record.AebaslastThreeMonthsPdfPath;
-                    fileName = record.AebaslastThreeMonthsPdfName;
-                    break;
+                "AEBAS3Months" =>
+                    record.AebaslastThreeMonthsPdfPath,
 
-                case "AEBASInspection":
-                    filePath = record.AebasinspectionDayPdfPath;
-                    fileName = record.AebasinspectionDayPdfName;
-                    break;
+                "AEBASInspection" =>
+                    record.AebasinspectionDayPdfPath,
 
-                case "PF":
-                    filePath = record.ProvidentFundPdfPath;
-                    fileName = record.ProvidentFundPdfName;
-                    break;
+                "PF" =>
+                    record.ProvidentFundPdfPath,
 
-                case "ESI":
-                    filePath = record.EsipdfPath;
-                    fileName = record.EsipdfName;
-                    break;
+                "ESI" =>
+                    record.EsipdfPath,
 
-                default:
-                    return NotFound();
-            }
+                _ => null
+            };
 
-            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound();
+
+            var resolvedPath = ResolveDocumentPath(filePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
                 return NotFound("File not found");
 
-            var finalName =
-                string.IsNullOrEmpty(fileName)
-                ? Path.GetFileName(filePath)
-                : fileName;
-
-            var provider =
-               new Microsoft.AspNetCore.StaticFiles
-                  .FileExtensionContentTypeProvider();
-
-            if (!provider.TryGetContentType(
-                filePath,
-                out string contentType))
-            {
-                contentType = "application/octet-stream";
-            }
-
-            //if (mode == "download")
-            //{
-            //    return PhysicalFile(
-            //        filePath,
-            //        contentType,
-            //        finalName);
-            //}
-
-            Response.Headers["Content-Disposition"] =
-              $"inline; filename=\"{finalName}\"";
-
-            return PhysicalFile(filePath, contentType);
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath));
         }
 
 

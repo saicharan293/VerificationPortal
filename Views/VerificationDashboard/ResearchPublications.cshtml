@@ -212,27 +212,21 @@
 
                     <div class="verification-value">
 
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.PublicationsPdfName))
+                        @if (!string.IsNullOrWhiteSpace(Model.PublicationsPdfName))
                         {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span class="text-truncate">
-                                    @Model.PublicationsPdfName
-                                </span>
-
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewResearchPublicationPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
-                            </div>
+                            @await Html.PartialAsync(
+                                "_DocumentViewerButton",
+                                new DocumentViewerVm
+                                {
+                                    Url = Url.Action(
+                                        "ViewResearchPublicationPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = Model.CollegeCode
+                                        })!,
+                                    Title = "Publications Document"
+                                })
                         }
                         else
                         {
@@ -258,27 +252,21 @@
 
                     <div class="verification-value">
 
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.ClinicalTrialsPdfName))
+                        @if (!string.IsNullOrWhiteSpace(Model.ClinicalTrialsPdfName))
                         {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span class="text-truncate">
-                                    @Model.ClinicalTrialsPdfName
-                                </span>
-
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewResearchPublicationPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
-                            </div>
+                            @await Html.PartialAsync(
+                                "_DocumentViewerButton",
+                                new DocumentViewerVm
+                                {
+                                    Url = Url.Action(
+                                        "ViewClinicalTrialsPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = Model.CollegeCode
+                                        })!,
+                                    Title = "Clinical Trials Document"
+                                })
                         }
                         else
                         {
@@ -304,27 +292,21 @@
 
                     <div class="verification-value">
 
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StudentsProjectsPdfName))
+                        @if (!string.IsNullOrWhiteSpace(Model.StudentsProjectsPdfName))
                         {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span class="text-truncate">
-                                    @Model.StudentsProjectsPdfName
-                                </span>
-
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewResearchPublicationPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
-                            </div>
+                            @await Html.PartialAsync(
+                                "_DocumentViewerButton",
+                                new DocumentViewerVm
+                                {
+                                    Url = Url.Action(
+                                        "ViewStudentsProjectsPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = Model.CollegeCode
+                                        })!,
+                                    Title = "Students Projects Document"
+                                })
                         }
                         else
                         {
@@ -350,27 +332,21 @@
 
                     <div class="verification-value">
 
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.FacultyProjectsPdfName))
+                        @if (!string.IsNullOrWhiteSpace(Model.FacultyProjectsPdfName))
                         {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span class="text-truncate">
-                                    @Model.FacultyProjectsPdfName
-                                </span>
-
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewResearchPublicationPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
-                            </div>
+                            @await Html.PartialAsync(
+                                "_DocumentViewerButton",
+                                new DocumentViewerVm
+                                {
+                                    Url = Url.Action(
+                                        "ViewFacultyProjectsPdf",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            collegeCode = Model.CollegeCode
+                                        })!,
+                                    Title = "Faculty Projects Document"
+                                })
                         }
                         else
                         {
@@ -491,40 +467,30 @@
 
 
                                 <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        row.PublicationPath))
+                                    @if (!string.IsNullOrWhiteSpace(row.PublicationPath))
                                     {
-                                        <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                            @* <span class="text-truncate">
-
-                                                @System.IO.Path.GetFileName(
-                                                    row.PublicationPath)
-
-                                            </span> *@
-
-                                            <a asp-controller="VerificationDashboard"
-                                               asp-action="ViewDepartmentPublicationPdf"
-                                               asp-route-collegeCode="@Model.CollegeCode"
-                                               asp-route-id="@row.Id"
-                                               target="_blank"
-                                               class="btn btn-sm btn-outline-primary">
-
-                                                <i class="bi bi-eye me-1"></i>
-                                                View File
-
-                                            </a>
-
-                                        </div>
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewDepartmentPublicationPdf",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        collegeCode = Model.CollegeCode,
+                                                        id = row.Id
+                                                    })!,
+                                                Title = string.IsNullOrWhiteSpace(row.DeptName)
+                                                    ? "Department Publication"
+                                                    : $"Publication - {row.DeptName}"
+                                            })
                                     }
                                     else
                                     {
-                                        <span>-</span>
+                                        <span class="text-muted">-</span>
                                     }
-
                                 </td>
-
                             </tr>
                         }
 

@@ -181,85 +181,73 @@
                                 </td>
 
                                 <td class="fw-semibold">
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.NameOfFaculty)
+                                    @(string.IsNullOrWhiteSpace(faculty.NameOfFaculty)
                                         ? "-"
                                         : faculty.NameOfFaculty)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.Designation)
+                                    @(string.IsNullOrWhiteSpace(faculty.Designation)
                                         ? "-"
                                         : faculty.Designation)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.DepartmentDetails)
+                                    @(string.IsNullOrWhiteSpace(faculty.DepartmentDetails)
                                         ? "-"
                                         : faculty.DepartmentDetails)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.RecognizedPgTeacher)
+                                    @(string.IsNullOrWhiteSpace(faculty.RecognizedPgTeacher)
                                         ? "-"
                                         : faculty.RecognizedPgTeacher)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.RecognizedPhDteacher)
+                                    @(string.IsNullOrWhiteSpace(faculty.RecognizedPhDteacher)
                                         ? "-"
                                         : faculty.RecognizedPhDteacher)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.IsExaminer)
+                                    @(string.IsNullOrWhiteSpace(faculty.IsExaminer)
                                         ? "-"
                                         : faculty.IsExaminer)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.ExaminerFor)
+                                    @(string.IsNullOrWhiteSpace(faculty.ExaminerFor)
                                         ? "-"
                                         : faculty.ExaminerFor)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.LitigationPending)
+                                    @(string.IsNullOrWhiteSpace(faculty.LitigationPending)
                                         ? "-"
                                         : faculty.LitigationPending)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.Mobile)
+                                    @(string.IsNullOrWhiteSpace(faculty.Mobile)
                                         ? "-"
                                         : faculty.Mobile)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.Email)
+                                    @(string.IsNullOrWhiteSpace(faculty.Email)
                                         ? "-"
                                         : faculty.Email)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.Pan)
+                                    @(string.IsNullOrWhiteSpace(faculty.Pan)
                                         ? "-"
                                         : faculty.Pan)
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.Aadhaar)
+                                    @(string.IsNullOrWhiteSpace(faculty.Aadhaar)
                                         ? "-"
                                         : faculty.Aadhaar)
                                 </td>
@@ -273,70 +261,97 @@
                                 </td>
 
 
-                                @* PG Recognition *@
+                                @* ============================================================
+                                   PG Recognition Document
+                                   ============================================================ *@
                                 <td>
 
                                     @if (!string.IsNullOrWhiteSpace(
                                         faculty.GuideRecognitionDocPath))
                                     {
-                                        <a href="@faculty.GuideRecognitionDocPath"
-                                           target="_blank"
-                                           class="btn btn-sm btn-outline-primary">
-
-                                            <i class="bi bi-eye me-1"></i>
-                                            View
-
-                                        </a>
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewFacultyDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = faculty.Id,
+                                                        type = "pg",
+                                                        mode = "view"
+                                                    })!,
+                                                Title = $"PG Recognition Document - {faculty.NameOfFaculty}"
+                                            })
                                     }
                                     else
                                     {
-                                        <span>-</span>
+                                        <span class="text-muted">-</span>
                                     }
 
                                 </td>
 
 
-                                @* PhD Recognition *@
+                                @* ============================================================
+                                   PhD Recognition Document
+                                   ============================================================ *@
                                 <td>
 
                                     @if (!string.IsNullOrWhiteSpace(
                                         faculty.PhDrecognitionDocPath))
                                     {
-                                        <a href="@faculty.PhDrecognitionDocPath"
-                                           target="_blank"
-                                           class="btn btn-sm btn-outline-primary">
-
-                                            <i class="bi bi-eye me-1"></i>
-                                            View
-
-                                        </a>
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewFacultyDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = faculty.Id,
+                                                        type = "phd",
+                                                        mode = "view"
+                                                    })!,
+                                                Title = $"PhD Recognition Document - {faculty.NameOfFaculty}"
+                                            })
                                     }
                                     else
                                     {
-                                        <span>-</span>
+                                        <span class="text-muted">-</span>
                                     }
 
                                 </td>
 
 
-                                @* Litigation Document *@
+                                @* ============================================================
+                                   Litigation Document
+                                   ============================================================ *@
                                 <td>
 
                                     @if (!string.IsNullOrWhiteSpace(
                                         faculty.LitigationDocPath))
                                     {
-                                        <a href="@faculty.LitigationDocPath"
-                                           target="_blank"
-                                           class="btn btn-sm btn-outline-primary">
-
-                                            <i class="bi bi-eye me-1"></i>
-                                            View
-
-                                        </a>
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewFacultyDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = faculty.Id,
+                                                        type = "litig",
+                                                        mode = "view"
+                                                    })!,
+                                                Title = $"Litigation Document - {faculty.NameOfFaculty}"
+                                            })
                                     }
                                     else
                                     {
-                                        <span>-</span>
+                                        <span class="text-muted">-</span>
                                     }
 
                                 </td>
@@ -344,12 +359,9 @@
 
                                 @* Remarks *@
                                 <td>
-
-                                    @(string.IsNullOrWhiteSpace(
-                                        faculty.RemoveRemarks)
+                                    @(string.IsNullOrWhiteSpace(faculty.RemoveRemarks)
                                         ? "-"
                                         : faculty.RemoveRemarks)
-
                                 </td>
 
                             </tr>
@@ -358,7 +370,6 @@
                         }
 
                     </tbody>
-
                 </table>
 
             </div>

@@ -166,18 +166,20 @@
                                     @Model.StaffOther.ExaminerDetailsPdfName
                                 </span>
 
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewStaffOtherPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   asp-route-fileType="Examiner"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewStaffOtherPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                fileType = "Examiner"
+                                            })!,
+                                        Title = "Examiner Details"
+                                    })
                             </div>
                         }
                         else
@@ -208,18 +210,20 @@
                                     @Model.StaffOther.AEBASLastThreeMonthsPdfName
                                 </span>
 
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewStaffOtherPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   asp-route-fileType="AEBAS3Months"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewStaffOtherPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                fileType = "AEBAS3Months"
+                                            })!,
+                                        Title = "AEBAS – Last Three Months"
+                                    })
                             </div>
                         }
                         else
@@ -250,18 +254,20 @@
                                     @Model.StaffOther.AEBASInspectionDayPdfName
                                 </span>
 
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewStaffOtherPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   asp-route-fileType="AEBASInspection"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewStaffOtherPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                fileType = "AEBASInspection"
+                                            })!,
+                                        Title = "AEBAS – Inspection Day"
+                                    })
                             </div>
                         }
                         else
@@ -292,18 +298,20 @@
                                     @Model.StaffOther.ProvidentFundPdfName
                                 </span>
 
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewStaffOtherPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   asp-route-fileType="PF"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewStaffOtherPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                fileType = "PF"
+                                            })!,
+                                        Title = "Provident Fund"
+                                    })
                             </div>
                         }
                         else
@@ -334,18 +342,20 @@
                                     @Model.StaffOther.ESIPdfName
                                 </span>
 
-                                <a asp-controller="VerificationDashboard"
-                                   asp-action="ViewStaffOtherPdf"
-                                   asp-route-collegeCode="@Model.CollegeCode"
-                                   asp-route-fileType="ESI"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye me-1"></i>
-                                    View File
-
-                                </a>
-
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewStaffOtherPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                fileType = "ESI"
+                                            })!,
+                                        Title = "ESI"
+                                    })
                             </div>
                         }
                         else
@@ -358,7 +368,6 @@
             </div>
 
         </div>
-
     </div>
 
 </div>

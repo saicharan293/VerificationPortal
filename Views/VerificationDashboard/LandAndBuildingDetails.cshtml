@@ -150,50 +150,198 @@
 
         <div class="row g-3 mb-4">
 
+            <!-- Sale Deed -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Sale Deed</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.SaleDeedDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Sale Deed
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.SaleDeedDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "SaleDeed"
+                                })!,
+                            Title = "Sale Deed"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Encumbrance Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Encumbrance Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.EncumbranceCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Encumbrance Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.EncumbranceCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "EncumbranceCertificate"
+                                })!,
+                            Title = "Encumbrance Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Land Use Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Land Use Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.LandUseCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Land Use Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.LandUseCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "LandUseCertificate"
+                                })!,
+                            Title = "Land Use Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Approved Layout Plan -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Approved Layout Plan</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.ApprovedLayoutPlanDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Approved Layout Plan
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ApprovedLayoutPlanDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "ApprovedLayoutPlan"
+                                })!,
+                            Title = "Approved Layout Plan"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Land Sketch -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Land Sketch</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.LandSketchDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Land Sketch
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.LandSketchDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "LandSketch"
+                                })!,
+                            Title = "Land Sketch"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Distance Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Distance Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.DistanceCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Distance Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.DistanceCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "DistanceCertificate"
+                                })!,
+                            Title = "Distance Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
         </div>
-
         <!-- Building -->
 
         <h5 class="fw-bold mb-3 border-bottom pb-2">
@@ -203,67 +351,271 @@
 
         <div class="row g-3 mb-4">
 
+            <!-- Total Built-up Area -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Total Built-up Area (Sq.m)</label>
+                <label class="form-label fw-bold">
+                    Total Built-up Area (Sq.m)
+                </label>
+
                 <input class="form-control"
                        value="@(Model.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
+
+            <!-- Approved Building Plan -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Approved Building Plan</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.ApprovedBuildingPlanDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Approved Building Plan
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ApprovedBuildingPlanDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "ApprovedBuildingPlan"
+                                })!,
+                            Title = "Approved Building Plan"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Completion Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Completion Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.CompletionCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Completion Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.CompletionCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "CompletionCertificate"
+                                })!,
+                            Title = "Completion Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Structural Stability Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Structural Stability Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.StructuralStabilityCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Structural Stability Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.StructuralStabilityCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "StructuralStabilityCertificate"
+                                })!,
+                            Title = "Structural Stability Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Fire Safety NOC -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Fire Safety NOC</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.FireSafetyNocDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Fire Safety NOC
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.FireSafetyNocDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "FireSafetyNoc"
+                                })!,
+                            Title = "Fire Safety NOC"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Lift License -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Lift License</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.LiftLicenseDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Lift License
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.LiftLicenseDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "LiftLicense"
+                                })!,
+                            Title = "Lift License"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Electrical Safety Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Electrical Safety Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.ElectricalSafetyCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Electrical Safety Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ElectricalSafetyCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "ElectricalSafetyCertificate"
+                                })!,
+                            Title = "Electrical Safety Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Water Supply Certificate -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Water Supply Certificate</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.WaterSupplyCertificateDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Water Supply Certificate
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.WaterSupplyCertificateDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "WaterSupplyCertificate"
+                                })!,
+                            Title = "Water Supply Certificate"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
+
+            <!-- Sewage / Sanitation Approval -->
             <div class="col-md-4">
-                <label class="form-label fw-bold">Sewage/Sanitation Approval</label>
-                <input class="form-control"
-                       value="@(string.IsNullOrEmpty(Model.SewageSanitationApprovalDocumentPath) ? "Not Uploaded" : "Uploaded")"
-                       disabled />
+                <label class="form-label fw-bold">
+                    Sewage / Sanitation Approval
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.SewageSanitationApprovalDocumentPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewLandBuildingDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Id,
+                                    documentType = "SewageSanitationApproval"
+                                })!,
+                            Title = "Sewage / Sanitation Approval"
+                        })
+                }
+                else
+                {
+                    <div class="form-control text-muted">
+                        Not Uploaded
+                    </div>
+                }
             </div>
 
         </div>

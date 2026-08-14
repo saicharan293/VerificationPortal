@@ -148,6 +148,7 @@
     padding: 1.5rem;
 }
 
+
 .feedback-form .form-label {
     font-weight: 500;
     color: var(--gray-700);
@@ -191,6 +192,9 @@
 }
 
 .feedback-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--gray-100);
@@ -209,7 +213,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--gray-500);
-    margin-bottom: 0.25rem;
+/*    margin-bottom: 0.25rem;*/
 }
 
 .feedback-value {

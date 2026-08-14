@@ -8,7 +8,6 @@
     ViewData["VerificationStatus"] = "Pending";
     ViewData["StatusBadgeClass"] = "pending";
     ViewData["ShowFeedbackSection"] = true;
-    ViewData["ShowFeedbackForm"] = true;
     ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
     ViewData["NextTabAction"] = Url.Action("DeanDirectorDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
     ViewData["NextTabLabel"] = "Next: Dean / Director Details";
@@ -47,6 +46,32 @@
                 <i class="bi bi-people"></i>
                 Trust Members
             </h3>
+
+             @if (!string.IsNullOrWhiteSpace(
+                ViewBag.RegisteredTrustMemberDetailsPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewTrustMemberDocument",
+                            "VerificationDashboard",
+                            new
+                            {
+                                collegeCode = ViewBag.CollegeCode,
+                                documentType = "RegisteredTrustMemberDetails"
+                            })!,
+                        Title = "Registered Trust Member Details"
+                    })
+                }
+                else
+                {
+                    <div class="text-muted mt-2">
+                        <i class="bi bi-file-earmark-x me-1"></i>
+                        Not Uploaded
+                    </div>
+                }
         </div>
         <div class="verification-card-body">
             @if (Model != null && Model.Count > 0)

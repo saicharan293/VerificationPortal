@@ -1,24 +1,46 @@
 @model VerificationPortal.Models.AffInstitutionsDetail
+
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
     ViewData["Title"] = "Institution Details";
     ViewData["ActiveTab"] = "InstitutionDetails";
-    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
-    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
-    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
-    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
-    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
-    // Use layout's feedback section - no duplicate form needed
-    ViewData["ShowFeedbackSection"] = true;
-    ViewData["ShowFeedbackForm"] = true;
-    ViewData["CurrentVerifier"] = User.Identity.Name;
-    ViewData["NextTabAction"] = Url.Action("Courses", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
-    ViewData["NextTabLabel"] = "Next: Courses & Intake";
-    ViewData["PrevTabAction"] = Url.Action("MyColleges", "MyColleges", new { });
-    ViewData["PrevTabLabel"] = "Back to My Colleges";
-}
 
-@section Styles {
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? Model?.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        ViewBag.FacultyCode ?? Model?.FacultyCode ?? "";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    // DON'T set ShowFeedbackForm here.
+    // SetVerificationViewData<AffInstitutionsDetail>()
+    // should populate it.
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "TrustDetails",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous : Trust Details";
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "TrustDetails",
+            "VerificationDashboard",
+            new { collegeCode = ViewBag.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next : Trust Details";
 }
 
 @section Scripts {

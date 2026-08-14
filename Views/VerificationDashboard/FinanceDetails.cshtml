@@ -495,21 +495,18 @@
         <div class="verification-card mt-4">
 
             <div class="verification-card-header">
-
                 <h3 class="verification-card-title">
                     <i class="bi bi-file-earmark-pdf"></i>
                     Supporting Documents
                 </h3>
-
             </div>
-
 
             <div class="verification-card-body">
 
                 <div class="row g-3">
 
                     <!-- Governing Council -->
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-12">
 
                         <div class="border rounded p-3 h-100">
 
@@ -535,22 +532,21 @@
 
                                 @if (!string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName))
                                 {
-                                    <a href="@Url.Action(
-                                        "ViewGoverningCouncilPdf",
-                                        "VerificationDashboard",
-                                        new
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
                                         {
-                                            collegeCode = section.CollegeCode,
-                                            courseLevel = section.CourseLevel,
-                                            facultyCode = ViewBag.FacultyCode
-                                        })"
-                                       target="_blank"
-                                       class="btn btn-outline-primary btn-sm flex-shrink-0">
-
-                                        <i class="bi bi-eye"></i>
-                                        View
-
-                                    </a>
+                                            Url = Url.Action(
+                                                "ViewGoverningCouncilPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = section.CollegeCode,
+                                                    courseLevel = section.CourseLevel,
+                                                    facultyCode = ViewBag.FacultyCode
+                                                })!,
+                                            Title = "Governing Council"
+                                        })
                                 }
 
                             </div>
@@ -561,7 +557,7 @@
 
 
                     <!-- Account Summary -->
-                    <div class="col-12 col-md-6">
+                    @* <div class="col-12 col-md-6">
 
                         <div class="border rounded p-3 h-100">
 
@@ -587,22 +583,21 @@
 
                                 @if (!string.IsNullOrWhiteSpace(section.AccountSummaryPdfName))
                                 {
-                                    <a href="@Url.Action(
-                                        "ViewAccountSummaryPdf",
-                                        "VerificationDashboard",
-                                        new
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
                                         {
-                                            collegeCode = section.CollegeCode,
-                                            courseLevel = section.CourseLevel,
-                                            facultyCode = ViewBag.FacultyCode
-                                        })"
-                                       target="_blank"
-                                       class="btn btn-outline-primary btn-sm flex-shrink-0">
-
-                                        <i class="bi bi-eye"></i>
-                                        View
-
-                                    </a>
+                                            Url = Url.Action(
+                                                "ViewAccountSummaryPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = section.CollegeCode,
+                                                    courseLevel = section.CourseLevel,
+                                                    facultyCode = ViewBag.FacultyCode
+                                                })!,
+                                            Title = "Account Summary"
+                                        })
                                 }
 
                             </div>
@@ -639,22 +634,21 @@
 
                                 @if (!string.IsNullOrWhiteSpace(section.AuditedStatementPdfName))
                                 {
-                                    <a href="@Url.Action(
-                                        "ViewAuditedStatementPdf",
-                                        "VerificationDashboard",
-                                        new
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
                                         {
-                                            collegeCode = section.CollegeCode,
-                                            courseLevel = section.CourseLevel,
-                                            facultyCode = ViewBag.FacultyCode
-                                        })"
-                                       target="_blank"
-                                       class="btn btn-outline-primary btn-sm flex-shrink-0">
-
-                                        <i class="bi bi-eye"></i>
-                                        View
-
-                                    </a>
+                                            Url = Url.Action(
+                                                "ViewAuditedStatementPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = section.CollegeCode,
+                                                    courseLevel = section.CourseLevel,
+                                                    facultyCode = ViewBag.FacultyCode
+                                                })!,
+                                            Title = "Audited Statement"
+                                        })
                                 }
 
                             </div>
@@ -693,22 +687,21 @@
 
                                     @if (!string.IsNullOrWhiteSpace(section.DonationPdfName))
                                     {
-                                        <a href="@Url.Action(
-                                            "ViewDonationPdf",
-                                            "VerificationDashboard",
-                                            new
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
                                             {
-                                                collegeCode = section.CollegeCode,
-                                                courseLevel = section.CourseLevel,
-                                                facultyCode = ViewBag.FacultyCode
-                                            })"
-                                           target="_blank"
-                                           class="btn btn-outline-primary btn-sm flex-shrink-0">
-
-                                            <i class="bi bi-eye"></i>
-                                            View
-
-                                        </a>
+                                                Url = Url.Action(
+                                                    "ViewDonationPdf",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        collegeCode = section.CollegeCode,
+                                                        courseLevel = section.CourseLevel,
+                                                        facultyCode = ViewBag.FacultyCode
+                                                    })!,
+                                                Title = "Donation Document"
+                                            })
                                     }
 
                                 </div>
@@ -716,7 +709,7 @@
                             </div>
 
                         </div>
-                    }
+                    } *@
 
                 </div>
 

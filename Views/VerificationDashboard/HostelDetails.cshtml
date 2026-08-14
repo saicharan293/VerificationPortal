@@ -153,30 +153,40 @@
                 </div>
             }
 
-            @if (!string.IsNullOrEmpty(Model.Hostel.PossessionProofPath))
+            @if (!string.IsNullOrWhiteSpace(Model.Hostel.PossessionProofPath))
             {
-                <div class="verification-card mt-4 d-flex">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Possession Proof
+                    </label>
 
-                    <div class="verification-card-header">
-                        <h3 class="verification-card-title">
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            Possession Proof
-                        </h3>
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewHostelDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    collegeCode = Model.Hostel.CollegeCode,
+                                    documentType = "PossessionProof"
+                                })!,
+                            Title = "Possession Proof"
+                        })
+                </div>
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Possession Proof
+                    </label>
+
+                    <div class="text-muted mt-2">
+                        <i class="bi bi-file-earmark-x me-1"></i>
+                        Not Uploaded
                     </div>
-
-                    <div class="verification-card-body">
-
-                        <a asp-action="DownloadPossessionProof"
-                           asp-route-collegeCode="@Model.Hostel.CollegeCode"
-                           asp-route-facultyCode="@Model.Hostel.FacultyCode"
-                           class="btn btn-outline-primary"
-                           target="_blank">
-                            <i class="bi bi-download"></i>
-                            View PDF
-                        </a>
-
-                    </div>
-
                 </div>
             }
 

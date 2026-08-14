@@ -9,7 +9,7 @@
     ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
     ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
     ViewData["ShowFeedbackSection"] = true;
-    ViewData["ShowFeedbackForm"] = true;
+    // ViewData["ShowFeedbackForm"] = true;
     ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
     ViewData["NextTabAction"] = Url.Action("Courses", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
     ViewData["NextTabLabel"] = "Next: Courses & Intake";
