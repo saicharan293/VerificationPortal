@@ -1,96 +1,526 @@
 @model VerificationPortal.Models.AffInstitutionsDetail
+
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
     ViewData["Title"] = "Principal Details - Verification Dashboard";
     ViewData["ActiveTab"] = "PrincipalDetails";
-    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
-    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
-    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
-    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
-    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
-    ViewData["ShowFeedbackSection"] = true;
-    // ViewData["ShowFeedbackForm"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
-    ViewData["NextTabAction"] = Url.Action("Courses", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
-    ViewData["NextTabLabel"] = "Next: Courses & Intake";
-    ViewData["PrevTabAction"] = Url.Action("DeanDirectorDetails", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
-    ViewData["PrevTabLabel"] = "Previous: Dean / Director Details";
-}
 
-@section Styles {
+    ViewData["InstitutionName"] =
+        Model?.NameOfInstitution ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        Model?.CollegeCode ?? "";
+
+    ViewData["FacultyName"] =
+        Model?.FacultyCode ?? "";
+
+    ViewData["VerificationStatus"] =
+        Model?.IsDeoVerified == true
+            ? "Verified"
+            : Model?.IsDeoVerified == false
+                ? "Rejected"
+                : "Pending";
+
+    ViewData["StatusBadgeClass"] =
+        Model?.IsDeoVerified == true
+            ? "verified"
+            : Model?.IsDeoVerified == false
+                ? "rejected"
+                : "pending";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "Courses",
+            "VerificationDashboard",
+            new
+            {
+                collegeCode = Model?.CollegeCode
+            });
+
+    ViewData["NextTabLabel"] =
+        "Next: Courses & Intake";
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "DeanDirectorDetails",
+            "VerificationDashboard",
+            new
+            {
+                collegeCode = Model?.CollegeCode
+            });
+
+    ViewData["PrevTabLabel"] =
+        "Previous: Dean / Director Details";
+
+
+    // Experience college lookup
+    var experienceColleges =
+        ViewBag.ExperienceColleges
+        as List<SelectListItem>
+        ?? new List<SelectListItem>();
 }
 
 @{
     ViewBag.ActiveTab = "PrincipalDetails";
 }
 
-<!-- Page Header -->
+
+<!-- ========================================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================================= -->
+
 <div class="page-header mb-4">
+
     <h1 class="page-title">
         <i class="bi bi-mortarboard"></i>
         Principal Details
     </h1>
-    <p class="text-muted mb-0">Review and verify Principal information for this institution</p>
+
+    <p class="text-muted mb-0">
+        Review and verify Principal information for this institution
+    </p>
+
 </div>
 
-<!-- Note Box -->
+
+<!-- ========================================================= -->
+<!-- NOTE -->
+<!-- ========================================================= -->
+
 <div class="note-box mb-4">
+
     <i class="bi bi-info-circle"></i>
+
     <div class="note-box-content">
-        <h6>Verification Instructions</h6>
-        <p>Review the Principal details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, proceed to the next tab: <strong>Courses & Intake</strong>.</p>
+
+        <h6>
+            Verification Instructions
+        </h6>
+
+        <p>
+            Review the Principal details and experience information
+            below. Provide your remarks in the remarks field and
+            select the verification status.
+        </p>
+
     </div>
+
 </div>
 
-    <div class="verification-card mb-4">
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-mortarboard"></i>
-                Principal Information
-            </h3>
-        </div>
-        <div class="verification-card-body">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Principal Name</label>
-                    <input type="text" class="form-control" value="@Model.PrincipalName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Principal Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.PrincipalMobileNumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Principal Email ID</label>
-                    <input type="email" class="form-control" value="@Model.PrincipalEmailId" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Dean Name</label>
-                    <input type="text" class="form-control" value="@Model.DeanName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Dean Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.DeanMobileNumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Dean Email ID</label>
-                    <input type="email" class="form-control" value="@Model.DeanEmailId" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Head of Institution</label>
-                    <input type="text" class="form-control" value="@Model.HeadOfInstitution" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Head Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionMobNo" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Head Email</label>
-                    <input type="email" class="form-control" value="@Model.HeadOfInstitutionEmail" disabled />
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Head Address</label>
-                    <textarea class="form-control" rows="2" disabled>@Model.HeadAddress</textarea>
-                </div>
-            </div>
-        </div>
+
+<!-- ========================================================= -->
+<!-- PRINCIPAL INFORMATION -->
+<!-- ========================================================= -->
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge"></i>
+            Principal Information
+        </h3>
+
     </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-3">
+
+            <!-- Principal Name -->
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Principal Name
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(ViewBag.PrincipalName ?? "-")"
+                       disabled />
+
+            </div>
+
+
+            <!-- Qualification -->
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Qualification
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(ViewBag.PrincipalQualification ?? "-")"
+                       disabled />
+
+            </div>
+
+
+            <!-- Qualification Date -->
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Qualification Date
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(ViewBag.PrincipalQualificationDate ?? "-")"
+                       disabled />
+
+            </div>
+
+
+            <!-- University -->
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    University
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(ViewBag.PrincipalUniversity ?? "-")"
+                       disabled />
+
+            </div>
+
+
+            <!-- State Council Number -->
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    State Council Number
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(ViewBag.PrincipalStateCouncilNumber ?? "-")"
+                       disabled />
+
+            </div>
+
+
+            <!-- Recognition -->
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    @ViewBag.RecognitionLabel
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(ViewBag.RecognitionStatus ?? "-")"
+                       disabled />
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- TEACHING EXPERIENCE -->
+<!-- ========================================================= -->
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-book"></i>
+            Teaching Experience
+        </h3>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (ViewBag.TeachingExperiences != null &&
+             ((IEnumerable<dynamic>)ViewBag.TeachingExperiences).Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th style="width:70px;">
+                                Sl. No
+                            </th>
+
+                            <th>
+                                Designation
+                            </th>
+
+                            <th>
+                                College
+                            </th>
+
+                            <th>
+                                Other College
+                            </th>
+
+                            <th>
+                                From Date
+                            </th>
+
+                            <th>
+                                To Date
+                            </th>
+
+                            <th>
+                                Total Experience
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var experience
+                            in (IEnumerable<dynamic>)ViewBag.TeachingExperiences)
+                        {
+                            var collegeName = "-";
+
+                            if (!string.IsNullOrWhiteSpace(experience.ExpCollegeCode))
+                            {
+                                collegeName = experienceColleges
+                                    .FirstOrDefault(x =>
+                                        x.Value == experience.ExpCollegeCode)
+                                    ?.Text
+                                    ?? experience.ExpCollegeCode;
+                            }
+
+                            <tr>
+
+                                <td class="text-center">
+                                    @serialNo
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.Designation)
+                                        ? "-"
+                                        : experience.Designation)
+                                </td>
+
+                                <td>
+                                    @collegeName
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.OtherCollege)
+                                        ? "-"
+                                        : experience.OtherCollege)
+                                </td>
+
+                                <td>
+                                    @(experience.FromDate != null
+                                        ? experience.FromDate.ToString("dd-MM-yyyy")
+                                        : "-")
+                                </td>
+
+                                <td>
+                                    @(experience.ToDate != null
+                                        ? experience.ToDate.ToString("dd-MM-yyyy")
+                                        : "-")
+                                </td>
+
+                                <td>
+                                    @(experience.TotalExperienceYears?.ToString() ?? "-")
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                No teaching experience details available.
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- ADMINISTRATIVE EXPERIENCE -->
+<!-- ========================================================= -->
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-briefcase"></i>
+            Administrative Experience
+        </h3>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (ViewBag.AdministrativeExperiences != null &&
+             ((IEnumerable<dynamic>)ViewBag.AdministrativeExperiences).Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th style="width:70px;">
+                                Sl. No
+                            </th>
+
+                            <th>
+                                Post Held
+                            </th>
+
+                            <th>
+                                College
+                            </th>
+
+                            <th>
+                                Other College
+                            </th>
+
+                            <th>
+                                From Date
+                            </th>
+
+                            <th>
+                                To Date
+                            </th>
+
+                            <th>
+                                Total Experience
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var experience
+                            in (IEnumerable<dynamic>)ViewBag.AdministrativeExperiences)
+                        {
+                            var collegeName = "-";
+
+                            if (!string.IsNullOrWhiteSpace(
+                                experience.ExpCollegeCode))
+                            {
+                                collegeName = experienceColleges
+                                .FirstOrDefault(x =>
+                                    x.Value == experience.ExpCollegeCode)
+                                ?.Text
+                                ?? experience.ExpCollegeCode;
+                            }
+
+                            <tr>
+
+                                <td class="text-center">
+                                    @serialNo
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.PostHeld)
+                                        ? "-"
+                                        : experience.PostHeld)
+                                </td>
+
+                                <td>
+                                    @collegeName
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.OtherCollege)
+                                        ? "-"
+                                        : experience.OtherCollege)
+                                </td>
+
+                                <td>
+                                    @(experience.FromDate != null
+                                        ? experience.FromDate.ToString("dd-MM-yyyy")
+                                        : "-")
+                                </td>
+
+                                <td>
+                                    @(experience.ToDate != null
+                                        ? experience.ToDate.ToString("dd-MM-yyyy")
+                                        : "-")
+                                </td>
+
+                                <td>
+                                    @(experience.TotalExperienceYears?.ToString() ?? "-")
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                No administrative experience details available.
+
+            </div>
+        }
+
+    </div>
+
+</div>

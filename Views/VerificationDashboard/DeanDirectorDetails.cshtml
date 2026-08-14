@@ -1,95 +1,530 @@
-@model VerificationPortal.Models.AffInstitutionsDetail
+@model VerificationPortal.Models.DeanDetailsViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    var experienceColleges =
+        ViewBag.ExperienceColleges as List<SelectListItem>
+        ?? new List<SelectListItem>();
+}
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
     ViewData["Title"] = "Dean / Director Details - Verification Dashboard";
     ViewData["ActiveTab"] = "DeanDirectorDetails";
-    ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
-    ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
-    ViewData["FacultyName"] = Model?.FacultyCode ?? "";
-    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
-    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
+
+    ViewData["InstitutionName"] =
+        ViewBag.CollegeName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        Model?.CollegeCode ?? "";
+
+    ViewData["FacultyName"] =
+        Model?.FacultyCode ?? "";
+
+    ViewData["VerificationStatus"] =
+        ViewBag.IsVerified == true
+            ? "Verified"
+            : ViewBag.IsVerified == false
+                ? "Rejected"
+                : "Pending";
+
+    ViewData["StatusBadgeClass"] =
+        ViewBag.IsVerified == true
+            ? "verified"
+            : ViewBag.IsVerified == false
+                ? "rejected"
+                : "pending";
+
     ViewData["ShowFeedbackSection"] = true;
-    // ViewData["ShowFeedbackForm"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
-    ViewData["NextTabAction"] = Url.Action("PrincipalDetails", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
-    ViewData["NextTabLabel"] = "Next: Principal Details";
-    ViewData["PrevTabAction"] = Url.Action("TrustMemberDetails", "VerificationDashboard", new { collegeCode = Model.CollegeCode });
-    ViewData["PrevTabLabel"] = "Previous: Trust Member Details";
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["NextTabAction"] =
+        Url.Action(
+            "PrincipalDetails",
+            "VerificationDashboard",
+            new { collegeCode = Model.CollegeCode });
+
+    ViewData["NextTabLabel"] =
+        "Next: Principal Details";
+
+    ViewData["PrevTabAction"] =
+        Url.Action(
+            "TrustMemberDetails",
+            "VerificationDashboard",
+            new { collegeCode = Model.CollegeCode });
+
+    ViewData["PrevTabLabel"] =
+        "Previous: Trust Member Details";
+
 }
 
-@section Styles {
-}
 
 @{
     ViewBag.ActiveTab = "DeanDirectorDetails";
 }
 
+
 <!-- Page Header -->
 <div class="page-header mb-4">
+
     <h1 class="page-title">
         <i class="bi bi-person-badge"></i>
         Dean / Director Details
     </h1>
-    <p class="text-muted mb-0">Review and verify Dean/Director information for this institution</p>
+
+    <p class="text-muted mb-0">
+        Review and verify Dean/Director information for this institution
+    </p>
+
 </div>
+
 
 <!-- Note Box -->
 <div class="note-box mb-4">
+
     <i class="bi bi-info-circle"></i>
+
     <div class="note-box-content">
+
         <h6>Verification Instructions</h6>
-        <p>Review the Dean/Director details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, proceed to the next tab: <strong>Principal Details</strong>.</p>
+
+        <p>
+            Review the Dean/Director details below.
+            Provide your remarks in the remarks field below,
+            and select the verification status (Accept/Reject).
+            Once completed, proceed to the next tab:
+            <strong>Principal Details</strong>.
+        </p>
+
     </div>
+
 </div>
 
+
+<!-- ========================================================= -->
+<!-- DEAN / DIRECTOR INFORMATION -->
+<!-- ========================================================= -->
+
 <div class="verification-card mb-4">
+
     <div class="verification-card-header">
+
         <h3 class="verification-card-title">
             <i class="bi bi-person-badge"></i>
             Dean / Director Information
         </h3>
+
     </div>
+
+
     <div class="verification-card-body">
+
         <div class="row g-3">
+
+            <!-- Name -->
             <div class="col-md-6">
-                <label class="form-label">Dean Name</label>
-                <input type="text" class="form-control" value="@Model.DeanName" disabled />
+
+                <label class="form-label">
+                    Dean / Director Name
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@Model.DeanOrDirectorName"
+                       disabled />
+
             </div>
+
+
+            <!-- Qualification -->
             <div class="col-md-6">
-                <label class="form-label">Dean Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.DeanMobileNumber" disabled />
+
+                <label class="form-label">
+                    Qualification
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@ViewBag.DeanQualificationName"
+                       disabled />
+
             </div>
+
+
+            <!-- Qualification Date -->
             <div class="col-md-6">
-                <label class="form-label">Dean Email ID</label>
-                <input type="email" class="form-control" value="@Model.DeanEmailId" disabled />
+
+                <label class="form-label">
+                    Qualification Date
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(Model.DeanQualificationDate?.ToString("dd-MM-yyyy") ?? "-")"
+                       disabled />
+
             </div>
+
+
+            <!-- University -->
             <div class="col-md-6">
-                <label class="form-label">Director Name</label>
-                <input type="text" class="form-control" value="@Model.DeanName" disabled />
-                <div class="form-text">Same as Dean in this model</div>
+
+                <label class="form-label">
+                    University
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@Model.DeanUniversity"
+                       disabled />
+
             </div>
+
+
+            <!-- State Council Number -->
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    State Council Number
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@Model.DeanStateCouncilNumber"
+                       disabled />
+
+            </div>
+
+
+            <!-- Recognition -->
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Recognition By @(Model.FacultyCode=="2" ? "DCI" : "MCI")
+                </label>
+
+                @if (Model.FacultyCode == "2")
+                {
+                    <input type="text"
+                           class="form-control"
+                           value="@(Model.RecognizedByDCI ? "Yes" : "No")"
+                           disabled />
+                }
+                else
+                {
+                    <input type="text"
+                           class="form-control"
+                           value="@(Model.RecognizedByMCI ? "Yes" : "No")"
+                           disabled />
+                }
+
+            </div>
+
         </div>
 
-        <div class="form-section mt-4">
-            <h5 class="form-section-title"><i class="bi bi-person-lines-fill me-2"></i>Head of Institution Details</h5>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Head of Institution Name</label>
-                    <input type="text" class="form-control" value="@Model.HeadOfInstitution" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Head Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionMobNo" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Head Email</label>
-                    <input type="email" class="form-control" value="@Model.HeadOfInstitutionEmail" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Head Address</label>
-                    <input type="text" class="form-control" value="@Model.HeadAddress" disabled />
-                </div>
-            </div>
-        </div>
     </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- TEACHING EXPERIENCE -->
+<!-- ========================================================= -->
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-mortarboard"></i>
+            Teaching Experience
+        </h3>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.TeachingExperiences != null &&
+             Model.TeachingExperiences.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:70px;">
+                                Sl. No
+                            </th>
+
+                            <th>
+                                Designation
+                            </th>
+
+                            <th>
+                                College
+                            </th>
+
+                            <th>
+                                Other College
+                            </th>
+
+                            <th>
+                                From
+                            </th>
+
+                            <th>
+                                To
+                            </th>
+
+                            <th>
+                                Total Experience
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (int i = 0;
+                              i < Model.TeachingExperiences.Count;
+                              i++)
+                        {
+                            var experience =
+                                Model.TeachingExperiences[i];
+
+                            // Convert ExpCollegeCode -> College Name
+                            var collegeName = "-";
+
+
+                            <tr>
+
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.Designation)
+                                        ? "-"
+                                        : experience.Designation)
+                                </td>
+
+                                <td>
+                                    @{
+
+                                        if (!string.IsNullOrWhiteSpace(experience.ExpCollegeCode))
+                                        {
+                                            collegeName =
+                                                experienceColleges
+                                                    .FirstOrDefault(x =>
+                                                        x.Value == experience.ExpCollegeCode)
+                                                    ?.Text
+                                                ?? experience.ExpCollegeCode;
+                                        }
+                                    }
+
+                                    @collegeName
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.OtherCollege)
+                                        ? "-"
+                                        : experience.OtherCollege)
+                                </td>
+
+                                <td>
+                                    @(experience.FromDate?
+                                        .ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(experience.ToDate?
+                                        .ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(experience.TeachingExperienceYears?
+                                        .ToString() ?? "-")
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-muted text-center py-4">
+
+                <i class="bi bi-info-circle me-2"></i>
+                No teaching experience details available.
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- ADMINISTRATIVE EXPERIENCE -->
+<!-- ========================================================= -->
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-building"></i>
+            Administrative Experience
+        </h3>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (Model.AdministrativeExperiences != null &&
+             Model.AdministrativeExperiences.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:70px;">
+                                Sl. No
+                            </th>
+
+                            <th>
+                                Post Held
+                            </th>
+
+                            <th>
+                                College
+                            </th>
+
+                            <th>
+                                Other College
+                            </th>
+
+                            <th>
+                                From
+                            </th>
+
+                            <th>
+                                To
+                            </th>
+
+                            <th>
+                                Total Experience
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    
+                    <tbody>
+
+                        @for (int i = 0;
+                              i < Model.AdministrativeExperiences.Count;
+                              i++)
+                        {
+                            var experience =
+                                Model.AdministrativeExperiences[i];
+
+                            // Convert ExpCollegeCode -> College Name
+                            
+
+                            <tr>
+
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.PostHeld)
+                                        ? "-"
+                                        : experience.PostHeld)
+                                </td>
+
+                                <td>
+                                    @{
+                                        var collegeName = "-";
+
+                                        if (!string.IsNullOrWhiteSpace(experience.ExpCollegeCode))
+                                        {
+                                            collegeName =
+                                                experienceColleges
+                                                    .FirstOrDefault(x =>
+                                                        x.Value == experience.ExpCollegeCode)
+                                                    ?.Text
+                                                ?? experience.ExpCollegeCode;
+                                        }
+                                    }
+
+                                    @collegeName
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        experience.OtherCollege)
+                                        ? "-"
+                                        : experience.OtherCollege)
+                                </td>
+
+                                <td>
+                                    @(experience.FromDate?
+                                        .ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(experience.ToDate?
+                                        .ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(experience.TotalExperienceYears?
+                                        .ToString() ?? "-")
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-muted text-center py-4">
+
+                <i class="bi bi-info-circle me-2"></i>
+                No administrative experience details available.
+
+            </div>
+        }
+
+    </div>
+
 </div>

@@ -95,103 +95,11 @@
         <div class="verification-card-body">
             <div class="row g-3">
                 <!-- Institution Basic Details -->
-                <div class="col-md-6">
-                    <label class="form-label">Faculty Code</label>
-                    <input type="text" class="form-control" value="@Model.FacultyCode" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">College Code</label>
-                    <input type="text" class="form-control" value="@Model.CollegeCode" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Type of Organization</label>
-                    <input type="text" class="form-control" value="@Model.TypeOfOrganization" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Type of Institution</label>
-                    <input type="text" class="form-control" value="@Model.TypeOfInstitution" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Name of Institution</label>
-                    <input type="text" class="form-control" value="@Model.NameOfInstitution" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Village/Town/City</label>
-                    <input type="text" class="form-control" value="@Model.VillageTownCity" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Taluk</label>
-                    <input type="text" class="form-control" value="@Model.Taluk" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">District</label>
-                    <input type="text" class="form-control" value="@Model.District" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Pin Code</label>
-                    <input type="text" class="form-control" value="@Model.PinCode" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.MobileNumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">STD Code</label>
-                    <input type="text" class="form-control" value="@Model.StdCode" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Fax</label>
-                    <input type="text" class="form-control" value="@Model.Fax" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Website</label>
-                    <input type="text" class="form-control" value="@Model.Website" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Email ID</label>
-                    <input type="text" class="form-control" value="@Model.EmailId" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Alt Landline/Mobile</label>
-                    <input type="text" class="form-control" value="@Model.AltLandlineOrMobile" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Alt Email ID</label>
-                    <input type="text" class="form-control" value="@Model.AltEmailId" disabled />
-                </div>
-
-                <!-- Institution Address -->
-                <div class="col-12">
-                    <label class="form-label">Address of Institution</label>
-                    <textarea class="form-control" rows="2" disabled>@Model.AddressOfInstitution</textarea>
-                </div>
-
-                <!-- Academic & Category Details -->
-                <div class="col-md-6">
-                    <label class="form-label">Academic Year Started</label>
-                    <input type="text" class="form-control" value="@Model.AcademicYearStarted" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Is Rural Institution</label>
-                    <input type="text" class="form-control" value="@(Model.IsRuralInstitution == true ? "Yes" : Model.IsRuralInstitution == false ? "No" : "Not specified")" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Is Minority Institution</label>
-                    <input type="text" class="form-control" value="@(Model.IsMinorityInstitution == true ? "Yes" : Model.IsMinorityInstitution == false ? "No" : "Not specified")" disabled />
-                </div>
-
+                
                 <!-- Trust Details -->
                 <div class="col-md-6">
                     <label class="form-label">Trust Name</label>
                     <input type="text" class="form-control" value="@Model.TrustName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">President Name</label>
-                    <input type="text" class="form-control" value="@Model.PresidentName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Aadhaar Number</label>
-                    <input type="text" class="form-control" value="@Model.AadhaarNumber" disabled />
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">PAN Number</label>
@@ -206,77 +114,84 @@
                     <input type="text" class="form-control" value="@(Model.RegistrationDate?.ToString("dd MMM yyyy") ?? "Not provided")" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Amendments</label>
-                    <input type="text" class="form-control" value="@(Model.Amendments == true ? "Yes" : Model.Amendments == false ? "No" : "Not specified")" disabled />
+                    <label class="form-label">President Name</label>
+                    <input type="text" class="form-control" value="@Model.PresidentName" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Existing Trust Name</label>
-                    <input type="text" class="form-control" value="@Model.ExistingTrustName" disabled />
+                    <label class="form-label">Category of Organisation</label>
+                    <input type="text" class="form-control" value="@Model.CategoryOfOrganisation" disabled />
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">GOK Obtained Trust Name</label>
                     <input type="text" class="form-control" value="@Model.GokobtainedTrustName" disabled />
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label">Amendments</label>
+                    <input type="text" class="form-control" value="@(Model.Amendments == true ? "Yes" : Model.Amendments == false ? "No" : "Not specified")" disabled />
+                </div>
+                @* <div class="col-md-6">
+                    <label class="form-label">Aadhaar Number</label>
+                    <input type="text" class="form-control" value="@Model.AadhaarNumber" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Existing Trust Name</label>
+                    <input type="text" class="form-control" value="@Model.ExistingTrustName" disabled />
+                </div> *@
+                @* <div class="col-md-6">
                     <label class="form-label">Changes in Trust Name</label>
                     <input type="text" class="form-control" value="@(Model.ChangesInTrustName == true ? "Yes" : Model.ChangesInTrustName == false ? "No" : "Not specified")" disabled />
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Other Nursing College in City</label>
                     <input type="text" class="form-control" value="@(Model.OtherNursingCollegeInCity == true ? "Yes" : Model.OtherNursingCollegeInCity == false ? "No" : "Not specified")" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Category of Organisation</label>
-                    <input type="text" class="form-control" value="@Model.CategoryOfOrganisation" disabled />
-                </div>
+                </div> *@
 
                 <!-- Contact Person Details -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Contact Person Name</label>
                     <input type="text" class="form-control" value="@Model.ContactPersonName" disabled />
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Contact Person Relation</label>
+                <div class="col-md-4">
+                    <label class="form-label">Contact Person Designation</label>
                     <input type="text" class="form-control" value="@Model.ContactPersonRelation" disabled />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Contact Person Mobile</label>
                     <input type="text" class="form-control" value="@Model.ContactPersonMobile" disabled />
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Other Physiotherapy College in City</label>
-                    <input type="text" class="form-control" value="@(Model.OtherPhysiotherapyCollegeInCity == true ? "Yes" : Model.OtherPhysiotherapyCollegeInCity == false ? "No" : "Not specified")" disabled />
+                <div class="col-md-4">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" value="@Model.AddressOfInstitution" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Pincode</label>
+                    <input type="text" class="form-control" value="@Model.PinCode" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" value="@Model.MobileNumber" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">STD code</label>
+                    <input type="text" class="form-control" value="@Model.StdCode" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fax</label>
+                    <input type="text" class="form-control" value="@Model.Fax" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Alternate Mobile/Landline Number</label>
+                    <input type="text" class="form-control" value="@Model.AltLandlineOrMobile" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Courses Applied Text</label>
-                    <input type="text" class="form-control" value="@Model.CoursesAppliedText" disabled />
-                </div>
-
-                <!-- Head of Institution & Financing -->
-                <div class="col-md-6">
-                    <label class="form-label">Head of Institution Name</label>
-                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionName" disabled />
+                    <label class="form-label">Email Id</label>
+                    <input type="text" class="form-control" value="@Model.EmailId" disabled />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Head of Institution Address</label>
-                    <input type="text" class="form-control" value="@Model.HeadOfInstitutionAddress" disabled />
+                    <label class="form-label">Alternate Email Id</label>
+                    <input type="text" class="form-control" value="@Model.AltEmailId" disabled />
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Financing Authority Name</label>
-                    <input type="text" class="form-control" value="@Model.FinancingAuthorityName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">College Status</label>
-                    <input type="text" class="form-control" value="@Model.CollegeStatus" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Gov. Autonomous Cert. Number</label>
-                    <input type="text" class="form-control" value="@Model.GovAutonomousCertNumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">KNC Certificate Number</label>
-                    <input type="text" class="form-control" value="@Model.KncCertificateNumber" disabled />
-                </div>
+                
                 <div class="col-md-6">
                     <label class="form-label">Created On</label>
                     <input type="text" class="form-control" value="@Model.CreatedOn.ToString("dd MMM yyyy HH:mm")" disabled />

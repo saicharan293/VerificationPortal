@@ -76,66 +76,32 @@
 
         <div class="row g-3 mb-4">
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-bold">Total Land Area (Acres)</label>
                 <input class="form-control"
                        value="@(Model.TotalLandAreaAcres?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-bold">Land Ownership Type</label>
                 <input class="form-control"
                        value="@(Model.LandOwnershipType ?? "N/A")"
                        disabled />
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-bold">Land Category</label>
                 <input class="form-control"
                        value="@(Model.LandCategory ?? "N/A")"
                        disabled />
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Tier 2 / Hilly Area</label>
-                <input class="form-control"
-                       value="@(Model.IsTier2OrHilly ? "Yes" : "No")"
-                       disabled />
-            </div>
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-bold">Future Expansion Space</label>
                 <input class="form-control"
                        value="@(Model.HasFutureExpansionSpace == true ? "Yes" : (Model.HasFutureExpansionSpace == false ? "No" : "N/A"))"
-                       disabled />
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Land in Two Pieces</label>
-                <input class="form-control"
-                       value="@(Model.IsLandInTwoPieces == true ? "Yes" : (Model.IsLandInTwoPieces == false ? "No" : "N/A"))"
-                       disabled />
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Distance College-Hospital (Km)</label>
-                <input class="form-control"
-                       value="@(Model.DistanceBetweenCollegeAndHospitalKm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Latitude</label>
-                <input class="form-control"
-                       value="@(Model.Latitude?.ToString("N6") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Longitude</label>
-                <input class="form-control"
-                       value="@(Model.Longitude?.ToString("N6") ?? "N/A")"
                        disabled />
             </div>
 
@@ -352,13 +318,103 @@
         <div class="row g-3 mb-4">
 
             <!-- Total Built-up Area -->
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-bold">
                     Total Built-up Area (Sq.m)
                 </label>
 
                 <input class="form-control"
                        value="@(Model.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area Per Lecture Hall (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.LectureHallAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Number of students / one lecture hall
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.LectureHallSeatingCapacity?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Number of lecture halls
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.LectureHallCount?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area of Museum & Demonstration Rooms (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area of Departmental Areas (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area of Preclinical Labs & Skill Labs (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.PreclinicalSkillLabAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area of Examination Hall (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area of Library Including Reading Room (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.LibraryAreaSqm?.ToString("N2") ?? "N/A")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">
+                    Area of Dental Hospital (in Sq.m)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.HospitalAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -616,57 +672,6 @@
                         Not Uploaded
                     </div>
                 }
-            </div>
-
-        </div>
-
-        <!-- Teaching Areas -->
-
-        <h5 class="fw-bold mb-3 border-bottom pb-2">
-            <i class="bi bi-mortarboard"></i>
-            Teaching Areas
-        </h5>
-
-        <div class="row g-3">
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Lecture Hall Count</label>
-                <input class="form-control" value="@(Model.LectureHallCount ?? 0)" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Lecture Hall Area (Sq.m)</label>
-                <input class="form-control" value="@(Model.LectureHallAreaSqm?.ToString("N2") ?? "N/A")" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Lecture Hall Seating Capacity</label>
-                <input class="form-control" value="@(Model.LectureHallSeatingCapacity ?? 0)" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Examination Hall Area</label>
-                <input class="form-control" value="@(Model.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Library Area</label>
-                <input class="form-control" value="@(Model.LibraryAreaSqm?.ToString("N2") ?? "N/A")" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Hospital Area</label>
-                <input class="form-control" value="@(Model.HospitalAreaSqm?.ToString("N2") ?? "N/A")" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Museum/Demo Rooms</label>
-                <input class="form-control" value="@(Model.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")" disabled />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Department-wise Area</label>
-                <input class="form-control" value="@(Model.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")" disabled />
             </div>
 
         </div>

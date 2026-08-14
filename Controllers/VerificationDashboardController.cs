@@ -58,8 +58,7 @@ namespace VerificationPortal.Controllers
             // PAGE CONTEXT
             // ---------------------------------------------------------
 
-            var context =
-                await GetPageContextAsync(collegeCode);
+            var context = await GetPageContextAsync(collegeCode);
 
             PopulateCommonViewBags(context);
 
@@ -71,11 +70,10 @@ namespace VerificationPortal.Controllers
             // COLLEGE
             // ---------------------------------------------------------
 
-            var college =
-                await _context.AffiliationCollegeMasters
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c =>
-                        c.CollegeCode == collegeCode);
+            var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c =>
+                    c.CollegeCode == collegeCode);
 
             ViewBag.CollegeName =
                 college?.CollegeName ?? "Unknown College";
@@ -85,17 +83,101 @@ namespace VerificationPortal.Controllers
             // INSTITUTION DETAILS
             // ---------------------------------------------------------
 
-            var institution =
-                await _context.AffInstitutionsDetails
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(x =>
-                        x.CollegeCode == collegeCode);
+            var institution = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode);
 
             if (institution == null)
             {
                 return NotFound(
                     $"Institution details not found for college code: {collegeCode}");
             }
+
+
+            // ---------------------------------------------------------
+            // TYPE OF INSTITUTION
+            // ---------------------------------------------------------
+
+            string typeOfInstitution = institution.TypeOfInstitution;
+
+            if (int.TryParse(institution.TypeOfInstitution, out int institutionTypeId))
+            {
+                typeOfInstitution =
+                    await _context.MstInstitutionTypes
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.InstitutionTypeId == institutionTypeId)
+                        .Select(x => x.InstitutionType)
+                        .FirstOrDefaultAsync()
+                    ?? institution.TypeOfInstitution;
+            }
+
+            ViewBag.TypeOfInstitution = typeOfInstitution;
+
+
+            // ---------------------------------------------------------
+            // STATUS OF COLLEGE
+            // ---------------------------------------------------------
+
+            string statusOfCollege = institution.StatusOfCollege;
+
+            if (byte.TryParse(institution.StatusOfCollege, out byte statusId))
+            {
+                statusOfCollege =
+                    await _context.AffInstitutionStatusMasters
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.InstitutionStatusId == statusId &&
+                            x.IsActive)
+                        .Select(x => x.StatusName)
+                        .FirstOrDefaultAsync()
+                    ?? institution.StatusOfCollege;
+            }
+
+            ViewBag.StatusOfCollege = statusOfCollege;
+
+
+            // ---------------------------------------------------------
+            // TALUK
+            // ---------------------------------------------------------
+
+            string taluk = institution.Taluk;
+
+            if (!string.IsNullOrWhiteSpace(institution.Taluk))
+            {
+                taluk =
+                    await _context.TalukMasters
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.TalukId == institution.Taluk)
+                        .Select(x => x.TalukName)
+                        .FirstOrDefaultAsync()
+                    ?? institution.Taluk;
+            }
+
+            ViewBag.Taluk = taluk;
+
+
+            // ---------------------------------------------------------
+            // DISTRICT
+            // ---------------------------------------------------------
+
+            string district = institution.District;
+
+            if (!string.IsNullOrWhiteSpace(institution.District))
+            {
+                district =
+                    await _context.DistrictMasters
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.DistrictId == institution.District)
+                        .Select(x => x.DistrictName)
+                        .FirstOrDefaultAsync()
+                    ?? institution.District;
+            }
+
+            ViewBag.District = district;
 
 
             // ---------------------------------------------------------
@@ -418,34 +500,330 @@ namespace VerificationPortal.Controllers
         }
 
 
+        private async Task<List<SelectListItem>> GetAffiliationCollegesAsync(
+    string facultyCode)
+        {
+            var colleges = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .Where(e =>
+                    e.FacultyCode.Trim() == facultyCode.Trim())
+                .Select(e => new SelectListItem
+                {
+                    Value = e.CollegeCode,
+                    Text = e.CollegeName + ", " + e.CollegeTown
+                })
+                .ToListAsync();
+
+            return colleges;
+        }
+
+
+        private async Task<List<SelectListItem>> GetAffiliationOtherCollegesAsync(
+            string facultyCode)
+        {
+            var otherColleges = await _context.AffiliationOthersCollegeMasters
+                .AsNoTracking()
+                .Where(e =>
+                    e.FacultyCode.ToString() == facultyCode.Trim())
+                .Select(e => new SelectListItem
+                {
+                    Value = e.CollegeCode,
+                    Text = e.CollegeName + ", " + e.CollegeTown
+                })
+                .ToListAsync();
+
+            return otherColleges;
+        }
+
+
+        private async Task<List<SelectListItem>> GetAllExperienceCollegesAsync(
+            string facultyCode)
+        {
+            var colleges =
+                await GetAffiliationCollegesAsync(facultyCode);
+
+            var otherColleges =
+                await GetAffiliationOtherCollegesAsync(facultyCode);
+
+            return colleges
+                .Concat(otherColleges)
+                .GroupBy(x => x.Value)
+                .Select(g => g.First())
+                .OrderBy(x => x.Text)
+                .ToList();
+        }
+
         // GET: /VerificationDashboard/DeanDirectorDetails/{collegeCode}
         [HttpGet]
         public async Task<IActionResult> DeanDirectorDetails(string collegeCode)
         {
-            if (string.IsNullOrEmpty(collegeCode))
-            {
-                return NotFound("College code is required");
-            }
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            // ---------------------------------------------------------
+            // INSTITUTION
+            // ---------------------------------------------------------
 
             var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i =>
+                    i.CollegeCode == collegeCode);
 
             if (institution == null)
             {
-                return NotFound($"Institution details not found for college code: {collegeCode}");
+                return NotFound(
+                    $"Institution details not found for college code: {collegeCode}");
             }
 
+            var facultyCode = institution.FacultyCode;
+
+
+            // ---------------------------------------------------------
+            // COLLEGE
+            // ---------------------------------------------------------
+
             var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c =>
+                    c.CollegeCode == collegeCode);
 
             ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.ActiveTab = "DeanDirectorDetails";
-            ViewBag.UserDesignation = GetUserDesignation();
 
-            await SetVerificationViewData<AffDeanOrDirectorDetail>(collegeCode);
+            ViewBag.CollegeName =
+                college?.CollegeName ?? "Unknown College";
 
-            return View(institution);
+            ViewBag.ActiveTab =
+                "DeanDirectorDetails";
+
+            ViewBag.UserDesignation =
+                GetUserDesignation();
+
+
+            // ---------------------------------------------------------
+            // QUALIFICATIONS
+            // ---------------------------------------------------------
+
+            ViewBag.Qualifications = new SelectList(
+                await _context.MstCourses
+                    .AsNoTracking()
+                    .Where(c =>
+                        !string.IsNullOrEmpty(c.CourseName) &&
+                        c.FacultyCode.ToString() == facultyCode)
+                    .OrderBy(c => c.CourseName)
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.CourseName
+                    })
+                    .ToListAsync(),
+                "Id",
+                "CourseName"
+            );
+
+
+            // ---------------------------------------------------------
+            // EXPERIENCE COLLEGES
+            // Includes:
+            // 1. AffiliationCollegeMasters
+            // 2. AffiliationOthersCollegeMasters
+            // ---------------------------------------------------------
+
+            var experienceColleges =
+                await GetAllExperienceCollegesAsync(facultyCode);
+
+            ViewBag.ExperienceColleges =
+                experienceColleges;
+
+            // Optional - keep this if other parts of the page
+            // need a SelectList.
+            ViewBag.CollegeList =
+                new SelectList(
+                    experienceColleges,
+                    "Value",
+                    "Text"
+                );
+
+
+            // ---------------------------------------------------------
+            // DEAN / DIRECTOR
+            // ---------------------------------------------------------
+
+            var dean = await _context.AffDeanOrDirectorDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d =>
+                    d.FacultyCode == facultyCode &&
+                    d.CollegeCode == collegeCode);
+
+            if (dean == null)
+            {
+                return NotFound(
+                    "Dean / Director details not found.");
+            }
+
+
+            // ---------------------------------------------------------
+            // VIEW MODEL
+            // ---------------------------------------------------------
+
+            var vm = new DeanDetailsViewModel
+            {
+                FacultyCode = facultyCode,
+                CollegeCode = collegeCode,
+
+                DeanOrDirectorName =
+                    dean.DeanOrDirectorName,
+
+                DeanQualification =
+                    dean.DeanQualification,
+
+                DeanQualificationDate =
+                    dean.DeanQualificationDate,
+
+                DeanUniversity =
+                    dean.DeanUniversity,
+
+                DeanStateCouncilNumber =
+                    dean.DeanStateCouncilNumber
+            };
+
+
+            // ---------------------------------------------------------
+            // QUALIFICATION NAME
+            // ---------------------------------------------------------
+
+            ViewBag.DeanQualificationName = "-";
+
+            if (int.TryParse(
+                dean.DeanQualification,
+                out int qualificationId))
+            {
+                ViewBag.DeanQualificationName =
+                    await _context.MstCourses
+                        .AsNoTracking()
+                        .Where(c =>
+                            c.Id == qualificationId)
+                        .Select(c =>
+                            c.CourseName)
+                        .FirstOrDefaultAsync()
+                    ?? dean.DeanQualification
+                    ?? "-";
+            }
+            else
+            {
+                ViewBag.DeanQualificationName =
+                    dean.DeanQualification ?? "-";
+            }
+
+
+            // ---------------------------------------------------------
+            // RECOGNITION
+            // ---------------------------------------------------------
+
+            if (facultyCode == "2")
+            {
+                vm.RecognizedByDCI =
+                    dean.RecognizedByDci ?? false;
+            }
+            else
+            {
+                vm.RecognizedByMCI =
+                    dean.RecognizedByMci ?? false;
+            }
+
+
+            // ---------------------------------------------------------
+            // TEACHING EXPERIENCE
+            // ---------------------------------------------------------
+
+            vm.TeachingExperiences =
+                await _context.AffDeanTeachingExperiences
+                    .AsNoTracking()
+                    .Where(t =>
+                        t.DeanId == dean.Id)
+                    .Select(t => new TeachingExperienceRow
+                    {
+                        Designation =
+                            t.Designation,
+
+                        CollegeCode =
+                            t.Collegecode,
+
+                        ExpCollegeCode =
+                            t.ExpCollegeCode,
+
+                        OtherCollege =
+                            t.OtherCollege,
+
+                        FromDate =
+                            t.FromDate,
+
+                        ToDate =
+                            t.ToDate,
+
+                        TeachingExperienceYears =
+                            t.TotalExperienceYears
+                    })
+                    .ToListAsync();
+
+
+            // ---------------------------------------------------------
+            // ADMINISTRATIVE EXPERIENCE
+            // ---------------------------------------------------------
+
+            vm.AdministrativeExperiences =
+                await _context.AffDeanAdministrativeExperiences
+                    .AsNoTracking()
+                    .Where(a =>
+                        a.DeanId == dean.Id)
+                    .Select(a => new AdministrativeExperienceRow
+                    {
+                        PostHeld =
+                            a.PostHeld,
+
+                        FromDate =
+                            a.FromDate,
+
+                        ExpCollegeCode =
+                            a.ExpCollegeCode,
+
+                        OtherCollege =
+                            a.OtherCollege,
+
+                        ToDate =
+                            a.ToDate,
+
+                        TotalExperienceYears =
+                            a.TotalExperienceYears
+                    })
+                    .ToListAsync();
+
+
+            // ---------------------------------------------------------
+            // DEFAULT ROWS
+            // ---------------------------------------------------------
+
+            if (!vm.TeachingExperiences.Any())
+            {
+                vm.TeachingExperiences.Add(
+                    new TeachingExperienceRow());
+            }
+
+            if (!vm.AdministrativeExperiences.Any())
+            {
+                vm.AdministrativeExperiences.Add(
+                    new AdministrativeExperienceRow());
+            }
+
+
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
+
+            await SetVerificationViewData<AffDeanOrDirectorDetail>(
+                collegeCode);
+
+
+            return View(vm);
         }
 
         [HttpGet]
@@ -663,28 +1041,198 @@ namespace VerificationPortal.Controllers
         [HttpGet]
         public async Task<IActionResult> PrincipalDetails(string collegeCode)
         {
-            if (string.IsNullOrEmpty(collegeCode))
-            {
-                return NotFound("College code is required");
-            }
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
 
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
 
-            if (institution == null)
-            {
-                return NotFound($"Institution details not found for college code: {collegeCode}");
-            }
+            var context = await GetPageContextAsync(collegeCode);
 
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+            PopulateCommonViewBags(context);
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.ActiveTab = "PrincipalDetails";
             ViewBag.UserDesignation = GetUserDesignation();
 
-            await SetVerificationViewData<AffPrincipalDetail>(collegeCode);
+
+            // ---------------------------------------------------------
+            // INSTITUTION
+            // ---------------------------------------------------------
+
+            var institution = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode);
+
+            if (institution == null)
+            {
+                return NotFound(
+                    $"Institution details not found for college code: {collegeCode}");
+            }
+
+            var facultyCode = institution.FacultyCode;
+
+
+            // ---------------------------------------------------------
+            // COLLEGE NAME
+            // ---------------------------------------------------------
+
+            var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode);
+
+            ViewBag.CollegeName =
+                college?.CollegeName ?? "Unknown College";
+
+
+            // ---------------------------------------------------------
+            // EXPERIENCE COLLEGE LIST
+            // ---------------------------------------------------------
+
+            var experienceColleges =
+                await GetAllExperienceCollegesAsync(facultyCode);
+
+            ViewBag.ExperienceColleges =
+                experienceColleges;
+
+
+            // ---------------------------------------------------------
+            // PRINCIPAL
+            // ---------------------------------------------------------
+
+            var principal = await _context.AffPrincipalDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode);
+
+            if (principal == null)
+            {
+                return NotFound(
+                    $"Principal details not found for college code: {collegeCode}");
+            }
+
+
+            // ---------------------------------------------------------
+            // QUALIFICATION NAME
+            // ---------------------------------------------------------
+
+            string principalQualification = "-";
+
+            if (int.TryParse(
+                principal.DeanQualification,
+                out int qualificationId))
+            {
+                principalQualification =
+                    await _context.MstCourses
+                        .AsNoTracking()
+                        .Where(c => c.Id == qualificationId)
+                        .Select(c => c.CourseName)
+                        .FirstOrDefaultAsync()
+                    ?? principal.DeanQualification
+                    ?? "-";
+            }
+            else
+            {
+                principalQualification =
+                    principal.DeanQualification ?? "-";
+            }
+
+
+            // ---------------------------------------------------------
+            // PRINCIPAL BASIC INFORMATION
+            // ---------------------------------------------------------
+
+            ViewBag.PrincipalName =
+                principal.DeanOrDirectorName ?? "-";
+
+            ViewBag.PrincipalQualification =
+                principalQualification;
+
+            ViewBag.PrincipalQualificationDate =
+                principal.DeanQualificationDate?
+                    .ToString("dd-MM-yyyy") ?? "-";
+
+            ViewBag.PrincipalUniversity =
+                principal.DeanUniversity ?? "-";
+
+            ViewBag.PrincipalStateCouncilNumber =
+                principal.DeanStateCouncilNumber ?? "-";
+
+
+            // ---------------------------------------------------------
+            // RECOGNITION
+            // ---------------------------------------------------------
+
+            if (facultyCode == "2")
+            {
+                ViewBag.RecognitionLabel =
+                    "Recognized by DCI";
+
+                ViewBag.RecognitionStatus =
+                    principal.RecognizedByDci == true
+                        ? "Yes"
+                        : principal.RecognizedByDci == false
+                            ? "No"
+                            : "-";
+            }
+            else
+            {
+                ViewBag.RecognitionLabel =
+                    "Recognized by MCI";
+
+                ViewBag.RecognitionStatus =
+                    principal.RecognizedByMci == true
+                        ? "Yes"
+                        : principal.RecognizedByMci == false
+                            ? "No"
+                            : "-";
+            }
+
+
+            // ---------------------------------------------------------
+            // TEACHING EXPERIENCE
+            // ---------------------------------------------------------
+
+            var teachingExperiences =
+                await _context.AffPrincipalTeachingExperiences
+                    .AsNoTracking()
+                    .Where(t =>
+                        t.DeanId == principal.Id)
+                    .OrderBy(t => t.Id)
+                    .ToListAsync();
+
+
+            ViewBag.TeachingExperiences =
+                teachingExperiences;
+
+
+            // ---------------------------------------------------------
+            // ADMINISTRATIVE EXPERIENCE
+            // ---------------------------------------------------------
+
+            var administrativeExperiences =
+                await _context.AffPrincipalAdministrativeExperiences
+                    .AsNoTracking()
+                    .Where(a =>
+                        a.DeanId == principal.Id)
+                    .OrderBy(a => a.Id)
+                    .ToListAsync();
+
+
+            ViewBag.AdministrativeExperiences =
+                administrativeExperiences;
+
+
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
+
+            await SetVerificationViewData<AffPrincipalDetail>(
+                collegeCode);
+
 
             return View(institution);
         }
@@ -1237,6 +1785,173 @@ namespace VerificationPortal.Controllers
 
             return View(ugCourses);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> PreviousNotification(string collegeCode, string courseId)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            if (string.IsNullOrWhiteSpace(courseId))
+                return NotFound("Course ID is required.");
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.Institution.FacultyCode;
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not found.");
+
+            // ---------------------------------------------------------
+            // COURSE
+            // ---------------------------------------------------------
+
+            var course = await _context.AffiliationCourseDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Facultycode == facultyCode &&
+                    x.Collegecode == collegeCode &&
+                    x.CourseId == courseId);
+
+            if (course == null)
+                return NotFound("Course details not found.");
+
+            // ---------------------------------------------------------
+            // DOCUMENT
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(course.PreviousNotificationFilesPath))
+                return NotFound("Previous notification file not found.");
+
+            if (!System.IO.File.Exists(course.PreviousNotificationFilesPath))
+                return NotFound("Previous notification file not found.");
+
+            // ---------------------------------------------------------
+            // INLINE DOCUMENT VIEWER
+            // ---------------------------------------------------------
+
+            Response.Headers["Content-Disposition"] = "inline";
+
+            return PhysicalFile(
+                course.PreviousNotificationFilesPath,
+                "application/pdf");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewGOKOrder(string collegeCode, string courseId)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            if (string.IsNullOrWhiteSpace(courseId))
+                return NotFound("Course ID is required.");
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.Institution.FacultyCode;
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not found.");
+
+            // ---------------------------------------------------------
+            // COURSE
+            // ---------------------------------------------------------
+
+            var entity = await _context.AffiliationCourseDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Facultycode == facultyCode &&
+                    x.Collegecode == collegeCode &&
+                    x.CourseId == courseId);
+
+            if (entity == null)
+                return NotFound("Course details not found.");
+
+            // ---------------------------------------------------------
+            // DOCUMENT
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(entity.GokorderPath) ||
+                !System.IO.File.Exists(entity.GokorderPath))
+            {
+                return NotFound("GOK Order file not found.");
+            }
+
+            // ---------------------------------------------------------
+            // INLINE DOCUMENT VIEWER
+            // ---------------------------------------------------------
+
+            Response.Headers["Content-Disposition"] = "inline";
+
+            return PhysicalFile(
+                entity.GokorderPath,
+                "application/pdf");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewLastAffiliation( string collegeCode,  string courseId)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            if (string.IsNullOrWhiteSpace(courseId))
+                return NotFound("Course ID is required.");
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.Institution.FacultyCode;
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not found.");
+
+            // ---------------------------------------------------------
+            // COURSE
+            // ---------------------------------------------------------
+
+            var entity = await _context.AffiliationCourseDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Facultycode == facultyCode &&
+                    x.Collegecode == collegeCode &&
+                    x.CourseId == courseId);
+
+            if (entity == null)
+                return NotFound("Course details not found.");
+
+            // ---------------------------------------------------------
+            // DOCUMENT
+            // ---------------------------------------------------------
+
+            if (string.IsNullOrWhiteSpace(entity.LastAffiliationRguhsfilePath) ||
+                !System.IO.File.Exists(entity.LastAffiliationRguhsfilePath))
+            {
+                return NotFound("RGUHS notification file not found.");
+            }
+
+            // ---------------------------------------------------------
+            // INLINE DOCUMENT VIEWER
+            // ---------------------------------------------------------
+
+            Response.Headers["Content-Disposition"] = "inline";
+
+            return PhysicalFile(
+                entity.LastAffiliationRguhsfilePath,
+                "application/pdf");
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> LandAndBuildingDetails(string collegeCode)

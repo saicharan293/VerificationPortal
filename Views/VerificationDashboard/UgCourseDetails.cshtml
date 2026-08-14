@@ -1,127 +1,554 @@
 @model List<VerificationPortal.Models.AffiliationCourseDetail>
+
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
     ViewData["Title"] = "UG Course Details - Verification Dashboard";
     ViewData["ActiveTab"] = "UgCourseDetails";
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? ViewBag.CollegeName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
-    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+
+    ViewData["InstitutionName"] =
+        ViewBag.InstitutionName ??
+        ViewBag.CollegeName ??
+        "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        ViewBag.CollegeCode ?? "";
+
+    ViewData["FacultyName"] =
+        ViewBag.FacultyName ?? "";
+
     ViewData["VerificationStatus"] = "Pending";
     ViewData["StatusBadgeClass"] = "pending";
+
     ViewData["ShowFeedbackSection"] = true;
-    // ViewData["ShowFeedbackForm"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
-    ViewData["NextTabAction"] = ViewBag.NextTabAction;
-    ViewData["NextTabLabel"] = ViewBag.NextTabLabel;
-    ViewData["PrevTabAction"] = ViewBag.PrevTabAction;
-    ViewData["PrevTabLabel"] = ViewBag.PrevTabLabel;
+
+    ViewData["CurrentVerifier"] =
+        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+
+    ViewData["NextTabAction"] =
+        ViewBag.NextTabAction;
+
+    ViewData["NextTabLabel"] =
+        ViewBag.NextTabLabel;
+
+    ViewData["PrevTabAction"] =
+        ViewBag.PrevTabAction;
+
+    ViewData["PrevTabLabel"] =
+        ViewBag.PrevTabLabel;
 }
 
 @section Styles {
 }
 
-<!-- Note Box -->
+@{
+    ViewBag.ActiveTab = "UgCourseDetails";
+}
+
+
+<!-- ========================================================= -->
+<!-- PAGE HEADER -->
+<!-- ========================================================= -->
+
+<div class="page-header mb-4">
+
+    <h1 class="page-title">
+        <i class="bi bi-book"></i>
+        UG Course Details
+    </h1>
+
+    <p class="text-muted mb-0">
+        Review and verify undergraduate course details, intake,
+        permissions, affiliations and inspection information.
+    </p>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- NOTE BOX -->
+<!-- ========================================================= -->
+
 <div class="note-box mb-4">
+
     <i class="bi bi-info-circle"></i>
+
     <div class="note-box-content">
-        <h6>Verification Instructions</h6>
-        <p>Review the UG course details below including sanctioned intake, LOP, recognition, EC/FC, affiliations, and inspections. Provide your remarks and select verification status. Once completed, proceed to the next tab: <strong>PG / Super Specialty Course Details</strong>.</p>
+
+        <h6>
+            Verification Instructions
+        </h6>
+
+        <p>
+            Review the UG course details section by section.
+            Verify the present intake, previous details, permissions,
+            EC/FC, RGUHS affiliation and previous LIC inspection
+            information. Provide your remarks and select the
+            verification status before proceeding to the next tab.
+        </p>
+
     </div>
+
 </div>
 
-<!-- UG Courses Table Card -->
-<div class="verification-card mb-4">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-book"></i>
-            UG Course Details
-        </h3>
-        <span class="badge bg-primary ms-2">@(Model?.Count ?? 0)  Courses</span>
-    </div>
-    <div class="verification-card-body">
-        @if (Model != null && Model.Count > 0)
-        {
-            <div class="table-responsive">
-                <table class="table table-hover table-sm">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Course ID</th>
-                            <th>Course Name</th>
-                            <th>Intake 2025-26</th>
-                            <th>Intake Slab</th>
-                            <th>Permission Type</th>
-                            <th>Year of LOP</th>
-                            <th>LOP Renewal (GOI/MCI)</th>
-                            <th>Sanctioned Intake</th>
-                            <th>Date of Recognition</th>
-                            <th>Year of EC/FC</th>
-                            <th>EC/FC Sanctioned Intake</th>
-                            <th>Last Affiliation (RGUHS)</th>
-                            <th>Sanctioned Intake (Last Affiliation)</th>
-                            <th>Previous LIC Inspection</th>
-                            <th>Action on Deficiencies</th>
-                            <th>Documents</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < Model.Count; i++)
-                        {
-                            var course = Model[i];
-                            <tr>
-                                <td>@(i + 1)</td>
-                                <td>@course.CourseId</td>
-                                <td><strong>@course.CourseName</strong></td>
-                                <td>@course.IntakeDuring202526</td>
-                                <td>@course.IntakeSlab</td>
-                                <td><span class="badge bg-info text-dark">@course.Typeofpermission</span></td>
-                                <td>@(course.YearofLop?.ToString("yyyy") ?? "-")</td>
-                                <td>@course.DateOfLoprenewalGoimci</td>
-                                <td>@course.SanctionedIntakePermission</td>
-                                <td>@course.Dateofrecognition</td>
-                                <td>@(course.YearofObtainingEcandFc?.ToString("yyyy") ?? "-")</td>
-                                <td>@course.SannctionedIntakeEcFc</td>
-                                <td>@course.YearOfLastAffiliationRguhs</td>
-                                <td>@course.SanctionedIntakeLastAffiliation</td>
-                                <td>@(course.DateOfPreviousLicinspection?.ToString("dd MMM yyyy") ?? "-")</td>
-                                <td class="text-truncate" style="max-width: 200px;" title="@course.ActionTakenOnDeficiencies">@course.ActionTakenOnDeficiencies</td>
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        @if (!string.IsNullOrEmpty(course.GokorderPath))
-                                        {
-                                            <a href="@course.GokorderPath" class="btn btn-sm btn-outline-primary" target="_blank" title="GOK Order">
-                                                <i class="bi bi-file-earmark-text"></i> GOK Order
-                                            </a>
-                                        }
-                                        @if (!string.IsNullOrEmpty(course.PreviousNotificationFilesPath))
-                                        {
-                                            <a href="@course.PreviousNotificationFilesPath" class="btn btn-sm btn-outline-secondary" target="_blank" title="Previous Notifications">
-                                                <i class="bi bi-file-earmark"></i> Prev Notif
-                                            </a>
-                                        }
-                                        @if (!string.IsNullOrEmpty(course.LastAffiliationRguhsfilePath))
-                                        {
-                                            <a href="@course.LastAffiliationRguhsfilePath" class="btn btn-sm btn-outline-success" target="_blank" title="Last Affiliation">
-                                                <i class="bi bi-file-check"></i> Last Affil
-                                            </a>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-info text-center py-4">
-                <i class="bi bi-database fs-1 d-block mb-2 opacity-50"></i>
-                <strong>No UG course data found</strong> for this college.
-                <p class="mb-0 text-muted">UG courses will appear here when available in the AffiliationCourseDetails table.</p>
-            </div>
-        }
-    </div>
-</div>
 
-<!-- Verification Remarks & Status (rendered by layout) -->
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var course in Model)
+    {
+        <!-- ===================================================== -->
+        <!-- COURSE HEADER -->
+        <!-- ===================================================== -->
+
+        <div class="verification-card mb-4">
+
+            <div class="verification-card-header">
+
+                <h3 class="verification-card-title">
+                    <i class="bi bi-book-half"></i>
+                    @course.CourseName
+                </h3>
+
+                <span class="badge bg-primary">
+                    Course ID: @course.CourseId
+                </span>
+
+            </div>
+
+            <div class="verification-card-body">
+
+
+                <!-- ================================================= -->
+                <!-- 1. PRESENT INTAKE -->
+                <!-- ================================================= -->
+
+                <div class="form-section mb-4">
+
+                    <h5 class="form-section-title">
+                        <i class="bi bi-bar-chart-line me-2"></i>
+                        Present Intake
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Course Name
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.CourseName ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Present Intake 2025-26
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.IntakeDuring202526?.ToString() ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- 2. PREVIOUS DETAILS -->
+                <!-- ================================================= -->
+
+                <div class="form-section mb-4">
+
+                    <h5 class="form-section-title">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Previous Details
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Course Name
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.CourseName ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Intake
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.IntakeSlab?.ToString() ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Year of Obtaining LOP
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.YearofLop?.ToString("yyyy") ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Previous Year Notification Copy
+                            </label>
+
+                            @if (!string.IsNullOrWhiteSpace(course.PreviousNotificationFilesPath))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "PreviousNotification",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = ViewBag.CollegeCode,
+                                                courseId = course.CourseId
+                                            })!,
+                                        Title = "Previous Year Notification"
+                                    })
+                            }
+                            else
+                            {
+                                <div class="">
+                                    <i class="bi bi-dash-circle me-1"></i>
+                                    No document available
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- 3. PARTICULARS OF PERMISSION -->
+                <!-- ================================================= -->
+
+                <div class="form-section mb-4">
+
+                    <h5 class="form-section-title">
+                        <i class="bi bi-file-earmark-check me-2"></i>
+                        Particulars of Permission
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Type of Permission
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.Typeofpermission ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Date of LOP &amp; Renewal from DCI/KSDC for UG
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.DateOfLoprenewalGoimci ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Sanctioned Intake
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.SanctionedIntakePermission?.ToString() ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Date of Recognition / Renewal by Apex Bodies
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.Dateofrecognition ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- 4. EC / FC -->
+                <!-- ================================================= -->
+
+                <div class="form-section mb-4">
+
+                    <h5 class="form-section-title">
+                        <i class="bi bi-building-check me-2"></i>
+                        Year of Obtaining EC &amp; FC from Government of Karnataka
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Year of Obtaining EC &amp; FC
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.YearofObtainingEcandFc?.ToString("yyyy") ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Sanctioned Intake
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.SannctionedIntakeEcFc?.ToString() ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                GOK Order (Supporting Document)
+                            </label>
+
+                            @if (!string.IsNullOrWhiteSpace(course.GokorderPath))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewGOKOrder",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = ViewBag.CollegeCode,
+                                                courseId = course.CourseId
+                                            })!,
+                                        Title = "GOK Order"
+                                    })
+                            }
+                            else
+                            {
+                                <div class="text-muted">
+                                    <i class="bi bi-dash-circle me-1"></i>
+                                    No document available
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- 5. LAST AFFILIATION -->
+                <!-- ================================================= -->
+
+                <div class="form-section mb-4">
+
+                    <h5 class="form-section-title">
+                        <i class="bi bi-award me-2"></i>
+                        Year of Last Affiliation Granted by RGUHS
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Year of Last Affiliation
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.YearOfLastAffiliationRguhs ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Sanctioned Intake
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.SanctionedIntakeLastAffiliation?.ToString() ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Supporting Document (RGUHS Notification)
+                            </label>
+
+                            @if (!string.IsNullOrWhiteSpace(course.LastAffiliationRguhsfilePath))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewLastAffiliation",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = ViewBag.CollegeCode,
+                                                courseId = course.CourseId
+                                            })!,
+                                        Title = "RGUHS Notification"
+                                    })
+                            }
+                            else
+                            {
+                                <div class="text-muted">
+                                    <i class="bi bi-dash-circle me-1"></i>
+                                    No document available
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- 6. PREVIOUS LIC INSPECTION -->
+                <!-- ================================================= -->
+
+                <div class="form-section">
+
+                    <h5 class="form-section-title">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Previous Inspection by LIC
+                    </h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Date of Previous Inspection by LIC
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@(course.DateOfPreviousLicinspection?.ToString("dd-MM-yyyy") ?? "-")"
+                                   disabled />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Action Taken to Rectify the Deficiencies – If Any
+                            </label>
+
+                            <textarea class="form-control"
+                                      rows="3"
+                                      style="resize: none"
+                                      disabled>@(course.ActionTakenOnDeficiencies ?? "-")</textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+}
+else
+{
+    <!-- ========================================================= -->
+    <!-- NO DATA -->
+    <!-- ========================================================= -->
+
+    <div class="verification-card mb-4">
+
+        <div class="verification-card-body">
+
+            <div class="alert alert-info text-center py-5 mb-0">
+
+                <i class="bi bi-database fs-1 d-block mb-3 opacity-50"></i>
+
+                <h5>
+                    No UG Course Data Found
+                </h5>
+
+                <p class="mb-0 text-muted">
+                    UG course details are not available for this college.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+}
