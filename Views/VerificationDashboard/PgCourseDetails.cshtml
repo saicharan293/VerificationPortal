@@ -34,7 +34,7 @@
     <div class="verification-card-header">
         <h3 class="verification-card-title">
             <i class="bi bi-mortarboard"></i>
-            PG / Super Specialty Course Details
+            PG Course Details
         </h3>
         <span class="badge bg-primary ms-2">@(Model?.Count ?? 0) Courses</span>
     </div>
@@ -51,8 +51,8 @@
                             @* <th>Type of Affiliation</th> *@
                             <th>Course Level</th>
                             @* <th>Course Prefix</th> *@
-                            <th>Present Intake</th>
-                            <th>RGUHS Intake</th>
+                            @* <th>Present Intake</th> *@
+                            <th>LOP Intake</th>
                             <th>LOP Date</th>
                             <th>Recognition by NMC</th>
                             <th>Recognition by DCI</th>
@@ -81,7 +81,7 @@
                                 </td>
                                 @* <td>@course.CoursePrefix</td> *@
                                 <td>@course.PresentIntake</td>
-                                <td>@course.RguhsIntake</td>
+                                @* <td>@course.RguhsIntake</td> *@
                                 <td>@(course.Lopdate?.ToString("dd MMM yyyy") ?? "-")</td>
                                 <td>@(course.DateofRecognitionByNmc?.ToString("dd MMM yyyy") ?? "-")</td>
                                 <td>@(course.DateofRecognitionByDci?.ToString("dd MMM yyyy") ?? "-")</td>
