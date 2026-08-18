@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
     ViewData["Title"] = "Institution Details";
-    ViewData["ActiveTab"] = "InstitutionDetails";
+    ViewData["ActiveTab"] = ViewBag.ActiveTab;
 
     ViewData["InstitutionName"] =
         ViewBag.InstitutionName ?? "Unknown Institution";
@@ -42,6 +42,7 @@
     ViewData["NextTabLabel"] =
         "Next : Trust Details";
 }
+
 
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
@@ -168,6 +169,16 @@
 
     </div>
 </div>
+@{
+    var basicFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 1);
+}
+
+@if (basicFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", basicFeedback)
+}
+
 <!-- Address Details -->
 <div class="verification-card">
     <div class="verification-card-header">
@@ -210,6 +221,16 @@
     </div>
 </div>
 
+@{
+    var addressFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 2);
+}
+
+@if (addressFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", addressFeedback)
+}
 <!-- Contact Information -->
 <div class="verification-card">
     <div class="verification-card-header">
@@ -247,6 +268,17 @@
         </div>
     </div>
 </div>
+
+@{
+    var contactFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 3);
+}
+
+@if (contactFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", contactFeedback)
+}
 
 <!-- Institutional Details -->
 <div class="verification-card">
@@ -298,6 +330,17 @@
     </div>
 </div>
 
+@{
+    var institutionFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 4);
+}
+
+@if (institutionFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", institutionFeedback)
+}
+
 <!-- Head of Institution -->
 <div class="verification-card">
     <div class="verification-card-header">
@@ -328,6 +371,19 @@
     </div>
 </div>
 
+
+
+@{
+    var headFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 5);
+}
+
+@if (headFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", headFeedback)
+}
+
 <!-- Nodal Officer -->
 <div class="verification-card">
     <div class="verification-card-header">
@@ -353,6 +409,18 @@
         </div>
     </div>
 </div>
+
+
+@{
+    var nodalFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 6);
+}
+
+@if (nodalFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", nodalFeedback)
+}
 
 <!-- Principal Details (Preview) -->
 <div class="verification-card">
@@ -380,6 +448,18 @@
     </div>
 </div>
 
+
+@{
+    var principalFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 7);
+}
+
+@if (principalFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", principalFeedback)
+}
+
 <!-- Dean/Director Details (Preview) -->
 <div class="verification-card">
     <div class="verification-card-header">
@@ -405,6 +485,18 @@
         </div>
     </div>
 </div>
+
+
+@{
+    var deanFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 8);
+}
+
+@if (deanFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", deanFeedback)
+}
 
 <!-- Trust Details (Preview) -->
 <div class="verification-card">
@@ -439,3 +531,15 @@
         </div>
     </div>
 </div>
+
+
+@{
+    var trustFeedback = (ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionId == 9);
+}
+
+@if (trustFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", trustFeedback)
+}

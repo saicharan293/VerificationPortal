@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
+using VerificationPortal.Models.ViewModels;
 using VerificationPortal.Services.Verification;
 using VerificationPortal.Services.Verification.Interfaces;
 using VerificationPortal.Services.Verification.Models;
@@ -61,6 +62,8 @@ namespace VerificationPortal.Controllers
             var context = await GetPageContextAsync(collegeCode);
 
             PopulateCommonViewBags(context);
+
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
             ViewBag.ActiveTab = "InstitutionDetails";
             ViewBag.UserDesignation = GetUserDesignation();
@@ -187,12 +190,53 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffInstitutionsDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 1);
 
             // ---------------------------------------------------------
             // VIEW
             // ---------------------------------------------------------
 
             return View(institution);
+        }
+
+        private async Task<List<SectionFeedbackViewModel>> GetTabSectionFeedbackAsync( string collegeCode,  int tabId)
+        {
+            var sections = await _context.MstSections
+                .AsNoTracking()
+                .Where(x => x.TabId == tabId)
+                .OrderBy(x => x.SectionId)
+                .ToListAsync();
+
+            var feedback = await _context.SectionWiseFeedbacks
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.TabId == tabId)
+                .ToListAsync();
+
+            var returnUrl = $"{Request.Path}{Request.QueryString}";
+
+            return sections.Select(section =>
+            {
+                var sectionFeedback = feedback.FirstOrDefault(x =>
+                    x.SectionId == section.SectionId);
+
+                return new SectionFeedbackViewModel
+                {
+                    FacultyId = sectionFeedback?.FacultyId ?? 2,
+                    CollegeCode = collegeCode,
+                    TabId = tabId,
+                    SectionId = section.SectionId,
+                    SectionName = section.SectionName,
+
+                    VerificationStatus = sectionFeedback?.VerificationStatus,
+                    Remarks = sectionFeedback?.Remarks,
+                    VerifiedBy = sectionFeedback?.VerifiedBy,
+                    VerifiedOn = sectionFeedback?.VerifiedOn,
+                    IsSaved = sectionFeedback != null,
+                    ReturnUrl = returnUrl
+                };
+            }).ToList();
         }
 
         // GET: /VerificationDashboard/TrustDetails/{collegeCode}
@@ -207,7 +251,7 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "TrustDetails";
+            ViewBag.ActiveTab =  ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             var institution =
@@ -345,7 +389,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.ActiveTab = "TrustMemberDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
             ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
 
@@ -366,9 +410,7 @@ namespace VerificationPortal.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> ViewTrustMemberDocument(
-            string collegeCode,
-            string documentType)
+        public async Task<IActionResult> ViewTrustMemberDocument(string collegeCode, string documentType)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
@@ -500,8 +542,7 @@ namespace VerificationPortal.Controllers
         }
 
 
-        private async Task<List<SelectListItem>> GetAffiliationCollegesAsync(
-    string facultyCode)
+        private async Task<List<SelectListItem>> GetAffiliationCollegesAsync( string facultyCode)
         {
             var colleges = await _context.AffiliationCollegeMasters
                 .AsNoTracking()
@@ -518,8 +559,7 @@ namespace VerificationPortal.Controllers
         }
 
 
-        private async Task<List<SelectListItem>> GetAffiliationOtherCollegesAsync(
-            string facultyCode)
+        private async Task<List<SelectListItem>> GetAffiliationOtherCollegesAsync(string facultyCode)
         {
             var otherColleges = await _context.AffiliationOthersCollegeMasters
                 .AsNoTracking()
@@ -536,8 +576,7 @@ namespace VerificationPortal.Controllers
         }
 
 
-        private async Task<List<SelectListItem>> GetAllExperienceCollegesAsync(
-            string facultyCode)
+        private async Task<List<SelectListItem>> GetAllExperienceCollegesAsync( string facultyCode )
         {
             var colleges =
                 await GetAffiliationCollegesAsync(facultyCode);
@@ -592,12 +631,9 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeName =
                 college?.CollegeName ?? "Unknown College";
 
-            ViewBag.ActiveTab =
-                "DeanDirectorDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
-            ViewBag.UserDesignation =
-                GetUserDesignation();
-
+            ViewBag.UserDesignation = GetUserDesignation();
 
             // ---------------------------------------------------------
             // QUALIFICATIONS
@@ -975,7 +1011,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.InstitutionName = institution.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = "ChairDistribution";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             await SetVerificationViewData<DentalChair>(collegeCode);
@@ -1052,7 +1088,7 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "PrincipalDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
 
@@ -1312,7 +1348,7 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "PgCourseDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
 
@@ -1572,7 +1608,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = "Infrastructure";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.TabTitle = "Classroom & Laboratory";
             ViewBag.TabIcon = "bi-houses";
             ViewBag.UserDesignation = GetUserDesignation();
@@ -1774,7 +1810,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName+", "+college?.CollegeTown ?? "Unknown College";
-            ViewBag.ActiveTab = "UGCourseDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.NextTabAction = Url.Action("PgCourseDetails", new { collegeCode });
             ViewBag.NextTabLabel = "Next: PG Course Details";
             ViewBag.PrevTabAction = Url.Action("PrincipalDetails", new { collegeCode });
@@ -1967,7 +2003,7 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "LandAndBuildingDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
 
@@ -2049,9 +2085,7 @@ namespace VerificationPortal.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> ViewLandBuildingDocument(
-                int id,
-                string documentType)
+        public async Task<IActionResult> ViewLandBuildingDocument( int id, string documentType)
         {
             var record = await _context.DentalCollegeLandBuildingDetails
                 .AsNoTracking()
@@ -2207,7 +2241,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.InstitutionName = institution.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = "ClassroomAndLaboratory";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             var verification = await _verificationService.GetVerificationAsync<DentalInfrastructure>(
@@ -2237,6 +2271,7 @@ namespace VerificationPortal.Controllers
 
             ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
 
+            ViewBag.ActiveTab = "ClassroomAndLaboratory";
             var model = new ClassroomAndLaboratoryViewModel
             {
                 CollegeCode = collegeCode,
@@ -2371,7 +2406,7 @@ namespace VerificationPortal.Controllers
             ViewBag.InstitutionName =
                 institution.NameOfInstitution ?? "Unknown Institution";
 
-            ViewBag.ActiveTab = "EquipmentList";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             await SetVerificationViewData<DentalCollegeEquipmentDetail>(
@@ -2379,6 +2414,7 @@ namespace VerificationPortal.Controllers
 
             return View(vm);
         }
+
         private async Task<VerificationPageContext> GetPageContextAsync(string collegeCode)
         {
             var institution = await _context.AffInstitutionsDetails
@@ -2470,7 +2506,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.InstitutionName = context.InstitutionName ?? "Unknown Institution";
-            ViewBag.ActiveTab = "BedDistribution";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             await SetVerificationViewData<MedicalUgbedDistribution>(collegeCode);
@@ -2489,7 +2525,7 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "HostelDetails";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             var college = await _context.AffiliationCollegeMasters
@@ -2522,9 +2558,7 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewHostelDocument(
-            string collegeCode,
-            string documentType)
+        public async Task<IActionResult> ViewHostelDocument( string collegeCode, string documentType)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
@@ -2567,7 +2601,7 @@ namespace VerificationPortal.Controllers
             // Populate common ViewBags
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "DepartmentOfficesAndEducationalUnit";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             // Use FacultyCode from VerificationPageContext
@@ -3028,7 +3062,7 @@ namespace VerificationPortal.Controllers
             ViewBag.InstitutionName =
                 institution.NameOfInstitution ?? "Unknown Institution";
 
-            ViewBag.ActiveTab = "UgAcademicMatters";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             // Existing verification information
@@ -3241,7 +3275,7 @@ namespace VerificationPortal.Controllers
             ViewBag.FacultyCode = facultyCode;
             ViewBag.InstitutionName =
                 institution.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = "PgAcademicMatters";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             await SetVerificationViewData<CaAcademicPerformance>(
@@ -3486,29 +3520,15 @@ namespace VerificationPortal.Controllers
             // COMMON VIEW DATA
             // =========================================================
 
-            ViewBag.InstitutionName =
-                pageContext.Institution.NameOfInstitution;
-
-            ViewBag.CollegeCode =
-                collegeCode;
-
-            ViewBag.FacultyCode =
-                facultyCode;
-
-            ViewBag.AffiliationType =
-                affiliationType;
-
-            ViewBag.CourseLevel =
-                courseLevel;
-
-            ViewBag.CourseLevels =
-                levels;
-
-            ViewBag.IsDentalFaculty =
-                facultyCode == 2;
-
-            ViewBag.DepartmentMasters =
-                departmentMasters;
+            ViewBag.InstitutionName = pageContext.Institution.NameOfInstitution;
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.AffiliationType = affiliationType;
+            ViewBag.CourseLevel = courseLevel;
+            ViewBag.CourseLevels = levels;
+            ViewBag.IsDentalFaculty = facultyCode == 2;
+            ViewBag.DepartmentMasters = departmentMasters;
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
 
             // =========================================================
@@ -3604,33 +3624,15 @@ namespace VerificationPortal.Controllers
                 AffiliationType = affiliationType,
 
                 // Main research details
-                PublicationsNo =
-                    researchRecord?.PublicationsNo,
-
-                PublicationsPdfName =
-                    researchRecord?.PublicationsPdfName,
-
-                ClinicalTrialsPdfName =
-                    researchRecord?.ClinicalTrialsPdfName,
-
-                StudentsRGUHSFunded =
-                    researchRecord?.StudentsRguhsfunded,
-
-                StudentsExternalBodyFunding =
-                    researchRecord?.StudentsExternalBodyFunding,
-
-                StudentsProjectsPdfName =
-                    researchRecord?.StudentsProjectsPdfName,
-
-                FacultyRGUHSFunded =
-                    researchRecord?.FacultyRguhsfunded,
-
-                FacultyExternalBodyFunding =
-                    researchRecord?.FacultyExternalBodyFunding,
-
-                FacultyProjectsPdfName =
-                    researchRecord?.FacultyProjectsPdfName,
-
+                PublicationsNo = researchRecord?.PublicationsNo,
+                PublicationsPdfName = researchRecord?.PublicationsPdfName,
+                ClinicalTrialsPdfName = researchRecord?.ClinicalTrialsPdfName,
+                StudentsRGUHSFunded = researchRecord?.StudentsRguhsfunded,
+                StudentsExternalBodyFunding = researchRecord?.StudentsExternalBodyFunding,
+                StudentsProjectsPdfName = researchRecord?.StudentsProjectsPdfName,
+                FacultyRGUHSFunded = researchRecord?.FacultyRguhsfunded,
+                FacultyExternalBodyFunding = researchRecord?.FacultyExternalBodyFunding,
+                FacultyProjectsPdfName = researchRecord?.FacultyProjectsPdfName,
                 // Department-wise publications
                 DepartmentWisePublications =
                     departmentPublications
@@ -3658,17 +3660,11 @@ namespace VerificationPortal.Controllers
             // 4. COMMON VIEW DATA
             // =========================================================
 
-            ViewBag.InstitutionName =
-                pageContext.Institution.NameOfInstitution;
-
-            ViewBag.CollegeCode =
-                collegeCode;
-
-            ViewBag.FacultyCode =
-                facultyCode;
-
-            ViewBag.AffiliationType =
-                affiliationType;
+            ViewBag.InstitutionName = pageContext.Institution.NameOfInstitution;
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.AffiliationType = affiliationType;
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
 
             // =========================================================
@@ -3690,10 +3686,7 @@ namespace VerificationPortal.Controllers
         [HttpGet] public async Task<IActionResult> ViewClinicalTrialsPdf(string collegeCode) => await GetResearchPdf(collegeCode, "ClinicalTrials");
 
         [HttpGet]
-        public IActionResult ViewFacultyDocument(
-            int id,
-            string type,
-            string mode = "view")
+        public IActionResult ViewFacultyDocument( int id, string type, string mode = "view")
         {
             var faculty = _context.FacultyDetails
                 .AsNoTracking()
@@ -3745,9 +3738,7 @@ namespace VerificationPortal.Controllers
                 contentType);
         }
 
-        private async Task<IActionResult> GetResearchPdf(
-            string collegeCode,
-            string fileType)
+        private async Task<IActionResult> GetResearchPdf(  string collegeCode, string fileType)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
@@ -3819,9 +3810,7 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewDepartmentPublicationPdf(
-    string collegeCode,
-    int id)
+        public async Task<IActionResult> ViewDepartmentPublicationPdf( string collegeCode, int id)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
@@ -3850,9 +3839,7 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewDentalLibraryRecord(
-    string collegeCode,
-    int recordId)
+        public async Task<IActionResult> ViewDentalLibraryRecord( string collegeCode, int recordId)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
@@ -3881,6 +3868,83 @@ namespace VerificationPortal.Controllers
             return PhysicalFile(
                 resolvedPath,
                 GetDocumentContentType(resolvedPath));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveSectionFeedback( SectionFeedbackViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var referer = Request.Headers.Referer.ToString();
+
+                if (!string.IsNullOrWhiteSpace(referer))
+                {
+                    var uri = new Uri(referer);
+                    var localUrl = uri.PathAndQuery;
+
+                    if (Url.IsLocalUrl(localUrl))
+                    {
+                        return Redirect(localUrl);
+                    }
+                }
+
+                return RedirectToAction(
+                    "InstitutionDetails",
+                    new { collegeCode = model.CollegeCode }
+                );
+            }
+
+            var feedback = await _context.SectionWiseFeedbacks
+                .FirstOrDefaultAsync(x =>
+                    x.FacultyId == model.FacultyId &&
+                    x.CollegeCode == model.CollegeCode &&
+                    x.TabId == model.TabId &&
+                    x.SectionId == model.SectionId);
+
+            bool isNew = feedback == null;
+
+            if (feedback == null)
+            {
+                feedback = new SectionWiseFeedback
+                {
+                    FacultyId = model.FacultyId,
+                    CollegeCode = model.CollegeCode,
+                    TabId = model.TabId,
+                    SectionId = model.SectionId
+                };
+
+                _context.SectionWiseFeedbacks.Add(feedback);
+            }
+
+            feedback.VerificationStatus = model.VerificationStatus;
+            feedback.Remarks = model.Remarks;
+            feedback.VerifiedBy = User.Identity?.Name;
+            feedback.VerifiedOn = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = isNew ? "Section verification saved successfully." : "Section verification updated successfully.";
+
+            // Redirect back to the page from which the form was submitted
+            var refererUrl = Request.Headers.Referer.ToString();
+
+            if (!string.IsNullOrWhiteSpace(refererUrl))
+            {
+                var uri = new Uri(refererUrl);
+                var localUrl = uri.PathAndQuery;
+
+                if (Url.IsLocalUrl(localUrl))
+                {
+                    return Redirect(localUrl);
+                }
+            }
+
+            // Fallback
+            return RedirectToAction(
+                "InstitutionDetails",
+                new { collegeCode = model.CollegeCode }
+            );
         }
 
         // POST: Save verification remarks and status
@@ -4252,10 +4316,7 @@ namespace VerificationPortal.Controllers
 
         // View PDF actions (keep these)
         [HttpGet]
-        public async Task<IActionResult> ViewGoverningCouncilPdf(
-    string collegeCode,
-    string courseLevel,
-    string facultyCode)
+        public async Task<IActionResult> ViewGoverningCouncilPdf( string collegeCode, string courseLevel, string facultyCode)
         {
             return await GetPdf(
                 "GoverningCouncil",
@@ -4265,49 +4326,24 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewAccountSummaryPdf(
-            string collegeCode,
-            string courseLevel,
-            string facultyCode)
+        public async Task<IActionResult> ViewAccountSummaryPdf( string collegeCode, string courseLevel, string facultyCode)
         {
-            return await GetPdf(
-                "AccountSummary",
-                collegeCode,
-                facultyCode,
-                courseLevel);
+            return await GetPdf( "AccountSummary", collegeCode, facultyCode, courseLevel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewAuditedStatementPdf(
-            string collegeCode,
-            string courseLevel,
-            string facultyCode)
+        public async Task<IActionResult> ViewAuditedStatementPdf( string collegeCode, string courseLevel, string facultyCode)
         {
-            return await GetPdf(
-                "AuditedStatement",
-                collegeCode,
-                facultyCode,
-                courseLevel);
+            return await GetPdf( "AuditedStatement", collegeCode, facultyCode, courseLevel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewDonationPdf(
-            string collegeCode,
-            string courseLevel,
-            string facultyCode)
+        public async Task<IActionResult> ViewDonationPdf( string collegeCode, string courseLevel, string facultyCode)
         {
-            return await GetPdf(
-                "Donation",
-                collegeCode,
-                facultyCode,
-                courseLevel);
+            return await GetPdf("Donation", collegeCode, facultyCode, courseLevel);
         }
 
-        private async Task<IActionResult> GetPdf(
-    string type,
-    string collegeCode,
-    string facultyCode,
-    string courseLevel)
+        private async Task<IActionResult> GetPdf( string type, string collegeCode, string facultyCode, string courseLevel)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code not specified.");
@@ -4445,6 +4481,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.CollegeCode = collegeCode;
             ViewBag.FacultyCode = facultyCode;
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
             return View("StaffPayScale", vm);
         }
@@ -4551,9 +4588,7 @@ namespace VerificationPortal.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> ViewStaffOtherPdf(
-             string collegeCode,
-             string fileType)
+        public async Task<IActionResult> ViewStaffOtherPdf( string collegeCode, string fileType)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound();
@@ -4858,17 +4893,11 @@ namespace VerificationPortal.Controllers
             // COMMON VIEW DATA
             // ---------------------------------------------------------
 
-            ViewBag.InstitutionName =
-                pageContext.Institution.NameOfInstitution;
-
-            ViewBag.CollegeCode =
-                collegeCode;
-
-            ViewBag.FacultyCode =
-                facultyCode;
-
-            ViewBag.AffiliationType =
-                affiliationType;
+            ViewBag.InstitutionName = pageContext.Institution.NameOfInstitution;
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.AffiliationType = affiliationType;
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
 
             // ---------------------------------------------------------
@@ -5435,17 +5464,11 @@ namespace VerificationPortal.Controllers
             // COMMON VIEW DATA
             // ---------------------------------------------------------
 
-            ViewBag.InstitutionName =
-                pageContext.Institution.NameOfInstitution;
-
-            ViewBag.CollegeCode =
-                collegeCode;
-
-            ViewBag.FacultyCode =
-                facultyCode;
-
-            ViewBag.AffiliationType =
-                affiliationType;
+            ViewBag.InstitutionName = pageContext.Institution.NameOfInstitution;
+            ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyCode = facultyCode;
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
+            ViewBag.AffiliationType = affiliationType;
 
 
             // ---------------------------------------------------------
@@ -5488,7 +5511,7 @@ namespace VerificationPortal.Controllers
             // Same common setup as HostelDetails
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = "ClinicalFacilities";
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
             // Build Clinical Facilities model

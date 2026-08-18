@@ -13,8 +13,10 @@
     --transition: all 0.2s ease;
     --transition-fast: all 0.15s ease;
 }
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 
-/* Sidebar */
 .verification-sidebar {
     position: fixed;
     top: 0;
@@ -28,7 +30,9 @@
     z-index: 1000;
     transition: var(--transition);
     box-shadow: var(--shadow-md);
-    overflow-y: auto;
+    /* IMPORTANT:
+       Do not allow the entire sidebar to scroll */
+    overflow: hidden;
 }
 
 .verification-sidebar.collapsed {

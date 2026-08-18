@@ -4,7 +4,9 @@
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
     ViewData["Title"] = "Classroom & Laboratory";
-    ViewData["ActiveTab"] = "ClassroomAndLaboratory";
+
+    ViewData["ActiveTab"] =
+        ViewBag.ActiveTab ?? "ClassroomAndLaboratory";
 
     ViewData["InstitutionName"] =
         ViewBag.InstitutionName ?? "Unknown Institution";

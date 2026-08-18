@@ -91,8 +91,50 @@
     --footer-text: #94a3b8;
 }
 
+[data-theme="dark"] .card,
+[data-theme="dark"] .dashboard-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .stat-card-dash,
+[data-theme="dark"] .action-card,
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .sidebar-card,
+[data-theme="dark"] .notice-item,
+[data-theme="dark"] .data-cat-item,
+[data-theme="dark"] .faculty-item,
+[data-theme="dark"] .step-content,
+[data-theme="dark"] .brand-content {
+    background: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
 /* ==================== GLOBAL THEME TRANSITIONS ==================== */
-* {
+body,
+.card,
+.dashboard-card,
+.stat-card,
+.stat-card-dash,
+.action-card,
+.feature-card,
+.sidebar-card,
+.notice-item,
+.data-cat-item,
+.faculty-item,
+.step-content,
+.brand-content,
+.top-bar,
+.custom-navbar,
+.auth-navbar,
+.form-control,
+.form-select,
+.search-input,
+.search-input-group,
+.dropdown-menu,
+.modal-content,
+.modal-header,
+.modal-footer,
+.theme-toggle,
+.theme-toggle-switch {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -117,25 +159,65 @@
     justify-content: center;
 }
 
-    .theme-toggle:hover {
-        background: var(--bg-hover);
-        border-color: var(--primary);
-        color: var(--primary);
-        transform: scale(1.05);
-    }
+.theme-toggle:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: scale(1.05);
+}
 
-    .theme-toggle i {
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
+.theme-toggle i {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
 
-    .theme-toggle .sun-icon {
-        display: none;
-    }
+.theme-toggle .sun-icon {
+    display: none;
+}
 
-    .theme-toggle .moon-icon {
-        display: inline-block;
-    }
+.theme-toggle .moon-icon {
+    display: inline-block;
+}
+
+
+/* ==================== USER DROPDOWN ==================== */
+
+.btn-user-dropdown {
+    color: var(--text-secondary) !important;
+    transition: color 0.3s ease;
+}
+
+.btn-user-dropdown > i {
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.btn-user-dropdown:hover,
+.btn-user-dropdown:focus,
+.btn-user-dropdown.show {
+    color: var(--primary) !important;
+}
+
+.btn-user-dropdown:hover > i,
+.btn-user-dropdown:focus > i,
+.btn-user-dropdown.show > i {
+    color: var(--primary);
+}
+
+/* User name */
+.user-info-text .id-name {
+    color: var(--text-primary);
+}
+
+/* Designation */
+.user-info-text small {
+    color: var(--text-tertiary);
+}
+
+/* Dropdown arrow */
+.btn-user-dropdown::after {
+    color: var(--text-tertiary);
+}
 
 [data-theme="dark"] .theme-toggle .sun-icon {
     display: inline-block;
@@ -163,18 +245,18 @@
     display: inline-block;
 }
 
-    .theme-toggle-switch::before {
-        content: '';
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        width: 20px;
-        height: 20px;
-        background: var(--primary);
-        border-radius: 50%;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
+.theme-toggle-switch::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
 [data-theme="dark"] .theme-toggle-switch::before {
     transform: translateX(28px);
@@ -309,18 +391,19 @@ body {
         border-color: var(--input-border) !important;
     }
 
-        .form-control::placeholder,
-        .search-input::placeholder {
-            color: var(--input-placeholder) !important;
-        }
+    .form-control::placeholder,
+    .search-input::placeholder {
+        color: var(--input-placeholder) !important;
+    }
 
-        .form-control:focus,
-        .search-input-group:focus-within {
-            background: var(--input-bg) !important;
-            border-color: var(--primary) !important;
-            color: var(--input-text) !important;
-            box-shadow: 0 0 0 3px var(--input-focus) !important;
-        }
+    .form-control:focus,
+    .search-input-group:focus-within {
+        background: var(--input-bg) !important;
+        border-color: var(--primary) !important;
+        color: var(--input-text) !important;
+        box-shadow: 0 0 0 3px var(--input-focus) !important;
+    }
+
     /* Form labels */
     .form-floating > label,
     .form-label {
@@ -367,18 +450,19 @@ body {
         color: var(--text-tertiary) !important;
     }
 
-        .search-tab.active {
-            background: rgba(59, 130, 246, 0.15) !important;
-            color: var(--primary-light) !important;
-        }
+    .search-tab.active {
+        background: rgba(59, 130, 246, 0.15) !important;
+        color: var(--primary-light) !important;
+    }
+
     /* Footer */
     .footer-section {
         background: var(--footer-bg) !important;
     }
 
-        .footer-section::before {
-            background: var(--primary) !important;
-        }
+    .footer-section::before {
+        background: var(--primary) !important;
+    }
 
     .footer-text,
     .footer-links a,
@@ -401,13 +485,13 @@ body {
         background: var(--bg-tertiary) !important;
     }
 
-        .user-info-nav strong {
-            color: var(--text-primary) !important;
-        }
+    .user-info-nav strong {
+        color: var(--text-primary) !important;
+    }
 
-        .user-info-nav small {
-            color: var(--text-tertiary) !important;
-        }
+    .user-info-nav small {
+        color: var(--text-tertiary) !important;
+    }
 
     .stat-card-dash h4 {
         color: var(--text-primary) !important;
@@ -429,17 +513,19 @@ body {
         color: var(--text-secondary) !important;
     }
 
-        .quick-action-item:hover {
-            background: var(--bg-hover) !important;
-        }
+    .quick-action-item:hover {
+        background: var(--bg-hover) !important;
+    }
+
     /* Back home link */
     .back-home {
         color: var(--text-tertiary) !important;
     }
 
-        .back-home:hover {
-            color: var(--primary-light) !important;
-        }
+    .back-home:hover {
+        color: var(--primary-light) !important;
+    }
+
     /* Forgot link */
     .forgot-link {
         color: var(--primary-light) !important;
@@ -458,20 +544,20 @@ body {
         color: var(--text-secondary) !important;
     }
 
-        .dropdown-item:hover {
-            background: var(--bg-hover) !important;
-            color: var(--primary-light) !important;
-        }
+    .dropdown-item:hover {
+        background: var(--bg-hover) !important;
+        color: var(--primary-light) !important;
+    }
     /* Table */
     .table {
         color: var(--text-secondary) !important;
     }
 
-        .table > :not(caption) > * > * {
-            background: var(--bg-card) !important;
-            color: var(--text-secondary) !important;
-            border-bottom-color: var(--border-color) !important;
-        }
+    .table > :not(caption) > * > * {
+        background: var(--bg-card) !important;
+        color: var(--text-secondary) !important;
+        border-bottom-color: var(--border-color) !important;
+    }
     /* Modal */
     .modal-content {
         background: var(--bg-card) !important;
@@ -510,10 +596,10 @@ body {
         color: var(--text-tertiary) !important;
     }
 
-        .password-toggle:hover {
-            background: var(--bg-hover) !important;
-            color: var(--primary-light) !important;
-        }
+    .password-toggle:hover {
+        background: var(--bg-hover) !important;
+        color: var(--primary-light) !important;
+    }
     /* Brand features */
     .brand-features li {
         color: rgba(255,255,255,0.95) !important;
@@ -527,4 +613,112 @@ body {
     .welcome-label {
         color: rgba(255,255,255,0.9) !important;
     }
+}
+
+[data-theme="dark"] .verification-dashboard,
+[data-theme="dark"] .main-content {
+    background: var(--bg-primary) !important;
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .top-bar {
+    background: var(--bg-card) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .page-title {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .verification-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .verification-card-header {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .verification-card-title {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .verification-card-title i {
+    color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .verification-card-body {
+    background: var(--bg-card);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-section {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .form-section-title {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .form-label {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--input-text) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--input-placeholder) !important;
+}
+
+[data-theme="dark"] .form-text {
+    color: var(--text-tertiary) !important;
+}
+
+[data-theme="dark"] .table {
+    --bs-table-bg: var(--bg-card);
+    --bs-table-color: var(--text-secondary);
+    --bs-table-border-color: var(--border-color);
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .table th {
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .table td {
+    background: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .table tbody tr:hover td {
+    background: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .note-box {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .note-box-content h6 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .note-box-content p {
+    color: var(--text-tertiary) !important;
+}
+
+[data-theme="dark"] .page-footer {
+    background: var(--footer-bg) !important;
+    border-color: var(--border-color) !important;
 }

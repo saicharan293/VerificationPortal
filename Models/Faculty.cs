@@ -77,6 +77,12 @@ public partial class Faculty
 
     public virtual ICollection<MstMedicalAlliedDiscipline> MstMedicalAlliedDisciplines { get; set; } = new List<MstMedicalAlliedDiscipline>();
 
+    public virtual ICollection<MstSection> MstSections { get; set; } = new List<MstSection>();
+
+    public virtual ICollection<MstTab> MstTabs { get; set; } = new List<MstTab>();
+
+    public virtual ICollection<SectionWiseFeedback> SectionWiseFeedbacks { get; set; } = new List<SectionWiseFeedback>();
+
     public virtual ICollection<SuperVisionInFieldPracticeArea> SuperVisionInFieldPracticeAreas { get; set; } = new List<SuperVisionInFieldPracticeArea>();
 
     public virtual ICollection<TblCollegeMapping> TblCollegeMappings { get; set; } = new List<TblCollegeMapping>();

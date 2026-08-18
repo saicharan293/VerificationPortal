@@ -86,14 +86,6 @@
                         <span>Pg Course Details</span>
                     </a>
                 </li>
-                @* <li class="nav-item">
-                    <a class="nav-link @(activeTab == "SSCourseDetails" ? "active" : "")"
-                       asp-controller="VerificationDashboard" asp-action="SSCourseDetails" asp-route-collegeCode="@collegeCode">
-                        <i class="bi bi-mortarboard"></i>
-                        <span>SS Course Details</span>
-                    </a>
-                </li> *@
-
 
                 <li class="nav-item">
                     <a class="nav-link @(activeTab == "Courses" ? "active" : "")"
@@ -293,7 +285,7 @@
         </nav>
 
         <!-- Quick Actions -->
-        <div class="sidebar-footer">
+        @* <div class="sidebar-footer">
             <div class="quick-actions">
                 <a href="#" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#verificationSummaryModal">
                     <i class="bi bi-clipboard-check"></i> Verification Summary
@@ -301,11 +293,8 @@
                 <a asp-controller="VerificationDashboard" asp-action="CompleteVerification" asp-route-collegeCode="@collegeCode" class="btn btn-success w-100 mt-2">
                     <i class="bi bi-check-circle"></i> Complete Verification
                 </a>
-                @* <a asp-controller="MyColleges" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">
-                    <i class="bi bi-arrow-left"></i> Back to My Colleges
-                </a> *@
             </div>
-        </div>
+        </div> *@
     </div>
 </aside>
 

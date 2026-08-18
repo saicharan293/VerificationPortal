@@ -1,0 +1,436 @@
+﻿@model SectionFeedbackViewModel
+
+<div class="section-feedback my-4"
+     data-section-id="@Model.SectionId"
+     data-tab-id="@Model.TabId"
+     data-faculty-id="@Model.FacultyId"
+     data-college-code="@Model.CollegeCode">
+
+    <div class="section-feedback-header d-flex justify-content-between align-items-center">
+
+        <div>
+            <h6 class="mb-1">
+                <i class="bi bi-clipboard-check me-1"></i>
+                Section Verification
+            </h6>
+
+            <small class="text-muted">
+                @Model.SectionName
+            </small>
+        </div>
+
+        @if (Model.IsSaved)
+        {
+            <span class="badge bg-success">
+                <i class="bi bi-check-circle me-1"></i>
+                Verified
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">
+                Not Verified
+            </span>
+        }
+
+    </div>
+
+
+    <div class="section-feedback-body mt-3">
+
+        @* =========================================================
+           NEW FEEDBACK
+           ========================================================= *@
+
+        @if (!Model.IsSaved)
+        {
+            <div id="verificationForm_@Model.SectionId">
+
+                <form asp-controller="VerificationDashboard"
+                      asp-action="SaveSectionFeedback"
+                      method="post"
+                      class="section-feedback-form">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="FacultyId" value="@Model.FacultyId" />
+                    <input type="hidden" name="CollegeCode" value="@Model.CollegeCode" />
+                    <input type="hidden" name="TabId" value="@Model.TabId" />
+                    <input type="hidden" name="SectionId" value="@Model.SectionId" />
+                    <input type="hidden" name="SectionName" value="@Model.SectionName" />
+                    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+                   
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Verification Status
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-select section-verification-status"
+                                    name="VerificationStatus"
+                                    required>
+
+                                <option value="">
+                                    -- Select Status --
+                                </option>
+
+                                <option value="Accepted">
+                                    Accept
+                                </option>
+
+                                <option value="Rejected">
+                                    Reject
+                                </option>
+
+                                <option value="Pending">
+                                    Pending Review
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback">
+                                Please select a verification status.
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-8">
+
+                            <label class="form-label">
+                                Remarks
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <textarea class="form-control section-verification-remarks"
+                                      name="Remarks"
+                                      rows="3"
+                                      placeholder="Enter your verification remarks here..."
+                                      required></textarea>
+
+                            <div class="form-text">
+                                Please provide remarks for your verification decision.
+                            </div>
+
+                            <div class="invalid-feedback">
+                                Remarks are required.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-end mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary section-feedback-save">
+
+                            <i class="bi bi-save me-1"></i>
+                            Save Verification
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        }
+
+
+        @* =========================================================
+           EXISTING FEEDBACK - DISPLAY MODE
+           ========================================================= *@
+
+        else
+        {
+            <div id="verificationDisplay_@Model.SectionId">
+
+                <div class="row g-3">
+
+                    @* Status *@
+                    <div class="col-md-4">
+
+                        <div class="feedback-item">
+
+                            <label class="feedback-label">
+                                Verification Status
+                            </label>
+
+                            <div class="feedback-value">
+
+                                @if (Model.VerificationStatus == "Accepted")
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Accepted
+                                    </span>
+                                }
+                                else if (Model.VerificationStatus == "Rejected")
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Rejected
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i>
+                                        @Model.VerificationStatus
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    @* Remarks *@
+                    <div class="col-md-8">
+
+                        <div class="feedback-item">
+
+                            <label class="feedback-label">
+                                Remarks
+                            </label>
+
+                            <div class="feedback-value">
+
+                                @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+                                {
+                                    @Model.Remarks
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No remarks available.
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Verification History *@
+
+                @if (!string.IsNullOrWhiteSpace(Model.VerifiedBy) ||
+                     Model.VerifiedOn.HasValue)
+                {
+                    <div class="verification-history mt-3">
+
+                        <small class="text-muted">
+
+                            @if (!string.IsNullOrWhiteSpace(Model.VerifiedBy))
+                            {
+                                <span>
+                                    <i class="bi bi-person-check me-1"></i>
+                                    Verified By:
+                                    <strong>@Model.VerifiedBy</strong>
+                                </span>
+                            }
+
+                            @if (Model.VerifiedOn.HasValue)
+                            {
+                                <span class="ms-3">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Verified On:
+                                    <strong>
+                                        @Model.VerifiedOn.Value.ToString("dd MMM yyyy hh:mm tt")
+                                    </strong>
+                                </span>
+                            }
+
+                        </small>
+
+                    </div>
+                }
+
+
+                @* Edit button *@
+
+                <div class="mt-4">
+
+                    <button type="button"
+                            class="btn btn-warning btn-edit-section-verification"
+                            data-section-id="@Model.SectionId">
+
+                        <i class="bi bi-pencil-square me-1"></i>
+                        Edit Verification
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            @* =====================================================
+               EXISTING FEEDBACK - EDIT MODE
+               ===================================================== *@
+
+            <div id="verificationEditForm_@Model.SectionId"
+                 style="display:none;">
+
+                <form asp-controller="VerificationDashboard"
+                      asp-action="SaveSectionFeedback"
+                      method="post"
+                      class="section-feedback-form">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="FacultyId" value="@Model.FacultyId" />
+                    <input type="hidden" name="CollegeCode" value="@Model.CollegeCode" />
+                    <input type="hidden" name="TabId" value="@Model.TabId" />
+                    <input type="hidden" name="SectionId" value="@Model.SectionId" />
+                    <input type="hidden" name="SectionName" value="@Model.SectionName" />
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Verification Status
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-select"
+                                    name="VerificationStatus"
+                                    required>
+
+                                <option value="Accepted"
+                                        selected="@(Model.VerificationStatus == "Accepted")">
+                                    Accept
+                                </option>
+
+                                <option value="Rejected"
+                                        selected="@(Model.VerificationStatus == "Rejected")">
+                                    Reject
+                                </option>
+
+                                <option value="Pending"
+                                        selected="@(Model.VerificationStatus == "Pending")">
+                                    Pending Review
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-8">
+
+                            <label class="form-label">
+                                Remarks
+                            </label>
+
+                            <textarea class="form-control"
+                                      name="Remarks"
+                                      rows="3"
+                                      placeholder="Enter your verification remarks...">@Model.Remarks</textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-save me-1"></i>
+                            Update Verification
+
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-secondary btn-cancel-section-verification"
+                                data-section-id="@Model.SectionId">
+
+                            <i class="bi bi-x-circle me-1"></i>
+                            Cancel
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<script>
+
+    // ============================================================
+    // Section Verification - Edit / Cancel
+    // ============================================================
+
+    document.addEventListener("click", function (event) {
+
+        // Edit Verification
+        const editButton = event.target.closest(".btn-edit-section-verification");
+
+        if (editButton) {
+
+            const sectionId = editButton.dataset.sectionId;
+
+            const display = document.getElementById(
+                `verificationDisplay_${sectionId}`
+            );
+
+            const editForm = document.getElementById(
+                `verificationEditForm_${sectionId}`
+            );
+
+            if (display && editForm) {
+                display.style.display = "none";
+                editForm.style.display = "block";
+            }
+
+            return;
+        }
+
+
+        // Cancel Edit
+        const cancelButton = event.target.closest(
+            ".btn-cancel-section-verification"
+        );
+
+        if (cancelButton) {
+
+            const sectionId = cancelButton.dataset.sectionId;
+
+            const display = document.getElementById(
+                `verificationDisplay_${sectionId}`
+            );
+
+            const editForm = document.getElementById(
+                `verificationEditForm_${sectionId}`
+            );
+
+            if (display && editForm) {
+                editForm.style.display = "none";
+                display.style.display = "block";
+            }
+        }
+
+    });
+</script>

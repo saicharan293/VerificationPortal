@@ -1,60 +1,119 @@
-/* report-card.css - Report-style card layout for MyColleges and verification pages */
-:root {
-    --primary: #2563eb;
-    --primary-light: #3b82f6;
-    --primary-dark: #1d4ed8;
-    --secondary: #64748b;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --info: #06b6d4;
-    --light: #f8fafc;
-    --dark: #1e293b;
-    --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-400: #94a3b8;
-    --gray-500: #64748b;
-    --gray-600: #475569;
-    --gray-700: #334155;
-    --gray-800: #1e293b;
-    --gray-900: #0f172a;
-    --border-radius: 0.5rem;
-    --border-radius-lg: 0.75rem;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    --transition: all 0.2s ease;
-    --transition-fast: all 0.15s ease;
+
+/* ============================================================
+   REPORT CARD CSS
+   Compatible with:
+   [data-theme="light"]
+   [data-theme="dark"]
+
+   IMPORTANT:
+   This file intentionally does NOT use:
+   @media (prefers-color-scheme: dark)
+
+   Theme switching is controlled by your application's
+   [data-theme] attribute.
+============================================================ */
+/* ============================================================
+   REPORT CARD LOCAL VARIABLES
+============================================================ */
+:root,
+[data-theme="light"] {
+    --report-primary: var(--primary, #2563eb);
+    --report-primary-light: var(--primary-light, #3b82f6);
+    --report-primary-dark: var(--primary-dark, #1d4ed8);
+    --report-success: #10b981;
+    --report-warning: #f59e0b;
+    --report-danger: #ef4444;
+    --report-info: #06b6d4;
+    --report-bg: var(--bg-primary, #ffffff);
+    --report-bg-secondary: var(--bg-secondary, #f8fafc);
+    --report-bg-tertiary: var(--bg-tertiary, #f1f5f9);
+    --report-card-bg: var(--bg-card, #ffffff);
+    --report-hover: var(--bg-hover, #f1f5f9);
+    --report-text: var(--text-primary, #0f172a);
+    --report-text-secondary: var(--text-secondary, #334155);
+    --report-text-tertiary: var(--text-tertiary, #64748b);
+    --report-text-muted: var(--text-muted, #94a3b8);
+    --report-border: var(--border-color, #e2e8f0);
+    --report-border-light: var(--border-light, #f1f5f9);
+    --report-border-dark: var(--border-dark, #cbd5e1);
+    --report-input-bg: var(--input-bg, #ffffff);
+    --report-input-border: var(--input-border, #e2e8f0);
+    --report-input-text: var(--input-text, #0f172a);
+    --report-input-placeholder: var(--input-placeholder, #94a3b8);
+    --report-radius: 0.5rem;
+    --report-radius-lg: 0.75rem;
+    --report-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --report-shadow: 0 1px 3px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --report-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --report-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.10), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --report-transition: all 0.2s ease;
+    --report-transition-fast: all 0.15s ease;
 }
+
+
+/* ============================================================
+   DARK THEME VARIABLES
+============================================================ */
+
+[data-theme="dark"] {
+    --report-primary: var(--primary, #3b82f6);
+    --report-primary-light: var(--primary-light, #60a5fa);
+    --report-primary-dark: var(--primary-dark, #1e40af);
+    --report-success: #34d399;
+    --report-warning: #fbbf24;
+    --report-danger: #f87171;
+    --report-info: #22d3ee;
+    --report-bg: var(--bg-primary, #0f172a);
+    --report-bg-secondary: var(--bg-secondary, #1e293b);
+    --report-bg-tertiary: var(--bg-tertiary, #334155);
+    --report-card-bg: var(--bg-card, #1e293b);
+    --report-hover: var(--bg-hover, #334155);
+    --report-text: var(--text-primary, #f1f5f9);
+    --report-text-secondary: var(--text-secondary, #e2e8f0);
+    --report-text-tertiary: var(--text-tertiary, #cbd5e1);
+    --report-text-muted: var(--text-muted, #94a3b8);
+    --report-border: var(--border-color, #334155);
+    --report-border-light: var(--border-light, #1e293b);
+    --report-border-dark: var(--border-dark, #475569);
+    --report-input-bg: var(--input-bg, #1e293b);
+    --report-input-border: var(--input-border, #334155);
+    --report-input-text: var(--input-text, #f1f5f9);
+    --report-input-placeholder: var(--input-placeholder, #64748b);
+    --report-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.30);
+    --report-shadow: 0 4px 10px rgba(0, 0, 0, 0.30);
+    --report-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.40);
+    --report-shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.50);
+}
+
 
 /* ============================================================
    REPORT CARD LAYOUT
 ============================================================ */
+
 .report-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-sm);
+    background: var(--report-card-bg);
+    color: var(--report-text-secondary);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-radius-lg);
+    box-shadow: var(--report-shadow-sm);
     margin-bottom: 1.5rem;
     overflow: hidden;
-    transition: var(--transition);
+    transition: var(--report-transition);
 }
 
-.report-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-light);
-}
+    .report-card:hover {
+        box-shadow: var(--report-shadow-md);
+        border-color: var(--report-primary-light);
+    }
 
-.text-danger{
-    color: var(--danger);
-}
+
+/* ============================================================
+   REPORT CARD HEADER
+============================================================ */
 
 .report-card-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
+    background: linear-gradient( 135deg, var(--report-primary) 0%, var(--report-primary-dark) 100% );
+    color: #ffffff;
     padding: 1.25rem 1.5rem;
     display: flex;
     flex-wrap: wrap;
@@ -70,6 +129,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0;
+    color: #ffffff;
 }
 
 .report-card-title i {
@@ -86,17 +146,45 @@
 
 .report-card-body {
     padding: 1.5rem;
+    color: var(--report-text-secondary);
 }
 
+
 /* ============================================================
-   VERIFICATION FEEDBACK SECTION (Report Card Footer)
+   FACULTY BADGE
 ============================================================ */
+
+.faculty-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    padding: 0.6rem 1rem;
+    border-radius: var(--report-radius);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(4px);
+}
+
+.faculty-badge i {
+    font-size: 1rem;
+}
+
+.faculty-badge strong {
+    color: #ffffff;
+}
+
+
+/* ============================================================
+   VERIFICATION FEEDBACK SECTION
+============================================================ */
+
 .verification-feedback-section {
-    background: var(--gray-50);
-/*    border-top: 2px solid var(--gray-200);*/
-    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    background: var(--report-bg-secondary);
+    border-top: 1px solid var(--report-border);
+    border-radius: 0 0 var(--report-radius-lg) var(--report-radius-lg);
     margin: 0 -1px -1px -1px;
-    padding: .8rem .8rem 1rem;
+    padding: 0.8rem 0.8rem 1rem;
 }
 
 .feedback-header {
@@ -105,9 +193,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-/*    margin-bottom: 1.5rem;*/
     padding-bottom: 1rem;
-/*    border-bottom: 1px solid var(--gray-200);*/
 }
 
 .feedback-title {
@@ -116,13 +202,13 @@
     gap: 0.75rem;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--report-text);
     margin: 0;
 }
 
 .feedback-title i {
     font-size: 1.25rem;
-    color: var(--primary);
+    color: var(--report-primary);
 }
 
 .verifier-info {
@@ -130,62 +216,84 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: var(--gray-600);
-    background: white;
+    color: var(--report-text-secondary);
+    background: var(--report-card-bg);
     padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--gray-200);
+    border-radius: var(--report-radius);
+    border: 1px solid var(--report-border);
 }
 
 .verifier-info i {
-    color: var(--primary);
+    color: var(--report-primary);
 }
 
 .feedback-body {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius);
+    background: var(--report-card-bg);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-radius);
     padding: 1.5rem;
 }
 
 
+/* ============================================================
+   FEEDBACK FORM
+============================================================ */
+
 .feedback-form .form-label {
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--report-text-secondary);
     margin-bottom: 0.5rem;
 }
 
 .feedback-form .form-control,
 .feedback-form .form-select {
-    border: 1px solid var(--gray-300);
-    border-radius: var(--border-radius);
+    border: 1px solid var(--report-input-border);
+    border-radius: var(--report-radius);
     padding: 0.625rem 1rem;
     font-size: 0.9375rem;
-    transition: var(--transition-fast);
-    background: white;
+    transition: var(--report-transition-fast);
+    background: var(--report-input-bg);
+    color: var(--report-input-text);
+}
+
+.feedback-form .form-control::placeholder {
+    color: var(--report-input-placeholder);
 }
 
 .feedback-form .form-control:focus,
 .feedback-form .form-select:focus {
-    border-color: var(--primary);
+    background: var(--report-input-bg);
+    color: var(--report-input-text);
+    border-color: var(--report-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     outline: none;
 }
 
+[data-theme="dark"] .feedback-form .form-control:focus,
+[data-theme="dark"] .feedback-form .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.20);
+}
+
 .feedback-form .form-text {
     font-size: 0.8125rem;
-    color: var(--gray-500);
+    color: var(--report-text-tertiary);
     margin-top: 0.375rem;
+}
+
+.feedback-form .invalid-feedback {
+    color: var(--report-danger);
 }
 
 .feedback-actions {
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
-/*    margin-top: 1.5rem;*/
-/*    padding-top: 1.5rem;*/
-/*    border-top: 1px solid var(--gray-200);*/
 }
+
+
+/* ============================================================
+   FEEDBACK DISPLAY
+============================================================ */
 
 .feedback-display {
     padding: 1rem;
@@ -197,7 +305,7 @@
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--report-border-light);
 }
 
 .feedback-item:last-child {
@@ -212,24 +320,25 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--gray-500);
-/*    margin-bottom: 0.25rem;*/
+    color: var(--report-text-tertiary);
 }
 
 .feedback-value {
     font-size: 0.9375rem;
-    color: var(--gray-900);
+    color: var(--report-text);
 }
 
-.feedback-value.small{
+.feedback-value.small {
     font-size: 0.775em;
     letter-spacing: 0.7px;
-    color: lightslategray;
+    color: var(--report-text-tertiary);
 }
+
 
 /* ============================================================
    STATUS BADGES
 ============================================================ */
+
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -243,118 +352,135 @@
 }
 
 .status-badge.pending {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
 }
 
 .status-badge.in-progress,
 .status-badge.active {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--report-primary-dark);
 }
 
 .status-badge.completed,
 .status-badge.accept {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
 }
 
 .status-badge.rejected,
 .status-badge.reject {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
 }
+
+[data-theme="dark"] .status-badge.pending {
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .status-badge.in-progress,
+[data-theme="dark"] .status-badge.active {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .status-badge.completed,
+[data-theme="dark"] .status-badge.accept {
+    color: #34d399;
+}
+
+[data-theme="dark"] .status-badge.rejected,
+[data-theme="dark"] .status-badge.reject {
+    color: #f87171;
+}
+
 
 /* ============================================================
    BUTTONS
 ============================================================ */
-.btn {
+
+.report-card .btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
     font-weight: 500;
-    border-radius: var(--border-radius);
-    border: 1px solid transparent;
-    transition: var(--transition-fast);
+    border-radius: var(--report-radius);
+    transition: var(--report-transition-fast);
     font-size: 0.9375rem;
 }
 
-.btn i {
+.report-card .btn i {
     font-size: 1rem;
 }
 
-.btn-primary {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
+.report-card .btn-primary {
+    background: var(--report-primary);
+    border-color: var(--report-primary);
+    color: #ffffff;
 }
 
-.btn-primary:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
-    color: white;
+.report-card .btn-primary:hover {
+    background: var(--report-primary-dark);
+    border-color: var(--report-primary-dark);
+    color: #ffffff;
 }
 
-.btn-success {
-    background: var(--success);
-    border-color: var(--success);
-    color: white;
+.report-card .btn-success {
+    background: var(--report-success);
+    border-color: var(--report-success);
+    color: #ffffff;
 }
 
-.btn-success:hover {
+.report-card .btn-success:hover {
     background: #059669;
     border-color: #059669;
-    color: white;
+    color: #ffffff;
 }
 
-.btn-outline-primary {
+.report-card .btn-outline-primary {
     background: transparent;
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--report-primary);
+    color: var(--report-primary);
 }
 
-.btn-outline-primary:hover {
-    background: var(--primary);
-    color: white;
+.report-card .btn-outline-primary:hover {
+    background: var(--report-primary);
+    color: #ffffff;
 }
 
-.btn-outline-secondary {
+.report-card .btn-outline-secondary {
     background: transparent;
-    border-color: var(--gray-400);
-    color: var(--gray-600);
+    border-color: var(--report-border-dark);
+    color: var(--report-text-secondary);
 }
 
-.btn-outline-secondary:hover {
-    background: var(--gray-100);
-    color: var(--gray-900);
+.report-card .btn-outline-secondary:hover {
+    background: var(--report-hover);
+    color: var(--report-text);
 }
 
-.btn-secondary {
-    background: var(--gray-500);
-    border-color: var(--gray-500);
-    color: white;
+.report-card .btn-secondary {
+    background: var(--report-text-tertiary);
+    border-color: var(--report-text-tertiary);
+    color: #ffffff;
 }
 
-.btn-secondary:hover {
-    background: var(--gray-600);
-    border-color: var(--gray-600);
-    color: white;
-}
 
 /* ============================================================
-   TABLE STYLES
+   TABLE
 ============================================================ */
+
 .college-table {
     margin: 0;
     font-size: 0.875rem;
+    color: var(--report-text-secondary);
 }
 
 .college-table thead th {
-    background: var(--gray-50);
-    border-bottom: 2px solid var(--gray-200);
+    background: var(--report-bg-secondary);
+    border-bottom: 2px solid var(--report-border);
     font-weight: 600;
-    color: var(--gray-600);
+    color: var(--report-text-secondary);
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -366,8 +492,9 @@
 }
 
 .college-table tbody tr {
-    border-bottom: 1px solid var(--gray-100);
-    transition: var(--transition);
+    background: var(--report-card-bg);
+    border-bottom: 1px solid var(--report-border-light);
+    transition: var(--report-transition);
 }
 
 .college-table tbody tr:last-child {
@@ -375,48 +502,55 @@
 }
 
 .college-table tbody tr:hover {
-    background: var(--gray-50);
+    background: var(--report-hover);
 }
 
 .college-table tbody td {
     padding: 0.875rem 1rem;
     vertical-align: middle;
+    color: var(--report-text-secondary);
+    border-color: var(--report-border-light);
 }
 
 .college-number {
-    color: var(--gray-400);
+    color: var(--report-text-muted);
     font-size: 0.8125rem;
     font-weight: 500;
 }
 
 .college-code {
-    font-family: 'SF Mono', 'Fira Code', 'Monospace';
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
     font-size: 0.8125rem;
-    background: var(--gray-100);
-    color: var(--primary-dark);
+    background: var(--report-bg-tertiary);
+    color: var(--report-primary-dark);
     padding: 0.25rem 0.625rem;
     border-radius: 0.375rem;
     font-weight: 600;
     white-space: nowrap;
+    border: 1px solid var(--report-border-light);
+}
+
+[data-theme="dark"] .college-code {
+    color: var(--report-primary-light);
 }
 
 .college-name {
     font-weight: 500;
-    color: var(--gray-900);
+    color: var(--report-text);
     max-width: 400px;
 }
 
 .college-name-link {
-    color: var(--primary);
+    color: var(--report-primary);
     text-decoration: none;
     font-weight: 500;
-    transition: var(--transition-fast);
+    transition: var(--report-transition-fast);
     display: inline-flex;
     align-items: center;
 }
 
 .college-name-link:hover {
-    color: var(--primary-dark);
+    color: var(--report-primary-dark);
     text-decoration: underline;
 }
 
@@ -426,56 +560,76 @@
 }
 
 .college-town {
-    color: var(--gray-500);
+    color: var(--report-text-tertiary);
     font-size: 0.8125rem;
 }
 
+
 /* ============================================================
-   SEARCH BAR
+   SEARCH BAR / SEARCH CONTAINER
 ============================================================ */
+
 .search-bar {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--gray-200);
-    background: var(--gray-50);
+    border-bottom: 1px solid var(--report-border);
+    background: var(--report-bg-secondary);
 }
 
-.search-input {
-    border: 1px solid var(--gray-300);
-    border-radius: var(--border-radius);
+.colleges-container > .p-3 {
+    background: var(--report-bg-secondary) !important;
+    border-color: var(--report-border) !important;
+}
+
+.search-input,
+.college-search {
+    border: 1px solid var(--report-input-border);
+    border-radius: var(--report-radius);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
-    transition: var(--transition);
-    background: white;
+    transition: var(--report-transition);
+    background: var(--report-input-bg);
+    color: var(--report-input-text);
 }
 
-.search-input:focus {
-    border-color: var(--primary);
+.search-input::placeholder,
+.college-search::placeholder {
+    color: var(--report-input-placeholder);
+}
+
+.search-input:focus,
+.college-search:focus {
+    background: var(--report-input-bg);
+    color: var(--report-input-text);
+    border-color: var(--report-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     outline: none;
 }
 
-.search-input::placeholder {
-    color: var(--gray-400);
+[data-theme="dark"] .search-input:focus,
+[data-theme="dark"] .college-search:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.20);
 }
+
 
 /* ============================================================
    EMPTY STATE
 ============================================================ */
+
 .empty-state {
     text-align: center;
     padding: 3rem 2rem;
-    color: var(--gray-500);
+    color: var(--report-text-tertiary);
 }
 
 .empty-state i {
     font-size: 3.5rem;
     opacity: 0.4;
     margin-bottom: 1rem;
-    color: var(--gray-300);
+    color: var(--report-text-muted);
 }
 
 .empty-state h4 {
-    color: var(--gray-700);
+    color: var(--report-text);
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
@@ -487,136 +641,145 @@
 
 .empty-state .small {
     font-size: 0.8125rem;
-    color: var(--gray-400);
+    color: var(--report-text-muted);
 }
+
 
 /* ============================================================
    NO MAPPINGS CARD
 ============================================================ */
+
 .no-mappings-card {
-    background: white;
-    border: 2px dashed var(--gray-300);
-    border-radius: var(--border-radius-lg);
+    background: var(--report-card-bg);
+    border: 2px dashed var(--report-border-dark);
+    border-radius: var(--report-radius-lg);
     padding: 3rem 2rem;
     text-align: center;
-    transition: var(--transition);
+    transition: var(--report-transition);
+    color: var(--report-text-secondary);
 }
 
 .no-mappings-card:hover {
-    border-color: var(--primary);
-    background: var(--gray-50);
+    border-color: var(--report-primary);
+    background: var(--report-hover);
 }
 
 .no-mappings-card i {
     font-size: 4rem;
-    color: var(--gray-300);
+    color: var(--report-text-muted);
     margin-bottom: 1.25rem;
 }
 
 .no-mappings-card h4 {
-    color: var(--gray-700);
+    color: var(--report-text);
     font-weight: 600;
     margin-bottom: 0.75rem;
 }
 
 .no-mappings-card p {
-    color: var(--gray-500);
+    color: var(--report-text-tertiary);
     margin: 0.25rem 0;
 }
 
 .no-mappings-card .small {
     font-size: 0.8125rem;
-    color: var(--gray-400);
+    color: var(--report-text-muted);
 }
+
 
 /* ============================================================
    STATS CARDS
 ============================================================ */
+
 .stats-row {
     margin-bottom: 1.5rem;
 }
 
 .stat-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius-lg);
+    background: var(--report-card-bg);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-radius-lg);
     padding: 1.5rem;
     text-align: center;
-    transition: var(--transition);
+    transition: var(--report-transition);
     height: 100%;
 }
 
 .stat-card:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--report-shadow-lg);
     transform: translateY(-2px);
-    border-color: var(--primary-light);
+    border-color: var(--report-primary-light);
 }
 
 .stat-number {
     font-size: 2.25rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--report-primary);
     line-height: 1.2;
 }
 
 .stat-label {
-    color: var(--gray-500);
+    color: var(--report-text-tertiary);
     font-size: 0.875rem;
     margin-top: 0.5rem;
     font-weight: 500;
 }
 
+
 /* ============================================================
    USER INFO CARD
 ============================================================ */
+
 .user-info-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius-lg);
+    background: linear-gradient( 135deg, var(--report-card-bg) 0%, var(--report-bg-secondary) 100% );
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-radius-lg);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    transition: var(--transition);
+    transition: var(--report-transition);
 }
 
 .user-info-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-light);
+    box-shadow: var(--report-shadow-md);
+    border-color: var(--report-primary-light);
 }
 
 .user-avatar {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    background: linear-gradient( 135deg, var(--report-primary) 0%, var(--report-primary-light) 100% );
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #ffffff;
     font-size: 1.5rem;
     flex-shrink: 0;
 }
 
 .user-details h5 {
     margin: 0 0 0.25rem;
-    color: var(--gray-900);
+    color: var(--report-text);
     font-weight: 600;
 }
 
 .user-details small {
-    color: var(--gray-500);
+    color: var(--report-text-tertiary);
 }
+
 
 /* ============================================================
    MAPPING SECTION
 ============================================================ */
+
 .mapping-section {
     margin-bottom: 1.5rem;
 }
 
 .mapping-header {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    background: var(--report-card-bg);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-radius-lg) var(--report-radius-lg) 0 0;
     padding: 1.25rem 1.5rem;
     display: flex;
     flex-wrap: wrap;
@@ -626,10 +789,10 @@
 }
 
 .faculty-name {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
+    background: linear-gradient( 135deg, var(--report-primary) 0%, var(--report-primary-dark) 100% );
+    color: #ffffff;
     padding: 0.75rem 1.25rem;
-    border-radius: var(--border-radius);
+    border-radius: var(--report-radius);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -643,6 +806,23 @@
     gap: 0.5rem;
     align-items: center;
 }
+
+.meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.meta-badges .badge {
+    background: var(--report-bg-tertiary);
+    color: var(--report-text-secondary);
+    border: 1px solid var(--report-border);
+}
+
+
+/* ============================================================
+   BADGES
+============================================================ */
 
 .badge {
     font-size: 0.8rem;
@@ -659,55 +839,462 @@
 }
 
 .badge-primary {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-dark);
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: rgba(37, 99, 235, 0.10);
+    color: var(--report-primary-dark);
+    border: 1px solid rgba(37, 99, 235, 0.20);
 }
 
 .badge-info {
-    background: rgba(6, 182, 212, 0.1);
+    background: rgba(6, 182, 212, 0.10);
     color: #0e7490;
-    border: 1px solid rgba(6, 182, 212, 0.2);
+    border: 1px solid rgba(6, 182, 212, 0.20);
 }
 
 .badge-secondary {
-    background: rgba(100, 116, 139, 0.1);
-    color: var(--gray-700);
-    border: 1px solid var(--gray-300);
+    background: rgba(100, 116, 139, 0.10);
+    color: var(--report-text-secondary);
+    border: 1px solid var(--report-border-dark);
 }
 
-.meta-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+[data-theme="dark"] .badge-primary {
+    color: #93c5fd;
 }
 
-.meta-badges .badge {
-    background: var(--gray-100);
-    color: var(--gray-700);
-    border: 1px solid var(--gray-200);
+[data-theme="dark"] .badge-info {
+    color: #67e8f9;
 }
 
-.status-badge {
-    font-weight: 500;
+[data-theme="dark"] .badge-secondary {
+    color: var(--report-text-secondary);
 }
+
+
+/* ============================================================
+   BOOTSTRAP OVERRIDES USED BY THIS PAGE
+============================================================ */
+
+/* Bootstrap bg-light */
+[data-theme="light"] .report-card .bg-light {
+    background-color: var(--report-bg-secondary) !important;
+    color: var(--report-text-secondary) !important;
+}
+
+[data-theme="dark"] .report-card .bg-light {
+    background-color: var(--report-bg-tertiary) !important;
+    color: var(--report-text-secondary) !important;
+}
+
+/* Bootstrap text-dark */
+[data-theme="dark"] .report-card .text-dark {
+    color: var(--report-text-primary, #f1f5f9) !important;
+}
+
+/* Bootstrap text-muted */
+.report-card .text-muted {
+    color: var(--report-text-tertiary) !important;
+}
+
+/* Bootstrap table-light */
+[data-theme="dark"] .report-card .table-light,
+[data-theme="dark"] .report-card .table-light > th,
+[data-theme="dark"] .report-card .table-light > td {
+    --bs-table-bg: var(--report-bg-secondary);
+    --bs-table-color: var(--report-text-secondary);
+    --bs-table-border-color: var(--report-border);
+    background-color: var(--report-bg-secondary) !important;
+    color: var(--report-text-secondary) !important;
+    border-color: var(--report-border) !important;
+}
+
+/* Bootstrap table hover */
+[data-theme="dark"] .report-card .table-hover > tbody > tr:hover > * {
+    --bs-table-hover-bg: var(--report-hover);
+    --bs-table-hover-color: var(--report-text);
+}
+
 
 /* ============================================================
    COLLEGES CONTAINER
 ============================================================ */
+
 .colleges-container {
-    border: 1px solid var(--gray-200);
+    border: 1px solid var(--report-border);
     border-top: none;
-    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    border-radius: 0 0 var(--report-radius-lg) var(--report-radius-lg);
     max-height: 550px;
     overflow-y: auto;
-    background: white;
+    background: var(--report-card-bg);
+}
+
+.colleges-container .border-bottom {
+    border-color: var(--report-border) !important;
+}
+
+
+/* ============================================================
+   DARK MODE TABLE OVERRIDES
+============================================================ */
+
+[data-theme="dark"] .college-table {
+    --bs-table-bg: var(--report-card-bg);
+    --bs-table-color: var(--report-text-secondary);
+    --bs-table-border-color: var(--report-border);
+}
+
+[data-theme="dark"] .college-table > :not(caption) > * > * {
+    background-color: var(--report-card-bg) !important;
+    color: var(--report-text-secondary) !important;
+    border-color: var(--report-border) !important;
+}
+
+[data-theme="dark"] .college-table thead th {
+    background-color: var(--report-bg-secondary) !important;
+    color: var(--report-text-secondary) !important;
+    border-color: var(--report-border) !important;
+}
+
+[data-theme="dark"] .college-table tbody tr:hover > * {
+    background-color: var(--report-hover) !important;
+    color: var(--report-text) !important;
+}
+
+
+/* ============================================================
+   FORM SELECT ARROW / OPTION COLORS
+============================================================ */
+
+[data-theme="dark"] .feedback-form select option,
+[data-theme="dark"] .college-search option {
+    background: var(--report-input-bg);
+    color: var(--report-input-text);
+}
+
+
+/* ============================================================
+   TEXT DANGER
+============================================================ */
+
+.report-card .text-danger {
+    color: var(--report-danger) !important;
+}
+
+
+/* ============================================================
+   SCROLLBAR
+============================================================ */
+
+.colleges-container::-webkit-scrollbar,
+.report-card-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.colleges-container::-webkit-scrollbar-track,
+.report-card-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.colleges-container::-webkit-scrollbar-thumb {
+    background: var(--report-border-dark);
+    border-radius: 4px;
+}
+
+.report-card-body::-webkit-scrollbar-thumb {
+    background: var(--report-border-dark);
+    border-radius: 4px;
+}
+
+.colleges-container::-webkit-scrollbar-thumb:hover {
+    background: var(--report-text-muted);
+}
+
+.report-card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--report-text-tertiary);
+}
+
+
+/* ============================================================
+   FOCUS VISIBLE
+============================================================ */
+
+.report-card *:focus-visible {
+    outline: 2px solid var(--report-primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+
+@keyframes reportFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes reportSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.report-card {
+    animation: reportFadeIn 0.3s ease, reportSlideIn 0.3s ease;
+}
+
+.report-card-body {
+    animation: reportFadeIn 0.3s ease;
+}
+
+
+/* ============================================================
+   INSTITUTION DETAILS / VERIFICATION CARDS
+   Supports:
+   [data-theme="light"]
+   [data-theme="dark"]
+============================================================ */
+
+.verification-card {
+    background: var(--report-card-bg);
+    color: var(--report-text);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-radius-lg);
+    box-shadow: var(--report-shadow-sm);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: var(--report-transition);
+}
+
+.verification-card:hover {
+    box-shadow: var(--report-shadow-md);
+    border-color: var(--report-primary-light);
+}
+
+
+/* ------------------------------------------------------------
+   VERIFICATION CARD HEADER
+------------------------------------------------------------ */
+
+.verification-card-header {
+    background: linear-gradient( 135deg, var(--report-primary) 0%, var(--report-primary-dark) 100% );
+    color: #ffffff;
+    padding: 1.15rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--report-border);
+}
+
+.verification-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.verification-card-title i {
+    font-size: 1.25rem;
+    color: #ffffff;
+    opacity: 0.95;
+}
+
+
+/* ------------------------------------------------------------
+   VERIFICATION CARD BODY
+------------------------------------------------------------ */
+
+.verification-card-body {
+    background: var(--report-card-bg);
+    color: var(--report-text-secondary);
+    padding: 1.5rem;
+}
+
+
+/* ------------------------------------------------------------
+   FORM LABELS
+------------------------------------------------------------ */
+
+.verification-card .form-label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--report-text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+
+/* ------------------------------------------------------------
+   FORM CONTROLS
+------------------------------------------------------------ */
+
+.verification-card .form-control,
+.verification-card .form-select {
+    background-color: var(--report-input-bg);
+    color: var(--report-input-text);
+    border: 1px solid var(--report-input-border);
+    border-radius: var(--report-radius);
+    min-height: 42px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+/* Normal input */
+
+.verification-card .form-control {
+    padding: 0.625rem 0.875rem;
+}
+
+
+/* Textarea */
+
+.verification-card textarea.form-control {
+    min-height: auto;
+    resize: vertical;
+}
+
+
+/* ------------------------------------------------------------
+   DISABLED FORM CONTROLS
+------------------------------------------------------------ */
+
+.verification-card .form-control:disabled,
+.verification-card .form-control[disabled],
+.verification-card .form-select:disabled,
+.verification-card .form-select[disabled] {
+    background-color: var(--report-input-bg) !important;
+    color: var(--report-input-text) !important;
+    border-color: var(--report-input-border) !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: var(--report-input-text);
+}
+
+
+/* ------------------------------------------------------------
+   PLACEHOLDER
+------------------------------------------------------------ */
+
+.verification-card .form-control::placeholder {
+    color: var(--report-input-placeholder);
+    opacity: 1;
+}
+
+
+/* ------------------------------------------------------------
+   FOCUS
+------------------------------------------------------------ */
+
+.verification-card .form-control:focus,
+.verification-card .form-select:focus {
+    background-color: var(--report-input-bg);
+    color: var(--report-input-text);
+    border-color: var(--report-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+
+/* Dark focus */
+
+[data-theme="dark"] .verification-card .form-control:focus,
+[data-theme="dark"] .verification-card .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.20);
+}
+
+
+/* ------------------------------------------------------------
+   DARK THEME - FORM CONTROLS
+------------------------------------------------------------ */
+
+[data-theme="dark"] .verification-card .form-control,
+[data-theme="dark"] .verification-card .form-select {
+    background-color: var(--report-input-bg) !important;
+    color: var(--report-input-text) !important;
+    border-color: var(--report-input-border) !important;
+}
+
+[data-theme="dark"] .verification-card .form-control:disabled,
+[data-theme="dark"] .verification-card .form-control[disabled] {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #f1f5f9;
+}
+
+
+/* ------------------------------------------------------------
+   DARK THEME - TEXTAREA
+------------------------------------------------------------ */
+
+[data-theme="dark"] .verification-card textarea.form-control:disabled {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+    opacity: 1 !important;
+}
+
+
+/* ------------------------------------------------------------
+   CARD ROW SPACING
+------------------------------------------------------------ */
+
+.verification-card .row {
+    color: var(--report-text-secondary);
+}
+
+
+/* ------------------------------------------------------------
+   EMPTY / NULL VALUES
+------------------------------------------------------------ */
+
+.verification-card .form-control:empty {
+    color: var(--report-text-muted);
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+------------------------------------------------------------ */
+
+@media (max-width: 767.98px) {
+
+    .verification-card {
+        margin-bottom: 1rem;
+        border-radius: var(--report-radius);
+    }
+
+    .verification-card-header {
+        padding: 1rem;
+    }
+
+    .verification-card-title {
+        font-size: 0.95rem;
+    }
+
+    .verification-card-body {
+        padding: 1rem;
+    }
 }
 
 /* ============================================================
    RESPONSIVE
 ============================================================ */
+
 @media (max-width: 767.98px) {
+
     .mapping-header {
         flex-direction: column;
         align-items: flex-start;
@@ -743,6 +1330,10 @@
         align-items: flex-start;
     }
 
+    .verifier-info {
+        width: 100%;
+    }
+
     .feedback-actions {
         flex-direction: column;
     }
@@ -751,17 +1342,37 @@
         width: 100%;
         justify-content: center;
     }
+
+    .report-card-header {
+        padding: 1rem;
+    }
+
+    .report-card-body {
+        padding: 1rem;
+    }
+
+    .feedback-body {
+        padding: 1rem;
+    }
 }
 
+
 /* ============================================================
-   PRINT STYLES
+   PRINT
 ============================================================ */
+
 @media print {
+
     .search-bar,
     .stats-row,
     .feedback-actions,
     .btn {
         display: none !important;
+    }
+
+    .report-card {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
     }
 
     .colleges-container {
@@ -773,12 +1384,14 @@
     .mapping-header {
         border-radius: 0;
         background: #f5f5f5 !important;
+        color: #000 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .college-table thead th {
         background: #f5f5f5 !important;
+        color: #000 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -789,257 +1402,22 @@
     }
 }
 
-/* ============================================================
-   DARK MODE SUPPORT
-============================================================ */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --primary: #3b82f6;
-        --primary-light: #60a5fa;
-        --primary-dark: #2563eb;
-        --light: #1e293b;
-        --dark: #f8fafc;
-        --gray-50: #0f172a;
-        --gray-100: #1e293b;
-        --gray-200: #334155;
-        --gray-300: #475569;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #94a3b8;
-        --gray-700: #e2e8f0;
-        --gray-800: #f1f5f9;
-        --gray-900: #f8fafc;
-    }
-
-    .report-card,
-    .user-info-card,
-    .stat-card,
-    .mapping-header,
-    .colleges-container,
-    .no-mappings-card,
-    .feedback-body,
-    .verifier-info {
-        background: var(--gray-100);
-        border-color: var(--gray-200);
-    }
-
-    .search-bar {
-        background: var(--gray-50);
-        border-color: var(--gray-200);
-    }
-
-    .search-input {
-        background: var(--gray-200);
-        border-color: var(--gray-300);
-        color: var(--gray-100);
-    }
-
-    .search-input:focus {
-        border-color: var(--primary);
-    }
-
-    .college-table thead th {
-        background: var(--gray-50);
-        border-color: var(--gray-200);
-        color: var(--gray-400);
-    }
-
-    .college-table tbody tr {
-        border-color: var(--gray-200);
-    }
-
-    .college-table tbody tr:hover {
-        background: var(--gray-200);
-    }
-
-    .college-code {
-        background: var(--gray-200);
-        color: var(--primary-light);
-    }
-
-    .college-name {
-        color: var(--gray-100);
-    }
-
-    .college-town {
-        color: var(--gray-400);
-    }
-
-    .empty-state {
-        color: var(--gray-400);
-    }
-
-    .empty-state i {
-        color: var(--gray-300);
-    }
-
-    .empty-state h4 {
-        color: var(--gray-300);
-    }
-
-    .empty-state .small {
-        color: var(--gray-500);
-    }
-
-    .no-mappings-card {
-        background: var(--gray-100);
-        border-color: var(--gray-200);
-    }
-
-    .no-mappings-card:hover {
-        background: var(--gray-50);
-        border-color: var(--primary);
-    }
-
-    .no-mappings-card i {
-        color: var(--gray-300);
-    }
-
-    .no-mappings-card h4 {
-        color: var(--gray-300);
-    }
-
-    .meta-badges .badge {
-        background: var(--gray-200);
-        color: var(--gray-300);
-        border-color: var(--gray-300);
-    }
-
-    .feedback-header {
-        border-color: var(--gray-200);
-    }
-
-    .feedback-body {
-        border-color: var(--gray-200);
-    }
-
-/*    .verification-feedback-section {
-        background: var(--gray-100);
-        border-color: var(--gray-200);
-    }*/
-
-    .feedback-form .form-control,
-    .feedback-form .form-select {
-        background: var(--gray-200);
-        border-color: var(--gray-300);
-        color: var(--gray-100);
-    }
-
-    .feedback-form .form-control:focus,
-    .feedback-form .form-select:focus {
-        background: var(--gray-200);
-        color: var(--gray-100);
-    }
-
-    .feedback-form .form-control:disabled,
-    .feedback-form .form-select:disabled {
-        background: var(--gray-50);
-        color: var(--gray-400);
-    }
-
-    .btn-outline-secondary {
-        border-color: var(--gray-300);
-        color: var(--gray-400);
-    }
-
-    .btn-outline-secondary:hover {
-        background: var(--gray-200);
-        color: var(--gray-100);
-    }
-
-    .badge-secondary {
-        background: var(--gray-200);
-        color: var(--gray-300);
-    }
-}
-
-/* ============================================================
-   FOCUS VISIBLE FOR ACCESSIBILITY
-============================================================ */
-*:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
 
 /* ============================================================
    REDUCED MOTION
 ============================================================ */
+
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
+
+    .report-card,
+    .report-card-body {
+        animation: none !important;
+    }
+
+    .report-card,
+    .report-card *,
+    .report-card *::before,
+    .report-card *::after {
         transition-duration: 0.01ms !important;
     }
 }
-
-/* ============================================================
-   SCROLLBAR STYLING
-============================================================ */
-.colleges-container::-webkit-scrollbar,
-.report-card-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-.colleges-container::-webkit-scrollbar-track,
-.report-card-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.colleges-container::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-}
-
-.report-card-body::-webkit-scrollbar-thumb {
-    background: var(--gray-300);
-    border-radius: 4px;
-}
-
-.colleges-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.report-card-body::-webkit-scrollbar-thumb:hover {
-    background: var(--gray-400);
-}
-
-/* ============================================================
-   ANIMATIONS
-============================================================ */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.report-card {
-    animation: fadeIn 0.3s ease, slideInRight 0.3s ease;
-}
-
-.mapping-section {
-    animation: fadeIn 0.3s ease, slideInRight 0.3s ease;
-}
-
-.report-card-body {
-    animation: fadeIn 0.3s ease;
-}
-
-/* Stagger animation for mapping sections */
-.mapping-section:nth-child(1) { animation-delay: 0.05s; }
-.mapping-section:nth-child(2) { animation-delay: 0.1s; }
-.mapping-section:nth-child(3) { animation-delay: 0.15s; }
-.mapping-section:nth-child(4) { animation-delay: 0.2s; }
-.mapping-section:nth-child(5) { animation-delay: 0.25s; }
-.mapping-section:nth-child(6) { animation-delay: 0.3s; }

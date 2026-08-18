@@ -2275,3 +2275,504 @@ SELECT * FROM MstDentalServices;
 
 SELECT * FROM DentalWardBedDistribution
 WHERE CollegeCode = 'D038'
+
+
+/* ============================================================
+   1. MstTabs
+   ============================================================ */
+
+CREATE TABLE dbo.MstTabs
+(
+    TabId INT IDENTITY(1,1) NOT NULL,
+    FacultyId INT NOT NULL,
+    TabName NVARCHAR(200) NOT NULL,
+
+    CONSTRAINT PK_MstTabs
+        PRIMARY KEY (TabId),
+
+    CONSTRAINT FK_MstTabs_Faculty
+        FOREIGN KEY (FacultyId)
+        REFERENCES dbo.Faculty(FacultyId)
+);
+GO
+
+INSERT INTO dbo.MstTabs (FacultyId, TabName)
+VALUES
+    (2, N'Institution Details'),
+    (2, N'Trust Details'),
+    (2, N'Trust Member Details'),
+    (2, N'Dean / Director Details'),
+    (2, N'Principal Details'),
+    (2, N'UG Course Details'),
+    (2, N'PG Course Details'),
+    (2, N'Courses & Intake'),
+    (2, N'Land & Building Details'),
+    (2, N'Classroom & Laboratory'),
+    (2, N'Chair Distribution'),
+    (2, N'Bed Distribution'),
+    (2, N'Hostel Details'),
+    (2, N'Department Offices And Educational Unit'),
+    (2, N'Equipment List'),
+    (2, N'Vehicle Details'),
+    (2, N'UG Academic Matters'),
+    (2, N'PG Academic Matters'),
+    (2, N'Staff Pay Scale'),
+    (2, N'Staff Other Details'),
+    (2, N'Finance Details'),
+    (2, N'Library Services'),
+    (2, N'Research & Publications'),
+    (2, N'Library Details'),
+    (2, N'Faculty Details'),
+    (2, N'Teaching Experience'),
+    (2, N'Clinical Facilities');
+GO
+
+
+/* ============================================================
+   2. MstSections
+   ============================================================ */
+
+CREATE TABLE dbo.MstSections
+(
+    SectionId INT IDENTITY(1,1) NOT NULL,
+    FacultyId INT NOT NULL,
+    TabId INT NOT NULL,
+    SectionName NVARCHAR(200) NOT NULL,
+
+    CONSTRAINT PK_MstSections
+        PRIMARY KEY (SectionId),
+
+    CONSTRAINT FK_MstSections_Faculty
+        FOREIGN KEY (FacultyId)
+        REFERENCES dbo.Faculty(FacultyId),
+
+    CONSTRAINT FK_MstSections_MstTabs
+        FOREIGN KEY (TabId)
+        REFERENCES dbo.MstTabs(TabId)
+);
+GO
+
+
+
+/* ============================================================
+   Institution Details
+   ============================================================ */
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Basic Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Address Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Contact Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Institutional Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Head of Institution'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Nodal Officer Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Principal Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Dean / Director Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Trust Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Institution Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Trust Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Trust Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Trust Members'
+FROM dbo.MstTabs
+WHERE TabName = N'Trust Member Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Dean / Director Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Dean / Director Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Teaching Experience'
+FROM dbo.MstTabs
+WHERE TabName = N'Dean / Director Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Administrative Experience'
+FROM dbo.MstTabs
+WHERE TabName = N'Dean / Director Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Principal Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Principal Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Teaching Experience'
+FROM dbo.MstTabs
+WHERE TabName = N'Principal Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Administrative Experience'
+FROM dbo.MstTabs
+WHERE TabName = N'Principal Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Present Intake'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Course Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Previous Details'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Course Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Particulars of Permission'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Course Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Year of Obtaining EC & FC from Government of Karnataka'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Course Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Year of Last Affiliation Granted by RGUHS'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Course Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Previous Inspection by LIC'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Course Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'PG Course Details'
+FROM dbo.MstTabs
+WHERE TabName = N'PG Course Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Land Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Land & Building Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Building Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Land & Building Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Facility Requirements'
+FROM dbo.MstTabs
+WHERE TabName = N'Classroom & Laboratory';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Chair Distribution Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Chair Distribution';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Beds Distribution'
+FROM dbo.MstTabs
+WHERE TabName = N'Bed Distribution';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Hostel Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Hostel Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Student Accommodation'
+FROM dbo.MstTabs
+WHERE TabName = N'Hostel Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Common Room Facilities'
+FROM dbo.MstTabs
+WHERE TabName = N'Hostel Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Hostel Facilities'
+FROM dbo.MstTabs
+WHERE TabName = N'Hostel Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Department Office Infrastructure'
+FROM dbo.MstTabs
+WHERE TabName = N'Department Offices And Educational Unit';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Dental Education Unit'
+FROM dbo.MstTabs
+WHERE TabName = N'Department Offices And Educational Unit';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Equipment Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Equipment List';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Vehicle Information'
+FROM dbo.MstTabs
+WHERE TabName = N'Vehicle Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'UG Academic Performance'
+FROM dbo.MstTabs
+WHERE TabName = N'UG Academic Matters';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'PG Academic Performance'
+FROM dbo.MstTabs
+WHERE TabName = N'PG Academic Matters';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Staff Pay Scale'
+FROM dbo.MstTabs
+WHERE TabName = N'Staff Pay Scale';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Staff Other Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Staff Other Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Authority & Account Details - UG'
+FROM dbo.MstTabs
+WHERE TabName = N'Finance Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Annual Financial Details - UG'
+FROM dbo.MstTabs
+WHERE TabName = N'Finance Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Account & Audit Details - UG'
+FROM dbo.MstTabs
+WHERE TabName = N'Finance Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Authority & Account Details - PG'
+FROM dbo.MstTabs
+WHERE TabName = N'Finance Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Annual Financial Details - PG'
+FROM dbo.MstTabs
+WHERE TabName = N'Finance Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Account & Audit Details - PG'
+FROM dbo.MstTabs
+WHERE TabName = N'Finance Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Department Library Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Services';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Research & Publication Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Research & Publications';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'General Library Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Library Items'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Library Building'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Technical Processes'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Library Equipment'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Details';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Library Finance'
+FROM dbo.MstTabs
+WHERE TabName = N'Library Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Faculty Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Faculty Details';
+
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Clinical Hospital Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Clinical Facilities';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Clinical Statistics'
+FROM dbo.MstTabs
+WHERE TabName = N'Clinical Facilities';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Discipline Details'
+FROM dbo.MstTabs
+WHERE TabName = N'Clinical Facilities';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Nursing, Paramedical, Technical & Allied Services'
+FROM dbo.MstTabs
+WHERE TabName = N'Clinical Facilities';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Engineering & Allied Services'
+FROM dbo.MstTabs
+WHERE TabName = N'Clinical Facilities';
+
+INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
+SELECT FacultyId, TabId, N'Ward-wise Bed Distribution in Attached Hospital'
+FROM dbo.MstTabs
+WHERE TabName = N'Clinical Facilities';
+
+/* ============================================================
+   3. SectionWiseFeedback
+   ============================================================ */
+
+CREATE TABLE dbo.SectionWiseFeedback
+(
+    SectionWiseFeedbackId INT IDENTITY(1,1) NOT NULL,
+
+    FacultyId INT NOT NULL,
+    CollegeCode NVARCHAR(100) NOT NULL,
+    TabId INT NOT NULL,
+    SectionId INT NOT NULL,
+    VerificationStatus NVARCHAR(50) NULL,
+    Remarks NVARCHAR(max) NULL,
+
+    VerifiedBy NVARCHAR(200) NULL,
+    VerifiedOn DATETIME2 NULL,
+
+    CONSTRAINT PK_SectionWiseFeedback
+        PRIMARY KEY (SectionWiseFeedbackId),
+
+    CONSTRAINT FK_SectionWiseFeedback_Faculty
+        FOREIGN KEY (FacultyId)
+        REFERENCES dbo.Faculty(FacultyId),
+
+    CONSTRAINT FK_SectionWiseFeedback_College
+        FOREIGN KEY (CollegeCode)
+        REFERENCES [dbo].[Affiliation_College_Master](CollegeCode),
+
+    CONSTRAINT FK_SectionWiseFeedback_Tab
+        FOREIGN KEY (TabId)
+        REFERENCES dbo.MstTabs(TabId),
+
+    CONSTRAINT FK_SectionWiseFeedback_Section
+        FOREIGN KEY (SectionId)
+        REFERENCES dbo.MstSections(SectionId)
+);
+GO
+
+/* ============================================================
+   4. Prevent duplicate section verification
+   ============================================================ */
+
+CREATE UNIQUE INDEX UX_SectionWiseFeedback_College_Faculty_Tab_Section
+ON dbo.SectionWiseFeedback
+(
+    CollegeCode,
+    FacultyId,
+    TabId,
+    SectionId
+);
+GO
+
+
+/* ============================================================
+   5. Useful indexes
+   ============================================================ */
+
+CREATE INDEX IX_MstTabs_FacultyId
+ON dbo.MstTabs(FacultyId);
+GO
+
+CREATE INDEX IX_MstSections_FacultyId
+ON dbo.MstSections(FacultyId);
+GO
+
+CREATE INDEX IX_MstSections_TabId
+ON dbo.MstSections(TabId);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_FacultyId
+ON dbo.SectionWiseFeedback(FacultyId);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_CollegeCode
+ON dbo.SectionWiseFeedback(CollegeCode);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_TabId
+ON dbo.SectionWiseFeedback(TabId);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_SectionId
+ON dbo.SectionWiseFeedback(SectionId);
+GO

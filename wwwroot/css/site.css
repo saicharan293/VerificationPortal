@@ -627,7 +627,7 @@ html {
     gap: 12px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
-    cursor: pointer;
+/*    cursor: pointer;*/
     position: relative;
     overflow: hidden;
 }
@@ -658,7 +658,7 @@ html {
 
         .data-cat-item:hover i {
             color: var(--primary);
-            transform: scale(1.2) rotate(360deg);
+            transform: scale(1.2) ;
         }
 
     .data-cat-item i {

@@ -434,6 +434,10 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<MstNursingAffiliatedMaterialDatum> MstNursingAffiliatedMaterialData { get; set; }
 
+    public virtual DbSet<MstSection> MstSections { get; set; }
+
+    public virtual DbSet<MstTab> MstTabs { get; set; }
+
     public virtual DbSet<NodalOfficerDetail> NodalOfficerDetails { get; set; }
 
     public virtual DbSet<NodalOfficerInitiative> NodalOfficerInitiatives { get; set; }
@@ -459,6 +463,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<RguhsIntakeChangeAndApproval> RguhsIntakeChangeAndApprovals { get; set; }
 
     public virtual DbSet<SeatSlabMaster> SeatSlabMasters { get; set; }
+
+    public virtual DbSet<SectionWiseFeedback> SectionWiseFeedbacks { get; set; }
 
     public virtual DbSet<SmallGroupTeaching> SmallGroupTeachings { get; set; }
 
@@ -6683,6 +6689,41 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.ParametersName).HasMaxLength(200);
         });
 
+        modelBuilder.Entity<MstSection>(entity =>
+        {
+            entity.HasKey(e => e.SectionId);
+
+            entity.HasIndex(e => e.FacultyId, "IX_MstSections_FacultyId");
+
+            entity.HasIndex(e => e.TabId, "IX_MstSections_TabId");
+
+            entity.Property(e => e.SectionName).HasMaxLength(200);
+
+            entity.HasOne(d => d.Faculty).WithMany(p => p.MstSections)
+                .HasForeignKey(d => d.FacultyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MstSections_Faculty");
+
+            entity.HasOne(d => d.Tab).WithMany(p => p.MstSections)
+                .HasForeignKey(d => d.TabId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MstSections_MstTabs");
+        });
+
+        modelBuilder.Entity<MstTab>(entity =>
+        {
+            entity.HasKey(e => e.TabId);
+
+            entity.HasIndex(e => e.FacultyId, "IX_MstTabs_FacultyId");
+
+            entity.Property(e => e.TabName).HasMaxLength(200);
+
+            entity.HasOne(d => d.Faculty).WithMany(p => p.MstTabs)
+                .HasForeignKey(d => d.FacultyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MstTabs_Faculty");
+        });
+
         modelBuilder.Entity<NodalOfficerDetail>(entity =>
         {
             entity.HasKey(e => e.Id).HasFillFactor(80);
@@ -6924,6 +6965,43 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.SeatSlabId)
                 .HasMaxLength(10)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<SectionWiseFeedback>(entity =>
+        {
+            entity.ToTable("SectionWiseFeedback");
+
+            entity.HasIndex(e => e.CollegeCode, "IX_SectionWiseFeedback_CollegeCode");
+
+            entity.HasIndex(e => e.FacultyId, "IX_SectionWiseFeedback_FacultyId");
+
+            entity.HasIndex(e => e.SectionId, "IX_SectionWiseFeedback_SectionId");
+
+            entity.HasIndex(e => e.TabId, "IX_SectionWiseFeedback_TabId");
+
+            entity.Property(e => e.CollegeCode).HasMaxLength(100);
+            entity.Property(e => e.VerificationStatus).HasMaxLength(50);
+            entity.Property(e => e.VerifiedBy).HasMaxLength(200);
+
+            entity.HasOne(d => d.CollegeCodeNavigation).WithMany(p => p.SectionWiseFeedbacks)
+                .HasForeignKey(d => d.CollegeCode)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SectionWiseFeedback_College");
+
+            entity.HasOne(d => d.Faculty).WithMany(p => p.SectionWiseFeedbacks)
+                .HasForeignKey(d => d.FacultyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SectionWiseFeedback_Faculty");
+
+            entity.HasOne(d => d.Section).WithMany(p => p.SectionWiseFeedbacks)
+                .HasForeignKey(d => d.SectionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SectionWiseFeedback_Section");
+
+            entity.HasOne(d => d.Tab).WithMany(p => p.SectionWiseFeedbacks)
+                .HasForeignKey(d => d.TabId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SectionWiseFeedback_Tab");
         });
 
         modelBuilder.Entity<SmallGroupTeaching>(entity =>
