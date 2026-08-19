@@ -281,3 +281,14 @@
 
     </div>
 </div>
+
+
+@{
+    var bedDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 29);
+}
+
+@if (bedDistributionFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", bedDistributionFeedback)
+}

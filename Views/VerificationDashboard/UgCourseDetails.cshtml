@@ -38,8 +38,6 @@
         ViewBag.PrevTabLabel;
 }
 
-@section Styles {
-}
 
 @{
     ViewBag.ActiveTab = "UgCourseDetails";
@@ -161,6 +159,16 @@
 
                 </div>
 
+                
+                @{
+                    var ugPresentFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                ?.FirstOrDefault(x => x.SectionId == 18);
+                }
+
+                @if (ugPresentFeedback != null)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", ugPresentFeedback)
+                }
 
                 <!-- ================================================= -->
                 <!-- 2. PREVIOUS DETAILS -->
@@ -251,6 +259,16 @@
 
                 </div>
 
+                
+                @{
+                    var ugPrevFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                ?.FirstOrDefault(x => x.SectionId == 19);
+                }
+
+                @if (ugPrevFeedback != null)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", ugPrevFeedback)
+                }
 
                 <!-- ================================================= -->
                 <!-- 3. PARTICULARS OF PERMISSION -->
@@ -321,6 +339,15 @@
 
                 </div>
 
+                @{
+                    var ugParticularFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                ?.FirstOrDefault(x => x.SectionId == 20);
+                }
+
+                @if (ugParticularFeedback != null)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", ugParticularFeedback)
+                }
 
                 <!-- ================================================= -->
                 <!-- 4. EC / FC -->
@@ -399,6 +426,16 @@
                 </div>
 
 
+                @{
+                    var ugECFCFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                ?.FirstOrDefault(x => x.SectionId == 21);
+                }
+
+                @if (ugECFCFeedback != null)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", ugECFCFeedback)
+                }
+
                 <!-- ================================================= -->
                 <!-- 5. LAST AFFILIATION -->
                 <!-- ================================================= -->
@@ -475,6 +512,15 @@
 
                 </div>
 
+                @{
+                    var ugLastFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                ?.FirstOrDefault(x => x.SectionId == 22);
+                }
+
+                @if (ugLastFeedback != null)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", ugLastFeedback)
+                }
 
                 <!-- ================================================= -->
                 <!-- 6. PREVIOUS LIC INSPECTION -->
@@ -518,6 +564,17 @@
                     </div>
 
                 </div>
+
+
+                @{
+                    var ugPrevLicFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                ?.FirstOrDefault(x => x.SectionId == 23);
+                }
+
+                @if (ugPrevLicFeedback != null)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", ugPrevLicFeedback)
+                }
 
             </div>
 

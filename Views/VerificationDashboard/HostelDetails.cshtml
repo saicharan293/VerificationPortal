@@ -194,7 +194,17 @@
 
     </div>
 
+
 </div>
+@{
+    var hostelInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 30);
+}
+
+@if (hostelInfoFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", hostelInfoFeedback)
+}
 
 <div class="verification-card mt-4">
 
@@ -240,8 +250,16 @@
         </div>
 
     </div>
-
 </div>
+@{
+    var studentAccomodationFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 31);
+}
+
+@if (studentAccomodationFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", studentAccomodationFeedback)
+}
 
 <div class="verification-card mt-4">
 
@@ -312,6 +330,16 @@
     </div>
 
 </div>
+
+@{
+    var commonRoomFacilitiesFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 32);
+}
+
+@if (commonRoomFacilitiesFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", commonRoomFacilitiesFeedback)
+}
 
 <div class="verification-card mt-4">
 
@@ -401,3 +429,14 @@
     </div>
 
 </div>
+
+                    
+@{
+    var hostelFacilitiesFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 33);
+}
+
+@if (hostelFacilitiesFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", hostelFacilitiesFeedback)
+}

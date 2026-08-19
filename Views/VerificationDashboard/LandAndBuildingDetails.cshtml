@@ -107,6 +107,15 @@
 
         </div>
 
+        @{
+            var landFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                        ?.FirstOrDefault(x => x.SectionId == 25);
+        }
+
+        @if (landFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", landFeedback)
+        }
         <!-- Documents -->
 
         <h5 class="fw-bold mb-3 border-bottom pb-2">
@@ -690,6 +699,18 @@
             </div>
         }
 
+
+        @{
+            var buildingFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                        ?.FirstOrDefault(x => x.SectionId == 26);
+        }
+        @if (buildingFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", buildingFeedback)
+        }
+
     </div>
+
+    
 
 </div>

@@ -228,6 +228,15 @@
 
 </div>
 
+@{
+    var deanInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 12);
+}
+
+@if (deanInfoFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", deanInfoFeedback)
+}
 
 <!-- ========================================================= -->
 <!-- TEACHING EXPERIENCE -->
@@ -379,6 +388,16 @@
 </div>
 
 
+@{
+    var deanTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 13);
+}
+
+@if (deanTeachFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", deanTeachFeedback)
+}
+
 <!-- ========================================================= -->
 <!-- ADMINISTRATIVE EXPERIENCE -->
 <!-- ========================================================= -->
@@ -528,3 +547,13 @@
     </div>
 
 </div>
+
+@{
+    var deanAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 14);
+}
+
+@if (deanAdminFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", deanAdminFeedback)
+}

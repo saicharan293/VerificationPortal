@@ -156,6 +156,15 @@
 
 </div>
 
+@{
+    var generalLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 50);
+}
+
+@if (generalLibraryDetailsFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", generalLibraryDetailsFeedback)
+}
 
 @* =========================================================
    LIBRARY ITEMS
@@ -250,6 +259,15 @@
 
 </div>
 
+@{
+    var libraryItemsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 51);
+}
+
+@if (libraryItemsFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", libraryItemsFeedback)
+}
 
 @* =========================================================
    LIBRARY BUILDING
@@ -315,6 +333,15 @@
 
 </div>
 
+@{
+    var libraryBuildingFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 52);
+}
+
+@if (libraryBuildingFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", libraryBuildingFeedback)
+}
 
 @* =========================================================
    TECHNICAL PROCESSES
@@ -376,6 +403,15 @@
 
 </div>
 
+@{
+    var techProcessFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 53);
+}
+
+@if (techProcessFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", techProcessFeedback)
+}
 
 @* =========================================================
    LIBRARY EQUIPMENT
@@ -437,6 +473,16 @@
 
 </div>
 
+
+@{
+    var libraryEquipmentFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 54);
+}
+
+@if (libraryEquipmentFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", libraryEquipmentFeedback)
+}
 
 @* =========================================================
    LIBRARY FINANCE
@@ -516,6 +562,16 @@
     </div>
 
 </div>
+
+@{
+    var libraryFinanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 55);
+}
+
+@if (libraryFinanceFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", libraryFinanceFeedback)
+}
 
 @section Scripts {
 

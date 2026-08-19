@@ -380,6 +380,16 @@
 </div>
 
 
+@{
+    var facultyDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 56);
+}
+
+@if (facultyDetailsFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", facultyDetailsFeedback)
+}
+
 @section Scripts {
     <script src="~/js/verification-dashboard.js"
             asp-append-version="true"></script>

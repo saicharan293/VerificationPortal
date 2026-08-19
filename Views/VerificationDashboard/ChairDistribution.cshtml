@@ -146,3 +146,13 @@
     </div>
 
 </div>
+
+@{
+    var chairDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 28);
+}
+
+@if (chairDistributionFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", chairDistributionFeedback)
+}

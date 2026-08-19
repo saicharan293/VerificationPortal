@@ -84,327 +84,336 @@
     </div>
 </div>
 
-    <!-- Trust Information Card -->
-    <div class="verification-card mb-4">
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-building"></i>
-                Trust Information
-            </h3>
+<!-- Trust Information Card -->
+<div class="verification-card mb-4">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-building"></i>
+            Trust Information
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="row g-3">
+            <!-- Institution Basic Details -->
+                
+            <!-- Trust Details -->
+            <div class="col-md-6">
+                <label class="form-label">Trust Name</label>
+                <input type="text" class="form-control" value="@Model.TrustName" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">PAN Number</label>
+                <input type="text" class="form-control" value="@Model.Pannumber" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Registration Number</label>
+                <input type="text" class="form-control" value="@Model.RegistrationNumber" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Registration Date</label>
+                <input type="text" class="form-control" value="@(Model.RegistrationDate?.ToString("dd MMM yyyy") ?? "Not provided")" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">President Name</label>
+                <input type="text" class="form-control" value="@Model.PresidentName" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Category of Organisation</label>
+                <input type="text" class="form-control" value="@Model.CategoryOfOrganisation" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">GOK Obtained Trust Name</label>
+                <input type="text" class="form-control" value="@Model.GokobtainedTrustName" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Amendments</label>
+                <input type="text" class="form-control" value="@(Model.Amendments == true ? "Yes" : Model.Amendments == false ? "No" : "Not specified")" disabled />
+            </div>
+            @* <div class="col-md-6">
+                <label class="form-label">Aadhaar Number</label>
+                <input type="text" class="form-control" value="@Model.AadhaarNumber" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Existing Trust Name</label>
+                <input type="text" class="form-control" value="@Model.ExistingTrustName" disabled />
+            </div> *@
+            @* <div class="col-md-6">
+                <label class="form-label">Changes in Trust Name</label>
+                <input type="text" class="form-control" value="@(Model.ChangesInTrustName == true ? "Yes" : Model.ChangesInTrustName == false ? "No" : "Not specified")" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Other Nursing College in City</label>
+                <input type="text" class="form-control" value="@(Model.OtherNursingCollegeInCity == true ? "Yes" : Model.OtherNursingCollegeInCity == false ? "No" : "Not specified")" disabled />
+            </div> *@
+
+            <!-- Contact Person Details -->
+            <div class="col-md-4">
+                <label class="form-label">Contact Person Name</label>
+                <input type="text" class="form-control" value="@Model.ContactPersonName" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Contact Person Designation</label>
+                <input type="text" class="form-control" value="@Model.ContactPersonRelation" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Contact Person Mobile</label>
+                <input type="text" class="form-control" value="@Model.ContactPersonMobile" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" value="@Model.AddressOfInstitution" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Pincode</label>
+                <input type="text" class="form-control" value="@Model.PinCode" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" value="@Model.MobileNumber" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">STD code</label>
+                <input type="text" class="form-control" value="@Model.StdCode" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fax</label>
+                <input type="text" class="form-control" value="@Model.Fax" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Alternate Mobile/Landline Number</label>
+                <input type="text" class="form-control" value="@Model.AltLandlineOrMobile" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email Id</label>
+                <input type="text" class="form-control" value="@Model.EmailId" disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Alternate Email Id</label>
+                <input type="text" class="form-control" value="@Model.AltEmailId" disabled />
+            </div>
+                
+            <div class="col-md-6">
+                <label class="form-label">Created On</label>
+                <input type="text" class="form-control" value="@Model.CreatedOn.ToString("dd MMM yyyy HH:mm")" disabled />
+            </div>
+
+            <!-- Required Documents -->
+            <div class="col-12">
+                <h5 class="border-bottom pb-2 mb-3">Required Documents</h5>
+            </div>
+
+        <!-- Amended Document -->
+        <div class="col-md-6">
+            <label class="form-label">GOK order Document</label>
+
+            @if (!string.IsNullOrWhiteSpace(Model.GokOrderExistingCoursesFilePath))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewGokOrderDocument",
+                            "VerificationDashboard",
+                            new
+                            {
+                                id = Model.InstitutionId,
+                                documentType = "AmendedDoc"
+                            })!,
+                        Title = "Amended Document"
+                    })
+            }
+            else
+            {
+                <span class="badge bg-secondary">Not Uploaded</span>
+            }
         </div>
-        <div class="verification-card-body">
-            <div class="row g-3">
-                <!-- Institution Basic Details -->
-                
-                <!-- Trust Details -->
-                <div class="col-md-6">
-                    <label class="form-label">Trust Name</label>
-                    <input type="text" class="form-control" value="@Model.TrustName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">PAN Number</label>
-                    <input type="text" class="form-control" value="@Model.Pannumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Registration Number</label>
-                    <input type="text" class="form-control" value="@Model.RegistrationNumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Registration Date</label>
-                    <input type="text" class="form-control" value="@(Model.RegistrationDate?.ToString("dd MMM yyyy") ?? "Not provided")" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">President Name</label>
-                    <input type="text" class="form-control" value="@Model.PresidentName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Category of Organisation</label>
-                    <input type="text" class="form-control" value="@Model.CategoryOfOrganisation" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">GOK Obtained Trust Name</label>
-                    <input type="text" class="form-control" value="@Model.GokobtainedTrustName" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Amendments</label>
-                    <input type="text" class="form-control" value="@(Model.Amendments == true ? "Yes" : Model.Amendments == false ? "No" : "Not specified")" disabled />
-                </div>
-                @* <div class="col-md-6">
-                    <label class="form-label">Aadhaar Number</label>
-                    <input type="text" class="form-control" value="@Model.AadhaarNumber" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Existing Trust Name</label>
-                    <input type="text" class="form-control" value="@Model.ExistingTrustName" disabled />
-                </div> *@
-                @* <div class="col-md-6">
-                    <label class="form-label">Changes in Trust Name</label>
-                    <input type="text" class="form-control" value="@(Model.ChangesInTrustName == true ? "Yes" : Model.ChangesInTrustName == false ? "No" : "Not specified")" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Other Nursing College in City</label>
-                    <input type="text" class="form-control" value="@(Model.OtherNursingCollegeInCity == true ? "Yes" : Model.OtherNursingCollegeInCity == false ? "No" : "Not specified")" disabled />
-                </div> *@
 
-                <!-- Contact Person Details -->
-                <div class="col-md-4">
-                    <label class="form-label">Contact Person Name</label>
-                    <input type="text" class="form-control" value="@Model.ContactPersonName" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Contact Person Designation</label>
-                    <input type="text" class="form-control" value="@Model.ContactPersonRelation" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Contact Person Mobile</label>
-                    <input type="text" class="form-control" value="@Model.ContactPersonMobile" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Address</label>
-                    <input type="text" class="form-control" value="@Model.AddressOfInstitution" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Pincode</label>
-                    <input type="text" class="form-control" value="@Model.PinCode" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Mobile Number</label>
-                    <input type="text" class="form-control" value="@Model.MobileNumber" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">STD code</label>
-                    <input type="text" class="form-control" value="@Model.StdCode" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Fax</label>
-                    <input type="text" class="form-control" value="@Model.Fax" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Alternate Mobile/Landline Number</label>
-                    <input type="text" class="form-control" value="@Model.AltLandlineOrMobile" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Email Id</label>
-                    <input type="text" class="form-control" value="@Model.EmailId" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Alternate Email Id</label>
-                    <input type="text" class="form-control" value="@Model.AltEmailId" disabled />
-                </div>
-                
-                <div class="col-md-6">
-                    <label class="form-label">Created On</label>
-                    <input type="text" class="form-control" value="@Model.CreatedOn.ToString("dd MMM yyyy HH:mm")" disabled />
-                </div>
+        <!-- Trust PAN -->
+        <div class="col-md-6">
+            <label class="form-label">Trust PAN</label>
 
-                <!-- Required Documents -->
-                <div class="col-12">
-                    <h5 class="border-bottom pb-2 mb-3">Required Documents</h5>
-                </div>
+            @if (!string.IsNullOrWhiteSpace(Model.PanfilePath))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewTrustDocument",
+                            "VerificationDashboard",
+                            new
+                            {
+                                id = Model.InstitutionId,
+                                documentType = "Panfile"
+                            })!,
+                        Title = "Trust PAN"
+                    })
+            }
+            else
+            {
+                <span class="badge bg-secondary">Not Uploaded</span>
+            }
+        </div>
 
-            <!-- Amended Document -->
+        <!-- Bank Statement -->
+        <div class="col-md-6">
+            <label class="form-label">Bank Statement</label>
+
+            @if (!string.IsNullOrWhiteSpace(Model.BankStatementFilePath))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewTrustDocument",
+                            "VerificationDashboard",
+                            new
+                            {
+                                id = Model.InstitutionId,
+                                documentType = "BankStatement"
+                            })!,
+                        Title = "Bank Statement"
+                    })
+            }
+            else
+            {
+                <span class="badge bg-secondary">Not Uploaded</span>
+            }
+        </div>
+
+        <!-- Registration Certificate -->
+        <div class="col-md-6">
+            <label class="form-label">Registration Certificate</label>
+
+            @if (!string.IsNullOrWhiteSpace(Model.RegistrationCertificateFilePath))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewTrustDocument",
+                            "VerificationDashboard",
+                            new
+                            {
+                                id = Model.InstitutionId,
+                                documentType = "RegistrationCertificate"
+                            })!,
+                        Title = "Registration Certificate"
+                    })
+            }
+            else
+            {
+                <span class="badge bg-secondary">Not Uploaded</span>
+            }
+        </div>
+
+        <!-- Audit Statement -->
+        <div class="col-md-6">
+            <label class="form-label">Audit Statement</label>
+
+            @if (!string.IsNullOrWhiteSpace(Model.AuditStatementFilePath))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewTrustDocument",
+                            "VerificationDashboard",
+                            new
+                            {
+                                id = Model.InstitutionId,
+                                documentType = "AuditStatement"
+                            })!,
+                        Title = "Audit Statement"
+                    })
+            }
+            else
+            {
+                <span class="badge bg-secondary">Not Uploaded</span>
+            }
+        </div>
             <div class="col-md-6">
-                <label class="form-label">GOK order Document</label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.GokOrderExistingCoursesFilePath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewGokOrderDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.InstitutionId,
-                                    documentType = "AmendedDoc"
-                                })!,
-                            Title = "Amended Document"
-                        })
-                }
-                else
-                {
-                    <span class="badge bg-secondary">Not Uploaded</span>
-                }
-            </div>
-
-            <!-- Trust PAN -->
-            <div class="col-md-6">
-                <label class="form-label">Trust PAN</label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.PanfilePath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewTrustDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.InstitutionId,
-                                    documentType = "Panfile"
-                                })!,
-                            Title = "Trust PAN"
-                        })
-                }
-                else
-                {
-                    <span class="badge bg-secondary">Not Uploaded</span>
-                }
-            </div>
-
-            <!-- Bank Statement -->
-            <div class="col-md-6">
-                <label class="form-label">Bank Statement</label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.BankStatementFilePath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewTrustDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.InstitutionId,
-                                    documentType = "BankStatement"
-                                })!,
-                            Title = "Bank Statement"
-                        })
-                }
-                else
-                {
-                    <span class="badge bg-secondary">Not Uploaded</span>
-                }
-            </div>
-
-            <!-- Registration Certificate -->
-            <div class="col-md-6">
-                <label class="form-label">Registration Certificate</label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.RegistrationCertificateFilePath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewTrustDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.InstitutionId,
-                                    documentType = "RegistrationCertificate"
-                                })!,
-                            Title = "Registration Certificate"
-                        })
-                }
-                else
-                {
-                    <span class="badge bg-secondary">Not Uploaded</span>
-                }
-            </div>
-
-            <!-- Audit Statement -->
-            <div class="col-md-6">
-                <label class="form-label">Audit Statement</label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.AuditStatementFilePath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewTrustDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.InstitutionId,
-                                    documentType = "AuditStatement"
-                                })!,
-                            Title = "Audit Statement"
-                        })
-                }
-                else
-                {
-                    <span class="badge bg-secondary">Not Uploaded</span>
-                }
-            </div>
-                <div class="col-md-6">
-                    <label class="form-label">Other Dental College in City</label>
-                    <input type="text" class="form-control" value="@(Model.OtherDentalCollegeInCity == true ? "Yes" : Model.OtherDentalCollegeInCity == false ? "No" : "Not specified")" disabled />
-                </div>
+                <label class="form-label">Other Dental College in City</label>
+                <input type="text" class="form-control" value="@(Model.OtherDentalCollegeInCity == true ? "Yes" : Model.OtherDentalCollegeInCity == false ? "No" : "Not specified")" disabled />
             </div>
         </div>
     </div>
+</div>
+@{
+    var trustInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 10);
+}
 
-    <!-- Verification Status Overview Card -->
-    <div class="verification-card mb-4">
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-shield-check"></i>
-                Verification Status Overview
-            </h3>
-        </div>
-        <div class="verification-card-body">
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                    <thead class="table-light">
+@if (trustInfoFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", trustInfoFeedback)
+}
+
+<!-- Verification Status Overview Card -->
+<div class="verification-card mb-4">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-shield-check"></i>
+            Verification Status Overview
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Level</th>
+                        <th>Status</th>
+                        <th>Verified By</th>
+                        <th>Verified Date</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var level in new (string Level, bool? Verified, string Name, DateTime? Date, string Remarks)[]
+                    {
+                        ("DEO", Model.IsDeoVerified, Model.DeoName, Model.DeoVerifiedDate, Model.DeoRemarks),
+                        ("JR", Model.IsJrVerified, Model.JrName, Model.JrVerifiedDate, Model.JrRemarks),
+                        ("SO", Model.IsSoVerified, Model.SoName, Model.SoVerifiedDate, Model.SoRemarks),
+                        ("AR", Model.IsArVerified, Model.ArName, Model.ArVerifiedDate, Model.ArRemarks),
+                        ("RG", Model.IsRgVerified, Model.RgName, Model.RgVerifiedDate, Model.RgRemarks),
+                        ("RE", Model.IsReVerified, Model.ReName, Model.ReVerifiedDate, Model.ReRemarks),
+                        ("DR", Model.IsDrVerified, Model.DrName, Model.DrVerifiedDate, Model.DrRemarks),
+                        ("VC", Model.IsVcVerified, Model.VcName, Model.VcVerifiedDate, Model.VcRemarks)
+                    })
+                    {
                         <tr>
-                            <th>Level</th>
-                            <th>Status</th>
-                            <th>Verified By</th>
-                            <th>Verified Date</th>
-                            <th>Remarks</th>
+                            <td><strong>@level.Level</strong></td>
+                            <td>
+                                @if (level.Verified == true)
+                                {
+                                    <span class="badge bg-success">Verified</span>
+                                }
+                                else if (level.Verified == false)
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                            </td>
+                            <td>@(level.Name ?? "-")</td>
+                            <td>@(level.Date?.ToString("dd MMM yyyy") ?? "-")</td>
+                            <td>@(level.Remarks ?? "-")</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var level in new (string Level, bool? Verified, string Name, DateTime? Date, string Remarks)[]
-                        {
-                            ("DEO", Model.IsDeoVerified, Model.DeoName, Model.DeoVerifiedDate, Model.DeoRemarks),
-                            ("JR", Model.IsJrVerified, Model.JrName, Model.JrVerifiedDate, Model.JrRemarks),
-                            ("SO", Model.IsSoVerified, Model.SoName, Model.SoVerifiedDate, Model.SoRemarks),
-                            ("AR", Model.IsArVerified, Model.ArName, Model.ArVerifiedDate, Model.ArRemarks),
-                            ("RG", Model.IsRgVerified, Model.RgName, Model.RgVerifiedDate, Model.RgRemarks),
-                            ("RE", Model.IsReVerified, Model.ReName, Model.ReVerifiedDate, Model.ReRemarks),
-                            ("DR", Model.IsDrVerified, Model.DrName, Model.DrVerifiedDate, Model.DrRemarks),
-                            ("VC", Model.IsVcVerified, Model.VcName, Model.VcVerifiedDate, Model.VcRemarks)
-                        })
-                        {
-                            <tr>
-                                <td><strong>@level.Level</strong></td>
-                                <td>
-                                    @if (level.Verified == true)
-                                    {
-                                        <span class="badge bg-success">Verified</span>
-                                    }
-                                    else if (level.Verified == false)
-                                    {
-                                        <span class="badge bg-danger">Rejected</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning text-dark">Pending</span>
-                                    }
-                                </td>
-                                <td>@(level.Name ?? "-")</td>
-                                <td>@(level.Date?.ToString("dd MMM yyyy") ?? "-")</td>
-                                <td>@(level.Remarks ?? "-")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-3">
-                <strong>Current Verification Level:</strong> @(Model.CurrentVerificationLevel ?? "Not Started")<br />
-                <strong>Overall Status:</strong> @(Model.OverallStatus ?? "Pending")<br />
-                <strong>Last Updated:</strong> @(Model.LastUpdatedDate?.ToString("dd MMM yyyy HH:mm") ?? "Never")
-            </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            <strong>Current Verification Level:</strong> @(Model.CurrentVerificationLevel ?? "Not Started")<br />
+            <strong>Overall Status:</strong> @(Model.OverallStatus ?? "Pending")<br />
+            <strong>Last Updated:</strong> @(Model.LastUpdatedDate?.ToString("dd MMM yyyy HH:mm") ?? "Never")
         </div>
     </div>
+</div>

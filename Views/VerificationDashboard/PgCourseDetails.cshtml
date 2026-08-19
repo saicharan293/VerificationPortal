@@ -103,4 +103,15 @@
     </div>
 </div>
 
+
+@{
+    var pgFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 24);
+}
+
+@if (pgFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", pgFeedback)
+}
+
 <!-- Verification Remarks & Status (rendered by layout) -->

@@ -186,6 +186,16 @@
         </div>
 
 
+        @{
+            var researchDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                        ?.FirstOrDefault(x => x.SectionId == 49);
+        }
+
+        @if (researchDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", researchDetailsFeedback)
+        }
+
         <!-- ================================================= -->
         <!-- UPLOADED DOCUMENTS -->
         <!-- ================================================= -->

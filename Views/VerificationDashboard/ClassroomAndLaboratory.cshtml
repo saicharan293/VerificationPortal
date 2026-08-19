@@ -609,6 +609,14 @@
             </div>
 
         </div>
+         @{
+            var classroomFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                        ?.FirstOrDefault(x => x.SectionId == 27);
+        }
+        @if (classroomFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", classroomFeedback)
+        }
 
     </div>
 }

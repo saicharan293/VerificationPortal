@@ -234,3 +234,14 @@
     </div>
 
 </div>
+
+
+@{
+    var vehicleDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 37);
+}
+
+@if (vehicleDetailsFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", vehicleDetailsFeedback)
+}

@@ -271,6 +271,16 @@
 
 </div>
 
+@{
+    var deptLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 48);
+}
+
+@if (deptLibraryDetailsFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", deptLibraryDetailsFeedback)
+}
+
 
 @* ============================================================
    DENTAL LIBRARY RECORDS

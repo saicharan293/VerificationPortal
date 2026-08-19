@@ -1060,7 +1060,7 @@ body {
     flex-direction: column;
     /* Do NOT scroll the entire content */
     overflow: hidden;
-    padding-bottom: 5rem;
+    padding-bottom: 2rem;
 }
 
 .main-content {

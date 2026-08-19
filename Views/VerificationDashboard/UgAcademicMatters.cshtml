@@ -169,3 +169,14 @@
     </div>
 
 </div>
+
+                                        
+@{
+    var ugAcademicPerformanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 38);
+}
+
+@if (ugAcademicPerformanceFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", ugAcademicPerformanceFeedback)
+}

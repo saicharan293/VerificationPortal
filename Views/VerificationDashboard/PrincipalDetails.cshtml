@@ -234,7 +234,15 @@
 
 </div>
 
+@{
+    var principalInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 15);
+}
 
+@if (principalInfoFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", principalInfoFeedback)
+}
 <!-- ========================================================= -->
 <!-- TEACHING EXPERIENCE -->
 <!-- ========================================================= -->
@@ -378,7 +386,15 @@
     </div>
 
 </div>
+@{
+    var principalTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 16);
+}
 
+@if (principalTeachFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", principalTeachFeedback)
+}
 
 <!-- ========================================================= -->
 <!-- ADMINISTRATIVE EXPERIENCE -->
@@ -524,3 +540,14 @@
     </div>
 
 </div>
+
+
+@{
+    var principalAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 17);
+}
+
+@if (principalAdminFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", principalAdminFeedback)
+}

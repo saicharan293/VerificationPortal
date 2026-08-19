@@ -122,7 +122,15 @@
             }
         </div>
     </div>
+@{
+    var trustMemberFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 11);
+}
 
+@if (trustMemberFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", trustMemberFeedback)
+}
     <!-- Verification Remarks & Status -->
    
 

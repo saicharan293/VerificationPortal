@@ -278,6 +278,8 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<InstitutionBasicDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
+
             return View(institution);
         }
 
@@ -404,6 +406,8 @@ namespace VerificationPortal.Controllers
 
 
             await SetVerificationViewData<ContinuationTrustMemberDetail>(collegeCode);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 3);
 
             return View(trustMembers);
         }
@@ -858,6 +862,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffDeanOrDirectorDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 4);
 
             return View(vm);
         }
@@ -1015,6 +1020,8 @@ namespace VerificationPortal.Controllers
             ViewBag.UserDesignation = GetUserDesignation();
 
             await SetVerificationViewData<DentalChair>(collegeCode);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 11);
 
             return View(model);
         }
@@ -1269,6 +1276,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffPrincipalDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 5);
 
             return View(institution);
         }
@@ -1434,7 +1442,7 @@ namespace VerificationPortal.Controllers
 
             await SetVerificationViewData<AffiliationPgSsCourseDetail>(
                 collegeCode);
-
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 7);
 
             return View(courses);
         }
@@ -1818,7 +1826,7 @@ namespace VerificationPortal.Controllers
             ViewBag.UserDesignation = GetUserDesignation();
 
             await SetVerificationViewData<AffiliationCourseDetail>(collegeCode);
-
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 6);
             return View(ugCourses);
         }
 
@@ -2079,6 +2087,7 @@ namespace VerificationPortal.Controllers
             ViewBag.NextTabLabel =
                 "Next: Classroom & Laboratory";
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
 
             return View(landBuilding);
         }
@@ -2303,6 +2312,8 @@ namespace VerificationPortal.Controllers
                 }).ToList()
             };
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 10);
+
             return View(model);
         }
 
@@ -2412,6 +2423,8 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<DentalCollegeEquipmentDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 15);
+
             return View(vm);
         }
 
@@ -2511,6 +2524,8 @@ namespace VerificationPortal.Controllers
 
             await SetVerificationViewData<MedicalUgbedDistribution>(collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 12);
+
             return View(vm);
         }
 
@@ -2553,6 +2568,8 @@ namespace VerificationPortal.Controllers
             };
 
             await SetVerificationViewData<AffHostelDetail>(collegeCode);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 13);
 
             return View(vm);
         }
@@ -2706,6 +2723,7 @@ namespace VerificationPortal.Controllers
                     !string.IsNullOrWhiteSpace(entity.MeuMembersListFilePath);
             }
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 14);
             return View(vm);
         }
 
@@ -2838,6 +2856,7 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = "CAVehicleDetails";
 
             await SetVerificationViewData<CaVehicleDetail>(collegeCode);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 16);
 
             return View(vm);
         }
@@ -3066,8 +3085,9 @@ namespace VerificationPortal.Controllers
             ViewBag.UserDesignation = GetUserDesignation();
 
             // Existing verification information
-            await SetVerificationViewData<CaAcademicPerformance>(
-                collegeCode);
+            await SetVerificationViewData<CaAcademicPerformance>( collegeCode);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 17);
 
 
             return View("UgAcademicMatters", model);
@@ -3280,6 +3300,8 @@ namespace VerificationPortal.Controllers
 
             await SetVerificationViewData<CaAcademicPerformance>(
                 collegeCode);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 18);
 
             return View("PgAcademicMatters", model);
         }
@@ -3538,6 +3560,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<CaMedicalDepartmentLibrary>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 22);
 
             return View("LibraryServices", model);
         }
@@ -3674,7 +3697,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<CaMedResearchPublicationsDetail>(
                 collegeCode);
 
-
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 23);
             return View("ResearchPublications", model);
 
         }
@@ -4304,6 +4327,8 @@ namespace VerificationPortal.Controllers
                 // Verification feedback
                 await SetVerificationViewData<MedCaAccountAndFeeDetail>(collegeCode);
 
+                ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 21);
+
                 return View("FinanceDetails", vm);
             }
             catch (Exception ex)
@@ -4482,7 +4507,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeCode = collegeCode;
             ViewBag.FacultyCode = facultyCode;
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 19);
             return View("StaffPayScale", vm);
         }
 
@@ -4582,6 +4607,8 @@ namespace VerificationPortal.Controllers
 
             ViewBag.CollegeCode = collegeCode;
             ViewBag.FacultyCode = facultyCode;
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 20);
 
             return View("StaffOtherDetails", vm);
         }
@@ -4907,6 +4934,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<CaMedLibraryGeneral>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 24);
 
             return View("LibraryDetails", model);
         }
@@ -5122,6 +5150,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<FacultyDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 25);
 
             return View("FacultyDetails", model);
         }
@@ -5478,6 +5507,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<TeachingStaffDepartmentWiseDetail>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 26);
 
             return View("TeachingExperience", model);
         }

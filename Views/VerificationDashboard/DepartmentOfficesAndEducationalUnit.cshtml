@@ -119,6 +119,22 @@
 
 </div>
 
+@{
+    var deptInfraFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 34);
+}
+
+@if (deptInfraFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", deptInfraFeedback)
+}
+
+
+@{
+    var deuFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                        ?.FirstOrDefault(x => x.SectionId == 35);
+}
+
 @if ((ViewBag.FacultyCode?.ToString() ?? "") == "2")
 {
     <!-- ================= DENTAL EDUCATION UNIT ================= -->
@@ -234,6 +250,11 @@
         </div>
 
     </div>
+
+    @if (deuFeedback != null)
+    {
+        @await Html.PartialAsync("_SectionFeedback", deuFeedback)
+    }
 }
 else
 {
