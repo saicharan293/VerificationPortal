@@ -83,7 +83,10 @@
         <p>Review the trust details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, you can proceed to the next tab: <strong>Trust Member Details</strong>.</p>
     </div>
 </div>
-
+@{
+    var trustInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 10);
+}
 <!-- Trust Information Card -->
 <div class="verification-card mb-4">
     <div class="verification-card-header">
@@ -341,17 +344,16 @@
                 <input type="text" class="form-control" value="@(Model.OtherDentalCollegeInCity == true ? "Yes" : Model.OtherDentalCollegeInCity == false ? "No" : "Not specified")" disabled />
             </div>
         </div>
+
+        
+        @if (trustInfoFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", trustInfoFeedback)
+        }
     </div>
 </div>
-@{
-    var trustInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 10);
-}
 
-@if (trustInfoFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", trustInfoFeedback)
-}
+
 
 <!-- Verification Status Overview Card -->
 <div class="verification-card mb-4">

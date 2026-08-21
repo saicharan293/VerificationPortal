@@ -2230,6 +2230,9 @@ body {
 .sidebar-nav .nav-link:nth-child(7) { animation-delay: 0.35s; }
 .sidebar-nav .nav-link:nth-child(8) { animation-delay: 0.4s; }
 
+/* ============================================================
+   SECTION FEEDBACK
+   ============================================================ */
 
 .section-feedback {
     border: 1px solid var(--border-color);
@@ -2238,30 +2241,253 @@ body {
     overflow: hidden;
 }
 
-.section-feedback-header {
+.section-feedback-body {
+    padding: 1.5rem;
+}
+
+
+/* ============================================================
+   FORM LABELS
+   ============================================================ */
+
+.section-feedback .form-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 0.65rem;
+}
+
+
+/* ============================================================
+   VERIFICATION STATUS SELECTOR
+   ============================================================ */
+
+.verification-status-selector {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+    .verification-status-selector .btn-check {
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none;
+    }
+
+
+/* Individual status button */
+
+.verification-status-btn {
+    flex: 1;
+    min-height: 48px;
     display: flex;
     align-items: center;
-/*    justify-content: space-between;*/
-    gap: 1rem;
-    padding: 0.9rem 1.25rem;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+    .verification-status-btn:hover {
+        transform: translateY(-1px);
+    }
+
+
+    /* ============================================================
+   ACCEPT
+   ============================================================ */
+
+    .verification-status-btn.status-accepted:hover {
+        border-color: #198754;
+        color: #198754;
+        background: rgba(25, 135, 84, 0.08);
+    }
+
+.btn-check:checked + .status-accepted {
+    background: #198754;
+    border-color: #198754;
+    color: #fff;
+    box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.15);
+}
+
+
+/* ============================================================
+   REJECT
+   ============================================================ */
+
+.verification-status-btn.status-rejected:hover {
+    border-color: #dc3545;
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.08);
+}
+
+.btn-check:checked + .status-rejected {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15);
+}
+
+
+/* ============================================================
+   PENDING
+   ============================================================ */
+
+.verification-status-btn.status-pending:hover {
+    border-color: #ffc107;
+    color: #856404;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.btn-check:checked + .status-pending {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.15);
+}
+
+
+/* ============================================================
+   FOCUS ACCESSIBILITY
+   ============================================================ */
+
+.verification-status-selector .btn-check:focus-visible + label {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   REMARKS
+   ============================================================ */
+
+.section-feedback textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.section-feedback .form-text {
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
+}
+.section-feedback .row {
+    align-items: flex-start;
+}
+
+.feedback-item {
+    height: auto;
+}
+
+.feedback-value {
     color: var(--text-primary);
+    line-height: 1.6;
 }
 
-.section-feedback-header i {
-    color: var(--primary);
+.feedback-remarks {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.65;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
-.section-feedback-body {
-    padding: 1.25rem;
+.verification-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .verification-meta {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+}
+
+
+/* ============================================================
+   FEEDBACK DISPLAY
+   ============================================================ */
+
+.feedback-item {
+    height: 100%;
+}
+
+.feedback-label {
+    display: block;
+    margin-bottom: 0.6rem;
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.feedback-value {
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+
+.verification-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge-accepted {
+    background: rgba(25, 135, 84, 0.12);
+    color: #198754;
+}
+
+.status-badge-rejected {
+    background: rgba(220, 53, 69, 0.12);
+    color: #dc3545;
+}
+
+.status-badge-pending {
+    background: rgba(255, 193, 7, 0.18);
+    color: #856404;
+}
+
+
+/* ============================================================
+   VERIFICATION META
+   ============================================================ */
+
+.verification-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
     color: var(--text-tertiary);
     font-size: 0.85rem;
 }
@@ -2271,12 +2497,74 @@ body {
     margin-right: 0.25rem;
 }
 
-.section-feedback .form-label {
+.verification-meta strong {
     color: var(--text-secondary);
-    font-weight: 600;
 }
 
-.section-feedback textarea {
-    resize: vertical;
-    min-height: 90px;
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
+.verification-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+
+/* ============================================================
+   EDIT FORM
+   ============================================================ */
+
+.verification-edit-form {
+    animation: verificationEditIn 0.2s ease;
+}
+
+@keyframes verificationEditIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+    .section-feedback-body {
+        padding: 1rem;
+    }
+
+    .verification-status-selector {
+        flex-direction: column;
+    }
+
+    .verification-status-btn {
+        width: 100%;
+    }
+
+    .verification-form-actions {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+
+    .verification-form-actions .btn {
+        width: 100%;
+    }
+
+    .verification-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
 }
