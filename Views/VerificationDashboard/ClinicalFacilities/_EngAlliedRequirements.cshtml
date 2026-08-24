@@ -1,6 +1,10 @@
 ﻿@model VerificationPortal.Models.EngAlliedRequirementsPostVM
 
 <div class="verification-card mt-4">
+    @{
+        var engAlliedFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionId == 61);
+    }
 
     <div class="verification-card-header">
 
@@ -111,6 +115,11 @@
             </div>
         }
 
+
+        @if (engAlliedFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", engAlliedFeedback)
+        }
     </div>
 
 </div>

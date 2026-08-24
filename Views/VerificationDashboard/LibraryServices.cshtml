@@ -67,6 +67,11 @@
    DEPARTMENT LIBRARY DETAILS
    ============================================================ *@
 
+@{
+    var deptLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 48);
+}
+
 <div class="verification-card mt-4">
 
     <div class="verification-card-header">
@@ -267,19 +272,18 @@
             </div>
         }
 
+
+
+        
+        @if (deptLibraryDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deptLibraryDetailsFeedback)
+        }
+
     </div>
 
 </div>
 
-@{
-    var deptLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 48);
-}
-
-@if (deptLibraryDetailsFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", deptLibraryDetailsFeedback)
-}
 
 
 @* ============================================================

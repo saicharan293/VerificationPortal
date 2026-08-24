@@ -56,6 +56,11 @@
    GENERAL LIBRARY DETAILS
    ========================================================= *@
 
+@{
+    var generalLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 50);
+}
+
 <div class="verification-card mt-4">
 
     <div class="verification-card-header">
@@ -152,23 +157,24 @@
 
         </div>
 
+        @if (generalLibraryDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", generalLibraryDetailsFeedback)
+        }
     </div>
 
 </div>
 
-@{
-    var generalLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 50);
-}
 
-@if (generalLibraryDetailsFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", generalLibraryDetailsFeedback)
-}
+
 
 @* =========================================================
    LIBRARY ITEMS
    ========================================================= *@
+@{
+    var libraryItemsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 51);
+}
 
 <div class="verification-card mt-4">
 
@@ -255,23 +261,27 @@
             </div>
         }
 
+
+        
+
+        @if (libraryItemsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", libraryItemsFeedback)
+        }
     </div>
 
 </div>
 
-@{
-    var libraryItemsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 51);
-}
 
-@if (libraryItemsFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", libraryItemsFeedback)
-}
 
 @* =========================================================
    LIBRARY BUILDING
    ========================================================= *@
+
+@{
+    var libraryBuildingFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 52);
+}
 
 <div class="verification-card mt-4">
 
@@ -329,23 +339,26 @@
 
         </div>
 
+        
+        @if (libraryBuildingFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", libraryBuildingFeedback)
+        }
     </div>
 
 </div>
 
-@{
-    var libraryBuildingFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 52);
-}
 
-@if (libraryBuildingFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", libraryBuildingFeedback)
-}
+
 
 @* =========================================================
    TECHNICAL PROCESSES
    ========================================================= *@
+
+@{
+    var techProcessFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 53);
+}
 
 <div class="verification-card mt-4">
 
@@ -399,23 +412,25 @@
             </div>
         }
 
+        
+        @if (techProcessFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", techProcessFeedback)
+        }
+
     </div>
 
 </div>
 
-@{
-    var techProcessFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 53);
-}
-
-@if (techProcessFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", techProcessFeedback)
-}
 
 @* =========================================================
    LIBRARY EQUIPMENT
    ========================================================= *@
+
+@{
+    var libraryEquipmentFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 54);
+}
 
 <div class="verification-card mt-4">
 
@@ -469,24 +484,26 @@
             </div>
         }
 
+
+        
+        @if (libraryEquipmentFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", libraryEquipmentFeedback)
+        }
+
     </div>
 
 </div>
 
 
-@{
-    var libraryEquipmentFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 54);
-}
-
-@if (libraryEquipmentFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", libraryEquipmentFeedback)
-}
-
 @* =========================================================
    LIBRARY FINANCE
    ========================================================= *@
+
+@{
+    var libraryFinanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 55);
+}
 
 <div class="verification-card mt-4">
 
@@ -559,19 +576,17 @@
             </div>
         }
 
+
+
+        @if (libraryFinanceFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", libraryFinanceFeedback)
+        }
+
     </div>
 
 </div>
 
-@{
-    var libraryFinanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 55);
-}
-
-@if (libraryFinanceFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", libraryFinanceFeedback)
-}
 
 @section Scripts {
 

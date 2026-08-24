@@ -77,6 +77,45 @@
 
             </div>
 
+            
+            @{
+                var courseLevel = section.CourseLevel?.ToLower();
+
+                var authoritySectionId = courseLevel switch
+                {
+                    "ug" => 42,
+                    "pg" => 45,
+                    _ => 0
+                };
+
+                var annualSectionId = courseLevel switch
+                {
+                    "ug" => 43,
+                    "pg" => 46
+                };
+
+                var accountSectionId = courseLevel switch
+                {
+                    "ug" => 44,
+                    "pg" => 47
+                };
+
+                var authorityFeedback =
+                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                    ?.FirstOrDefault(x =>
+                        x.SectionId == authoritySectionId);
+
+                var annualFeedback =
+                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                    ?.FirstOrDefault(x =>
+                        x.SectionId == annualSectionId);
+
+                var accountFeedback =
+                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                    ?.FirstOrDefault(x =>
+                        x.SectionId == accountSectionId);
+            }
+
 
             <div class="verification-card-body">
 
@@ -123,55 +162,17 @@
 
                 </div>
 
+                @if (authorityFeedback != null)
+                {
+                    @await Html.PartialAsync( "_SectionFeedback", authorityFeedback )
+                }
+
             </div>
 
             
-            @{
-                var courseLevel = section.CourseLevel?.ToLower();
-
-                var authoritySectionId = courseLevel switch
-                {
-                    "ug" => 42,
-                    "pg" => 45,
-                    _ => 0
-                };
-
-                var annualSectionId = courseLevel switch
-                {
-                    "ug" => 43,
-                    "pg" => 46
-                };
-
-                var accountSectionId = courseLevel switch
-                {
-                    "ug" => 44,
-                    "pg" => 47
-                };
-
-                var authorityFeedback =
-                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                    ?.FirstOrDefault(x =>
-                        x.SectionId == authoritySectionId);
-
-                var annualFeedback =
-                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                    ?.FirstOrDefault(x =>
-                        x.SectionId == annualSectionId);
-
-                var accountFeedback =
-                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                    ?.FirstOrDefault(x =>
-                        x.SectionId == accountSectionId);
-            }
-
-
         </div>
 
-        @if (authorityFeedback != null)
-        {
-            @await Html.PartialAsync( "_SectionFeedback", authorityFeedback )
-        }
-
+        
 
         <!-- =========================================================
              ANNUAL FINANCIAL DETAILS
@@ -376,15 +377,17 @@
 
                 </div>
 
+                @if (annualFeedback != null)
+                {
+                    @await Html.PartialAsync( "_SectionFeedback", annualFeedback )
+                }
+
+
             </div>
 
         </div>
 
-        @if (annualFeedback != null)
-        {
-            @await Html.PartialAsync( "_SectionFeedback", annualFeedback )
-        }
-
+        
         <!-- =========================================================
              ACCOUNT & AUDIT DETAILS
         ========================================================== -->
@@ -532,14 +535,16 @@
 
                 </div>
 
+                @if (accountFeedback != null)
+                {
+                    @await Html.PartialAsync( "_SectionFeedback", accountFeedback )
+                }
+
             </div>
 
         </div>
 
-        @if (accountFeedback != null)
-        {
-            @await Html.PartialAsync( "_SectionFeedback", accountFeedback )
-        }
+        
 
         <!-- =========================================================
              SUPPORTING DOCUMENTS

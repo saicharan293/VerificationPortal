@@ -1,7 +1,10 @@
 ﻿@model VerificationPortal.Models.ClinicalHospitalVerificationRow
 
 <div class="verification-card mt-4">
-
+    @{
+        var clinicalHospitalFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionId == 57);
+    }
     <div class="verification-card-header">
 
         <h3 class="verification-card-title">
@@ -172,6 +175,12 @@
                 </table>
 
             </div>
+        }
+
+
+        @if (clinicalHospitalFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", clinicalHospitalFeedback)
         }
 
     </div>

@@ -2,6 +2,11 @@
 
 <div class="verification-card mt-4">
 
+    @{
+        var disciplineFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionId == 59);
+    }
+
     <div class="verification-card-header">
 
         <h3 class="verification-card-title">
@@ -122,6 +127,10 @@
             </div>
         }
 
+        @if (disciplineFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", disciplineFeedback)
+        }
     </div>
 
 </div>

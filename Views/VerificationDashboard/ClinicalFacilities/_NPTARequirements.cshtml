@@ -2,6 +2,11 @@
 
 <div class="verification-card mt-4">
 
+    @{
+        var nptaRequirementsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionId == 60);
+    }
+
     <div class="verification-card-header">
 
         <h3 class="verification-card-title">
@@ -114,6 +119,11 @@
             </div>
         }
 
+
+        @if (nptaRequirementsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", nptaRequirementsFeedback)
+        }
     </div>
 
 </div>

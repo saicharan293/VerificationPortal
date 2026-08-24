@@ -29,6 +29,11 @@
     </div>
 </div>
 
+@{
+    var pgFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 24);
+}
+
 <!-- PG/SS Courses Table Card -->
 <div class="verification-card mb-4">
     <div class="verification-card-header">
@@ -100,18 +105,15 @@
                 <p class="mb-0 text-muted">PG / Super Specialty courses will appear here when available in the AffiliationPgSsCourseDetails table.</p>
             </div>
         }
+
+        
+        @if (pgFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", pgFeedback)
+        }
     </div>
 </div>
 
 
-@{
-    var pgFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 24);
-}
-
-@if (pgFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", pgFeedback)
-}
 
 <!-- Verification Remarks & Status (rendered by layout) -->

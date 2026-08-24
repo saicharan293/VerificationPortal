@@ -60,6 +60,11 @@
 </div>
 
 
+@{
+    var deptInfraFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 34);
+}
+
 <div class="verification-card">
 
     <div class="verification-card-header">
@@ -115,19 +120,17 @@
 
         </div>
 
+
+        @if (deptInfraFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deptInfraFeedback)
+        }
+
     </div>
 
 </div>
 
-@{
-    var deptInfraFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 34);
-}
 
-@if (deptInfraFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", deptInfraFeedback)
-}
 
 
 @{
@@ -246,15 +249,14 @@
                 }
 
             </div>
-
+            @if (deuFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", deuFeedback)
+            }
         </div>
 
     </div>
 
-    @if (deuFeedback != null)
-    {
-        @await Html.PartialAsync("_SectionFeedback", deuFeedback)
-    }
 }
 else
 {

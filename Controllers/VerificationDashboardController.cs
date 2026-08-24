@@ -5557,6 +5557,8 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<HospitalDetailsForAffiliation>(
                 collegeCode);
 
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 27);
+
             return View(model);
         }
 

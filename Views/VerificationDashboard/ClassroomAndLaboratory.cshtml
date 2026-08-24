@@ -103,7 +103,10 @@
             </h3>
 
         </div>
-
+        @{
+            var classroomFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                        ?.FirstOrDefault(x => x.SectionId == 27);
+        }
 
         <div class="verification-card-body">
 
@@ -608,15 +611,13 @@
 
             </div>
 
+            @if (classroomFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", classroomFeedback)
+            }
         </div>
-         @{
-            var classroomFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionId == 27);
-        }
-        @if (classroomFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", classroomFeedback)
-        }
+        
+        
 
     </div>
 }

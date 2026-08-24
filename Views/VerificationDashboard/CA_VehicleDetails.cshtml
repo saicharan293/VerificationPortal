@@ -110,6 +110,12 @@
     </div>
 </div>
 
+
+@{
+    var vehicleDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 37);
+}
+
 <div class="verification-card">
 
     <div class="verification-card-header">
@@ -231,17 +237,13 @@
             </div>
         }
 
+
+        
+        @if (vehicleDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", vehicleDetailsFeedback)
+        }
     </div>
 
 </div>
 
-
-@{
-    var vehicleDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 37);
-}
-
-@if (vehicleDetailsFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", vehicleDetailsFeedback)
-}

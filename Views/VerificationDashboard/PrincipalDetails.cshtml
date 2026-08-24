@@ -117,6 +117,10 @@
 <!-- ========================================================= -->
 <!-- PRINCIPAL INFORMATION -->
 <!-- ========================================================= -->
+@{
+    var principalInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 15);
+}
 
 <div class="verification-card mb-4">
 
@@ -230,22 +234,24 @@
 
         </div>
 
+
+        
+        @if (principalInfoFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", principalInfoFeedback)
+        }
     </div>
 
 </div>
 
-@{
-    var principalInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 15);
-}
 
-@if (principalInfoFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", principalInfoFeedback)
-}
 <!-- ========================================================= -->
 <!-- TEACHING EXPERIENCE -->
 <!-- ========================================================= -->
+@{
+    var principalTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 16);
+}
 
 <div class="verification-card mb-4">
 
@@ -383,22 +389,26 @@
             </div>
         }
 
+
+        
+        @if (principalTeachFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", principalTeachFeedback)
+        }
     </div>
 
 </div>
-@{
-    var principalTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 16);
-}
 
-@if (principalTeachFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", principalTeachFeedback)
-}
+
 
 <!-- ========================================================= -->
 <!-- ADMINISTRATIVE EXPERIENCE -->
 <!-- ========================================================= -->
+
+@{
+    var principalAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 17);
+}
 
 <div class="verification-card mb-4">
 
@@ -537,17 +547,12 @@
             </div>
         }
 
+
+        
+        @if (principalAdminFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", principalAdminFeedback)
+        }
     </div>
 
 </div>
-
-
-@{
-    var principalAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 17);
-}
-
-@if (principalAdminFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", principalAdminFeedback)
-}

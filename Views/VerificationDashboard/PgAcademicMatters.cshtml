@@ -75,6 +75,12 @@
      PG ACADEMIC PERFORMANCE
      ========================= -->
 
+
+@{
+    var pgCourseFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 39);
+}
+
 <div class="verification-card mt-4">
 
     <div class="verification-card-header">
@@ -189,16 +195,14 @@
             </div>
         }
 
+
+        
+        @if (pgCourseFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", pgCourseFeedback)
+        }
+
     </div>
 
 </div>
 
-@{
-    var pgCourseFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 39);
-}
-
-@if (pgCourseFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", pgCourseFeedback)
-}

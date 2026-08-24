@@ -3,6 +3,10 @@
 <div class="verification-card mt-4">
 
     <div class="verification-card-header">
+        @{
+            var wardBedDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                        ?.FirstOrDefault(x => x.SectionId == 62);
+        }
 
         <h3 class="verification-card-title">
             <i class="bi bi-hospital me-2"></i>
@@ -111,6 +115,11 @@
                 </table>
 
             </div>
+        }
+
+        @if (wardBedDistributionFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", wardBedDistributionFeedback)
         }
 
     </div>

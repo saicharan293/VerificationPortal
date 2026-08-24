@@ -106,7 +106,10 @@
 <!-- ========================================================= -->
 <!-- DEAN / DIRECTOR INFORMATION -->
 <!-- ========================================================= -->
-
+@{
+    var deanInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 12);
+}
 <div class="verification-card mb-4">
 
     <div class="verification-card-header">
@@ -224,23 +227,24 @@
 
         </div>
 
+        @if (deanInfoFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deanInfoFeedback)
+        }
     </div>
 
 </div>
 
-@{
-    var deanInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 12);
-}
 
-@if (deanInfoFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", deanInfoFeedback)
-}
 
 <!-- ========================================================= -->
 <!-- TEACHING EXPERIENCE -->
 <!-- ========================================================= -->
+
+@{
+    var deanTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 13);
+}
 
 <div class="verification-card mb-4">
 
@@ -383,24 +387,24 @@
             </div>
         }
 
+
+        @if (deanTeachFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deanTeachFeedback)
+        }
     </div>
 
 </div>
 
 
-@{
-    var deanTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 13);
-}
-
-@if (deanTeachFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", deanTeachFeedback)
-}
 
 <!-- ========================================================= -->
 <!-- ADMINISTRATIVE EXPERIENCE -->
 <!-- ========================================================= -->
+@{
+    var deanAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 14);
+}
 
 <div class="verification-card mb-4">
 
@@ -544,16 +548,12 @@
             </div>
         }
 
+
+        
+        @if (deanAdminFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deanAdminFeedback)
+        }
     </div>
 
 </div>
-
-@{
-    var deanAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 14);
-}
-
-@if (deanAdminFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", deanAdminFeedback)
-}

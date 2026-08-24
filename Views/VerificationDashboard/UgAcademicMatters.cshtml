@@ -72,6 +72,12 @@
     </div>
 
 </div>
+                                        
+@{
+    var ugAcademicPerformanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 38);
+}
+
 
 <div class="verification-card mb-4">
 
@@ -166,17 +172,13 @@
             </div>
         }
 
+
+        
+        @if (ugAcademicPerformanceFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", ugAcademicPerformanceFeedback)
+        }
     </div>
 
 </div>
 
-                                        
-@{
-    var ugAcademicPerformanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 38);
-}
-
-@if (ugAcademicPerformanceFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", ugAcademicPerformanceFeedback)
-}

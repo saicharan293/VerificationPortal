@@ -59,6 +59,11 @@
     </div>
 </div>
 
+
+@{
+    var bedDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 29);
+}
 <div class="verification-card">
 
     <div class="verification-card-header">
@@ -279,16 +284,12 @@
             </div>
         }
 
+        
+        @if (bedDistributionFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", bedDistributionFeedback)
+        }
+
     </div>
 </div>
 
-
-@{
-    var bedDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 29);
-}
-
-@if (bedDistributionFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", bedDistributionFeedback)
-}
