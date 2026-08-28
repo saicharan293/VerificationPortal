@@ -259,67 +259,7 @@
                 </div>
 
                 <!-- Verification Feedback & Status Section (Report Format - Bottom of Each Card) -->
-                <div class="report-card-footer verification-feedback-section">
-                    <div class="feedback-header">
-                        <h3 class="feedback-title">
-                            <i class="bi bi-clipboard-check"></i>
-                            Verification Feedback & Status
-                        </h3>
-                        <div class="verifier-info">
-                            <i class="bi bi-person-badge"></i>
-                            <span>@ViewBag.UserDesignation - @ViewBag.UserName</span>
-                        </div>
-                    </div>
-                    <div class="feedback-body">
-                        <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>
-                            <input type="hidden" name="collegeCode" value="" id="feedback-college-code" />
-                            <input type="hidden" name="tabName" value="InstitutionDetails" />
-
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label" for="remarks">Remarks <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="remarks" name="remarks" rows="3" required
-                                              placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes."></textarea>
-                                    <div class="form-text">Please provide detailed remarks for your verification decision.</div>
-                                    <div class="invalid-feedback">Remarks are required for verification.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="status">Verification Status <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="status" name="status" required>
-                                        <option value="">-- Select Status --</option>
-                                        <option value="accept">Accept</option>
-                                        <option value="reject">Reject</option>
-                                        <option value="pending">Pending Review</option>
-                                    </select>
-                                    <div class="invalid-feedback">Please select a verification status.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="verificationLevel">Verification Level</label>
-                                    <select class="form-select" id="verificationLevel" name="verificationLevel">
-                                        <option value="">-- Select Level --</option>
-                                        <option value="DEO">DEO (District Education Officer)</option>
-                                        <option value="JR">JR (Joint Registrar)</option>
-                                        <option value="SO">SO (Section Officer)</option>
-                                        <option value="AR">AR (Assistant Registrar)</option>
-                                        <option value="RG">RG (Registrar)</option>
-                                        <option value="RE">RE (Registrar Evaluation)</option>
-                                        <option value="DR">DR (Director)</option>
-                                        <option value="VC">VC (Vice Chancellor)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            @* <div class="feedback-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-save"></i> Save Verification
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="resetFeedbackForm(this)">
-                                    <i class="bi bi-x-circle"></i> Clear
-                                </button>
-                            </div> *@
-                        </form>
-                    </div>
-                </div>
+                
             </div>
         }
     }

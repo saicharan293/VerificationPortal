@@ -148,19 +148,7 @@ namespace VerificationPortal.Controllers
                 return View(model);
             }
 
-            // Check for duplicate mapping
-            var existingMapping = await _context.TblCollegeMappings
-                .FirstOrDefaultAsync(m => m.UserId == model.SelectedUserId
-                                       && m.FacultyCode == model.SelectedFacultyId);
-
-            if (existingMapping != null)
-            {
-                ModelState.AddModelError("",
-                    "This user already has a college mapping. Please edit the existing one or delete it first.");
-                await PopulateCreateViewModel(model);
-                return View(model);
-            }
-
+            // Get selected user first
             var user = await _context.TblRguhsFacultyUsers
                 .FirstOrDefaultAsync(u => u.Id == model.SelectedUserId);
 
@@ -171,7 +159,28 @@ namespace VerificationPortal.Controllers
                 return View(model);
             }
 
-            // Get selected colleges to determine the alphabetical range
+            // ---------------------------------------------------------
+            // 1. Prevent duplicate mapping for the SAME user + faculty
+            // ---------------------------------------------------------
+            var existingUserMapping = await _context.TblCollegeMappings
+                .FirstOrDefaultAsync(m =>
+                    m.UserId == user.UserId &&
+                    m.FacultyCode == model.SelectedFacultyId &&
+                    m.IsActive);
+
+            if (existingUserMapping != null)
+            {
+                ModelState.AddModelError("",
+                    "This user already has an active college mapping for this faculty. " +
+                    "Please edit the existing mapping instead.");
+
+                await PopulateCreateViewModel(model);
+                return View(model);
+            }
+
+            // ---------------------------------------------------------
+            // 2. Get selected colleges
+            // ---------------------------------------------------------
             var selectedColleges = await _context.AffiliationCollegeMasters
                 .Where(c => model.SelectedCollegeCodes.Contains(c.CollegeCode))
                 .OrderBy(c => c.CollegeName)
@@ -184,24 +193,122 @@ namespace VerificationPortal.Controllers
                 return View(model);
             }
 
-            // Determine the alphabetical range from college names
-            var firstLetter = selectedColleges.First().CollegeName?.Trim().Substring(0, 1).ToUpper() ?? "A";
-            var lastLetter = selectedColleges.Last().CollegeName?.Trim().Substring(0, 1).ToUpper() ?? "Z";
+            // ---------------------------------------------------------
+            // 3. Check overlap ONLY if user is NOT an admin
+            // ---------------------------------------------------------
+            if (user.IsAdmin != true)
+            {
+                var selectedCollegeCodes = selectedColleges
+                    .Select(c => c.CollegeCode)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            // Create a SINGLE mapping with the range
+                // Get existing active mappings for this faculty
+                var existingMappings = await _context.TblCollegeMappings
+                    .Where(m =>
+                        m.FacultyCode == model.SelectedFacultyId &&
+                        m.IsActive &&
+                        m.UserId != user.UserId)
+                    .ToListAsync();
+
+                var overlappingMappings = new List<TblCollegeMapping>();
+
+                foreach (var existingMapping in existingMappings)
+                {
+                    // Get colleges covered by existing mapping
+                    var existingColleges = await _context.AffiliationCollegeMasters
+                        .Where(c =>
+                            c.FacultyCode == model.SelectedFacultyId.ToString() &&
+                            c.CollegeName != null)
+                        .ToListAsync();
+
+                    existingColleges = existingColleges
+                        .Where(c =>
+                        {
+                            var collegeName = c.CollegeName?.Trim();
+
+                            if (string.IsNullOrEmpty(collegeName))
+                                return false;
+
+                            var firstLetter = collegeName.Substring(0, 1);
+
+                            return string.Compare(
+                                       firstLetter,
+                                       existingMapping.FromLetter,
+                                       StringComparison.OrdinalIgnoreCase) >= 0
+                                   &&
+                                   string.Compare(
+                                       firstLetter,
+                                       existingMapping.ToLetter,
+                                       StringComparison.OrdinalIgnoreCase) <= 0;
+                        })
+                        .Where(c =>
+                            string.Compare(
+                                c.CollegeCode,
+                                existingMapping.CollegeFrom,
+                                StringComparison.OrdinalIgnoreCase) >= 0
+                            &&
+                            string.Compare(
+                                c.CollegeCode,
+                                existingMapping.CollegeTo,
+                                StringComparison.OrdinalIgnoreCase) <= 0)
+                        .ToList();
+
+                    if (existingColleges.Any(c =>
+                            selectedCollegeCodes.Contains(c.CollegeCode)))
+                    {
+                        overlappingMappings.Add(existingMapping);
+                    }
+                }
+
+                if (overlappingMappings.Any())
+                {
+                    var users = string.Join(
+                        ", ",
+                        overlappingMappings
+                            .Select(x => x.UserName)
+                            .Distinct());
+
+                    ModelState.AddModelError(
+                        "",
+                        $"One or more selected colleges are already assigned to: {users}. " +
+                        "Only Admin users can have overlapping college assignments.");
+
+                    await PopulateCreateViewModel(model);
+                    return View(model);
+                }
+            }
+
+            // ---------------------------------------------------------
+            // 4. Determine alphabetical range
+            // ---------------------------------------------------------
+            var firstCollege = selectedColleges.First();
+            var lastCollege = selectedColleges.Last();
+
+            var firstCollegeName = firstCollege.CollegeName?.Trim();
+            var lastCollegeName = lastCollege.CollegeName?.Trim();
+
+            var firstLetter = !string.IsNullOrEmpty(firstCollegeName)
+                ? firstCollegeName.Substring(0, 1).ToUpper()
+                : "A";
+
+            var lastLetter = !string.IsNullOrEmpty(lastCollegeName)
+                ? lastCollegeName.Substring(0, 1).ToUpper()
+                : "Z";
+
+            // ---------------------------------------------------------
+            // 5. Create mapping
+            // ---------------------------------------------------------
             var mapping = new TblCollegeMapping
             {
                 UserId = user.UserId,
-                UserName = user.UserName,
+                UserName = user.UserName ?? "",
                 FacultyCode = model.SelectedFacultyId,
 
-                // Alphabetical Range
                 FromLetter = firstLetter,
                 ToLetter = lastLetter,
 
-                // College Code Range
-                CollegeFrom = selectedColleges.First().CollegeCode,
-                CollegeTo = selectedColleges.Last().CollegeCode,
+                CollegeFrom = firstCollege.CollegeCode,
+                CollegeTo = lastCollege.CollegeCode,
 
                 CreatedDate = DateTime.Now,
                 CreatedBy = User.Identity?.Name ?? "System",
@@ -209,14 +316,21 @@ namespace VerificationPortal.Controllers
             };
 
             _context.TblCollegeMappings.Add(mapping);
+
             await _context.SaveChangesAsync();
 
             _logger.LogInformation(
-                "Admin {Admin} assigned range {From}-{To} ({Count} colleges) to user {UserId} ({UserName})",
-                User.Identity?.Name, firstLetter, lastLetter, selectedColleges.Count, user.UserId, user.UserName);
+                "User {UserId} ({UserName}) assigned range {From}-{To} ({Count} colleges), IsAdmin={IsAdmin}",
+                user.UserId,
+                user.UserName,
+                firstLetter,
+                lastLetter,
+                selectedColleges.Count,
+                user.IsAdmin);
 
             TempData["SuccessMessage"] =
-                $"Successfully assigned {selectedColleges.Count} college(s) ({firstLetter}-{lastLetter}) to {user.UserName}.";
+                $"Successfully assigned {selectedColleges.Count} college(s) " +
+                $"({firstLetter}-{lastLetter}) to {user.UserName}.";
 
             return RedirectToAction(nameof(Index));
         }

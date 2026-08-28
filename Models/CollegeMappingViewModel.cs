@@ -136,5 +136,28 @@ namespace VerificationPortal.Models
         public string ToLetter { get; set; } = "";
         public string CollegeFromCode { get; set; } = "";
         public string CollegeToCode { get; set; } = "";
+
+        public Dictionary<string, CollegeFeedbackStatusViewModel> FeedbackStatuses
+        {
+            get;
+            set;
+        } = new();
+    }
+
+    public class CollegeFeedbackStatusViewModel
+    {
+        public string Status { get; set; } = "Not Started";
+
+        public int TotalSections { get; set; }
+
+        public int CompletedSections { get; set; }
+
+        public int PendingSections { get; set; }
+
+        public int RejectedSections { get; set; }
+
+        public DateTime? LastVerifiedOn { get; set; }
+
+        public string? LastVerifiedBy { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using VerificationPortal.Models;
 using VerificationPortal.Services.Verification.Models;
 
 namespace VerificationPortal.Services.Verification.Interfaces
@@ -9,5 +10,7 @@ namespace VerificationPortal.Services.Verification.Interfaces
 
 
         Task<VerificationDisplayModel> GetVerificationAsync<T>( Expression<Func<T, bool>> predicate, string role) where T : class;
+
+        Task<List<VerificationHistoryViewModel>> GetVerificationHistoryAsync<T>( Expression<Func<T, bool>> predicate) where T : class;
     }
 }

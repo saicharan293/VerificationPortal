@@ -12,6 +12,12 @@ namespace VerificationPortal.Controllers
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<MyCollegesController> _logger = logger;
 
+        private bool IsAdminUser()
+        {
+            var isAdminClaim = User.FindFirst("IsAdmin");
+            return isAdminClaim != null && bool.TryParse(isAdminClaim.Value, out bool isAdmin) && isAdmin;
+        }
+
         // GET: /MyColleges
         public async Task<IActionResult> Index()
         {
@@ -76,11 +82,11 @@ namespace VerificationPortal.Controllers
                     .ToList();
 
                 // Further filter by college code range (CollegeFrom to CollegeTo)
-                colleges = colleges
-                    .Where(c =>
-                        string.Compare(c.CollegeCode, mapping.CollegeFrom, StringComparison.OrdinalIgnoreCase) >= 0
-                        && string.Compare(c.CollegeCode, mapping.CollegeTo, StringComparison.OrdinalIgnoreCase) <= 0)
-                    .ToList();
+                //colleges = colleges
+                //    .Where(c =>
+                //        string.Compare(c.CollegeCode, mapping.CollegeFrom, StringComparison.OrdinalIgnoreCase) >= 0
+                //        && string.Compare(c.CollegeCode, mapping.CollegeTo, StringComparison.OrdinalIgnoreCase) <= 0)
+                //    .ToList();
 
                 var facultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty");
 

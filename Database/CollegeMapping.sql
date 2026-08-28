@@ -1,3 +1,193 @@
+
+select * from TblRguhsFacultyUser
+where Faculty = 2
+
+------------- PRIMARY KEY FOR FACULTY USER -----------
+EXEC sp_rename
+    'dbo.TblRguhsFacultyUser',
+    'TblRguhsFacultyUser_Old';
+GO
+
+
+CREATE TABLE dbo.TblRguhsFacultyUser
+(
+    Id INT IDENTITY(1,1) NOT NULL
+        CONSTRAINT PK_TblRguhsFacultyUser PRIMARY KEY,
+
+    UserId INT NOT NULL,
+    Password NVARCHAR(256) NULL,
+    PasswordHash NVARCHAR(MAX) NULL,
+    UserName NVARCHAR(100) NULL,
+    IsActive BIT NOT NULL,
+    Faculty INT NULL,
+    IsFinance BIT NULL,
+    FinanceDesignation VARCHAR(10) NULL,
+    DesignationDescription VARCHAR(200) NULL,
+    IsSection BIT NULL,
+    IsAdmin BIT NULL,
+    FailedLoginAttempts INT NOT NULL,
+    LockoutEndTime DATETIME NULL
+);
+GO
+
+
+INSERT INTO dbo.TblRguhsFacultyUser
+(
+    UserId,
+    Password,
+    PasswordHash,
+    UserName,
+    IsActive,
+    Faculty,
+    IsFinance,
+    FinanceDesignation,
+    DesignationDescription,
+    IsSection,
+    IsAdmin,
+    FailedLoginAttempts,
+    LockoutEndTime
+)
+SELECT
+    UserId,
+    Password,
+    PasswordHash,
+    UserName,
+    IsActive,
+    Faculty,
+    IsFinance,
+    FinanceDesignation,
+    DesignationDescription,
+    IsSection,
+    IsAdmin,
+    FailedLoginAttempts,
+    LockoutEndTime
+FROM dbo.TblRguhsFacultyUser_Old
+ORDER BY Id;
+
+--------------------------------
+
+--DROP TABLE dbo.TblRguhsFacultyUser_Old;
+
+----------------------------------
+
+
+ALTER TABLE [Admission_Affiliation].[dbo].[CA_Med_StaffParticularsOther]
+ADD
+    ExaminerDetailsPdfName2 NVARCHAR(255) NULL,
+    ExaminerDetailsPdfName3 NVARCHAR(255) NULL,
+    ExaminerDetailsPdfName4 NVARCHAR(255) NULL,
+    ExaminerDetailsPdfName5 NVARCHAR(255) NULL,
+    ExaminerDetailsPdfPath2 NVARCHAR(500) NULL,
+    ExaminerDetailsPdfPath3 NVARCHAR(500) NULL,
+    ExaminerDetailsPdfPath4 NVARCHAR(500) NULL,
+    ExaminerDetailsPdfPath5 NVARCHAR(500) NULL;
+
+ALTER TABLE IndoorBedsOccupancy
+ADD CONSTRAINT CK_IndoorBedsOccupancy_RGUHSIntake
+CHECK (RGUHSintake >= 0);
+
+ALTER TABLE DentalCollegeLandBuildingDetail
+ADD Latitude  decimal(9,6) NULL,
+    Longitude decimal(9,6) NULL;
+
+ALTER TABLE DentalCollegeLandBuildingDetail
+ADD CourseLevel VARCHAR(10) NULL;
+
+UPDATE DentalCollegeLandBuildingDetail
+SET CourseLevel = 'UG';
+------------------------------
+
+
+ALTER TABLE [dbo].[Affiliation_College_Master]
+ADD CollegeEmail NVARCHAR(255) NULL;
+
+
+--------------------------------
+
+ALTER TABLE DentalChairs
+ADD AffiliationTypeId INT NULL;
+
+ALTER TABLE DentalChairs
+ADD CONSTRAINT FK_DentalChairs_TypeOfAffiliation
+FOREIGN KEY (AffiliationTypeId)
+REFERENCES TypeOfAffiliation(TypeId);
+
+UPDATE DentalChairs
+SET AffiliationTypeId = 2
+WHERE AffiliationTypeId IS NULL;
+
+--------------------------------
+
+--------------------------------
+
+ALTER TABLE [dbo].[DentalCollegeLandBuildingDetail]
+ADD AffiliationTypeId INT NULL;
+
+ALTER TABLE [dbo].[DentalCollegeLandBuildingDetail]
+ADD CONSTRAINT FK_DentalCollegeLandBuildingDetail_TypeOfAffiliation
+FOREIGN KEY (AffiliationTypeId)
+REFERENCES TypeOfAffiliation(TypeId);
+
+UPDATE DentalCollegeLandBuildingDetail
+SET AffiliationTypeId = 2
+WHERE AffiliationTypeId IS NULL;
+
+--------------------------------
+
+
+
+--------------------------------
+
+ALTER TABLE [dbo].[Medical_SkillsLaboratory]
+ADD AffiliationTypeId INT NULL;
+
+ALTER TABLE [Medical_SkillsLaboratory]
+ADD CONSTRAINT FK_Medical_SkillsLaboratory_TypeOfAffiliation
+FOREIGN KEY (AffiliationTypeId)
+REFERENCES TypeOfAffiliation(TypeId);
+
+UPDATE Medical_SkillsLaboratory
+SET AffiliationTypeId = 2
+WHERE AffiliationTypeId IS NULL;
+
+--------------------------------
+
+---------------------------------
+
+ALTER TABLE Medical_UGBedDistribution
+ADD AffiliationTypeId INT NULL;
+
+ALTER TABLE Medical_UGBedDistribution
+ADD CONSTRAINT FK_Medical_UGBedDistribution_TypeOfAffiliation
+FOREIGN KEY (AffiliationTypeId)
+REFERENCES TypeOfAffiliation(TypeId);
+
+UPDATE Medical_UGBedDistribution
+SET AffiliationTypeId = 2
+WHERE AffiliationTypeId IS NULL;
+
+-----------------------------------------
+
+ALTER TABLE DentalInfrastructure
+ADD CourseLevel VARCHAR(10) NULL;
+
+UPDATE DentalInfrastructure
+SET CourseLevel = 'UG';
+
+
+ALTER TABLE DentalInfrastructure
+ADD CONSTRAINT UQ_DentalInfrastructure
+UNIQUE
+(
+    CollegeCode,
+    FacultyCode,
+    AffiliationTypeId,
+    CourseLevel,
+    RequirementId,
+    SeatSlab
+);
+
+---------
 -- ============================================
 -- Insert Faculty Users for DENTAL (Faculty = 2)
 -- ============================================
@@ -190,7 +380,16 @@ DEFAULT (1) FOR IsActive;
 
 
 SELECT * FROM Affiliation_College_Master
-WHERE FacultyCode=2 order by CollegeName desc
+WHERE FacultyCode=2 order by CollegeName desc;
+
+SELECT * FROM CollegeCourseIntakeDetails
+WHERE FacultyCode = 2
+
+SELECT * FROM AcademicIntake
+WHERE FacultyCode = 2 and CollegeCode = 'd038';
+
+select * from CA_Med_LibraryEquipments
+where FacultyCode = 2
 
 select * from [dbo].[AFF_InstitutionsDetails]
 where facultycode = 2 and CollegeCode='d038'
@@ -258,7 +457,7 @@ ADD
     IsJrVerified BIT NULL,
     JrRemarks NVARCHAR(1000) NULL,
     JrVerifiedDate DATETIME NULL,
-    JrName NVARCHAR(200) NULL,a
+    JrName NVARCHAR(200) NULL,
 
     -- SO
     IsSoVerified BIT NULL,
@@ -2166,8 +2365,8 @@ select * from [dbo].[Affiliation_CourseDetails]
 where facultycode = 2 and Collegecode = 'd038';
 
 SELECT * FROM [dbo].[CA_Progress]
-WHERE CollegeCode = 'd007' and StepKey like '%veh%' and courselevel like '%UG%'
-
+WHERE CollegeCode = 'D007' and courselevel like '%pG%'
+and StepKey like '%veh%' 
 SELECT * FROM [dbo].[CA_Med_LibraryEquipments]
 WHERE FacultyCode = 2 AND CollegeCode = 'D008'
 

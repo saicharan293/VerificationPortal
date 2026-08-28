@@ -1,5 +1,10 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var verificationHistory =
+        ViewData["VerificationHistory"]
+        as IEnumerable<VerificationPortal.Models.VerificationHistoryViewModel>
+        ?? Enumerable.Empty<VerificationPortal.Models.VerificationHistoryViewModel>();
 }
 
 <!DOCTYPE html>
@@ -285,6 +290,8 @@
         <!-- Overlay for mobile sidebar -->
         <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
     </div>
+    @* @await Html.PartialAsync("_VerificationHistory", verificationHistory) *@
+
 
     <!-- Verification Summary Modal -->
     <div class="modal fade" id="verificationSummaryModal" tabindex="-1" aria-labelledby="verificationSummaryModalLabel" aria-hidden="true">

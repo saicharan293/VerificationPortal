@@ -75,6 +75,53 @@ html {
     color: var(--white);
 }
 
+.user-profile {
+    height: 48px;
+}
+
+.user-info-text {
+    line-height: 1.2;
+}
+
+    .user-info-text strong {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .user-info-text small {
+        font-size: 0.72rem;
+        opacity: 0.7;
+    }
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.logout-btn {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.bi-box-arrow-right{
+    color: white;
+}
+
 .lang-switcher {
     display: inline-block;
     margin-left: 5px;

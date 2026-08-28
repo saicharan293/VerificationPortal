@@ -1,4 +1,6 @@
-﻿namespace VerificationPortal.Services.Verification.Models
+﻿using VerificationPortal.Models;
+
+namespace VerificationPortal.Services.Verification.Models
 {
     public class VerificationRequest
     {
@@ -17,5 +19,7 @@
         public string? VerifiedBy { get; set; }
         public DateTime? VerifiedDate { get; set; }
         public bool? IsVerified { get; set; }
+
+        public List<VerificationHistoryViewModel> History { get; set; } = new();
     }
 }

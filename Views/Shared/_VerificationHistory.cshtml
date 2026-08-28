@@ -1,0 +1,89 @@
+﻿@model IEnumerable<VerificationPortal.Models.VerificationHistoryViewModel>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-clock-history"></i>
+            Verification History
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-light border mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                No verification history available.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Designation</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                            <th>Verified By</th>
+                            <th>Verified Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.Designation</strong>
+                                </td>
+
+                                <td>
+                                    @if (item.IsVerified == true)
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else if (item.IsVerified == false)
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.Remarks)
+                                        ? "-"
+                                        : item.Remarks)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.VerifiedBy)
+                                        ? "-"
+                                        : item.VerifiedBy)
+                                </td>
+
+                                <td>
+                                    @(item.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+
+    </div>
+</div>
