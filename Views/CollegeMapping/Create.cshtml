@@ -33,7 +33,7 @@
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-hidden" id="validationSummary"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" id="validationSummary"></div>
 
             <div class="row g-3">
                 <!-- Faculty Selection -->
@@ -188,7 +188,7 @@
             if (facultyId > 0) {
                 const users = allUsers.filter(u => u.facultyId === facultyId);
                 users.forEach(u => {
-                    userSelect.innerHTML += `<option value="${u.id}">${u.name} - ${u.designation || 'N/A'}</option>`;
+                    userSelect.innerHTML += `<option value="${u.userId}">${u.name} - ${u.designation || 'N/A'}</option>`;
                 });
                 userSelect.disabled = false;
                 applyFilterBtn.disabled = false;

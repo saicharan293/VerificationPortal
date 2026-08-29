@@ -70,7 +70,7 @@ namespace VerificationPortal.Controllers
                     CreatedDate = g.Min(m => m.CreatedDate),
                     CreatedBy = g.First().CreatedBy,
                     FacultyName = g.First().FacultyCodeNavigation?.FacultyName,
-                    UserDesignation = users.FirstOrDefault(u => u.UserId == g.Key.UserId)?.DesignationDescription,
+                    UserDesignation = users.FirstOrDefault(u => u.UserId == g.Key.UserId && u.Faculty == g.Key.FacultyCode)?.DesignationDescription,
                     MappingCount = g.Count(),
                     MappingIds = g.Select(m => m.Id).ToList()
                 })
@@ -150,7 +150,7 @@ namespace VerificationPortal.Controllers
 
             // Get selected user first
             var user = await _context.TblRguhsFacultyUsers
-                .FirstOrDefaultAsync(u => u.Id == model.SelectedUserId);
+                .FirstOrDefaultAsync(u => u.UserId == model.SelectedUserId && u.Faculty == model.SelectedFacultyId);
 
             if (user == null)
             {
@@ -182,7 +182,9 @@ namespace VerificationPortal.Controllers
             // 2. Get selected colleges
             // ---------------------------------------------------------
             var selectedColleges = await _context.AffiliationCollegeMasters
-                .Where(c => model.SelectedCollegeCodes.Contains(c.CollegeCode))
+                .Where(c => 
+                    c.FacultyCode == model.SelectedFacultyId.ToString() &&  
+                    model.SelectedCollegeCodes.Contains(c.CollegeCode))
                 .OrderBy(c => c.CollegeName)
                 .ToListAsync();
 
@@ -200,6 +202,7 @@ namespace VerificationPortal.Controllers
             {
                 var selectedCollegeCodes = selectedColleges
                     .Select(c => c.CollegeCode)
+                    .Where(c => !string.IsNullOrWhiteSpace(c))
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
                 // Get existing active mappings for this faculty
@@ -210,18 +213,55 @@ namespace VerificationPortal.Controllers
                         m.UserId != user.UserId)
                     .ToListAsync();
 
+                
+
+                // --------------------------------------------------------- 
+                // Get the users associated with those mappings. 
+                // We need this to identify Admin mappings. 
+                // ---------------------------------------------------------
+
+                var existingUserIds = existingMappings
+                    .Select(m => m.UserId)
+                    .Distinct()
+                    .ToList();
+
+                var adminUserIds = await _context.TblRguhsFacultyUsers
+                    .Where(u =>
+                        u.Faculty == model.SelectedFacultyId &&
+                        u.IsAdmin == true &&
+                        existingUserIds.Contains(u.UserId))
+                    .Select(u => u.UserId)
+                    .Distinct()
+                    .ToListAsync();
+
+
+                // --------------------------------------------------------
+                // IMPORTANT:
+                // Remove Mappings belonging to Admin users.
+                //
+                // Therefore, if an admin has all colleges assigned, 
+                // those colleges will NOT block a normal user
+
+                existingMappings = existingMappings
+                    .Where(m => !adminUserIds.Contains(m.UserId))
+                    .ToList();
+
+                // --------------------------------------------------------- 
+                // Get colleges ONLY for the selected faculty. 
+                // ---------------------------------------------------------
+                var facultyColleges = await _context.AffiliationCollegeMasters 
+                    .Where(c => 
+                        c.FacultyCode == model.SelectedFacultyId.ToString() && 
+                        c.CollegeName != null && 
+                        c.CollegeCode != null) 
+                    .ToListAsync();
+
                 var overlappingMappings = new List<TblCollegeMapping>();
 
                 foreach (var existingMapping in existingMappings)
                 {
                     // Get colleges covered by existing mapping
-                    var existingColleges = await _context.AffiliationCollegeMasters
-                        .Where(c =>
-                            c.FacultyCode == model.SelectedFacultyId.ToString() &&
-                            c.CollegeName != null)
-                        .ToListAsync();
-
-                    existingColleges = existingColleges
+                    var existingColleges = facultyColleges
                         .Where(c =>
                         {
                             var collegeName = c.CollegeName?.Trim();
@@ -370,7 +410,9 @@ namespace VerificationPortal.Controllers
             }
 
             var user = await _context.TblRguhsFacultyUsers
-                .FirstOrDefaultAsync(u => u.Id == model.SelectedUserId);
+                .FirstOrDefaultAsync(u => 
+                    u.Id == model.SelectedUserId && 
+                    u.Faculty == model.SelectedFacultyId);
 
             if (user == null)
             {
