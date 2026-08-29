@@ -1045,53 +1045,104 @@ namespace VerificationPortal.Controllers
             var designation = GetUserDesignation();
 
             // =========================================================
-            // ADMIN
+            // ADMIN (Admin, Director, Vice Chancellor)
             // =========================================================
 
             if (IsAdminUser())
             {
-                // Get previous page-level verifications
+                var entity = await _context.Set<T>()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        EF.Property<string>(x, property.Name) == collegeCode);
+
                 var history = await _verificationService
                     .GetVerificationHistoryAsync<T>(
                         x => EF.Property<string>(x, property.Name) == collegeCode);
 
                 ViewData["VerificationHistory"] = history;
 
-                // -----------------------------------------------------
-                // Get latest verification
-                // -----------------------------------------------------
-
-                var latestVerification = history?
-                    .OrderByDescending(x => x.VerifiedDate)
-                    .FirstOrDefault();
-
-                // -----------------------------------------------------
-                // No verification exists yet
-                // -----------------------------------------------------
-
-                if (latestVerification == null)
+                if (entity == null)
                 {
-                    ViewData["ExistingRemarks"] = null;
-                    ViewData["ExistingStatus"] = "Pending";
-                    ViewData["ExistingStatusClass"] = "bg-warning";
-                    ViewData["VerifiedBy"] = null;
-                    ViewData["VerifiedDate"] = null;
-
-                    // SHOW FORM
-                    ViewData["ShowFeedbackForm"] = true;
-
+                    SetPendingVerificationViewData();
                     return;
                 }
 
-                // -----------------------------------------------------
-                // Existing verification
-                // -----------------------------------------------------
+                // =====================================================
+                // GET VERIFICATION PREFIX FROM DESIGNATION
+                // =====================================================
 
-                ViewData["ExistingRemarks"] =
-                    latestVerification.Remarks;
+                var verificationPrefix = GetVerificationPrefix(designation);
+
+                if (string.IsNullOrWhiteSpace(verificationPrefix))
+                {
+                    throw new Exception(
+                        $"No verification mapping found for designation: {designation}");
+                }
+
+                // =====================================================
+                // GET DESIGNATION-SPECIFIC PROPERTIES DYNAMICALLY
+                // =====================================================
+
+                var properties = typeof(T).GetProperties();
+
+                var statusProperty = properties.FirstOrDefault(p =>
+                    p.Name.Equals(
+                        $"Is{verificationPrefix}Verified",
+                        StringComparison.OrdinalIgnoreCase));
+
+                var remarksProperty = properties.FirstOrDefault(p =>
+                    p.Name.Equals(
+                        $"{verificationPrefix}Remarks",
+                        StringComparison.OrdinalIgnoreCase));
+
+                var dateProperty = properties.FirstOrDefault(p =>
+                    p.Name.Equals(
+                        $"{verificationPrefix}VerifiedDate",
+                        StringComparison.OrdinalIgnoreCase));
+
+                var nameProperty = properties.FirstOrDefault(p =>
+                    p.Name.Equals(
+                        $"{verificationPrefix}Name",
+                        StringComparison.OrdinalIgnoreCase));
+
+                if (statusProperty == null)
+                {
+                    throw new Exception(
+                        $"{typeof(T).Name} does not contain verification properties " +
+                        $"for designation: {designation}");
+                }
+
+                bool? isVerified =
+                    statusProperty.GetValue(entity) as bool?;
+
+                string? remarks =
+                    remarksProperty?.GetValue(entity) as string;
+
+                DateTime? verifiedDate =
+                    dateProperty?.GetValue(entity) as DateTime?;
+
+                string? verifiedBy =
+                    nameProperty?.GetValue(entity) as string;
+
+                // =====================================================
+                // NO VERIFICATION YET
+                // =====================================================
+
+                if (isVerified == null &&
+                    string.IsNullOrWhiteSpace(remarks))
+                {
+                    SetPendingVerificationViewData();
+                    return;
+                }
+
+                // =====================================================
+                // EXISTING VERIFICATION
+                // =====================================================
+
+                ViewData["ExistingRemarks"] = remarks;
 
                 ViewData["ExistingStatus"] =
-                    latestVerification.IsVerified switch
+                    isVerified switch
                     {
                         true => "Approved",
                         false => "Rejected",
@@ -1099,7 +1150,7 @@ namespace VerificationPortal.Controllers
                     };
 
                 ViewData["ExistingStatusClass"] =
-                    latestVerification.IsVerified switch
+                    isVerified switch
                     {
                         true => "bg-success",
                         false => "bg-danger",
@@ -1107,26 +1158,16 @@ namespace VerificationPortal.Controllers
                     };
 
                 ViewData["VerifiedBy"] =
-                    latestVerification.VerifiedBy;
+                    verifiedBy ?? designation;
 
                 ViewData["VerifiedDate"] =
-                    latestVerification.VerifiedDate?
-                        .ToString("dd-MM-yyyy hh:mm tt");
-
-                // -----------------------------------------------------
-                // IMPORTANT
-                //
-                // If verification is not completed, show form.
-                // If already Approved/Rejected, display existing result.
-                // -----------------------------------------------------
+                    verifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
 
                 ViewData["ShowFeedbackForm"] =
-                    latestVerification.IsVerified == null;
+                    isVerified == null;
 
                 return;
             }
-
-
             // =========================================================
             // NORMAL USER
             // =========================================================
@@ -1135,6 +1176,11 @@ namespace VerificationPortal.Controllers
                 .GetVerificationAsync<T>(
                     x => EF.Property<string>(x, property.Name) == collegeCode,
                     designation);
+
+            // Also fetch full verification history for display
+            var verificationHistory = await _verificationService
+                .GetVerificationHistoryAsync<T>(
+                    x => EF.Property<string>(x, property.Name) == collegeCode);
 
             if (verification == null)
             {
@@ -1145,7 +1191,7 @@ namespace VerificationPortal.Controllers
                 ViewData["VerifiedDate"] = null;
                 ViewData["ShowFeedbackForm"] = true;
 
-                ViewData["VerificationHistory"] = new List<VerificationHistoryViewModel>();
+                ViewData["VerificationHistory"] = verificationHistory;
 
                 return;
             }
@@ -1174,8 +1220,59 @@ namespace VerificationPortal.Controllers
 
             ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
 
+            ViewData["VerificationHistory"] = verificationHistory;
+        }
 
-            ViewData["VerificationHistory"] =  verification.History;
+
+
+        private string? GetVerificationPrefix(string? designation)
+        {
+            if (string.IsNullOrWhiteSpace(designation))
+                return null;
+
+            return designation.Trim().ToLowerInvariant() switch
+            {
+                "deo" => "Deo",
+                "data entry operator" => "Deo",
+
+                "jr" => "Jr",
+                "junior registrar" => "Jr",
+
+                "so" => "So",
+                "section officer" => "So",
+
+                "ar" => "Ar",
+                "assistant registrar" => "Ar",
+
+                "rg" => "Rg",
+                "registrar" => "Rg",
+
+                "re" => "Re",
+
+                "dr" => "Dr",
+                "director" => "Dr",
+
+                "vc" => "Vc",
+                "vice chancellor" => "Vc",
+
+                _ => null
+            };
+        }
+
+        private void SetPendingVerificationViewData()
+        {
+            ViewData["ExistingRemarks"] = null;
+
+            ViewData["ExistingStatus"] = "Pending";
+
+            ViewData["ExistingStatusClass"] =
+                "bg-warning";
+
+            ViewData["VerifiedBy"] = null;
+
+            ViewData["VerifiedDate"] = null;
+
+            ViewData["ShowFeedbackForm"] = true;
         }
 
         // GET: /VerificationDashboard/PrincipalDetails/{collegeCode}
@@ -1866,7 +1963,7 @@ namespace VerificationPortal.Controllers
 
                 { "EquipmentList", typeof(DentalCollegeEquipmentDetail) },
 
-                { "CAVehicleDetails", typeof(CaVehicleDetail) },
+                { "CA_VehicleDetails", typeof(CaVehicleDetail) },
 
                 { "UgAcademicMatters", typeof(CaAcademicPerformance) },
 
@@ -2823,6 +2920,8 @@ namespace VerificationPortal.Controllers
                     !string.IsNullOrWhiteSpace(entity.MeuMembersListFilePath);
             }
 
+
+            await SetVerificationViewData<AffInstitutionsDetail>( collegeCode);
             ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 14);
             return View(vm);
         }

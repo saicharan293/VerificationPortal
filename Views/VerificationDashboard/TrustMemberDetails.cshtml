@@ -39,6 +39,10 @@
         <p>Review the trust member details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, you can proceed to the next tab: <strong>Dean / Director Details</strong>.</p>
     </div>
 </div>
+@{
+    var trustMemberFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionId == 11);
+}
 
     <div class="verification-card mb-4">
         <div class="verification-card-header">
@@ -120,19 +124,16 @@
                     No trust member records found for this institution.
                 </div>
             }
+            @if (trustMemberFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", trustMemberFeedback)
+            }
+            <!-- Verification Remarks & Status -->
+
         </div>
     </div>
-@{
-    var trustMemberFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 11);
-}
 
-@if (trustMemberFeedback != null)
-{
-    @await Html.PartialAsync("_SectionFeedback", trustMemberFeedback)
-}
-    <!-- Verification Remarks & Status -->
-   
+
 
 @functions {
     private string GetVerificationStatusBadge(VerificationPortal.Models.ContinuationTrustMemberDetail member)
