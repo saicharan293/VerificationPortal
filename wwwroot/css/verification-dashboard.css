@@ -45,15 +45,13 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: var(--gray-50);
     color: var(--gray-900);
-    overflow: hidden;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 /* Dashboard Layout */
 .verification-dashboard {
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 .verification-sidebar {
@@ -164,7 +162,6 @@ body {
 
 .main-content {
     flex: 1;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -946,15 +943,13 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: var(--gray-50);
     color: var(--gray-900);
-    overflow: hidden;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 /* Dashboard Layout */
 .verification-dashboard {
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 .verification-sidebar {
@@ -1065,7 +1060,6 @@ body {
 
 .main-content {
     flex: 1;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     min-height: 100vh;

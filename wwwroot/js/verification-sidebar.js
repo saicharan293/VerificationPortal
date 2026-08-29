@@ -65,19 +65,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Auto-save draft functionality
-    const formInputs = document.querySelectorAll('.verification-card-body input, .verification-card-body select, .verification-card-body textarea');
-    let autoSaveTimer;
+    // const formInputs = document.querySelectorAll('.verification-card-body input, .verification-card-body select, .verification-card-body textarea');
+    // let autoSaveTimer;
 
-    formInputs.forEach(input => {
-        input.addEventListener('change', function () {
-            clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(() => {
-                saveDraft();
-            }, 2000);
-        });
-    });
+    // formInputs.forEach(input => {
+    //     input.addEventListener('change', function () {
+    //         clearTimeout(autoSaveTimer);
+    //         autoSaveTimer = setTimeout(() => {
+    //             saveDraft();
+    //         }, 2000);
+    //     });
+    // });
 
-    function saveDraft() {
+    /*function saveDraft() {
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
             const formData = new FormData(form);
@@ -86,31 +86,31 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem(key, JSON.stringify(data));
         });
         showToast('Draft saved automatically', 'info');
-    }
+    }*/
 
     // Load draft on page load
-    function loadDrafts() {
-        const forms = document.querySelectorAll('form');
-        forms.forEach(form => {
-            const key = `draft_${form.id || form.action}`;
-            const draft = localStorage.getItem(key);
-            if (draft) {
-                try {
-                    const data = JSON.parse(draft);
-                    Object.keys(data).forEach(fieldName => {
-                        const input = form.querySelector(`[name="${fieldName}"]`);
-                        if (input && !input.value) {
-                            input.value = data[fieldName];
-                        }
-                    });
-                } catch (e) {
-                    console.warn('Failed to load draft:', e);
-                }
-            }
-        });
-    }
+    // function loadDrafts() {
+    //     const forms = document.querySelectorAll('form');
+    //     forms.forEach(form => {
+    //         const key = `draft_${form.id || form.action}`;
+    //         const draft = localStorage.getItem(key);
+    //         if (draft) {
+    //             try {
+    //                 const data = JSON.parse(draft);
+    //                 Object.keys(data).forEach(fieldName => {
+    //                     const input = form.querySelector(`[name="${fieldName}"]`);
+    //                     if (input && !input.value) {
+    //                         input.value = data[fieldName];
+    //                     }
+    //                 });
+    //             } catch (e) {
+    //                 console.warn('Failed to load draft:', e);
+    //             }
+    //         }
+    //     });
+    // }
 
-    loadDrafts();
+    // loadDrafts();
 
     // Clear draft on successful submit
     document.addEventListener('submit', function (event) {
@@ -344,8 +344,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Expose functions globally for use in views
     window.VerificationSidebar = {
         showToast,
-        saveDraft,
-        loadDrafts,
         exportVerificationSummary,
         closeSidebar
     };
