@@ -279,8 +279,35 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeName =
                 college?.CollegeName ?? "Unknown College";
 
-            await SetVerificationViewData<InstitutionBasicDetail>(
-                collegeCode);
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
+
+            VerificationDisplayModel? verification = null;
+
+            bool hasSectionData = institution != null;
+
+            try
+            {
+                verification = await _verificationService
+                    .GetVerificationAsync<AffInstitutionsDetail>(
+                        x => x.CollegeCode == collegeCode,
+                        GetUserDesignation());
+            }
+            catch (Exception ex) when (
+                ex.Message.Contains("record not found"))
+            {
+                verification = null;
+            }
+
+            SetVerificationViewData(
+                verification,
+                hasSectionData,
+                "Institution details have not been submitted for this college.");
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(
+                collegeCode,
+                1);
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
 
@@ -409,7 +436,29 @@ namespace VerificationPortal.Controllers
             ViewBag.RegisteredTrustMemberDetailsPath = trustMemberDocument?.RegisteredTrustMemberDetailsPath;
 
 
-            await SetVerificationViewData<ContinuationTrustMemberDetail>(collegeCode);
+            // ---------------------------------------------------------
+            // VERIFICATION
+            // ---------------------------------------------------------
+
+            VerificationDisplayModel? verification = null;
+
+            bool hasSectionData = institution != null;
+
+            try
+            {
+                verification = await _verificationService
+                    .GetVerificationAsync<AffInstitutionsDetail>(
+                        x => x.CollegeCode == collegeCode,
+                        GetUserDesignation());
+            }
+            catch (Exception ex) when (
+                ex.Message.Contains("record not found"))
+            {
+                verification = null;
+            }
+
+            SetVerificationViewData( verification, hasSectionData, "Institution details have not been submitted for this college.");
+
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 3);
 
@@ -1043,6 +1092,8 @@ namespace VerificationPortal.Controllers
                     $"{typeof(T).Name} does not contain a CollegeCode property.");
 
             var designation = GetUserDesignation();
+
+            ViewData["IsAdmin"] = IsAdminUser();
 
             // =========================================================
             // ADMIN (Admin, Director, Vice Chancellor)
@@ -2448,32 +2499,24 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
-            var verification = await _verificationService.GetVerificationAsync<DentalInfrastructure>(
-                x => x.CollegeCode == collegeCode,
-                GetUserDesignation());
+            VerificationDisplayModel? verification = null;
 
-            ViewData["ExistingRemarks"] = verification.Remarks;
+            bool hasSectionData = savedInfrastructure.Any();
 
-            ViewData["ExistingStatus"] = verification.IsVerified switch
+            try
             {
-                true => "Approved",
-                false => "Rejected",
-                null => "Pending"
-            };
-
-            ViewData["ExistingStatusClass"] = verification.IsVerified switch
+                verification = await _verificationService
+                        .GetVerificationAsync<DentalInfrastructure>(
+                            x => x.CollegeCode == collegeCode,
+                            GetUserDesignation());
+            }
+            catch (Exception ex) when (
+                ex.Message.Contains("record not found"))
             {
-                true => "bg-success",
-                false => "bg-danger",
-                null => "bg-warning"
-            };
+                verification = null;
+            }
 
-            ViewData["VerifiedBy"] = verification.VerifiedBy;
-
-            ViewData["VerifiedDate"] =
-                verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
-
-            ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
+            SetVerificationViewData( verification, hasSectionData, "Classroom and Laboratory details have not been submitted for this college.");
 
             ViewBag.ActiveTab = "ClassroomAndLaboratory";
             var model = new ClassroomAndLaboratoryViewModel
@@ -4812,6 +4855,74 @@ namespace VerificationPortal.Controllers
             return View("StaffOtherDetails", vm);
         }
 
+
+
+        public IActionResult DataNotAvailable( string entityName,  string collegeCode, string pageName)
+        {
+            var model = new VerificationDataNotFoundViewModel
+            {
+                EntityName = entityName,
+                CollegeCode = collegeCode,
+                PageName = pageName,
+
+                Message =
+                    $"The required data for {pageName} has not been entered for this college yet."
+            };
+
+            return View(model);
+        }
+
+        private void SetVerificationViewData( VerificationDisplayModel? verification, bool hasSectionData, string noDataMessage)
+        {
+            // ==========================================
+            // NO DATA AVAILABLE
+            // ==========================================
+
+            if (!hasSectionData)
+            {
+                ViewData["NoDataAvailable"] = true;
+                ViewData["NoDataMessage"] = noDataMessage;
+
+                ViewData["ExistingRemarks"] = null;
+                ViewData["ExistingStatus"] = "Not Submitted";
+                ViewData["ExistingStatusClass"] = "bg-secondary";
+                ViewData["VerifiedBy"] = null;
+                ViewData["VerifiedDate"] = null;
+                ViewData["ShowFeedbackForm"] = false;
+
+                return;
+            }
+
+            // ==========================================
+            // DATA AVAILABLE
+            // ==========================================
+
+            ViewData["NoDataAvailable"] = false;
+
+            ViewData["ExistingRemarks"] = verification?.Remarks;
+
+            ViewData["ExistingStatus"] = verification?.IsVerified switch
+            {
+                true => "Approved",
+                false => "Rejected",
+                null => "Pending"
+            };
+
+            ViewData["ExistingStatusClass"] = verification?.IsVerified switch
+            {
+                true => "bg-success",
+                false => "bg-danger",
+                null => "bg-warning"
+            };
+
+            ViewData["VerifiedBy"] = verification?.VerifiedBy;
+
+            ViewData["VerifiedDate"] =
+                verification?.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
+
+            ViewData["ShowFeedbackForm"] =
+                verification?.IsVerified == null;
+        }
 
         [HttpGet]
         public async Task<IActionResult> ViewStaffOtherPdf( string collegeCode, string fileType)

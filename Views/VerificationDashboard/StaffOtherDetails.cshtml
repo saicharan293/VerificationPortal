@@ -137,6 +137,16 @@
 
         </div>
 
+        @{
+            var staffOtherDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                                    ?.FirstOrDefault(x => x.SectionId == 41);
+        }
+
+        @if (staffOtherDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", staffOtherDetailsFeedback)
+        }
+
 
         @* Uploaded Documents *@
 

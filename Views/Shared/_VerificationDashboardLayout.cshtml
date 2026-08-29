@@ -58,219 +58,225 @@
                 <!-- Page Content -->
                 <div class="page-content">
                     @RenderBody()
-                </div>
-
-                @* ==================== VERIFICATION FEEDBACK & STATUS SECTION ==================== *@
-                @if (ViewData["ShowFeedbackSection"] != null && (bool)ViewData["ShowFeedbackSection"])
-                {
-                    <section class="verification-feedback-section" data-aos-duration="600">
-                        <div class="container-fluid">
-                            <div class="feedback-card">
-                                <div class="feedback-header">
-                                    <h2 class="feedback-title">
-                                        <i class="bi bi-clipboard-check"></i>
-                                        Over all Verification Feedback & Status
-                                    </h2>
-                                    @* @if (ViewData["CurrentVerifier"] != null)
-                                    {
-                                        <div class="verifier-info">
-                                            <i class="bi bi-person-badge"></i>
-                                            <span>@ViewData["CurrentVerifier"]</span>
-                                        </div>
-                                    } *@
-                                </div>
-                                <div class="feedback-body">
-                                    @if (ViewData["ShowFeedbackForm"] != null && (bool)ViewData["ShowFeedbackForm"])
-                                    {
-                                        <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>
-                                            <input type="hidden" name="collegeCode" value="@ViewData["CollegeCode"]" />
-                                            <input type="hidden" name="tabName" value="@ViewData["ActiveTab"]" />
-
-                                            <div class="row g-3">
-                                                <div class="col-12">
-                                                    <label class="form-label" for="status">Verification Status <span class="text-danger">*</span></label>
-                                                    <select class="form-select" id="status" name="status">
-                                                        <option value="">-- Select Status --</option>
-
-                                                        <option value="accept"
-                                                                selected="@(ViewData["ExistingStatus"]?.ToString() == "Approved")">
-                                                            Accept
-                                                        </option>
-
-                                                        <option value="reject"
-                                                                selected="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")">
-                                                            Reject
-                                                        </option>
-
-                                                        <option value="pending"
-                                                                selected="@(ViewData["ExistingStatus"]?.ToString() == "Pending")">
-                                                            Pending Review
-                                                        </option>
-                                                    </select>
-                                                    <div class="invalid-feedback">Please select a verification status.</div>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label class="form-label" for="remarks">Remarks <span class="text-danger">*</span></label>
-                                                    <textarea class="form-control" id="remarks" name="remarks" rows="4"
-                                                              placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes.">@ViewData["ExistingRemarks"]</textarea>
-                                                    <div class="form-text">Please provide detailed remarks for your verification decision.</div>
-                                                    <div class="invalid-feedback">Remarks are required for verification.</div>
-                                                </div>
+                    @if (ViewData["ShowFeedbackSection"] != null && (bool)ViewData["ShowFeedbackSection"])
+                    {
+                        <section class="verification-feedback-section" data-aos-duration="600">
+                            <div class="container-fluid">
+                                <div class="feedback-card">
+                                    <div class="feedback-header">
+                                        <h2 class="feedback-title">
+                                            <i class="bi bi-clipboard-check"></i>
+                                            Over all Verification Feedback & Status
+                                        </h2>
+                                        @* @if (ViewData["CurrentVerifier"] != null)
+                                        {
+                                            <div class="verifier-info">
+                                                <i class="bi bi-person-badge"></i>
+                                                <span>@ViewData["CurrentVerifier"]</span>
                                             </div>
-
-                                            <div class="feedback-actions">
-                                                <button type="submit" class="btn btn-primary btn-lg">
-                                                    <i class="bi bi-save"></i> Save Verification
-                                                </button>
-                                                @if (ViewData["NextTabAction"] != null)
-                                                {
-                                                    <a href="@ViewData["NextTabAction"]" class="btn btn-outline-primary btn-lg">
-                                                        <i class="bi bi-arrow-right"></i> @ViewData["NextTabLabel"]
-                                                    </a>
-                                                }
-                                                @* @if (ViewData["PrevTabAction"] != null)
-                                                {
-                                                    <a href="@ViewData["PrevTabAction"]" class="btn btn-outline-secondary btn-lg">
-                                                        <i class="bi bi-arrow-left"></i> @ViewData["PrevTabLabel"]
-                                                    </a>
-                                                } *@
-                                                @* <a asp-controller="MyColleges" asp-action="Index" class="btn btn-outline-secondary btn-lg">
-                                                    <i class="bi bi-arrow-left"></i> Back to My Colleges
-                                                </a> *@
-                                            </div>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        @* Display-only feedback status *@
-                                        <div id="verificationDisplay">
-
-
-                                            @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Previous Remarks</label>
-                                                    <div class="feedback-value">
-                                                        @ViewData["ExistingRemarks"]
-                                                    </div>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Previous Remarks</label>
-                                                    <div class="feedback-value small">
-                                                        No previous remarks available.
-                                                    </div>
-                                                </div>
-                                            }
-
-                                            @if (ViewData["ExistingStatus"] != null)
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Previous Status</label>
-                                                    <div class="feedback-value">
-                                                        <span class="status-badge @ViewData["ExistingStatusClass"]">
-                                                            @ViewData["ExistingStatus"]
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            }
-
-                                            @if (ViewData["VerifiedBy"] != null)
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Verified By</label>
-                                                    <div class="feedback-value">@ViewData["VerifiedBy"]</div>
-                                                </div>
-                                            }
-
-                                            @if (ViewData["VerifiedDate"] != null)
-                                            {
-                                                <div class="feedback-item">
-                                                    <label class="feedback-label">Verified Date</label>
-                                                    <div class="feedback-value">@ViewData["VerifiedDate"]</div>
-                                                </div>
-                                            }
-
-                                            <div class="mt-4">
-                                                <button type="button"
-                                                        class="btn btn-warning"
-                                                        id="btnEditVerification">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                    Edit Verification
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                        <div id="verificationEditForm" style="display:none;">
-
-                                            <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form">
-
+                                        } *@
+                                    </div>
+                                    <div class="feedback-body">
+                                        @if (ViewData["ShowFeedbackForm"] != null && (bool)ViewData["ShowFeedbackForm"])
+                                        {
+                                            <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>
                                                 <input type="hidden" name="collegeCode" value="@ViewData["CollegeCode"]" />
-
                                                 <input type="hidden" name="tabName" value="@ViewData["ActiveTab"]" />
 
                                                 <div class="row g-3">
-
                                                     <div class="col-12">
+                                                        <label class="form-label" for="status">Verification Status <span class="text-danger">*</span></label>
+                                                        <select class="form-select" id="status" name="status">
+                                                            <option value="">-- Select Status --</option>
 
-                                                        <label class="form-label">
-                                                            Verification Status
-                                                        </label>
-
-                                                        <select class="form-select" name="status">
-
-                                                            <option value="accept" selected="@(ViewData["ExistingStatus"]?.ToString() == "Approved")">
+                                                            <option value="accept"
+                                                                    selected="@(ViewData["ExistingStatus"]?.ToString() == "Approved")">
                                                                 Accept
                                                             </option>
 
-                                                            <option value="reject" selected="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")">
+                                                            <option value="reject"
+                                                                    selected="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")">
                                                                 Reject
                                                             </option>
 
-                                                            <option value="pending" selected="@(ViewData["ExistingStatus"]?.ToString() == "Pending")">
+                                                            <option value="pending"
+                                                                    selected="@(ViewData["ExistingStatus"]?.ToString() == "Pending")">
                                                                 Pending Review
                                                             </option>
-
                                                         </select>
-
+                                                        <div class="invalid-feedback">Please select a verification status.</div>
                                                     </div>
-
-                                                    <div class="col-12">
-
-                                                        <label class="form-label">
-                                                            Remarks
-                                                        </label>
-
-                                                        <textarea class="form-control" rows="4" name="remarks">@ViewData["ExistingRemarks"]</textarea>
-
+                                                    <div class="col-md-12">
+                                                        <label class="form-label" for="remarks">Remarks <span class="text-danger">*</span></label>
+                                                        <textarea class="form-control" id="remarks" name="remarks" rows="4"
+                                                                  placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes.">@ViewData["ExistingRemarks"]</textarea>
+                                                        <div class="form-text">Please provide detailed remarks for your verification decision.</div>
+                                                        <div class="invalid-feedback">Remarks are required for verification.</div>
                                                     </div>
-
                                                 </div>
 
-                                                <div class="feedback-actions mt-4">
-
-                                                    <button class="btn btn-primary" type="submit">
-                                                        <i class="bi bi-save"></i>
-                                                        Update Verification
+                                                <div class="feedback-actions">
+                                                    <button type="submit" class="btn btn-primary btn-lg">
+                                                        <i class="bi bi-save"></i> Save Verification
                                                     </button>
-
-                                                    <button type="button" class="btn btn-secondary" id="btnCancelEdit">
-                                                        Cancel
-                                                    </button>
-
+                                                    @if (ViewData["NextTabAction"] != null)
+                                                    {
+                                                        <a href="@ViewData["NextTabAction"]" class="btn btn-outline-primary btn-lg">
+                                                            <i class="bi bi-arrow-right"></i> @ViewData["NextTabLabel"]
+                                                        </a>
+                                                    }
+                                                    @* @if (ViewData["PrevTabAction"] != null)
+                                                    {
+                                                        <a href="@ViewData["PrevTabAction"]" class="btn btn-outline-secondary btn-lg">
+                                                            <i class="bi bi-arrow-left"></i> @ViewData["PrevTabLabel"]
+                                                        </a>
+                                                    } *@
+                                                    @* <a asp-controller="MyColleges" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                                        <i class="bi bi-arrow-left"></i> Back to My Colleges
+                                                    </a> *@
                                                 </div>
-
                                             </form>
+                                        }
+                                        else
+                                        {
+                                            @* Display-only feedback status *@
+                                            <div id="verificationDisplay">
 
-                                        </div>
-                                    }
+
+                                                @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Previous Remarks</label>
+                                                        <div class="feedback-value">
+                                                            @ViewData["ExistingRemarks"]
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Previous Remarks</label>
+                                                        <div class="feedback-value small">
+                                                            No previous remarks available.
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                @if (ViewData["ExistingStatus"] != null)
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Previous Status</label>
+                                                        <div class="feedback-value">
+                                                            <span class="status-badge @ViewData["ExistingStatusClass"]">
+                                                                @ViewData["ExistingStatus"]
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                @if (ViewData["VerifiedBy"] != null)
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Verified By</label>
+                                                        <div class="feedback-value">@ViewData["VerifiedBy"]</div>
+                                                    </div>
+                                                }
+
+                                                @if (ViewData["VerifiedDate"] != null)
+                                                {
+                                                    <div class="feedback-item">
+                                                        <label class="feedback-label">Verified Date</label>
+                                                        <div class="feedback-value">@ViewData["VerifiedDate"]</div>
+                                                    </div>
+                                                }
+
+                                                <div class="mt-4">
+                                                    <button type="button"
+                                                            class="btn btn-warning"
+                                                            id="btnEditVerification">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                        Edit Verification
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                            <div id="verificationEditForm" style="display:none;">
+
+                                                <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form">
+
+                                                    <input type="hidden" name="collegeCode" value="@ViewData["CollegeCode"]" />
+
+                                                    <input type="hidden" name="tabName" value="@ViewData["ActiveTab"]" />
+
+                                                    <div class="row g-3">
+
+                                                        <div class="col-12">
+
+                                                            <label class="form-label">
+                                                                Verification Status
+                                                            </label>
+
+                                                            <select class="form-select" name="status">
+
+                                                                <option value="accept" selected="@(ViewData["ExistingStatus"]?.ToString() == "Approved")">
+                                                                    Accept
+                                                                </option>
+
+                                                                <option value="reject" selected="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")">
+                                                                    Reject
+                                                                </option>
+
+                                                                <option value="pending" selected="@(ViewData["ExistingStatus"]?.ToString() == "Pending")">
+                                                                    Pending Review
+                                                                </option>
+
+                                                            </select>
+
+                                                        </div>
+
+                                                        <div class="col-12">
+
+                                                            <label class="form-label">
+                                                                Remarks
+                                                            </label>
+
+                                                            <textarea class="form-control" rows="4" name="remarks">@ViewData["ExistingRemarks"]</textarea>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="feedback-actions mt-4">
+
+                                                        <button class="btn btn-primary" type="submit">
+                                                            <i class="bi bi-save"></i>
+                                                            Update Verification
+                                                        </button>
+
+                                                        <button type="button" class="btn btn-secondary" id="btnCancelEdit">
+                                                            Cancel
+                                                        </button>
+
+                                                    </div>
+
+                                                </form>
+
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                }
+                        </section>
+                    }
+
+                    @if ((ViewData["IsAdmin"] as bool?) == true)
+                    {
+                        @await Html.PartialAsync("_VerificationHistory", verificationHistory)
+                    }
+
+                </div>
+
+                @* ==================== VERIFICATION FEEDBACK & STATUS SECTION ==================== *@
 
                 <!-- Footer -->
                 <footer class="page-footer">
@@ -290,8 +296,7 @@
         <!-- Overlay for mobile sidebar -->
         <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
     </div>
-    @* @await Html.PartialAsync("_VerificationHistory", verificationHistory) *@
-
+   
 
     <!-- Verification Summary Modal -->
     <div class="modal fade" id="verificationSummaryModal" tabindex="-1" aria-labelledby="verificationSummaryModalLabel" aria-hidden="true">

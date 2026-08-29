@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using VerificationPortal.DATA;
+using VerificationPortal.Exceptions;
 using VerificationPortal.Models;
 using VerificationPortal.Services.Verification.Interfaces;
 using VerificationPortal.Services.Verification.Models;
@@ -47,7 +48,11 @@ namespace VerificationPortal.Services.Verification
                 .FirstOrDefaultAsync(predicate);
 
             if (entity == null)
-                throw new Exception($"{typeof(T).Name} record not found.");
+            {
+                throw new VerificationDataNotFoundException(
+                    typeof(T).Name
+                );
+            }
 
             var handler =
                 _provider.GetRequiredService<IVerificationHandler<T>>();

@@ -159,5 +159,8 @@ namespace VerificationPortal.Models
         public DateTime? LastVerifiedOn { get; set; }
 
         public string? LastVerifiedBy { get; set; }
+
+        // Optional: designation whose status is being displayed
+        public string? Designation { get; set; }
     }
 }

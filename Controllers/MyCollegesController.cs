@@ -36,6 +36,13 @@ namespace VerificationPortal.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            // ========================================================= 
+            // USER DETAILS 
+            // =========================================================
+
+            var userDesignation = user.DesignationDescription ?? "";
+
+
             // Get user's college mappings (only active ones)
             var mappings = await _context.TblCollegeMappings
                 .Where(m => m.UserId == user.UserId && m.IsActive)
@@ -57,8 +64,6 @@ namespace VerificationPortal.Controllers
                 .Where(f => facultyIds.Contains(f.FacultyId))
                 .ToDictionaryAsync(f => f.FacultyId, f => f.FacultyName);
 
-            // Get user designation
-            var userDesignation = user.DesignationDescription ?? "";
 
             var viewModels = new List<CollegeMappingWithCollegesViewModel>();
 
@@ -110,5 +115,145 @@ namespace VerificationPortal.Controllers
 
             return View(viewModels);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetVerificationStatuses( int facultyId, List<string> collegeCodes)
+        {
+            if (collegeCodes == null || !collegeCodes.Any())
+            {
+                return Json(new Dictionary<string, CollegeFeedbackStatusViewModel>());
+            }
+
+            var totalSections = await _context.MstSections
+                .AsNoTracking()
+                .CountAsync(s => s.FacultyId == facultyId);
+
+            var allFeedback = await _context.SectionWiseFeedbacks
+                .AsNoTracking()
+                .Where(f =>
+                    f.FacultyId == facultyId &&
+                    collegeCodes.Contains(f.CollegeCode))
+                .ToListAsync();
+
+            var result =
+                new Dictionary<string, CollegeFeedbackStatusViewModel>();
+
+            foreach (var collegeCode in collegeCodes)
+            {
+                var collegeFeedback = allFeedback
+                    .Where(f => f.CollegeCode == collegeCode)
+                    .ToList();
+
+                result[collegeCode] =
+                    GetCollegeFeedbackStatus(
+                        collegeFeedback,
+                        totalSections);
+            }
+
+            return Json(result);
+        }
+
+        private CollegeFeedbackStatusViewModel GetCollegeFeedbackStatus( List<SectionWiseFeedback> collegeFeedback, int totalSections)
+        {
+            if (collegeFeedback == null || !collegeFeedback.Any())
+            {
+                return new CollegeFeedbackStatusViewModel
+                {
+                    Status = "Pending",
+                    TotalSections = totalSections,
+                    CompletedSections = 0,
+                    PendingSections = totalSections,
+                    RejectedSections = 0,
+                    LastVerifiedOn = null,
+                    LastVerifiedBy = null
+                };
+            }
+
+            var verifiedSections = collegeFeedback
+                .Where(f =>
+                    !string.IsNullOrWhiteSpace(f.VerificationStatus) &&
+                    (
+                        f.VerificationStatus.Equals(
+                            "Verified",
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        f.VerificationStatus.Equals(
+                            "Approved",
+                            StringComparison.OrdinalIgnoreCase)
+                    ))
+                .Select(f => f.SectionId)
+                .Distinct()
+                .Count();
+
+            var rejectedSections = collegeFeedback
+                .Where(f =>
+                    !string.IsNullOrWhiteSpace(f.VerificationStatus) &&
+                    f.VerificationStatus.Equals(
+                        "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                .Select(f => f.SectionId)
+                .Distinct()
+                .Count();
+
+            var completedSectionIds = collegeFeedback
+                .Where(f => !string.IsNullOrWhiteSpace(f.VerificationStatus))
+                .Select(f => f.SectionId)
+                .Distinct()
+                .Count();
+
+            var pendingSections = totalSections - completedSectionIds;
+
+            if (pendingSections < 0)
+            {
+                pendingSections = 0;
+            }
+
+            var latestFeedback = collegeFeedback
+                .Where(f => f.VerifiedOn.HasValue)
+                .OrderByDescending(f => f.VerifiedOn)
+                .FirstOrDefault();
+
+            string overallStatus;
+
+            // Priority 1:
+            // Even ONE pending section means Pending
+            if (pendingSections > 0)
+            {
+                overallStatus = "Pending";
+            }
+
+            // Priority 2:
+            // No pending, but at least one rejected
+            else if (rejectedSections > 0)
+            {
+                overallStatus = "Rejected";
+            }
+
+            // Priority 3:
+            // No pending + no rejected = all accepted
+            else if (verifiedSections == totalSections)
+            {
+                overallStatus = "Completed";
+            }
+
+            // Fallback
+            else
+            {
+                overallStatus = "Pending";
+            }
+
+            return new CollegeFeedbackStatusViewModel
+            {
+                Status = overallStatus,
+                TotalSections = totalSections,
+                CompletedSections = completedSectionIds,
+                PendingSections = pendingSections,
+                RejectedSections = rejectedSections,
+                LastVerifiedOn = latestFeedback?.VerifiedOn,
+                LastVerifiedBy = latestFeedback?.VerifiedBy
+            };
+        }
+
+
     }
 }

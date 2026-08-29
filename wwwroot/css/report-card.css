@@ -182,7 +182,7 @@
 .verification-feedback-section {
     background: var(--report-bg-secondary);
     border-top: 1px solid var(--report-border);
-    border-radius: 0 0 var(--report-radius-lg) var(--report-radius-lg);
+    border-radius: 1rem var(--report-radius-lg) var(--report-radius-lg);
     margin: 0 -1px -1px -1px;
     padding: 0.8rem 0.8rem 1rem;
 }
