@@ -314,7 +314,7 @@ namespace VerificationPortal.Controllers
             return View(institution);
         }
 
-        public IActionResult ViewGokOrderDocument(int id, string documentType)
+        public IActionResult ViewTrustDetailsPageDocument(int id, string documentType)
         {
             var institution = _context.InstitutionBasicDetails
                 .FirstOrDefault(x => x.InstitutionId == id);
