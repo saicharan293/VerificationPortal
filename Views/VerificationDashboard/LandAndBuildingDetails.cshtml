@@ -441,12 +441,11 @@
                         new DocumentViewerVm
                         {
                             Url = Url.Action(
-                                "ViewLandBuildingDocument",
+                                "ViewApprovedBuildingPlanDocument",
                                 "VerificationDashboard",
                                 new
                                 {
-                                    id = Model.Id,
-                                    documentType = "ApprovedBuildingPlan"
+                                    id = Model.Id
                                 })!,
                             Title = "Approved Building Plan"
                         })

@@ -405,16 +405,21 @@ else
                                 DEU Members List (PDF)
                             </div>
 
-                            <a asp-controller="VerificationDashboard"
-                               asp-action="ViewDeuMembersList"
-                               asp-route-collegeCode="@ViewBag.CollegeCode"
-                               target="_blank"
-                               class="btn btn-outline-primary btn-sm">
-
-                                <i class="bi bi-eye"></i>
-                                View Document
-
-                            </a>
+                            <div style="min-width: 150px;">
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewDeuMembersList",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = ViewBag.CollegeCode
+                                            })!,
+                                        Title = "DEU Members List"
+                                    })
+                            </div>
 
                         </div>
                     }
