@@ -377,6 +377,7 @@
 
                 </div>
 
+
                 @if (annualFeedback != null)
                 {
                     @await Html.PartialAsync( "_SectionFeedback", annualFeedback )
@@ -535,6 +536,185 @@
 
                 </div>
 
+
+                <div class="row g-4 mt-1">
+
+                    <!-- Governing Council -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Governing Council Document
+                            </label>
+
+                            <div class="verification-value">
+
+                                @if (!string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName))
+                                {
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
+                                        {
+                                            Url = Url.Action(
+                                                "ViewGoverningCouncilDocument",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = section.CollegeCode,
+                                                    courseLevel = section.CourseLevel,
+                                                    facultyCode = section.FacultyCode
+                                                })!,
+                                            Title = "Governing Council Document"
+                                        })
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Not Uploaded
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Account Summary -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Account Summary
+                            </label>
+
+                            <div class="verification-value">
+
+                                @if (!string.IsNullOrWhiteSpace(section.AccountSummaryPdfName))
+                                {
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
+                                        {
+                                            Url = Url.Action(
+                                                "ViewAccountSummaryPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = section.CollegeCode,
+                                                    courseLevel = section.CourseLevel,
+                                                    facultyCode = section.FacultyCode
+                                                })!,
+                                            Title = "Account Summary"
+                                        })
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Not Uploaded
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Audited Statement -->
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Audited Statement
+                            </label>
+
+                            <div class="verification-value">
+
+                                @if (!string.IsNullOrWhiteSpace(section.AuditedStatementPdfName))
+                                {
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
+                                        {
+                                            Url = Url.Action(
+                                                "ViewAuditedStatementPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = section.CollegeCode,
+                                                    courseLevel = section.CourseLevel,
+                                                    facultyCode = section.FacultyCode
+                                                })!,
+                                            Title = "Audited Statement"
+                                        })
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Not Uploaded
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Donation - PG Only -->
+                    @if (section.IsPG)
+                    {
+                        <div class="col-12 col-md-6">
+
+                            <div class="verification-field">
+
+                                <label class="verification-label">
+                                    Donation Document
+                                </label>
+
+                                <div class="verification-value">
+
+                                    @if (!string.IsNullOrWhiteSpace(section.DonationPdfName))
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewDonationPdf",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        collegeCode = section.CollegeCode,
+                                                        courseLevel = section.CourseLevel,
+                                                        facultyCode = section.FacultyCode
+                                                    })!,
+                                                Title = "Donation Document"
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Not Uploaded
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
                 @if (accountFeedback != null)
                 {
                     @await Html.PartialAsync( "_SectionFeedback", accountFeedback )
@@ -550,230 +730,6 @@
              SUPPORTING DOCUMENTS
         ========================================================== -->
 
-        <div class="verification-card mt-4">
-
-            <div class="verification-card-header">
-                <h3 class="verification-card-title">
-                    <i class="bi bi-file-earmark-pdf"></i>
-                    Supporting Documents
-                </h3>
-            </div>
-
-            <div class="verification-card-body">
-
-                <div class="row g-3">
-
-                    <!-- Governing Council -->
-                    <div class="col-12 col-md-12">
-
-                        <div class="border rounded p-3 h-100">
-
-                            <div class="d-flex align-items-center justify-content-between gap-3">
-
-                                <div class="d-flex align-items-center">
-
-                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-
-                                    <div>
-                                        <div class="fw-semibold">
-                                            Governing Council
-                                        </div>
-
-                                        <small class="text-muted">
-                                            @(string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName)
-                                                ? "No document uploaded"
-                                                : section.GoverningCouncilPdfName)
-                                        </small>
-                                    </div>
-
-                                </div>
-
-                                @if (!string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName))
-                                {
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewGoverningCouncilPdf",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = section.CollegeCode,
-                                                    courseLevel = section.CourseLevel,
-                                                    facultyCode = ViewBag.FacultyCode
-                                                })!,
-                                            Title = "Governing Council"
-                                        })
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Account Summary -->
-                    @* <div class="col-12 col-md-6">
-
-                        <div class="border rounded p-3 h-100">
-
-                            <div class="d-flex align-items-center justify-content-between gap-3">
-
-                                <div class="d-flex align-items-center">
-
-                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-
-                                    <div>
-                                        <div class="fw-semibold">
-                                            Account Summary
-                                        </div>
-
-                                        <small class="text-muted">
-                                            @(string.IsNullOrWhiteSpace(section.AccountSummaryPdfName)
-                                                ? "No document uploaded"
-                                                : section.AccountSummaryPdfName)
-                                        </small>
-                                    </div>
-
-                                </div>
-
-                                @if (!string.IsNullOrWhiteSpace(section.AccountSummaryPdfName))
-                                {
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewAccountSummaryPdf",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = section.CollegeCode,
-                                                    courseLevel = section.CourseLevel,
-                                                    facultyCode = ViewBag.FacultyCode
-                                                })!,
-                                            Title = "Account Summary"
-                                        })
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Audited Statement -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="border rounded p-3 h-100">
-
-                            <div class="d-flex align-items-center justify-content-between gap-3">
-
-                                <div class="d-flex align-items-center">
-
-                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-
-                                    <div>
-                                        <div class="fw-semibold">
-                                            Audited Statement
-                                        </div>
-
-                                        <small class="text-muted">
-                                            @(string.IsNullOrWhiteSpace(section.AuditedStatementPdfName)
-                                                ? "No document uploaded"
-                                                : section.AuditedStatementPdfName)
-                                        </small>
-                                    </div>
-
-                                </div>
-
-                                @if (!string.IsNullOrWhiteSpace(section.AuditedStatementPdfName))
-                                {
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewAuditedStatementPdf",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = section.CollegeCode,
-                                                    courseLevel = section.CourseLevel,
-                                                    facultyCode = ViewBag.FacultyCode
-                                                })!,
-                                            Title = "Audited Statement"
-                                        })
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Donation PDF - PG only -->
-                    @if (section.IsPG)
-                    {
-                        <div class="col-12 col-md-6">
-
-                            <div class="border rounded p-3 h-100">
-
-                                <div class="d-flex align-items-center justify-content-between gap-3">
-
-                                    <div class="d-flex align-items-center">
-
-                                        <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-
-                                        <div>
-                                            <div class="fw-semibold">
-                                                Donation Document
-                                            </div>
-
-                                            <small class="text-muted">
-                                                @(string.IsNullOrWhiteSpace(section.DonationPdfName)
-                                                    ? "No document uploaded"
-                                                    : section.DonationPdfName)
-                                            </small>
-                                        </div>
-
-                                    </div>
-
-                                    @if (!string.IsNullOrWhiteSpace(section.DonationPdfName))
-                                    {
-                                        @await Html.PartialAsync(
-                                            "_DocumentViewerButton",
-                                            new DocumentViewerVm
-                                            {
-                                                Url = Url.Action(
-                                                    "ViewDonationPdf",
-                                                    "VerificationDashboard",
-                                                    new
-                                                    {
-                                                        collegeCode = section.CollegeCode,
-                                                        courseLevel = section.CourseLevel,
-                                                        facultyCode = ViewBag.FacultyCode
-                                                    })!,
-                                                Title = "Donation Document"
-                                            })
-                                    }
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                    } *@
-
-                </div>
-
-            </div>
-
-        </div>
     }
 }
 else

@@ -4609,13 +4609,42 @@ namespace VerificationPortal.Controllers
 
         // View PDF actions (keep these)
         [HttpGet]
-        public async Task<IActionResult> ViewGoverningCouncilPdf( string collegeCode, string courseLevel, string facultyCode)
+        public async Task<IActionResult> ViewGoverningCouncilDocument(string collegeCode, string courseLevel, string facultyCode)
         {
-            return await GetPdf(
-                "GoverningCouncil",
-                collegeCode,
-                facultyCode,
-                courseLevel);
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code not specified.");
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return NotFound("Faculty code not specified.");
+
+            if (string.IsNullOrWhiteSpace(courseLevel))
+                return NotFound("Course level not specified.");
+
+            var record = await _context.MedCaAccountAndFeeDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.CourseLevel == courseLevel);
+
+            if (record == null)
+                return NotFound("Finance record not found.");
+
+            if (string.IsNullOrWhiteSpace(record.GoverningCouncilPdfPath))
+                return NotFound("Governing Council document not found.");
+
+            var resolvedPath = ResolveDocumentPath(
+                record.GoverningCouncilPdfPath
+            );
+
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound("Governing Council document file not found.");
+
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath),
+                enableRangeProcessing: true
+            );
         }
 
         [HttpGet]
