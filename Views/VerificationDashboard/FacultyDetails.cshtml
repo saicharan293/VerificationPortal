@@ -111,8 +111,18 @@
                                 Recognized PG Teacher
                             </th>
 
+                            
+                            <th>
+                                PG Recognition
+                            </th>
+
+
                             <th>
                                 Recognized PhD Teacher
+                            </th>
+
+                            <th>
+                                PhD Recognition
                             </th>
 
                             <th>
@@ -151,13 +161,6 @@
                                 Validity To
                             </th>
 
-                            <th>
-                                PG Recognition
-                            </th>
-
-                            <th>
-                                PhD Recognition
-                            </th>
 
                             <th>
                                 Litigation Document
@@ -208,11 +211,72 @@
                                         ? "-"
                                         : faculty.RecognizedPgTeacher)
                                 </td>
+                                @* ============================================================
+                                   PG Recognition Document
+                                   ============================================================ *@
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        faculty.GuideRecognitionDocPath))
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewFacultyDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = faculty.Id,
+                                                        type = "pg",
+                                                        mode = "view"
+                                                    })!,
+                                                Title = $"PG Recognition Document - {faculty.NameOfFaculty}"
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+
+                                </td>
 
                                 <td>
                                     @(string.IsNullOrWhiteSpace(faculty.RecognizedPhDteacher)
                                         ? "-"
                                         : faculty.RecognizedPhDteacher)
+                                </td>
+
+                                @* ============================================================
+                                   PhD Recognition Document
+                                   ============================================================ *@
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        faculty.PhDrecognitionDocPath))
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewFacultyDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = faculty.Id,
+                                                        type = "phd",
+                                                        mode = "view"
+                                                    })!,
+                                                Title = $"PhD Recognition Document - {faculty.NameOfFaculty}"
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+
                                 </td>
 
                                 <td>
@@ -265,69 +329,6 @@
                                     @(faculty.To?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
 
-
-                                @* ============================================================
-                                   PG Recognition Document
-                                   ============================================================ *@
-                                <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        faculty.GuideRecognitionDocPath))
-                                    {
-                                        @await Html.PartialAsync(
-                                            "_DocumentViewerButton",
-                                            new DocumentViewerVm
-                                            {
-                                                Url = Url.Action(
-                                                    "ViewFacultyDocument",
-                                                    "VerificationDashboard",
-                                                    new
-                                                    {
-                                                        id = faculty.Id,
-                                                        type = "pg",
-                                                        mode = "view"
-                                                    })!,
-                                                Title = $"PG Recognition Document - {faculty.NameOfFaculty}"
-                                            })
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-
-                                </td>
-
-
-                                @* ============================================================
-                                   PhD Recognition Document
-                                   ============================================================ *@
-                                <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        faculty.PhDrecognitionDocPath))
-                                    {
-                                        @await Html.PartialAsync(
-                                            "_DocumentViewerButton",
-                                            new DocumentViewerVm
-                                            {
-                                                Url = Url.Action(
-                                                    "ViewFacultyDocument",
-                                                    "VerificationDashboard",
-                                                    new
-                                                    {
-                                                        id = faculty.Id,
-                                                        type = "phd",
-                                                        mode = "view"
-                                                    })!,
-                                                Title = $"PhD Recognition Document - {faculty.NameOfFaculty}"
-                                            })
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-
-                                </td>
 
 
                                 @* ============================================================
