@@ -39,6 +39,9 @@
         const error =
             document.getElementById("documentViewerError");
 
+        console.log('Document viewer clicked');
+        console.log('Document URL:', url);
+
 
         // -------------------------------------------------
         // VALIDATE REQUIRED ELEMENTS

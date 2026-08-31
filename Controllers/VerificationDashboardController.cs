@@ -2409,6 +2409,32 @@ namespace VerificationPortal.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> ViewApprovedBuildingPlanDocument(int id)
+        {
+            var record = await _context.DentalCollegeLandBuildingDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (record == null)
+                return NotFound();
+
+            var filePath = record.ApprovedBuildingPlanDocumentPath;
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("Approved Building Plan document not available.");
+
+            // If the database stores the complete physical path,
+            // this check is enough.
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Approved Building Plan file not found.");
+
+            return PhysicalFile(
+                filePath,
+                GetContentType(filePath),
+                enableRangeProcessing: true);
+        }
+
         private static string GetContentType(string filePath)
         {
             var extension = Path.GetExtension(filePath).ToLowerInvariant();

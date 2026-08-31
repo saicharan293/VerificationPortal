@@ -417,44 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Document Viewer
-    document.querySelectorAll('.document-viewer-btn').forEach(button => {
-
-        button.addEventListener('click', function (event) {
-
-            event.preventDefault();
-
-            const documentUrl = this.getAttribute('data-document-url');
-            const documentTitle = this.getAttribute('data-document-title');
-
-            console.log('Document viewer clicked');
-            console.log('Document URL:', documentUrl);
-
-            const modalElement = document.getElementById('globalDocumentViewerModal');
-            const iframe = document.getElementById('globalDocumentViewerFrame');
-            const modalTitle = document.getElementById('documentViewerModalLabel');
-
-            if (!modalElement) {
-                console.error('globalDocumentViewerModal not found');
-                return;
-            }
-
-            if (!iframe) {
-                console.error('globalDocumentViewerFrame not found');
-                return;
-            }
-
-            if (modalTitle) {
-                modalTitle.textContent = documentTitle || 'Document Viewer';
-            }
-
-            // This triggers the controller endpoint
-            iframe.src = documentUrl;
-
-            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modal.show();
-        });
-    });
-
+    
     // Expose functions globally for use in views
     window.VerificationDashboard = {
         showToast,
