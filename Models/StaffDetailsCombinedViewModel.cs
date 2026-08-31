@@ -67,6 +67,8 @@ namespace VerificationPortal.Models
         [Required(ErrorMessage = "Please select Examiner Details Attached")]
         public string? ExaminerDetailsAttached { get; set; }
 
+        public IFormFile? TeachersUpdatedPdf { get; set; }
+
         // Saved File Names (for view button)
         public string? ExaminerDetailsPdfName { get; set; }
         public string? ExaminerDetailsPdfName2 { get; set; }
@@ -83,6 +85,8 @@ namespace VerificationPortal.Models
         public string? AcquittanceRegisterMaintained { get; set; }
 
         public string? ProvidentFundPdfName { get; set; }
+
+        public string? TeachersUpdatedPdfName { get; set; }
         public string? ESIPdfName { get; set; }
     }
 }

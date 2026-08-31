@@ -4830,6 +4830,9 @@ namespace VerificationPortal.Controllers
                 staffOther.AcquittanceRegisterMaintained =
                     otherDetails.AcquittanceRegisterMaintained;
 
+                staffOther.TeachersUpdatedPdfName =
+                    otherDetails.TeachersUpdatedPdfName;
+
                 staffOther.ExaminerDetailsPdfName =
                     otherDetails.ExaminerDetailsPdfName;
 
@@ -4969,6 +4972,9 @@ namespace VerificationPortal.Controllers
 
             string? filePath = fileType switch
             {
+                "EmsList" => 
+                    record.TeachersUpdatedPdfPath,
+
                 "Examiner" =>
                     record.ExaminerDetailsPdfPath,
 
