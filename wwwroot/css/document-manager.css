@@ -1,0 +1,619 @@
+﻿/* ============================================================
+   DOCUMENT MANAGER PAGE
+   ============================================================ */
+
+
+/* ============================================================
+   PAGE WRAPPER
+   ============================================================ */
+
+.document-manager-page {
+    width: 100%;
+    padding: 1.5rem;
+}
+
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+
+.document-manager-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.document-manager-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.document-manager-header-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-manager-header-icon i {
+    font-size: 1.4rem;
+}
+
+.document-manager-title {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.document-manager-subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--gray-500);
+}
+
+
+/* ============================================================
+   COMMON CARD
+   ============================================================ */
+
+.document-manager-card {
+    background: var(--nav-bg) !important;
+    border: 1px solid var(--nav-bg);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+
+/* ============================================================
+   CARD HEADER
+   ============================================================ */
+
+.document-manager-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-bg);
+}
+
+.document-manager-card-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.document-manager-card-title-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-manager-card-title-icon i {
+    font-size: 1.05rem;
+}
+
+.document-manager-card-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.document-manager-card-description {
+    margin: 0.2rem 0 0;
+    font-size: 0.82rem;
+    color: var(--gray-500);
+}
+
+
+/* ============================================================
+   CARD BODY
+   ============================================================ */
+
+.document-manager-card-body {
+    padding: 1.5rem;
+    background: var(--nav-bg);
+}
+
+
+/* ============================================================
+   ADD DOCUMENT FORM
+   ============================================================ */
+
+.document-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.document-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.document-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.document-form-label {
+    margin-bottom: 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.document-required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+
+/* ============================================================
+   FORM CONTROLS
+   ============================================================ */
+
+.document-manager-page .form-control,
+.document-manager-page .form-select {
+    min-height: 42px;
+    border-radius: 8px;
+    border-color: var(--gray-300);
+    font-size: 0.9rem;
+}
+
+.document-manager-page .form-control:focus,
+.document-manager-page .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.12);
+}
+
+
+/* ============================================================
+   DOCUMENT OPTIONS
+   ============================================================ */
+
+.document-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.document-mandatory-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.document-mandatory-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.document-mandatory-label {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+.document-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.document-save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 150px;
+    min-height: 42px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.document-reset-btn {
+    min-height: 42px;
+    border-radius: 8px;
+}
+
+
+/* ============================================================
+   DOCUMENT LIST HEADER
+   ============================================================ */
+
+.document-list-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 0.65rem;
+    border-radius: 20px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   DOCUMENT FILTER
+   ============================================================ */
+
+.document-filter-section {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.document-filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
+    gap: 1rem;
+}
+
+.document-search-wrapper {
+    position: relative;
+}
+
+.document-search-wrapper i {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+}
+
+.document-search-wrapper .form-control {
+    padding-left: 2.5rem;
+}
+
+
+/* ============================================================
+   DOCUMENT TABLE
+   ============================================================ */
+
+.document-table-wrapper {
+    overflow-x: auto;
+}
+
+.document-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.document-table thead th {
+    padding: 0.9rem 1rem;
+    background: var(--gray-500);
+    border-bottom: 1px solid var(--gray-200);
+    color: var(--gray-50);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.document-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+    font-size: 0.88rem;
+}
+
+.document-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+
+.document-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ============================================================
+   SERIAL NUMBER
+   ============================================================ */
+
+.document-sl-no {
+    width: 60px;
+    color: var(--gray-500);
+}
+
+
+/* ============================================================
+   DOCUMENT NAME
+   ============================================================ */
+
+.document-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.document-name-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.document-name-text {
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+
+.document-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.document-status-badge.mandatory {
+    background: var(--bs-danger);
+    color: #059669;
+}
+
+.document-status-badge.optional {
+    background: var(--bs-info);
+    color: var(--gray-600);
+}
+
+
+
+/* ============================================================
+   DELETE CONFIRMATION MODAL
+   ============================================================ */
+
+.delete-confirmation-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.delete-confirmation-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    color: var(--danger);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+@media (max-width: 575.98px) {
+
+    .delete-confirmation-content {
+        flex-direction: column;
+    }
+}
+/* ============================================================
+   ACTION BUTTONS
+   ============================================================ */
+
+.document-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.document-action-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-500);
+    transition: all 0.2s ease;
+}
+
+.document-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.document-action-btn.edit:hover {
+    color: var(--primary);
+    background: rgba(37, 99, 235, 0.08);
+    border-color: rgba(37, 99, 235, 0.25);
+}
+
+.document-action-btn.delete:hover {
+    color: var(--danger);
+    background: rgba(220, 38, 38, 0.08);
+    border-color: rgba(220, 38, 38, 0.25);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.document-empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: var(--nav-bg);
+}
+
+.document-empty-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    background: var(--gray-100);
+    color: var(--gray-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-empty-icon i {
+    font-size: 2rem;
+}
+
+.document-empty-title {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.document-empty-text {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--gray-500);
+}
+
+/* ============================================================
+   BACK BUTTON
+   ============================================================ */
+
+.document-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 42px;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.document-back-btn i {
+    font-size: 1rem;
+}
+
+
+/* Mobile */
+
+@media (max-width: 767.98px) {
+
+    .document-manager-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .document-back-btn {
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 991.98px) {
+
+    .document-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .document-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .document-search-wrapper {
+        grid-column: 1 / -1;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    .document-manager-page {
+        padding: 1rem;
+    }
+
+    .document-manager-header {
+        align-items: flex-start;
+    }
+
+    .document-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .document-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .document-search-wrapper {
+        grid-column: auto;
+    }
+
+    .document-form-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .document-form-actions {
+        width: 100%;
+    }
+
+    .document-form-actions .btn {
+        flex: 1;
+    }
+
+    .document-manager-card-header {
+        padding: 1rem;
+    }
+
+    .document-manager-card-body {
+        padding: 1rem;
+    }
+
+    .document-filter-section {
+        padding: 1rem;
+    }
+}

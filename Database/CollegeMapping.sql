@@ -64,6 +64,8 @@ SELECT
 FROM dbo.TblRguhsFacultyUser_Old
 ORDER BY Id;
 
+
+
 --------------------------------
 
 --DROP TABLE dbo.TblRguhsFacultyUser_Old;
@@ -380,7 +382,7 @@ DEFAULT (1) FOR IsActive;
 
 
 SELECT * FROM Affiliation_College_Master
-WHERE FacultyCode=1 order by CollegeName desc;
+WHERE FacultyCode=2 order by CollegeName desc;
 
 SELECT * FROM CollegeCourseIntakeDetails
 WHERE FacultyCode = 2

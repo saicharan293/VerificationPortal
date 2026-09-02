@@ -32,4 +32,6 @@ public partial class TblRguhsFacultyUser
     public int FailedLoginAttempts { get; set; }
 
     public DateTime? LockoutEndTime { get; set; }
+
+    public virtual ICollection<DocumentWiseFeedback> DocumentWiseFeedbacks { get; set; } = new List<DocumentWiseFeedback>();
 }

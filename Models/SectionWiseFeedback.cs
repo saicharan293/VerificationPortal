@@ -15,13 +15,13 @@ public partial class SectionWiseFeedback
 
     public int SectionId { get; set; }
 
-    public string? VerifiedBy { get; set; }
-
-    public DateTime? VerifiedOn { get; set; }
-
     public string? VerificationStatus { get; set; }
 
     public string? Remarks { get; set; }
+
+    public string? VerifiedBy { get; set; }
+
+    public DateTime? VerifiedOn { get; set; }
 
     public virtual AffiliationCollegeMaster CollegeCodeNavigation { get; set; } = null!;
 

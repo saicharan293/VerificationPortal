@@ -35,6 +35,10 @@ public partial class Faculty
 
     public virtual ICollection<DeptWisePublication> DeptWisePublications { get; set; } = new List<DeptWisePublication>();
 
+    public virtual ICollection<DocumentWiseFeedback> DocumentWiseFeedbacks { get; set; } = new List<DocumentWiseFeedback>();
+
+    public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+
     public virtual ICollection<HealthCenterChp> HealthCenterChps { get; set; } = new List<HealthCenterChp>();
 
     public virtual ICollection<HospitalDocumentDetail> HospitalDocumentDetails { get; set; } = new List<HospitalDocumentDetail>();
@@ -54,6 +58,8 @@ public partial class Faculty
     public virtual ICollection<MstDentalInfrastructure> MstDentalInfrastructures { get; set; } = new List<MstDentalInfrastructure>();
 
     public virtual ICollection<MstDentalService> MstDentalServices { get; set; } = new List<MstDentalService>();
+
+    public virtual ICollection<MstDocument> MstDocuments { get; set; } = new List<MstDocument>();
 
     public virtual ICollection<MstEquipmentDepartment> MstEquipmentDepartments { get; set; } = new List<MstEquipmentDepartment>();
 

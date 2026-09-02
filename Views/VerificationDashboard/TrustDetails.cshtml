@@ -57,8 +57,18 @@
 
     ViewData["PrevTabLabel"] =
         "Previous: Institution Details";
-}
 
+    var documentMappings =  ViewBag.DocumentMappings as Dictionary<string, int> ?? new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase);
+
+    int? GetDocumentId(string documentName)
+    {
+        return documentMappings.TryGetValue(
+            documentName,
+            out var documentId)
+            ? documentId
+            : null;
+    }
+}
 @section Styles {
 }
 
@@ -205,140 +215,168 @@
                 <h5 class="border-bottom pb-2 mb-3">Required Documents</h5>
             </div>
 
-        <!-- Amended Document -->
-        <div class="col-md-6">
-            <label class="form-label">GOK order Document</label>
+            <!-- Amended Document -->
+            <div class="col-md-6">
+                <label class="form-label">GOK Order Document</label>
 
-            @if (!string.IsNullOrWhiteSpace(Model.GokOrderExistingCoursesFilePath))
-            {
-                @await Html.PartialAsync(
-                    "_DocumentViewerButton",
-                    new DocumentViewerVm
-                    {
-                        Url = Url.Action(
-                            "ViewTrustDetailsPageDocument",
-                            "VerificationDashboard",
-                            new
-                            {
-                                id = Model.InstitutionId,
-                                documentType = "AmendedDoc"
-                            })!,
-                        Title = "Amended Document"
-                    })
-            }
-            else
-            {
-                <span class="badge bg-secondary">Not Uploaded</span>
-            }
-        </div>
+                @if (!string.IsNullOrWhiteSpace(Model.GokOrderExistingCoursesFilePath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewTrustDetailsPageDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.InstitutionId,
+                                    documentType = "AmendedDoc"
+                                })!,
+                            Title = "Amended Document",
 
-        <!-- Trust PAN -->
-        <div class="col-md-6">
-            <label class="form-label">Trust PAN</label>
+                            DocumentId = GetDocumentId("GOK Order Document"),
 
-            @if (!string.IsNullOrWhiteSpace(Model.PanfilePath))
-            {
-                @await Html.PartialAsync(
-                    "_DocumentViewerButton",
-                    new DocumentViewerVm
-                    {
-                        Url = Url.Action(
-                            "ViewTrustDetailsPageDocument",
-                            "VerificationDashboard",
-                            new
-                            {
-                                id = Model.InstitutionId,
-                                documentType = "Panfile"
-                            })!,
-                        Title = "Trust PAN"
-                    })
-            }
-            else
-            {
-                <span class="badge bg-secondary">Not Uploaded</span>
-            }
-        </div>
+                            FacultyId = Convert.ToInt32(Model.FacultyCode),
 
-        <!-- Bank Statement -->
-        <div class="col-md-6">
-            <label class="form-label">Bank Statement</label>
+                            CollegeCode = Model.CollegeCode
+                        })
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Not Uploaded</span>
+                }
+            </div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.BankStatementFilePath))
-            {
-                @await Html.PartialAsync(
-                    "_DocumentViewerButton",
-                    new DocumentViewerVm
-                    {
-                        Url = Url.Action(
-                            "ViewTrustDetailsPageDocument",
-                            "VerificationDashboard",
-                            new
-                            {
-                                id = Model.InstitutionId,
-                                documentType = "BankStatement"
-                            })!,
-                        Title = "Bank Statement"
-                    })
-            }
-            else
-            {
-                <span class="badge bg-secondary">Not Uploaded</span>
-            }
-        </div>
+            <!-- Trust PAN -->
+            <div class="col-md-6">
+                <label class="form-label">Trust PAN</label>
 
-        <!-- Registration Certificate -->
-        <div class="col-md-6">
-            <label class="form-label">Registration Certificate</label>
+                @if (!string.IsNullOrWhiteSpace(Model.PanfilePath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewTrustDetailsPageDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.InstitutionId,
+                                    documentType = "Panfile"
+                                })!,
+                            Title = "Trust PAN",
+                            DocumentId = GetDocumentId("Trust PAN"),
 
-            @if (!string.IsNullOrWhiteSpace(Model.RegistrationCertificateFilePath))
-            {
-                @await Html.PartialAsync(
-                    "_DocumentViewerButton",
-                    new DocumentViewerVm
-                    {
-                        Url = Url.Action(
-                            "ViewTrustDetailsPageDocument",
-                            "VerificationDashboard",
-                            new
-                            {
-                                id = Model.InstitutionId,
-                                documentType = "RegistrationCertificate"
-                            })!,
-                        Title = "Registration Certificate"
-                    })
-            }
-            else
-            {
-                <span class="badge bg-secondary">Not Uploaded</span>
-            }
-        </div>
+                            FacultyId = Convert.ToInt32(Model.FacultyCode),
 
-        <!-- Audit Statement -->
-        <div class="col-md-6">
-            <label class="form-label">Audit Statement</label>
+                            CollegeCode = Model.CollegeCode
+                        })
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Not Uploaded</span>
+                }
+            </div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.AuditStatementFilePath))
-            {
-                @await Html.PartialAsync(
-                    "_DocumentViewerButton",
-                    new DocumentViewerVm
-                    {
-                        Url = Url.Action(
-                            "ViewTrustDetailsPageDocument",
-                            "VerificationDashboard",
-                            new
-                            {
-                                id = Model.InstitutionId,
-                                documentType = "AuditStatement"
-                            })!,
-                        Title = "Audit Statement"
-                    })
-            }
-            else
-            {
-                <span class="badge bg-secondary">Not Uploaded</span>
-            }
-        </div>
+            <!-- Bank Statement -->
+            <div class="col-md-6">
+                <label class="form-label">Bank Statement</label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.BankStatementFilePath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewTrustDetailsPageDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.InstitutionId,
+                                    documentType = "BankStatement"
+                                })!,
+                            Title = "Bank Statement",
+                            DocumentId = GetDocumentId("Bank Statement"),
+
+                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+
+                            CollegeCode = Model.CollegeCode
+                        })
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Not Uploaded</span>
+                }
+            </div>
+
+            <!-- Registration Certificate -->
+            <div class="col-md-6">
+                <label class="form-label">Registration Certificate</label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.RegistrationCertificateFilePath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewTrustDetailsPageDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.InstitutionId,
+                                    documentType = "RegistrationCertificate"
+                                })!,
+                            Title = "Registration Certificate",
+
+                            DocumentId = GetDocumentId("Registration Certificate"),
+
+                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+
+                            CollegeCode = Model.CollegeCode
+                        })
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Not Uploaded</span>
+                }
+            </div>
+
+            <!-- Audit Statement -->
+            <div class="col-md-6">
+                <label class="form-label">Audit Statement</label>
+
+                @if (!string.IsNullOrWhiteSpace(Model.AuditStatementFilePath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewTrustDetailsPageDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.InstitutionId,
+                                    documentType = "AuditStatement",
+                                    DocumentId = GetDocumentId("Audit Statement"),
+
+                                    FacultyId = Convert.ToInt32(Model.FacultyCode),
+
+                                    CollegeCode = Model.CollegeCode
+                                })!,
+                            Title = "Audit Statement"
+                        })
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Not Uploaded</span>
+                }
+            </div>
+
             <div class="col-md-6">
                 <label class="form-label">Other Dental College in City</label>
                 <input type="text" class="form-control" value="@(Model.OtherDentalCollegeInCity == true ? "Yes" : Model.OtherDentalCollegeInCity == false ? "No" : "Not specified")" disabled />

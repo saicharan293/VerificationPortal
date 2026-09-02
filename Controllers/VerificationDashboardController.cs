@@ -279,6 +279,16 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeName =
                 college?.CollegeName ?? "Unknown College";
 
+
+            // --------------------------------------------------------
+            // GET MASTER DOCUMENTS
+            // --------------------------------------------------------
+
+            // These documents can be matched with the actual
+            // document fields displayed on the Trust Details page.
+
+            ViewBag.Documents = await GetDocumentMappingsAsync(Convert.ToInt32(context.FacultyCode), 2);
+
             // ---------------------------------------------------------
             // VERIFICATION
             // ---------------------------------------------------------
@@ -305,9 +315,7 @@ namespace VerificationPortal.Controllers
                 hasSectionData,
                 "Institution details have not been submitted for this college.");
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(
-                collegeCode,
-                1);
+
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
 
@@ -5959,6 +5967,64 @@ namespace VerificationPortal.Controllers
         {
             var isSectionClaim = User.FindFirst("IsSection");
             return isSectionClaim != null && bool.TryParse(isSectionClaim.Value, out bool isSection) && isSection;
+        }
+
+
+        // ============================================================
+        // GET DOCUMENT IDs FOR A TAB
+        // PURPOSE:
+        // Loads all active master documents configured for the given
+        // faculty, tab, and optional section.
+        //
+        // The result is returned as a dictionary where:
+        //
+        // Key   = DocumentName
+        // Value = DocumentId
+        //
+        // String comparison is handled case-insensitively so that the
+        // Razor page does not depend on exact letter casing.
+        // ============================================================
+
+        private async Task<Dictionary<string, int>> GetDocumentMappingsAsync(
+            int facultyId,
+            int tabId,
+            int? sectionId = null)
+        {
+            var documents = await _context.MstDocuments
+                .AsNoTracking()
+                .Where(d =>
+                    d.IsActive &&
+                    d.FacultyId == facultyId &&
+                    d.TabId == tabId &&
+                    (
+                        d.SectionId == sectionId ||
+                        d.SectionId == null
+                    ))
+                .Select(d => new
+                {
+                    d.DocumentId,
+                    d.DocumentName
+                })
+                .ToListAsync();
+
+
+            // Return document name -> document ID mapping.
+            //
+            // OrdinalIgnoreCase ensures:
+            //
+            // "Trust PAN"
+            // "trust pan"
+            // "TRUST PAN"
+            //
+            // are treated as the same key.
+            return documents
+                .GroupBy(
+                    d => d.DocumentName,
+                    StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First().DocumentId,
+                    StringComparer.OrdinalIgnoreCase);
         }
     }
 }

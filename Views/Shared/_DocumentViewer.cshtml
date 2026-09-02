@@ -4,15 +4,17 @@
      aria-labelledby="globalDocumentViewerTitle"
      aria-hidden="true">
 
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-fullscreen-xl-down modal-xl modal-dialog-centered">
 
         <div class="modal-content">
 
-            <!-- Header -->
+            <!-- =====================================================
+                 MODAL HEADER
+            ====================================================== -->
+
             <div class="modal-header">
 
-                <h5 class="modal-title"
-                    id="globalDocumentViewerTitle">
+                <h5 class="modal-title" id="globalDocumentViewerTitle">
 
                     <i class="bi bi-file-earmark-text me-2"></i>
                     Document Viewer
@@ -27,68 +29,238 @@
 
             </div>
 
-            <!-- Body -->
-            <div class="modal-body p-0"
-                 style="height:75vh;">
 
-                <div id="documentViewerLoading"
-                     class="d-flex justify-content-center align-items-center h-100">
+            <!-- =====================================================
+                 MODAL BODY
+            ====================================================== -->
 
-                    <div class="text-center">
+            <div class="modal-body p-0">
 
-                        <div class="spinner-border"
-                             role="status">
-                        </div>
+                <div class="row g-0" style="height:75vh;">
 
-                        <div class="mt-3">
-                            Loading document...
+                    <!-- =============================================
+                         DOCUMENT VIEWER
+                    ============================================== -->
+
+                    <div class="col-lg-8 border-end">
+
+                        <div class="h-100 position-relative">
+
+                            <!-- LOADING -->
+
+                            <div id="documentViewerLoading" class="d-flex justify-content-center align-items-center h-100">
+
+                                <div class="text-center">
+
+                                    <div class="spinner-border"
+                                         role="status">
+                                    </div>
+
+                                    <div class="mt-3">
+                                        Loading document...
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PDF / DOCUMENT VIEWER -->
+
+                            <iframe id="globalDocumentViewerFrame"
+                                    title="Document Viewer"
+                                    style="
+                                        display:none;
+                                        width:100%;
+                                        height:100%;
+                                        border:0;
+                                        ">
+                            </iframe>
+
+
+                            <!-- IMAGE VIEWER -->
+
+                            <div id="globalDocumentViewerImageContainer"
+                                 class="d-none h-100 justify-content-center align-items-center">
+
+                                <img id="globalDocumentViewerImage"
+                                     alt="Document Preview"
+                                     style="
+                                    max-width:100%;
+                                    max-height:100%;
+                                    object-fit:contain;
+                                    " />
+
+                            </div>
+
+
+                            <!-- UNSUPPORTED DOCUMENT -->
+
+                            <div id="globalDocumentViewerUnsupported"
+                                 class="d-none h-100 justify-content-center align-items-center">
+
+                                <div class="text-center">
+
+                                    <i class="bi bi-file-earmark-x display-4"></i>
+
+                                    <h5 class="mt-3">
+                                        Preview not available
+                                    </h5>
+
+                                    <a id="globalDocumentViewerDownload"
+                                       href="#"
+                                       target="_blank"
+                                       class="btn btn-primary">
+
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>
+                                        Open Document
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
                         </div>
 
                     </div>
 
-                </div>
 
-                <iframe id="globalDocumentViewerFrame"
-                        title="Document Viewer"
-                        style="
-                    display:none;
-                    width:100%;
-                    height:100%;
-                    border:0;
-                    ">
-                </iframe>
+                    <!-- =============================================
+                         DOCUMENT FEEDBACK
+                    ============================================== -->
 
-                <div id="globalDocumentViewerImageContainer"
-                     class="d-none h-100 justify-content-center align-items-center">
+                    <div class="col-lg-4">
 
-                    <img id="globalDocumentViewerImage"
-                         style="
-                    max-width:100%;
-                    max-height:100%;
-                    object-fit:contain;
-                    " />
+                        <div class="document-feedback-panel">
 
-                </div>
+                            <!-- PANEL HEADER -->
 
-                <div id="globalDocumentViewerUnsupported"
-                     class="d-none h-100 justify-content-center align-items-center">
+                            <div class="document-feedback-header">
 
-                    <div class="text-center">
+                                <div class="document-feedback-icon">
 
-                        <i class="bi bi-file-earmark-x display-4"></i>
+                                    <i class="bi bi-chat-square-text"></i>
 
-                        <h5 class="mt-3">
-                            Preview not available
-                        </h5>
+                                </div>
 
-                        <a id="globalDocumentViewerDownload"
-                           href="#"
-                           target="_blank"
-                           class="btn btn-primary">
+                                <div>
 
-                            Open Document
+                                    <h6 class="mb-1">
+                                        Verification Feedback
+                                    </h6>
 
-                        </a>
+                                    <small class="text-muted">
+                                        Review and provide feedback.
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- FEEDBACK FORM -->
+
+                            <form id="documentFeedbackForm">
+
+                                @Html.AntiForgeryToken()
+
+
+                                <!-- DOCUMENT CONTEXT -->
+
+                                <input type="hidden"
+                                       id="feedbackDocumentId"
+                                       name="DocumentId" />
+
+                                <input type="hidden"
+                                       id="feedbackFacultyId"
+                                       name="FacultyId" />
+
+                                <input type="hidden"
+                                       id="feedbackCollegeCode"
+                                       name="CollegeCode" />
+
+
+                                <!-- STATUS -->
+
+                                <div class="mb-3">
+
+                                    <label for="feedbackStatus"
+                                           class="form-label">
+
+                                        Verification Status
+
+                                        <span class="text-danger">*</span>
+
+                                    </label>
+
+                                    <select id="feedbackStatus"
+                                            name="Status"
+                                            class="form-select">
+
+                                        <option value="">
+                                            -- Select Status --
+                                        </option>
+
+                                        <option value="Approved">
+                                            Approved
+                                        </option>
+
+                                        <option value="Rejected">
+                                            Rejected
+                                        </option>
+
+                                        <option value="Clarification Required">
+                                            Clarification Required
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- FEEDBACK -->
+
+                                <div class="mb-3">
+
+                                    <label for="feedbackText"
+                                           class="form-label">
+
+                                        Remarks
+
+                                    </label>
+
+                                    <textarea id="feedbackText"
+                                              name="Feedback"
+                                              class="form-control"
+                                              rows="6"
+                                              placeholder="Enter verification remarks..."></textarea>
+
+                                </div>
+
+
+                                <!-- FEEDBACK MESSAGE -->
+
+                                <div id="documentFeedbackMessage"
+                                     class="d-none mb-3">
+                                </div>
+
+
+                                <!-- SAVE -->
+
+                                <button type="submit"
+                                        id="saveDocumentFeedbackBtn"
+                                        class="btn btn-primary w-100">
+
+                                    <i class="bi bi-save me-1"></i>
+
+                                    Save Feedback
+
+                                </button>
+
+                            </form>
+
+                        </div>
 
                     </div>
 
@@ -96,7 +268,11 @@
 
             </div>
 
-            <!-- Footer -->
+
+            <!-- =====================================================
+                 MODAL FOOTER
+            ====================================================== -->
+
             <div class="modal-footer">
 
                 <button type="button"

@@ -55,6 +55,8 @@ public partial class AffiliationCollegeMaster
 
     public virtual ICollection<DentalWardBedDistribution> DentalWardBedDistributions { get; set; } = new List<DentalWardBedDistribution>();
 
+    public virtual ICollection<DocumentWiseFeedback> DocumentWiseFeedbacks { get; set; } = new List<DocumentWiseFeedback>();
+
     public virtual ICollection<MedicalAlliedDisciplineDetail> MedicalAlliedDisciplineDetails { get; set; } = new List<MedicalAlliedDisciplineDetail>();
 
     public virtual ICollection<SectionWiseFeedback> SectionWiseFeedbacks { get; set; } = new List<SectionWiseFeedback>();

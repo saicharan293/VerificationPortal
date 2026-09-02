@@ -1,6 +1,45 @@
 ﻿(function () {
 
-    document.addEventListener("click", function (event) {
+
+    // ====================================================
+    // GET EXISTING DOCUMENT FEEDBACK
+    // ====================================================
+
+    async function loadDocumentFeedback(documentId, facultyId, collegeCode) {
+        const feedbackStatus = document.getElementById("feedbackStatus");
+
+        const feedbackText = document.getElementById("feedbackText");
+
+        if (!documentId || !facultyId || !collegeCode) {
+            console.warn("Unable to load feedback. Missing document context.");
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams({
+                documentId: documentId,
+                facultyId: facultyId,
+                collegeCode: collegeCode
+            });
+
+            const response = await fetch(`@Url.Action("GetDocumentFeedback","DocumentManager")?${params.toString()}`);
+
+            if (!response.ok) throw new Error("Unable to load document feedback.");
+
+            const result = await response.json();
+
+            if (result.exists) {
+                if (feedbackStatus) feedbackStatus.value = result.status || "";
+
+                if (feedbackText) feedbackText.value = result.feedback || "";
+            }
+        }
+        catch (error) {
+            console.error("Error loading document feedback: ", error);
+        }
+    }
+
+    document.addEventListener("click", async function (event) {
 
         const button =
             event.target.closest(".document-viewer-btn");
@@ -19,8 +58,23 @@
             button.getAttribute("data-document-title")
             || "Document Viewer";
 
+        const documentId = button.getAttribute("data-document-id");
+        const facultyId = button.getAttribute("data-faculty-id");
+
+        const collegeCode = button.getAttribute("data-college-code");
+
         if (!url) {
             console.error("Document URL is missing.");
+            return;
+        }
+
+        // -------------------------------------------------
+        // VALIDATE DOCUMENT ID
+        // -------------------------------------------------
+
+        if (!documentId) {
+            console.error("Document ID is missing.");
+
             return;
         }
 
@@ -39,8 +93,23 @@
         const error =
             document.getElementById("documentViewerError");
 
-        console.log('Document viewer clicked');
-        console.log('Document URL:', url);
+
+        // -------------------------------------------------
+        // GET DOCUMENT FEEDBACK ELEMENTS
+        // -------------------------------------------------
+
+        const feedbackDocumentId = document.getElementById("feedbackDocumentId");
+        const feedbackFacultyId = document.getElementById("feedbackFacultyId");
+        const feedbackCollegeCode = document.getElementById("feedbackCollegeCode");
+        const feedbackStatus = document.getElementById("feedbackStatus");
+        const feedbackText = document.getElementById("feedbackText");
+
+
+        console.log("Document viewer clicked");
+        console.log("Document URL:", url);
+        console.log("Document ID:", documentId);
+        console.log("Faculty ID:", facultyId);
+        console.log("College Code:", collegeCode);
 
 
         // -------------------------------------------------
@@ -91,6 +160,45 @@
                 title;
         }
 
+        // -------------------------------------------------
+        // SET FEEDBACK CONTEXT
+        // -------------------------------------------------
+
+        if (feedbackDocumentId) feedbackDocumentId.value = documentId || "";
+
+        if (feedbackFacultyId) feedbackFacultyId.value = facultyId || "";
+
+        if (feedbackCollegeCode) feedbackCollegeCode.value = collegeCode || "";
+
+        if (feedbackStatus) feedbackStatus.value = "";
+
+        if (feedbackText) feedbackText.value = "";
+
+
+
+        // -------------------------------------------------
+        // SHOW MODAL
+        // -------------------------------------------------
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(
+                modalElement
+            );
+
+        modal.show();
+
+        // -------------------------------------------------
+        // LOAD EXISTING FEEDBACK
+        //
+        // This runs asynchronously and does not block the
+        // document viewer.
+        // -------------------------------------------------
+
+        loadDocumentFeedback(
+            documentId,
+            facultyId,
+            collegeCode
+        );
 
         // -------------------------------------------------
         // LOAD DOCUMENT
@@ -134,16 +242,6 @@
         iframe.src = url;
 
 
-        // -------------------------------------------------
-        // SHOW MODAL
-        // -------------------------------------------------
-
-        const modal =
-            bootstrap.Modal.getOrCreateInstance(
-                modalElement
-            );
-
-        modal.show();
 
     });
 
@@ -174,6 +272,21 @@
                 iframe.style.display = "none";
 
             }
+
+
+            // FEEDBACK FORM
+
+            const feedbackStatus = document.getElementById("feedbackStatus");
+            const feedbackText = document.getElementById("feedbackText");
+
+            const feedbackDocumentId = document.getElementById( "feedbackDocumentId");
+            const feedbackFacultyId = document.getElementById("feedbackFacultyId");
+
+            if (feedbackStatus) feedbackStatus.value = "";
+            if (feedbackDocumentId) feedbackDocumentId.value = "";
+            if (feedbackText) feedbackText.value = "";
+            if (feedbackFacultyId) feedbackFacultyId.value = "";
+
 
         }
     );

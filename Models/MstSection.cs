@@ -15,6 +15,8 @@ public partial class MstSection
 
     public virtual Faculty Faculty { get; set; } = null!;
 
+    public virtual ICollection<MstDocument> MstDocuments { get; set; } = new List<MstDocument>();
+
     public virtual ICollection<SectionWiseFeedback> SectionWiseFeedbacks { get; set; } = new List<SectionWiseFeedback>();
 
     public virtual MstTab Tab { get; set; } = null!;
