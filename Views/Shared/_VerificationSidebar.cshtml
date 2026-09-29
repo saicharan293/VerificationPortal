@@ -6,6 +6,7 @@
     var facultyName = ViewData["FacultyName"]?.ToString() ?? "";
     var verificationStatus = ViewData["VerificationStatus"]?.ToString();
     var statusBadgeClass = ViewData["StatusBadgeClass"]?.ToString();
+    var existingCourseLevel = Context.Session.GetString("CourseLevel");
 }
 
 <aside class="verification-sidebar" id="verificationSidebar" role="navigation" aria-label="Verification sections">
@@ -72,21 +73,26 @@
                         <span>Principal Details</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link @(activeTab == "UGCourseDetails" ? "active" : "")"
-                       asp-controller="VerificationDashboard" asp-action="UGCourseDetails" asp-route-collegeCode="@collegeCode">
-                        <i class="bi bi-mortarboard"></i>
-                        <span>Ug Course Details</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(activeTab == "PgCourseDetails" ? "active" : "")"
-                       asp-controller="VerificationDashboard" asp-action="PgCourseDetails" asp-route-collegeCode="@collegeCode">
-                        <i class="bi bi-mortarboard"></i>
-                        <span>Pg Course Details</span>
-                    </a>
-                </li>
-
+                @if(existingCourseLevel == "UG")
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(activeTab == "UGCourseDetails" ? "active" : "")"
+                           asp-controller="VerificationDashboard" asp-action="UGCourseDetails" asp-route-collegeCode="@collegeCode">
+                            <i class="bi bi-mortarboard"></i>
+                            <span>Ug Course Details</span>
+                        </a>
+                    </li>
+                }
+                else if(existingCourseLevel == "PG")
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(activeTab == "PgCourseDetails" ? "active" : "")"
+                           asp-controller="VerificationDashboard" asp-action="PgCourseDetails" asp-route-collegeCode="@collegeCode">
+                            <i class="bi bi-mortarboard"></i>
+                            <span>Pg Course Details</span>
+                        </a>
+                    </li>
+                }
                 <li class="nav-item">
                     <a class="nav-link @(activeTab == "Courses" ? "active" : "")"
                        asp-controller="VerificationDashboard" asp-action="Courses" asp-route-collegeCode="@collegeCode">

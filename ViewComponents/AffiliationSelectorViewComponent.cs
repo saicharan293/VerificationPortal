@@ -62,6 +62,16 @@ namespace VerificationPortal.ViewComponents
                 return View(model);
             }
 
+            var affiliationTypeId = HttpContext.Session.GetInt32("AffiliationTypeId");
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+
+
+            model.ShowAffiliationSelector = !affiliationTypeId.HasValue || string.IsNullOrEmpty(courseLevel);
+
+            model.SelectedCourseLevel = courseLevel;
+
             // 4. Current affiliation = Continuation of Affiliation
             model.AffiliationTypes =
                 await _context.TypeOfAffiliations
@@ -82,7 +92,10 @@ namespace VerificationPortal.ViewComponents
                     .AsNoTracking()
                     .Where(x =>
                         x.FacultyCode == user.Faculty &&
-                        !string.IsNullOrEmpty(x.CourseLevel))
+                        !string.IsNullOrEmpty(x.CourseLevel) &&
+                        x.CourseLevel != "Phd" &&
+                        x.CourseLevel != "Fellowship" &&
+                        x.CourseLevel != "Phd and Fellowship")
                     .Select(x => x.CourseLevel)
                     .Distinct()
                     .ToListAsync();
@@ -108,6 +121,9 @@ namespace VerificationPortal.ViewComponents
                         _ => "bi-book"
                     }
                 })
+                .OrderBy(x => x.Level == "UG" ? 1:
+                              x.Level == "PG" ? 2 :
+                              x.Level == "SS" ? 3 : 4)
                 .ToList();
 
             return View(model);

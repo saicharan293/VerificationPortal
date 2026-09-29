@@ -8,11 +8,10 @@
            ========================================================= */
 
     .affiliation-selector-overlay {
-        display: none;
+        display: flex;
         position: fixed;
         inset: 0;
         z-index: 99999;
-        display: flex;
         align-items: center;
         justify-content: center;
         padding: 24px;
@@ -22,6 +21,9 @@
         animation: affiliationOverlayIn 0.25s ease;
     }
 
+    .affiliation-selector-overlay.is-hidden {
+        display: none !important;
+    }
 
     /* =========================================================
            MODAL
@@ -558,11 +560,11 @@
 
     </div>
 }
-else if (Model.ShowAffiliationSelector)
+else
 {
     <div id="affiliationSelectorOverlay"
          data-affiliation-type-id="@Model.SelectedAffiliationTypeId"
-         class="affiliation-selector-overlay">
+         class="affiliation-selector-overlay  @(Model.ShowAffiliationSelector ? "" : "is-hidden")">
 
         <div class="affiliation-selector-modal">
 
@@ -702,7 +704,7 @@ else if (Model.ShowAffiliationSelector)
                             @foreach (var level in Model.CourseLevels)
                             {
                                 <button type="button"
-                                        class="course-level-card"
+                                        class="course-level-card @(Model.SelectedCourseLevel == level.Level ? "active" : "") "
                                         data-course-level="@level.Level">
 
                                     <div class="course-level-icon">
@@ -806,7 +808,7 @@ else if (Model.ShowAffiliationSelector)
             document.getElementById("affiliationContinueBtn");
 
 
-        let selectedCourseLevel = null;
+        let selectedCourseLevel = '@Model.SelectedCourseLevel';
 
 
         /*
@@ -818,6 +820,8 @@ else if (Model.ShowAffiliationSelector)
         if (!continueButton) {
             return;
         }
+
+        if(selectedCourseLevel) continueButton.disabled = false;
 
 
         /* ============================================
