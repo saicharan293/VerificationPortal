@@ -1,20 +1,27 @@
 
-select * from TblRguhsFacultyUser
-where Faculty = 2
+--1
+--UPDATE Affiliation_College_Master
+--SET CollegeEmail = 'den.td038@rguhs.ac.in'
+--WHERE CollegeCode = 'D038';
 
+--select * from TblRguhsFacultyUser
+--where UserName = 'DENTAL_DEO'
+
+
+--2
 ------------- PRIMARY KEY FOR FACULTY USER -----------
 EXEC sp_rename
     'dbo.TblRguhsFacultyUser',
     'TblRguhsFacultyUser_Old';
 GO
 
-
 CREATE TABLE dbo.TblRguhsFacultyUser
 (
-    Id INT IDENTITY(1,1) NOT NULL
+    UserId INT IDENTITY(1,1) NOT NULL
         CONSTRAINT PK_TblRguhsFacultyUser PRIMARY KEY,
 
-    UserId INT NOT NULL,
+    Id INT NULL,
+
     Password NVARCHAR(256) NULL,
     PasswordHash NVARCHAR(MAX) NULL,
     UserName NVARCHAR(100) NULL,
@@ -28,12 +35,33 @@ CREATE TABLE dbo.TblRguhsFacultyUser
     FailedLoginAttempts INT NOT NULL,
     LockoutEndTime DATETIME NULL
 );
-GO
 
+
+----------------------------------
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_DEO', 'DentalDEO@2026', '$2y$10$ay08DD3FqFHUyZqw/SE6dOorSppfLzTMZdd4je1kksHf6HxWuKYfW', 1, 2, 0, NULL, 'Data Entry Operator', 0, 0, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_JR', 'DentalJR@2026', '$2y$10$Vb/o0SOyv.X2dWmFZKI7kus/AqBtOOnIfxf5BHCfntsA3NQCvc/.K', 1, 2, 0, NULL, 'Junior Assistant', 0, 0, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_SO', 'DentalSO@2026', '$2y$10$68SypNpAYeJveDDtR9A.ZefTlq4vp4Nm6Smbh/vfGwG1MV0klIU5y', 1, 2, 0, NULL, 'Section Officer', 1, 0, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_AR', 'DentalAR@2026', '$2y$10$EM4KacCJx4VFEgD.88.hO.W0cL15tsr.obOEkwYKjtu7.SmzVJLEu', 1, 2, 0, NULL, 'Assistant Registrar', 0, 0, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_RG', 'DentalRG@2026', '$2y$10$Dvyp7iYXiy3hHfyzrghTtOpq5t9sEL/utd6gSqT7AWuAmqSCDq6oy', 1, 2, 0, NULL, 'Registrar', 0, 0, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_RE', 'DentalRE@2026', '$2y$10$2QhIaIi/BH6RM.RUmKGC4uebNLQKVN42pWSDlVGjCREz2G7qjiIMW', 1, 2, 0, NULL, 'Registrar Evaluation', 0, 0, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_DR', 'DentalDR@2026', '$2y$10$QH2iUDvmoniP7TRBry4GluosxVHrewtD4bH255zf1N6IbjS9cj1xK', 1, 2, 0, NULL, 'Director', 0, 1, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('DENTAL_VC', 'DentalVC@2026', '$2y$10$r2LCi8ut3oHNUYLF7XfDcuJtN1ANhhfCp740xOlhKqDmoZzJLoqVe', 1, 2, 0, NULL, 'Vice Chancellor', 0, 1, 0, NULL);
+
+INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, FinanceDesignation, DesignationDescription, IsSection, IsAdmin, FailedLoginAttempts, LockoutEndTime) VALUES ('ADMIN', 'Admin@2026', '$2y$10$l6rdWrtRY4G654O3TPIRROQ9M6Y.NsaMbszy1axC8iMWhkkGiBPUe', 1, NULL, 0, NULL, 'System Administrator', 1, 1, 0, NULL);
+
+----------------------------------
 
 INSERT INTO dbo.TblRguhsFacultyUser
 (
-    UserId,
+    Id,
     Password,
     PasswordHash,
     UserName,
@@ -48,7 +76,7 @@ INSERT INTO dbo.TblRguhsFacultyUser
     LockoutEndTime
 )
 SELECT
-    UserId,
+    Id,
     Password,
     PasswordHash,
     UserName,
@@ -64,7 +92,29 @@ SELECT
 FROM dbo.TblRguhsFacultyUser_Old
 ORDER BY Id;
 
+----------------------------------
 
+--SELECT COUNT(*) AS OldCount
+--FROM dbo.TblRguhsFacultyUser_Old;
+
+--SELECT COUNT(*) AS NewCount
+--FROM dbo.TblRguhsFacultyUser;
+
+
+--SELECT 
+--    UserId,
+--    Id,
+--    UserName,
+--    Faculty
+--FROM dbo.TblRguhsFacultyUser
+--ORDER BY UserId;
+
+--SELECT UserId, COUNT(*) AS Count
+--FROM dbo.TblRguhsFacultyUser
+--GROUP BY UserId
+--HAVING COUNT(*) > 1;
+
+--SELECT * FROM TblRguhsFacultyUser;
 
 --------------------------------
 
@@ -73,66 +123,66 @@ ORDER BY Id;
 ----------------------------------
 
 
-ALTER TABLE [Admission_Affiliation].[dbo].[CA_Med_StaffParticularsOther]
-ADD
-    ExaminerDetailsPdfName2 NVARCHAR(255) NULL,
-    ExaminerDetailsPdfName3 NVARCHAR(255) NULL,
-    ExaminerDetailsPdfName4 NVARCHAR(255) NULL,
-    ExaminerDetailsPdfName5 NVARCHAR(255) NULL,
-    ExaminerDetailsPdfPath2 NVARCHAR(500) NULL,
-    ExaminerDetailsPdfPath3 NVARCHAR(500) NULL,
-    ExaminerDetailsPdfPath4 NVARCHAR(500) NULL,
-    ExaminerDetailsPdfPath5 NVARCHAR(500) NULL;
+--ALTER TABLE [Admission_Affiliation].[dbo].[CA_Med_StaffParticularsOther]
+--ADD
+--    ExaminerDetailsPdfName2 NVARCHAR(255) NULL,
+--    ExaminerDetailsPdfName3 NVARCHAR(255) NULL,
+--    ExaminerDetailsPdfName4 NVARCHAR(255) NULL,
+--    ExaminerDetailsPdfName5 NVARCHAR(255) NULL,
+--    ExaminerDetailsPdfPath2 NVARCHAR(500) NULL,
+--    ExaminerDetailsPdfPath3 NVARCHAR(500) NULL,
+--    ExaminerDetailsPdfPath4 NVARCHAR(500) NULL,
+--    ExaminerDetailsPdfPath5 NVARCHAR(500) NULL;
 
-ALTER TABLE IndoorBedsOccupancy
-ADD CONSTRAINT CK_IndoorBedsOccupancy_RGUHSIntake
-CHECK (RGUHSintake >= 0);
+--ALTER TABLE IndoorBedsOccupancy
+--ADD CONSTRAINT CK_IndoorBedsOccupancy_RGUHSIntake
+--CHECK (RGUHSintake >= 0);
 
-ALTER TABLE DentalCollegeLandBuildingDetail
-ADD Latitude  decimal(9,6) NULL,
-    Longitude decimal(9,6) NULL;
+--ALTER TABLE DentalCollegeLandBuildingDetail
+--ADD Latitude  decimal(9,6) NULL,
+--    Longitude decimal(9,6) NULL;
 
-ALTER TABLE DentalCollegeLandBuildingDetail
-ADD CourseLevel VARCHAR(10) NULL;
+--ALTER TABLE DentalCollegeLandBuildingDetail
+--ADD CourseLevel VARCHAR(10) NULL;
 
-UPDATE DentalCollegeLandBuildingDetail
-SET CourseLevel = 'UG';
+--UPDATE DentalCollegeLandBuildingDetail
+--SET CourseLevel = 'UG';
 ------------------------------
 
 
-ALTER TABLE [dbo].[Affiliation_College_Master]
-ADD CollegeEmail NVARCHAR(255) NULL;
+--ALTER TABLE [dbo].[Affiliation_College_Master]
+--ADD CollegeEmail NVARCHAR(255) NULL;
 
 
 --------------------------------
 
-ALTER TABLE DentalChairs
-ADD AffiliationTypeId INT NULL;
+--ALTER TABLE DentalChairs
+--ADD AffiliationTypeId INT NULL;
 
-ALTER TABLE DentalChairs
-ADD CONSTRAINT FK_DentalChairs_TypeOfAffiliation
-FOREIGN KEY (AffiliationTypeId)
-REFERENCES TypeOfAffiliation(TypeId);
+--ALTER TABLE DentalChairs
+--ADD CONSTRAINT FK_DentalChairs_TypeOfAffiliation
+--FOREIGN KEY (AffiliationTypeId)
+--REFERENCES TypeOfAffiliation(TypeId);
 
-UPDATE DentalChairs
-SET AffiliationTypeId = 2
-WHERE AffiliationTypeId IS NULL;
-
---------------------------------
+--UPDATE DentalChairs
+--SET AffiliationTypeId = 2
+--WHERE AffiliationTypeId IS NULL;
 
 --------------------------------
 
-ALTER TABLE [dbo].[DentalCollegeLandBuildingDetail]
-ADD AffiliationTypeId INT NULL;
+--------------------------------
 
-ALTER TABLE [dbo].[DentalCollegeLandBuildingDetail]
-ADD CONSTRAINT FK_DentalCollegeLandBuildingDetail_TypeOfAffiliation
-FOREIGN KEY (AffiliationTypeId)
-REFERENCES TypeOfAffiliation(TypeId);
+--ALTER TABLE [dbo].[DentalCollegeLandBuildingDetail]
+--ADD AffiliationTypeId INT NULL;
 
-UPDATE DentalCollegeLandBuildingDetail
-SET AffiliationTypeId = 2
-WHERE AffiliationTypeId IS NULL;
+--ALTER TABLE [dbo].[DentalCollegeLandBuildingDetail]
+--ADD CONSTRAINT FK_DentalCollegeLandBuildingDetail_TypeOfAffiliation
+--FOREIGN KEY (AffiliationTypeId)
+--REFERENCES TypeOfAffiliation(TypeId);
+
+--UPDATE DentalCollegeLandBuildingDetail
+--SET AffiliationTypeId = 2
+--WHERE AffiliationTypeId IS NULL;
 
 --------------------------------
 
@@ -140,54 +190,54 @@ WHERE AffiliationTypeId IS NULL;
 
 --------------------------------
 
-ALTER TABLE [dbo].[Medical_SkillsLaboratory]
-ADD AffiliationTypeId INT NULL;
+--ALTER TABLE [dbo].[Medical_SkillsLaboratory]
+--ADD AffiliationTypeId INT NULL;
 
-ALTER TABLE [Medical_SkillsLaboratory]
-ADD CONSTRAINT FK_Medical_SkillsLaboratory_TypeOfAffiliation
-FOREIGN KEY (AffiliationTypeId)
-REFERENCES TypeOfAffiliation(TypeId);
+--ALTER TABLE [Medical_SkillsLaboratory]
+--ADD CONSTRAINT FK_Medical_SkillsLaboratory_TypeOfAffiliation
+--FOREIGN KEY (AffiliationTypeId)
+--REFERENCES TypeOfAffiliation(TypeId);
 
-UPDATE Medical_SkillsLaboratory
-SET AffiliationTypeId = 2
-WHERE AffiliationTypeId IS NULL;
+--UPDATE Medical_SkillsLaboratory
+--SET AffiliationTypeId = 2
+--WHERE AffiliationTypeId IS NULL;
 
 --------------------------------
 
 ---------------------------------
 
-ALTER TABLE Medical_UGBedDistribution
-ADD AffiliationTypeId INT NULL;
+--ALTER TABLE Medical_UGBedDistribution
+--ADD AffiliationTypeId INT NULL;
 
-ALTER TABLE Medical_UGBedDistribution
-ADD CONSTRAINT FK_Medical_UGBedDistribution_TypeOfAffiliation
-FOREIGN KEY (AffiliationTypeId)
-REFERENCES TypeOfAffiliation(TypeId);
+--ALTER TABLE Medical_UGBedDistribution
+--ADD CONSTRAINT FK_Medical_UGBedDistribution_TypeOfAffiliation
+--FOREIGN KEY (AffiliationTypeId)
+--REFERENCES TypeOfAffiliation(TypeId);
 
-UPDATE Medical_UGBedDistribution
-SET AffiliationTypeId = 2
-WHERE AffiliationTypeId IS NULL;
+--UPDATE Medical_UGBedDistribution
+--SET AffiliationTypeId = 2
+--WHERE AffiliationTypeId IS NULL;
 
 -----------------------------------------
 
-ALTER TABLE DentalInfrastructure
-ADD CourseLevel VARCHAR(10) NULL;
+--ALTER TABLE DentalInfrastructure
+--ADD CourseLevel VARCHAR(10) NULL;
 
-UPDATE DentalInfrastructure
-SET CourseLevel = 'UG';
+--UPDATE DentalInfrastructure
+--SET CourseLevel = 'UG';
 
 
-ALTER TABLE DentalInfrastructure
-ADD CONSTRAINT UQ_DentalInfrastructure
-UNIQUE
-(
-    CollegeCode,
-    FacultyCode,
-    AffiliationTypeId,
-    CourseLevel,
-    RequirementId,
-    SeatSlab
-);
+--ALTER TABLE DentalInfrastructure
+--ADD CONSTRAINT UQ_DentalInfrastructure
+--UNIQUE
+--(
+--    CollegeCode,
+--    FacultyCode,
+--    AffiliationTypeId,
+--    CourseLevel,
+--    RequirementId,
+--    SeatSlab
+--);
 
 ---------
 -- ============================================
@@ -196,99 +246,26 @@ UNIQUE
 -- Password: "Dental@2026" for all users
 -- PasswordHash: Use BCrypt to generate actual hash
 
-BEGIN TRANSACTION;
+--BEGIN TRANSACTION;
 
 ----- INSERT QUERY FOR COMMITTEE NAMES FOR DENTAL FACULTY ----------
 
-INSERT INTO CA_MST_Med_CommitteeNames
-(
-    CommitteeName,
-    FacultyCode,
-    SubFacultyCode,
-    CourseLevel
-)
-VALUES
-('Academic council details',        2, NULL, 'ALL'),
-('Anti-ragging committee',          2, NULL, 'ALL'),
-('Gender harassment committee',     2, NULL, 'ALL'),
-('Institutional ethical committee', 2, NULL, 'ALL'),
-('POSH Committee',                  2, NULL, 'ALL'),
-('Pharmacovigilance Committee',     2, NULL, 'UG'),
-('Curriculum Committee',            2, NULL, 'UG'),
-('IACE (Institutional Animal Ethics Committee)', 2, NULL, 'ALL');
-
--- 1. Data Entry Operator (DEO)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (1, 'DENTAL_DEO', 'DentalDEO@2026', '$2y$10$ay08DD3FqFHUyZqw/SE6dOorSppfLzTMZdd4je1kksHf6HxWuKYfW', 
-     1, 2, 0, NULL, 'Data Entry Operator', 0, 0, 0, NULL);
-
--- 2. Junior Assistant (JR)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (2, 'DENTAL_JR', 'DentalJR@2026', '$2y$10$Vb/o0SOyv.X2dWmFZKI7kus/AqBtOOnIfxf5BHCfntsA3NQCvc/.K', 
-     1, 2, 0, NULL, 'Junior Assistant', 0, 0, 0, NULL);
-
--- 3. Section Officer (SO)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (3, 'DENTAL_SO', 'DentalSO@2026', '$2y$10$68SypNpAYeJveDDtR9A.ZefTlq4vp4Nm6Smbh/vfGwG1MV0klIU5y', 
-     1, 2, 0, NULL, 'Section Officer', 1, 0, 0, NULL);
-
--- 4. Assistant Registrar (AR)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (4, 'DENTAL_AR', 'DentalAR@2026', '$2y$10$EM4KacCJx4VFEgD.88.hO.W0cL15tsr.obOEkwYKjtu7.SmzVJLEu', 
-     1, 2, 0, NULL, 'Assistant Registrar', 0, 0, 0, NULL);
-
--- 5. Registrar (RG)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (5, 'DENTAL_RG', 'DentalRG@2026', '$2y$10$Dvyp7iYXiy3hHfyzrghTtOpq5t9sEL/utd6gSqT7AWuAmqSCDq6oy', 
-     1, 2, 0, NULL, 'Registrar', 0, 0, 0, NULL);
-
--- 6. Registrar Evaluation (RE)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (6, 'DENTAL_RE', 'DentalRE@2026', '$2y$10$2QhIaIi/BH6RM.RUmKGC4uebNLQKVN42pWSDlVGjCREz2G7qjiIMW', 
-     1, 2, 0, NULL, 'Registrar Evaluation', 0, 0, 0, NULL);
-
--- 7. Director (DR)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (7, 'DENTAL_DR', 'DentalDR@2026', '$2y$10$QH2iUDvmoniP7TRBry4GluosxVHrewtD4bH255zf1N6IbjS9cj1xK', 
-     1, 2, 0, NULL, 'Director', 0, 1, 0, NULL);
-
--- 8. Vice Chancellor (VC)
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (8, 'DENTAL_VC', 'DentalVC@2026', '$2y$10$r2LCi8ut3oHNUYLF7XfDcuJtN1ANhhfCp740xOlhKqDmoZzJLoqVe', 
-     1, 2, 0, NULL, 'Vice Chancellor', 0, 1, 0, NULL);
-
+--INSERT INTO CA_MST_Med_CommitteeNames
+--(
+--    CommitteeName,
+--    FacultyCode,
+--    SubFacultyCode,
+--    CourseLevel
+--)
+--VALUES
+--('Academic council details',        2, NULL, 'ALL'),
+--('Anti-ragging committee',          2, NULL, 'ALL'),
+--('Gender harassment committee',     2, NULL, 'ALL'),
+--('Institutional ethical committee', 2, NULL, 'ALL'),
+--('POSH Committee',                  2, NULL, 'ALL'),
+--('Pharmacovigilance Committee',     2, NULL, 'UG'),
+--('Curriculum Committee',            2, NULL, 'UG'),
+--('IACE (Institutional Animal Ethics Committee)', 2, NULL, 'ALL');
 
 
 -- ============================================
@@ -297,16 +274,16 @@ VALUES
 -- This admin user has NO faculty assignment
 -- and has full system access (IsAdmin = 1)
 
-INSERT INTO TblRguhsFacultyUser 
-    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
-     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
-     FailedLoginAttempts, LockoutEndTime)
-VALUES 
-    (0, 'ADMIN', 'Admin@2026', '$2y$10$l6rdWrtRY4G654O3TPIRROQ9M6Y.NsaMbszy1axC8iMWhkkGiBPUe', 
-     1, NULL, 0, NULL, 'System Administrator', 1, 1, 0, NULL);
+--INSERT INTO TblRguhsFacultyUser 
+--    (UserId, UserName, Password, PasswordHash, IsActive, Faculty, IsFinance, 
+--     FinanceDesignation, DesignationDescription, IsSection, IsAdmin, 
+--     FailedLoginAttempts, LockoutEndTime)
+--VALUES 
+--    (0, 'ADMIN', 'Admin@2026', '$2y$10$l6rdWrtRY4G654O3TPIRROQ9M6Y.NsaMbszy1axC8iMWhkkGiBPUe', 
+--     1, NULL, 0, NULL, 'System Administrator', 1, 1, 0, NULL);
 
 
-COMMIT;
+--COMMIT;
 
 -- ============================================
 -- Verify Inserted Data
@@ -318,8 +295,8 @@ FROM TblRguhsFacultyUser
 WHERE Faculty = 2 
 ORDER BY UserId;
 
-SELECT * FROM [dbo].[TblRguhsFacultyUser]
-  where Faculty=2
+--SELECT * FROM [dbo].[TblRguhsFacultyUser]
+--  where Faculty=2
 
 
 ------------------------------------------------
@@ -356,6 +333,7 @@ CREATE NONCLUSTERED INDEX [IX_Tbl_CollegeMapping_UserId]
 ON [dbo].[Tbl_CollegeMapping] ([UserId] ASC);
 GO
 
+
 CREATE NONCLUSTERED INDEX [IX_Tbl_CollegeMapping_FacultyCode] 
 ON [dbo].[Tbl_CollegeMapping] ([FacultyCode] ASC);
 GO
@@ -381,20 +359,22 @@ ADD CONSTRAINT DF_TblCollegeMapping_IsActive
 DEFAULT (1) FOR IsActive;
 
 
-SELECT * FROM Affiliation_College_Master
-WHERE FacultyCode=2 order by CollegeName desc;
+--SELECT * FROM Affiliation_College_Master
+--WHERE FacultyCode=2 order by CollegeName desc;
 
-SELECT * FROM CollegeCourseIntakeDetails
-WHERE FacultyCode = 2
+--SELECT * FROM CollegeCourseIntakeDetails
+--WHERE FacultyCode = 2
 
-SELECT * FROM AcademicIntake
-WHERE FacultyCode = 2 and CollegeCode = 'd038';
+--SELECT * FROM AcademicIntake
+--WHERE FacultyCode = 2 and CollegeCode = 'd038';
 
-select * from CA_Med_LibraryEquipments
-where FacultyCode = 2
+--select * from CA_Med_LibraryEquipments
+--where FacultyCode = 2
 
-select * from [dbo].[AFF_InstitutionsDetails]
-where facultycode = 2 and CollegeCode='d038'
+--select * from [dbo].[AFF_InstitutionsDetails]
+--where facultycode = 2 and CollegeCode='d038'
+
+------------------- ALTER QUERIES -----------------
 
 ALTER TABLE AFF_InstitutionsDetails
 ADD
@@ -1843,6 +1823,7 @@ ADD
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
 
+
 ALTER TABLE CA_Med_LibraryBuilding
 ADD
     -- DEO
@@ -1897,6 +1878,7 @@ ADD
     CurrentVerificationLevel NVARCHAR(50) NULL,
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
+
 
 ALTER TABLE CA_Med_LibTechnicalProcess
 ADD
@@ -1953,6 +1935,7 @@ ADD
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
 
+
 ALTER TABLE CA_Med_LibraryEquipments
 ADD
     -- DEO
@@ -2007,6 +1990,7 @@ ADD
     CurrentVerificationLevel NVARCHAR(50) NULL,
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
+
 
 ALTER TABLE CA_Med_LibraryFinance
 ADD
@@ -2063,6 +2047,7 @@ ADD
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
 
+
 ALTER TABLE [dbo].[FacultyDetails]
 ADD
     -- DEO
@@ -2118,6 +2103,7 @@ ADD
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
 
+
 ALTER TABLE [dbo].[TeachingStaffDepartmentWiseDetails]
 ADD
     -- DEO
@@ -2172,6 +2158,7 @@ ADD
     CurrentVerificationLevel NVARCHAR(50) NULL,
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
+
 
 ALTER TABLE [dbo].[HospitalDetailsForAffiliation]
 ADD
@@ -2284,6 +2271,7 @@ ADD
     OverallStatus NVARCHAR(30) NULL,
     LastUpdatedDate DATETIME NULL;
 
+
 ALTER TABLE [dbo].[DentalWardBedDistribution]
 ADD
     -- DEO
@@ -2340,7 +2328,349 @@ ADD
     LastUpdatedDate DATETIME NULL;
 
 
-select * from TblRguhsFacultyUser;
+-------------------
+
+/* ============================================================
+   1. MstTabs
+   ============================================================ */
+
+CREATE TABLE dbo.MstTabs
+(
+    TabId INT IDENTITY(1,1) NOT NULL,
+    FacultyId INT NOT NULL,
+    TabName NVARCHAR(200) NOT NULL,
+
+    CONSTRAINT PK_MstTabs
+        PRIMARY KEY (TabId),
+
+    CONSTRAINT FK_MstTabs_Faculty
+        FOREIGN KEY (FacultyId)
+        REFERENCES dbo.Faculty(FacultyId)
+);
+GO
+
+/* ============================================================
+   2. MstSections
+   ============================================================ */
+
+CREATE TABLE dbo.MstSections
+(
+    SectionId INT IDENTITY(1,1) NOT NULL,
+    FacultyId INT NOT NULL,
+    TabId INT NOT NULL,
+    SectionName NVARCHAR(200) NOT NULL,
+
+    CONSTRAINT PK_MstSections
+        PRIMARY KEY (SectionId),
+
+    CONSTRAINT FK_MstSections_Faculty
+        FOREIGN KEY (FacultyId)
+        REFERENCES dbo.Faculty(FacultyId),
+
+    CONSTRAINT FK_MstSections_MstTabs
+        FOREIGN KEY (TabId)
+        REFERENCES dbo.MstTabs(TabId)
+);
+GO
+
+
+/* ============================================================
+   DENTAL FACULTY (FacultyId = 2)
+   TABS + SECTIONS
+   ============================================================ */
+
+BEGIN TRANSACTION;
+
+BEGIN TRY
+
+    /* ============================================================
+       TABS
+       ============================================================ */
+    INSERT INTO dbo.MstTabs (FacultyId, TabName)
+    VALUES
+        (2, N'Institution Details'),
+        (2, N'Trust Details'),
+        (2, N'Trust Member Details'),
+        (2, N'Dean / Director Details'),
+        (2, N'Principal Details'),
+        (2, N'UG Course Details'),
+        (2, N'PG Course Details'),
+        (2, N'Courses & Intake'),
+        (2, N'Land & Building Details'),
+        (2, N'Classroom & Laboratory'),
+        (2, N'Chair Distribution'),
+        (2, N'Bed Distribution'),
+        (2, N'Hostel Details'),
+        (2, N'Department Offices And Educational Unit'),
+        (2, N'Equipment List'),
+        (2, N'Vehicle Details'),
+        (2, N'UG Academic Matters'),
+        (2, N'PG Academic Matters'),
+        (2, N'Staff Pay Scale'),
+        (2, N'Staff Other Details'),
+        (2, N'Finance Details'),
+        (2, N'Library Services'),
+        (2, N'Research & Publications'),
+        (2, N'Library Details'),
+        (2, N'Faculty Details'),
+        (2, N'Teaching Experience'),
+        (2, N'Clinical Facilities');
+
+
+    /* ============================================================
+       SECTIONS
+       ============================================================ */
+    INSERT INTO dbo.MstSections
+    (
+        FacultyId,
+        TabId,
+        SectionName
+    )
+    SELECT
+        T.FacultyId,
+        T.TabId,
+        V.SectionName
+    FROM
+    (
+        VALUES
+            /* Institution Details */
+            (N'Institution Details', N'Basic Information'),
+            (N'Institution Details', N'Address Details'),
+            (N'Institution Details', N'Contact Information'),
+            (N'Institution Details', N'Institutional Details'),
+            (N'Institution Details', N'Head of Institution'),
+            (N'Institution Details', N'Nodal Officer Details'),
+            (N'Institution Details', N'Principal Details'),
+            (N'Institution Details', N'Dean / Director Details'),
+            (N'Institution Details', N'Trust Details'),
+
+            /* Trust Details */
+            (N'Trust Details', N'Trust Information'),
+
+            /* Trust Member Details */
+            (N'Trust Member Details', N'Trust Members'),
+
+            /* Dean / Director Details */
+            (N'Dean / Director Details', N'Dean / Director Information'),
+            (N'Dean / Director Details', N'Teaching Experience'),
+            (N'Dean / Director Details', N'Administrative Experience'),
+
+            /* Principal Details */
+            (N'Principal Details', N'Principal Information'),
+            (N'Principal Details', N'Teaching Experience'),
+            (N'Principal Details', N'Administrative Experience'),
+
+            /* UG Course Details */
+            (N'UG Course Details', N'Present Intake'),
+            (N'UG Course Details', N'Previous Details'),
+            (N'UG Course Details', N'Particulars of Permission'),
+            (N'UG Course Details', N'Year of Obtaining EC & FC from Government of Karnataka'),
+            (N'UG Course Details', N'Year of Last Affiliation Granted by RGUHS'),
+            (N'UG Course Details', N'Previous Inspection by LIC'),
+
+            /* PG Course Details */
+            (N'PG Course Details', N'PG Course Details'),
+
+            /* Land & Building Details */
+            (N'Land & Building Details', N'Land Details'),
+            (N'Land & Building Details', N'Building Details'),
+
+            /* Classroom & Laboratory */
+            (N'Classroom & Laboratory', N'Facility Requirements'),
+
+            /* Chair Distribution */
+            (N'Chair Distribution', N'Chair Distribution Details'),
+
+            /* Bed Distribution */
+            (N'Bed Distribution', N'Beds Distribution'),
+
+            /* Hostel Details */
+            (N'Hostel Details', N'Hostel Information'),
+            (N'Hostel Details', N'Student Accommodation'),
+            (N'Hostel Details', N'Common Room Facilities'),
+            (N'Hostel Details', N'Hostel Facilities'),
+
+            /* Department Offices And Educational Unit */
+            (N'Department Offices And Educational Unit', N'Department Office Infrastructure'),
+            (N'Department Offices And Educational Unit', N'Dental Education Unit'),
+
+            /* Equipment List */
+            (N'Equipment List', N'Equipment Details'),
+
+            /* Vehicle Details */
+            (N'Vehicle Details', N'Vehicle Information'),
+
+            /* UG Academic Matters */
+            (N'UG Academic Matters', N'UG Academic Performance'),
+
+            /* PG Academic Matters */
+            (N'PG Academic Matters', N'PG Academic Performance'),
+
+            /* Staff Pay Scale */
+            (N'Staff Pay Scale', N'Staff Pay Scale'),
+
+            /* Staff Other Details */
+            (N'Staff Other Details', N'Staff Other Details'),
+
+            /* Finance Details */
+            (N'Finance Details', N'Authority & Account Details - UG'),
+            (N'Finance Details', N'Annual Financial Details - UG'),
+            (N'Finance Details', N'Account & Audit Details - UG'),
+            (N'Finance Details', N'Authority & Account Details - PG'),
+            (N'Finance Details', N'Annual Financial Details - PG'),
+            (N'Finance Details', N'Account & Audit Details - PG'),
+
+            /* Library Services */
+            (N'Library Services', N'Department Library Details'),
+
+            /* Research & Publications */
+            (N'Research & Publications', N'Research & Publication Details'),
+
+            /* Library Details */
+            (N'Library Details', N'General Library Details'),
+            (N'Library Details', N'Library Items'),
+            (N'Library Details', N'Library Building'),
+            (N'Library Details', N'Technical Processes'),
+            (N'Library Details', N'Library Equipment'),
+            (N'Library Details', N'Library Finance'),
+
+            /* Faculty Details */
+            (N'Faculty Details', N'Faculty Details'),
+
+            /* Clinical Facilities */
+            (N'Clinical Facilities', N'Clinical Hospital Details'),
+            (N'Clinical Facilities', N'Clinical Statistics'),
+            (N'Clinical Facilities', N'Discipline Details'),
+            (N'Clinical Facilities', N'Nursing, Paramedical, Technical & Allied Services'),
+            (N'Clinical Facilities', N'Engineering & Allied Services'),
+            (N'Clinical Facilities', N'Ward-wise Bed Distribution in Attached Hospital')
+    ) V(TabName, SectionName)
+    INNER JOIN dbo.MstTabs T
+        ON T.TabName = V.TabName
+       AND T.FacultyId = 2;
+
+
+    COMMIT TRANSACTION;
+
+    PRINT 'Dental tabs and sections inserted successfully.';
+
+END TRY
+BEGIN CATCH
+
+    ROLLBACK TRANSACTION;
+
+    THROW;
+
+END CATCH;
+
+/* ============================================================
+   3. SectionWiseFeedback
+   ============================================================ */
+
+CREATE TABLE dbo.SectionWiseFeedback
+(
+    SectionWiseFeedbackId INT IDENTITY(1,1) NOT NULL,
+
+    FacultyId INT NOT NULL,
+    CollegeCode NVARCHAR(100) NOT NULL,
+    TabId INT NOT NULL,
+    SectionId INT NOT NULL,
+    VerificationStatus NVARCHAR(50) NULL,
+    Remarks NVARCHAR(max) NULL,
+
+    VerifiedBy NVARCHAR(200) NULL,
+    VerifiedOn DATETIME2 NULL,
+
+    CONSTRAINT PK_SectionWiseFeedback
+        PRIMARY KEY (SectionWiseFeedbackId),
+
+    CONSTRAINT FK_SectionWiseFeedback_Faculty
+        FOREIGN KEY (FacultyId)
+        REFERENCES dbo.Faculty(FacultyId),
+
+    CONSTRAINT FK_SectionWiseFeedback_College
+        FOREIGN KEY (CollegeCode)
+        REFERENCES [dbo].[Affiliation_College_Master](CollegeCode),
+
+    CONSTRAINT FK_SectionWiseFeedback_Tab
+        FOREIGN KEY (TabId)
+        REFERENCES dbo.MstTabs(TabId),
+
+    CONSTRAINT FK_SectionWiseFeedback_Section
+        FOREIGN KEY (SectionId)
+        REFERENCES dbo.MstSections(SectionId)
+);
+
+
+/* ============================================================
+   4. Prevent duplicate section verification
+   ============================================================ */
+
+CREATE UNIQUE INDEX UX_SectionWiseFeedback_College_Faculty_Tab_Section
+ON dbo.SectionWiseFeedback
+(
+    CollegeCode,
+    FacultyId,
+    TabId,
+    SectionId
+);
+GO
+
+
+/* ============================================================
+   5. Useful indexes
+   ============================================================ */
+
+CREATE INDEX IX_MstTabs_FacultyId
+ON dbo.MstTabs(FacultyId);
+GO
+
+CREATE INDEX IX_MstSections_FacultyId
+ON dbo.MstSections(FacultyId);
+GO
+
+CREATE INDEX IX_MstSections_TabId
+ON dbo.MstSections(TabId);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_FacultyId
+ON dbo.SectionWiseFeedback(FacultyId);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_CollegeCode
+ON dbo.SectionWiseFeedback(CollegeCode);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_TabId
+ON dbo.SectionWiseFeedback(TabId);
+GO
+
+CREATE INDEX IX_SectionWiseFeedback_SectionId
+ON dbo.SectionWiseFeedback(SectionId);
+GO
+
+
+
+INSERT INTO dbo.MstDocument
+(
+    FacultyId,
+    TabId,
+    SectionId,
+    DocumentName,
+    IsMandatory,
+    DisplayOrder,
+    IsActive
+)
+VALUES
+    (2, 2, 10, N'GOK Order Document', 0, NULL, 1),
+    (2, 2, 10, N'Trust PAN',            0, NULL, 1),
+    (2, 2, 10, N'Bank Statement',      0, NULL, 1),
+    (2, 2, 10, N'Registration Certificate', 0, NULL, 1),
+    (2, 2, 10, N'Audit Statement',     0, NULL, 1);
+
+--------------------SELECT QUERIES ---------------
+
+--select * from TblRguhsFacultyUser;
 
 SELECT * FROM [dbo].[AFF_InstitutionsDetails] WHERE CollegeCode='D008';
 
@@ -2476,504 +2806,3 @@ SELECT * FROM MstDentalServices;
 
 SELECT * FROM DentalWardBedDistribution
 WHERE CollegeCode = 'D038'
-
-
-/* ============================================================
-   1. MstTabs
-   ============================================================ */
-
-CREATE TABLE dbo.MstTabs
-(
-    TabId INT IDENTITY(1,1) NOT NULL,
-    FacultyId INT NOT NULL,
-    TabName NVARCHAR(200) NOT NULL,
-
-    CONSTRAINT PK_MstTabs
-        PRIMARY KEY (TabId),
-
-    CONSTRAINT FK_MstTabs_Faculty
-        FOREIGN KEY (FacultyId)
-        REFERENCES dbo.Faculty(FacultyId)
-);
-GO
-
-INSERT INTO dbo.MstTabs (FacultyId, TabName)
-VALUES
-    (2, N'Institution Details'),
-    (2, N'Trust Details'),
-    (2, N'Trust Member Details'),
-    (2, N'Dean / Director Details'),
-    (2, N'Principal Details'),
-    (2, N'UG Course Details'),
-    (2, N'PG Course Details'),
-    (2, N'Courses & Intake'),
-    (2, N'Land & Building Details'),
-    (2, N'Classroom & Laboratory'),
-    (2, N'Chair Distribution'),
-    (2, N'Bed Distribution'),
-    (2, N'Hostel Details'),
-    (2, N'Department Offices And Educational Unit'),
-    (2, N'Equipment List'),
-    (2, N'Vehicle Details'),
-    (2, N'UG Academic Matters'),
-    (2, N'PG Academic Matters'),
-    (2, N'Staff Pay Scale'),
-    (2, N'Staff Other Details'),
-    (2, N'Finance Details'),
-    (2, N'Library Services'),
-    (2, N'Research & Publications'),
-    (2, N'Library Details'),
-    (2, N'Faculty Details'),
-    (2, N'Teaching Experience'),
-    (2, N'Clinical Facilities');
-GO
-
-
-/* ============================================================
-   2. MstSections
-   ============================================================ */
-
-CREATE TABLE dbo.MstSections
-(
-    SectionId INT IDENTITY(1,1) NOT NULL,
-    FacultyId INT NOT NULL,
-    TabId INT NOT NULL,
-    SectionName NVARCHAR(200) NOT NULL,
-
-    CONSTRAINT PK_MstSections
-        PRIMARY KEY (SectionId),
-
-    CONSTRAINT FK_MstSections_Faculty
-        FOREIGN KEY (FacultyId)
-        REFERENCES dbo.Faculty(FacultyId),
-
-    CONSTRAINT FK_MstSections_MstTabs
-        FOREIGN KEY (TabId)
-        REFERENCES dbo.MstTabs(TabId)
-);
-GO
-
-
-
-/* ============================================================
-   Institution Details
-   ============================================================ */
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Basic Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Address Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Contact Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Institutional Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Head of Institution'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Nodal Officer Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Principal Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Dean / Director Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Trust Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Institution Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Trust Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Trust Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Trust Members'
-FROM dbo.MstTabs
-WHERE TabName = N'Trust Member Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Dean / Director Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Dean / Director Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Teaching Experience'
-FROM dbo.MstTabs
-WHERE TabName = N'Dean / Director Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Administrative Experience'
-FROM dbo.MstTabs
-WHERE TabName = N'Dean / Director Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Principal Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Principal Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Teaching Experience'
-FROM dbo.MstTabs
-WHERE TabName = N'Principal Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Administrative Experience'
-FROM dbo.MstTabs
-WHERE TabName = N'Principal Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Present Intake'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Course Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Previous Details'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Course Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Particulars of Permission'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Course Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Year of Obtaining EC & FC from Government of Karnataka'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Course Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Year of Last Affiliation Granted by RGUHS'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Course Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Previous Inspection by LIC'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Course Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'PG Course Details'
-FROM dbo.MstTabs
-WHERE TabName = N'PG Course Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Land Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Land & Building Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Building Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Land & Building Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Facility Requirements'
-FROM dbo.MstTabs
-WHERE TabName = N'Classroom & Laboratory';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Chair Distribution Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Chair Distribution';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Beds Distribution'
-FROM dbo.MstTabs
-WHERE TabName = N'Bed Distribution';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Hostel Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Hostel Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Student Accommodation'
-FROM dbo.MstTabs
-WHERE TabName = N'Hostel Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Common Room Facilities'
-FROM dbo.MstTabs
-WHERE TabName = N'Hostel Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Hostel Facilities'
-FROM dbo.MstTabs
-WHERE TabName = N'Hostel Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Department Office Infrastructure'
-FROM dbo.MstTabs
-WHERE TabName = N'Department Offices And Educational Unit';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Dental Education Unit'
-FROM dbo.MstTabs
-WHERE TabName = N'Department Offices And Educational Unit';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Equipment Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Equipment List';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Vehicle Information'
-FROM dbo.MstTabs
-WHERE TabName = N'Vehicle Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'UG Academic Performance'
-FROM dbo.MstTabs
-WHERE TabName = N'UG Academic Matters';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'PG Academic Performance'
-FROM dbo.MstTabs
-WHERE TabName = N'PG Academic Matters';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Staff Pay Scale'
-FROM dbo.MstTabs
-WHERE TabName = N'Staff Pay Scale';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Staff Other Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Staff Other Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Authority & Account Details - UG'
-FROM dbo.MstTabs
-WHERE TabName = N'Finance Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Annual Financial Details - UG'
-FROM dbo.MstTabs
-WHERE TabName = N'Finance Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Account & Audit Details - UG'
-FROM dbo.MstTabs
-WHERE TabName = N'Finance Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Authority & Account Details - PG'
-FROM dbo.MstTabs
-WHERE TabName = N'Finance Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Annual Financial Details - PG'
-FROM dbo.MstTabs
-WHERE TabName = N'Finance Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Account & Audit Details - PG'
-FROM dbo.MstTabs
-WHERE TabName = N'Finance Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Department Library Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Services';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Research & Publication Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Research & Publications';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'General Library Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Library Items'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Library Building'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Technical Processes'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Library Equipment'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Details';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Library Finance'
-FROM dbo.MstTabs
-WHERE TabName = N'Library Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Faculty Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Faculty Details';
-
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Clinical Hospital Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Clinical Facilities';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Clinical Statistics'
-FROM dbo.MstTabs
-WHERE TabName = N'Clinical Facilities';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Discipline Details'
-FROM dbo.MstTabs
-WHERE TabName = N'Clinical Facilities';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Nursing, Paramedical, Technical & Allied Services'
-FROM dbo.MstTabs
-WHERE TabName = N'Clinical Facilities';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Engineering & Allied Services'
-FROM dbo.MstTabs
-WHERE TabName = N'Clinical Facilities';
-
-INSERT INTO dbo.MstSections (FacultyId, TabId, SectionName)
-SELECT FacultyId, TabId, N'Ward-wise Bed Distribution in Attached Hospital'
-FROM dbo.MstTabs
-WHERE TabName = N'Clinical Facilities';
-
-/* ============================================================
-   3. SectionWiseFeedback
-   ============================================================ */
-
-CREATE TABLE dbo.SectionWiseFeedback
-(
-    SectionWiseFeedbackId INT IDENTITY(1,1) NOT NULL,
-
-    FacultyId INT NOT NULL,
-    CollegeCode NVARCHAR(100) NOT NULL,
-    TabId INT NOT NULL,
-    SectionId INT NOT NULL,
-    VerificationStatus NVARCHAR(50) NULL,
-    Remarks NVARCHAR(max) NULL,
-
-    VerifiedBy NVARCHAR(200) NULL,
-    VerifiedOn DATETIME2 NULL,
-
-    CONSTRAINT PK_SectionWiseFeedback
-        PRIMARY KEY (SectionWiseFeedbackId),
-
-    CONSTRAINT FK_SectionWiseFeedback_Faculty
-        FOREIGN KEY (FacultyId)
-        REFERENCES dbo.Faculty(FacultyId),
-
-    CONSTRAINT FK_SectionWiseFeedback_College
-        FOREIGN KEY (CollegeCode)
-        REFERENCES [dbo].[Affiliation_College_Master](CollegeCode),
-
-    CONSTRAINT FK_SectionWiseFeedback_Tab
-        FOREIGN KEY (TabId)
-        REFERENCES dbo.MstTabs(TabId),
-
-    CONSTRAINT FK_SectionWiseFeedback_Section
-        FOREIGN KEY (SectionId)
-        REFERENCES dbo.MstSections(SectionId)
-);
-GO
-
-/* ============================================================
-   4. Prevent duplicate section verification
-   ============================================================ */
-
-CREATE UNIQUE INDEX UX_SectionWiseFeedback_College_Faculty_Tab_Section
-ON dbo.SectionWiseFeedback
-(
-    CollegeCode,
-    FacultyId,
-    TabId,
-    SectionId
-);
-GO
-
-
-/* ============================================================
-   5. Useful indexes
-   ============================================================ */
-
-CREATE INDEX IX_MstTabs_FacultyId
-ON dbo.MstTabs(FacultyId);
-GO
-
-CREATE INDEX IX_MstSections_FacultyId
-ON dbo.MstSections(FacultyId);
-GO
-
-CREATE INDEX IX_MstSections_TabId
-ON dbo.MstSections(TabId);
-GO
-
-CREATE INDEX IX_SectionWiseFeedback_FacultyId
-ON dbo.SectionWiseFeedback(FacultyId);
-GO
-
-CREATE INDEX IX_SectionWiseFeedback_CollegeCode
-ON dbo.SectionWiseFeedback(CollegeCode);
-GO
-
-CREATE INDEX IX_SectionWiseFeedback_TabId
-ON dbo.SectionWiseFeedback(TabId);
-GO
-
-CREATE INDEX IX_SectionWiseFeedback_SectionId
-ON dbo.SectionWiseFeedback(SectionId);
-GO

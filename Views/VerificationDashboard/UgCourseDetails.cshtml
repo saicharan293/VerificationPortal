@@ -239,10 +239,14 @@
                                             "VerificationDashboard",
                                             new
                                             {
-                                                collegeCode = ViewBag.CollegeCode,
-                                                courseId = course.CourseId
+                                                collegeCode = ViewBag.CollegeCode
                                             })!,
-                                        Title = "Previous Year Notification"
+
+                                        Title = "Previous Year Notification",
+
+                                        DocumentId = null,
+                                        FacultyId = Convert.ToInt32(ViewBag.FacultyId),
+                                        CollegeCode = ViewBag.CollegeCode
                                     })
                             }
                             else

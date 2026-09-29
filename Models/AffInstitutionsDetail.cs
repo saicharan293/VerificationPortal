@@ -123,6 +123,12 @@ public partial class AffInstitutionsDetail
 
     public string? GovAutonomousCertNumber { get; set; }
 
+    public string? NameOfAdministrativeAuthority { get; set; }
+
+    public string? AddressOfAdministrativeAuthority { get; set; }
+
+    public string? MembersOfGoverningBodyOrCouncilFilePath { get; set; }
+
     public bool? IsDeoVerified { get; set; }
 
     public string? DeoRemarks { get; set; }

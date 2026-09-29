@@ -75,6 +75,14 @@ public partial class AffHostelDetail
 
     public string? WomenHostelAreaSqFt { get; set; }
 
+    public decimal? CommonRoomForMenArea { get; set; }
+
+    public decimal? CommonRoomForWomenArea { get; set; }
+
+    public string? GamesRecreationFacilities { get; set; }
+
+    public string? MedicalExaminationHealthServices { get; set; }
+
     public bool? IsDeoVerified { get; set; }
 
     public string? DeoRemarks { get; set; }

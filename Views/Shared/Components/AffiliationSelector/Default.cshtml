@@ -1,0 +1,969 @@
+﻿@model VerificationPortal.Models.AffiliationSelectorVM
+
+
+<style>
+
+    /* =========================================================
+           OVERLAY
+           ========================================================= */
+
+    .affiliation-selector-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(5, 7, 12, 0.88);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        animation: affiliationOverlayIn 0.25s ease;
+    }
+
+
+    /* =========================================================
+           MODAL
+           ========================================================= */
+
+    .affiliation-selector-modal {
+        width: 100%;
+        max-width: 680px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: linear-gradient( 145deg, #171a21, #101217 );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.65);
+        color: #ffffff;
+        animation: affiliationModalIn 0.3s ease;
+    }
+
+
+    /* =========================================================
+           HEADER
+           ========================================================= */
+
+    .affiliation-selector-header {
+        position: relative;
+        padding: 26px 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .affiliation-close-btn {
+        position: absolute;
+        top: 22px;
+        right: 22px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 9px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        color: #858b98;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+    }
+
+
+        .affiliation-close-btn:hover {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            transform: rotate(90deg);
+        }
+
+
+        .affiliation-close-btn i {
+            font-size: 13px;
+        }
+
+
+    .affiliation-selector-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+
+    .affiliation-selector-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: rgba(99, 102, 241, 0.14);
+        color: #818cf8;
+        font-size: 20px;
+    }
+
+
+    .affiliation-selector-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 650;
+        letter-spacing: -0.2px;
+    }
+
+
+    .affiliation-selector-header p {
+        margin: 5px 0 0;
+        color: #858b98;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+           BODY
+           ========================================================= */
+
+    .affiliation-selector-body {
+        padding: 28px;
+    }
+
+
+    .affiliation-field {
+        margin-bottom: 28px;
+    }
+
+
+        .affiliation-field:last-child {
+            margin-bottom: 0;
+        }
+
+
+    .affiliation-field-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 10px;
+        color: #d8dae0;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+        .affiliation-field-label i {
+            color: #818cf8;
+            font-size: 14px;
+        }
+
+
+    .affiliation-field-description {
+        margin: -3px 0 13px;
+        color: #777e8b;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+           READONLY AFFILIATION
+           ========================================================= */
+
+    .affiliation-readonly-box {
+        min-height: 62px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+
+    .affiliation-readonly-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(99, 102, 241, 0.12);
+        color: #818cf8;
+        font-size: 14px;
+    }
+
+
+    .affiliation-readonly-content {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+
+    .affiliation-readonly-label {
+        color: #6f7683;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+    }
+
+
+    .affiliation-readonly-content strong {
+        color: #e5e7eb;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+    .affiliation-readonly-status {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: rgba(34, 197, 94, 0.08);
+        color: #6ee7a0;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+           COURSE LEVEL
+           ========================================================= */
+
+    .course-level-selection {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+
+    .course-level-card {
+        position: relative;
+        min-height: 112px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 12px;
+        padding: 17px;
+        border-radius: 13px;
+        background: #1a1d24;
+        border: 1px solid #2c3039;
+        color: #ffffff;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+
+
+        .course-level-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(129, 140, 248, 0.6);
+            background: #1e222b;
+        }
+
+
+        .course-level-card.active {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.12);
+            box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35) inset;
+        }
+
+
+    .course-level-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #a5b4fc;
+        font-size: 16px;
+    }
+
+
+    .course-level-card.active
+    .course-level-icon {
+        background: rgba(99, 102, 241, 0.18);
+        color: #a5b4fc;
+    }
+
+
+    .course-level-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+
+    .course-level-code {
+        color: #f3f4f6;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+
+    .course-level-name {
+        color: #777e8b;
+        font-size: 10px;
+    }
+
+
+    .course-level-check {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #6366f1;
+        color: white;
+        font-size: 10px;
+        opacity: 0;
+        transform: scale(.7);
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+
+    .course-level-card.active
+    .course-level-check {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+
+    /* =========================================================
+           EMPTY STATE
+           ========================================================= */
+
+    .affiliation-empty-state {
+        min-height: 55px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 15px;
+        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px solid rgba(239, 68, 68, 0.14);
+        color: #aeb3bd;
+        font-size: 12px;
+    }
+
+
+        .affiliation-empty-state i {
+            color: #f87171;
+        }
+
+
+    /* =========================================================
+           FOOTER
+           ========================================================= */
+
+    .affiliation-selector-footer {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 16px 28px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+
+    .affiliation-footer-info {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #6f7683;
+        font-size: 11px;
+    }
+
+
+        .affiliation-footer-info i {
+            color: #818cf8;
+        }
+
+
+    .affiliation-continue-btn {
+        min-width: 125px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 9px;
+        background: #6366f1;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease, opacity .2s ease;
+    }
+
+
+        .affiliation-continue-btn:hover:not(:disabled) {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+
+        .affiliation-continue-btn:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+    .affiliation-no-college {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 22px;
+        border-radius: 14px;
+        background: rgba(245, 158, 11, 0.06);
+        border: 1px solid rgba(245, 158, 11, 0.18);
+    }
+
+    .affiliation-no-college-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+        font-size: 20px;
+    }
+
+    .affiliation-no-college-content h4 {
+        margin: 0 0 5px;
+        color: #f3f4f6;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .affiliation-no-college-content p {
+        margin: 0;
+        color: #8b929f;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+           ANIMATIONS
+           ========================================================= */
+
+    @@keyframes affiliationOverlayIn {
+
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+
+    @@keyframes affiliationModalIn {
+
+        from {
+            opacity: 0;
+            transform: translateY(15px) scale(.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+
+    /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+    @@media (max-width: 650px) {
+
+        .affiliation-selector-overlay {
+            padding: 14px;
+        }
+
+
+        .affiliation-selector-body {
+            padding: 22px;
+        }
+
+
+        .affiliation-selector-header {
+            padding: 22px;
+        }
+
+
+        .course-level-selection {
+            grid-template-columns: 1fr;
+        }
+
+
+        .course-level-card {
+            min-height: 78px;
+            flex-direction: row;
+            align-items: center;
+        }
+
+
+        .affiliation-selector-footer {
+            padding: 16px 22px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+
+        .affiliation-continue-btn {
+            width: 100%;
+        }
+    }
+
+    .affiliation-selector-overlay.is-hidden {
+        display: none !important;
+    }
+
+</style>
+
+@if (!Model.HasCollegeAssignment)
+{
+    <div class="affiliation-no-college">
+
+        <div class="affiliation-no-college-icon">
+            <i class="bi bi-building-exclamation"></i>
+        </div>
+
+        <div class="affiliation-no-college-content">
+
+            <h4>No College Assigned</h4>
+
+            <p>
+                @Model.Message
+            </p>
+
+        </div>
+
+    </div>
+}
+else if (Model.ShowAffiliationSelector)
+{
+    <div id="affiliationSelectorOverlay"
+         data-affiliation-type-id="@Model.SelectedAffiliationTypeId"
+         class="affiliation-selector-overlay">
+
+        <div class="affiliation-selector-modal">
+
+            <!-- ================= HEADER ================= -->
+
+            <div class="affiliation-selector-header">
+
+                <div class="affiliation-selector-title-wrapper">
+
+                    <div class="affiliation-selector-icon">
+                        <i class="bi bi-layers-fill"></i>
+                    </div>
+
+                    <div>
+                        <h2>Affiliation Selection</h2>
+
+                        <p>
+                            Select the course level you want to continue with.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- CLOSE BUTTON -->
+
+                <button type="button"
+                        id="closeAffiliationSelector"
+                        class="affiliation-close-btn"
+                        title="Close">
+
+                    <i class="bi bi-x-lg"></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- ================= BODY ================= -->
+
+            <div class="affiliation-selector-body">
+
+                <!-- AFFILIATION TYPE -->
+
+                <div class="affiliation-field">
+
+                    <label class="affiliation-field-label">
+
+                        <i class="bi bi-diagram-3"></i>
+
+                        Type of Affiliation
+
+                    </label>
+
+
+                    @if (Model.AffiliationTypes.Any())
+                    {
+                        var selectedType =
+                            Model.AffiliationTypes
+                                .FirstOrDefault(x =>
+                                    x.TypeId == Model.SelectedAffiliationTypeId);
+
+                        <div class="affiliation-readonly-box">
+
+                            <div class="affiliation-readonly-icon">
+
+                                <i class="bi bi-lock-fill"></i>
+
+                            </div>
+
+
+                            <div class="affiliation-readonly-content">
+
+                                <span class="affiliation-readonly-label">
+                                    Affiliation Type
+                                </span>
+
+                                <strong>
+                                    @(selectedType?.TypeDescription
+                                        ?? "Select Affiliation Type")
+                                </strong>
+
+                            </div>
+
+
+                            <div class="affiliation-readonly-status">
+
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                <span>
+                                    Fixed
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="affiliation-empty-state">
+
+                            <i class="bi bi-exclamation-circle"></i>
+
+                            <span>
+                                No affiliation type available.
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- ================= COURSE LEVEL ================= -->
+
+                <div class="affiliation-field">
+
+                    <label class="affiliation-field-label">
+
+                        <i class="bi bi-mortarboard"></i>
+
+                        Course Level
+
+                    </label>
+
+
+                    <p class="affiliation-field-description">
+
+                        Select the course level for the affiliation process.
+
+                    </p>
+
+
+                    @if (Model.CourseLevels.Any())
+                    {
+                        <div class="course-level-selection">
+
+                            @foreach (var level in Model.CourseLevels)
+                            {
+                                <button type="button"
+                                        class="course-level-card"
+                                        data-course-level="@level.Level">
+
+                                    <div class="course-level-icon">
+
+                                        <i class="bi @level.Icon"></i>
+
+                                    </div>
+
+
+                                    <div class="course-level-content">
+
+                                        <span class="course-level-code">
+                                            @level.Level
+                                        </span>
+
+                                        <span class="course-level-name">
+                                            @level.DisplayName
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="course-level-check">
+
+                                        <i class="bi bi-check"></i>
+
+                                    </div>
+
+                                </button>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="affiliation-empty-state">
+
+                            <i class="bi bi-exclamation-triangle"></i>
+
+                            <span>
+                                No course levels are available.
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= FOOTER ================= -->
+
+            <div class="affiliation-selector-footer">
+
+                <div class="affiliation-footer-info">
+
+                    <i class="bi bi-info-circle"></i>
+
+                    <span>
+                        Your selection will be used throughout this session.
+                    </span>
+
+                </div>
+
+
+                <button type="button"
+                        id="affiliationContinueBtn"
+                        class="affiliation-continue-btn"
+                        disabled>
+
+                    <span>
+                        Continue
+                    </span>
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const overlay =
+            document.getElementById("affiliationSelectorOverlay");
+
+        if (!overlay) {
+            return;
+        }
+
+        const courseLevelCards =
+            overlay.querySelectorAll(".course-level-card");
+
+        const continueButton =
+            document.getElementById("affiliationContinueBtn");
+
+
+        let selectedCourseLevel = null;
+
+
+        /*
+         * If there is no college assigned,
+         * there will be no Continue button.
+         *
+         * Therefore don't execute the selection logic.
+         */
+        if (!continueButton) {
+            return;
+        }
+
+
+        /* ============================================
+           COURSE LEVEL SELECTION
+           ============================================ */
+
+        courseLevelCards.forEach(function (card) {
+
+            card.addEventListener("click", function () {
+
+                courseLevelCards.forEach(function (item) {
+
+                    item.classList.remove("active");
+
+                });
+
+
+                this.classList.add("active");
+
+
+                selectedCourseLevel =
+                    this.getAttribute("data-course-level");
+
+
+                continueButton.disabled =
+                    !selectedCourseLevel;
+
+            });
+
+        });
+
+
+        /* ============================================
+           CONTINUE
+           ============================================ */
+
+        continueButton.addEventListener(
+            "click",
+            async function () {
+
+                if (!selectedCourseLevel) {
+                    return;
+                }
+                const affiliationTypeId = overlay.getAttribute("data-affiliation-type-id");
+
+                continueButton.disabled = true;
+
+
+                const originalHtml =
+                    continueButton.innerHTML;
+
+
+                continueButton.innerHTML = `
+                    <span>Loading...</span>
+                    <i class="bi bi-arrow-repeat"></i>
+                `;
+
+
+                try {
+
+                    const setContextUrl = '@Url.Action("SetContext", "Home")';
+
+                    const response = await fetch(
+                        setContextUrl,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                courseLevel: selectedCourseLevel,
+                                affiliationTypeId: parseInt(
+                                    affiliationTypeId,
+                                    10
+                                )
+                            })
+                        }
+                    );
+
+                    if (!response.ok) {
+
+                        const errorText =  await response.text();
+
+                        console.error( "SetContext failed:", response.status, errorText );
+
+                        throw new Error(
+                            "Unable to save affiliation context."
+                        );
+                    }
+
+                    const overlay = document.getElementById("affiliationSelectorOverlay");
+
+                    if (overlay) {
+                        overlay.style.display = "none";
+                    }
+
+                    // Small delay so the overlay closes visually
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 150);
+
+
+                }
+                catch (error) {
+
+                    console.error("SetContext error:", error);
+
+                    continueButton.disabled = false;
+
+                    continueButton.innerHTML = originalHtml;
+
+                    alert(
+                        "Unable to save your selection. Please try again."
+                    );
+                }
+
+            }
+        );
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const overlay = document.getElementById("affiliationSelectorOverlay");
+
+        const closeButton = document.getElementById("closeAffiliationSelector");
+
+        if (!overlay || !closeButton) {
+            console.warn("Affiliation selector elements not found.");
+            return;
+        }
+
+
+        /* ============================================
+           CLOSE OVERLAY
+           ============================================ */
+
+        closeButton.addEventListener("click", function () {
+
+            overlay.classList.add("is-hidden");
+
+        });
+
+
+    });
+
+</script>

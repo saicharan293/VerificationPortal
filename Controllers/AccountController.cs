@@ -126,7 +126,7 @@ namespace VerificationPortal.Controllers
                 // Create claims for authentication
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim("FullName", user.UserName),
                     new Claim("UserId", user.UserId.ToString()),
@@ -176,8 +176,15 @@ namespace VerificationPortal.Controllers
         public async Task<IActionResult> Logout()
         {
             var userName = User.Identity?.Name;
+
+            HttpContext.Session.Remove("AffiliationTypeId");
+            HttpContext.Session.Remove("TypeOfAffiliation");
+            HttpContext.Session.Remove("SelectedLevel");
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             _logger.LogInformation($"User {userName} logged out.");
+
             TempData["InfoMessage"] = "You have been logged out successfully.";
             return RedirectToAction("Login", "Account");
         }

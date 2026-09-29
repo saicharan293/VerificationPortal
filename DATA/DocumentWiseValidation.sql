@@ -132,7 +132,7 @@ CREATE TABLE DocumentWiseFeedback
     -- Foreign key to RGUHS Faculty User
     CONSTRAINT FK_DocumentWiseFeedback_User
         FOREIGN KEY (UserId)
-        REFERENCES TblRguhsFacultyUser(Id)
+        REFERENCES TblRguhsFacultyUser(UserId)
 );
 
 

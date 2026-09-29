@@ -69,6 +69,12 @@ public partial class MedicalDepartmentOfficesMeu
 
     public string? DeuMembersListFilePath { get; set; }
 
+    public string? DeuyearOfStarting { get; set; }
+
+    public string? NatureOfActivities { get; set; }
+
+    public int? TypeId { get; set; }
+
     public bool? IsDeoVerified { get; set; }
 
     public string? DeoRemarks { get; set; }
@@ -138,4 +144,6 @@ public partial class MedicalDepartmentOfficesMeu
     public string? OverallStatus { get; set; }
 
     public DateTime? LastUpdatedDate { get; set; }
+
+    public virtual TypeOfAffiliation? Type { get; set; }
 }

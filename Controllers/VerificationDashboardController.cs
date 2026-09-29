@@ -287,7 +287,7 @@ namespace VerificationPortal.Controllers
             // These documents can be matched with the actual
             // document fields displayed on the Trust Details page.
 
-            ViewBag.Documents = await GetDocumentMappingsAsync(Convert.ToInt32(context.FacultyCode), 2);
+            ViewBag.Documents = await GetDocumentMappingsAsync(Convert.ToInt32(context.FacultyCode), 2, 10);
 
             // ---------------------------------------------------------
             // VERIFICATION
@@ -349,6 +349,30 @@ namespace VerificationPortal.Controllers
 
                 _ => null
             };
+
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return NotFound();
+
+            var filePath = ResolveDocumentPath(storedPath);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile(
+                filePath,
+                GetDocumentContentType(filePath));
+        }
+
+        [HttpGet]
+        public IActionResult ViewAuditStatementDocument(int id)
+        {
+            var institution = _context.InstitutionBasicDetails
+                .FirstOrDefault(x => x.InstitutionId == id);
+
+            if (institution == null)
+                return NotFound();
+
+            var storedPath = institution.AuditStatementFilePath;
 
             if (string.IsNullOrWhiteSpace(storedPath))
                 return NotFound();
@@ -2071,6 +2095,7 @@ namespace VerificationPortal.Controllers
                 .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
             ViewBag.CollegeCode = collegeCode;
+            ViewBag.FacultyId = college?.FacultyCode;
             ViewBag.CollegeName = college?.CollegeName+", "+college?.CollegeTown ?? "Unknown College";
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.NextTabAction = Url.Action("PgCourseDetails", new { collegeCode });
@@ -2085,13 +2110,10 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> PreviousNotification(string collegeCode, string courseId)
+        public async Task<IActionResult> PreviousNotification(string collegeCode)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
-
-            if (string.IsNullOrWhiteSpace(courseId))
-                return NotFound("Course ID is required.");
 
             // ---------------------------------------------------------
             // PAGE CONTEXT
@@ -2112,8 +2134,7 @@ namespace VerificationPortal.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.Facultycode == facultyCode &&
-                    x.Collegecode == collegeCode &&
-                    x.CourseId == courseId);
+                    x.Collegecode == collegeCode);
 
             if (course == null)
                 return NotFound("Course details not found.");
@@ -5949,7 +5970,7 @@ namespace VerificationPortal.Controllers
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
             {
-                var user = _context.TblRguhsFacultyUsers.FirstOrDefault(u => u.Id == userId);
+                var user = _context.TblRguhsFacultyUsers.FirstOrDefault(u => u.UserId == userId);
                 return user?.DesignationDescription ?? "Unknown";
             }
             return "Unknown";

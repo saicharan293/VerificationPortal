@@ -129,6 +129,15 @@
                                 <i class="bi bi-file-earmark-text"></i> Reports
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="javascript:void(0);"
+                               id="openAffiliationSelector">
+                                <i class="bi bi-layers-fill"></i>
+                                Affiliation Context
+                            </a>
+                        </li>
                     </ul>
 
                     <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
@@ -251,5 +260,35 @@
     <script src="~/js/theme.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @await Component.InvokeAsync("AffiliationSelector")
+    }
+
 </body>
 </html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const openButton =
+            document.getElementById("openAffiliationSelector");
+
+        const overlay =
+            document.getElementById("affiliationSelectorOverlay");
+
+        if (openButton && overlay) {
+
+            openButton.addEventListener("click", function (e) {
+
+                e.preventDefault();
+
+                overlay.style.display = "flex";
+
+            });
+
+        }
+
+    });
+</script>

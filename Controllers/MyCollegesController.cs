@@ -29,7 +29,7 @@ namespace VerificationPortal.Controllers
 
             int userDbId = int.Parse(userIdClaim);
             var user = await _context.TblRguhsFacultyUsers
-                .FirstOrDefaultAsync(u => u.Id == userDbId);
+                .FirstOrDefaultAsync(u => u.UserId == userDbId);
 
             if (user == null)
             {

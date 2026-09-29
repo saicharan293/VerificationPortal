@@ -32,7 +32,7 @@ namespace VerificationPortal.Controllers
 
             int userDbId = int.Parse(userIdClaim);
             var user = await _context.TblRguhsFacultyUsers
-                .FirstOrDefaultAsync(u => u.Id == userDbId);
+                .FirstOrDefaultAsync(u => u.UserId == userDbId);
 
             if (user == null)
             {
@@ -68,6 +68,11 @@ namespace VerificationPortal.Controllers
                 IsSection = user.IsSection ?? false
             };
 
+            //var affiliationTypeId = HttpContext.Session.GetInt32("AffiliationTypeId");
+
+            //var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            //model.ShowAffiliationSelector = !affiliationTypeId.HasValue || string.IsNullOrEmpty(courseLevel);
             return View(model);
         }
 

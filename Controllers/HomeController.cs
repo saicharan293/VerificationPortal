@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using VerificationPortal.Models;
 using VerificationPortal.Models.ViewModels;
 
 namespace VerificationPortal.Controllers
@@ -47,6 +48,38 @@ namespace VerificationPortal.Controllers
                 new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
             );
             return LocalRedirect(returnUrl);
+        }
+
+        [HttpPost]
+        public IActionResult SetContext( [FromBody] AffiliationContextRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest();
+            }
+
+            if (request.AffiliationTypeId <= 0)
+            {
+                return BadRequest("Invalid affiliation type.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.CourseLevel))
+            {
+                return BadRequest("Course level is required.");
+            }
+
+
+            // Store context in session
+
+            HttpContext.Session.SetInt32("AffiliationTypeId", request.AffiliationTypeId);
+
+            HttpContext.Session.SetString("CourseLevel", request.CourseLevel);
+
+
+            return Ok(new
+            {
+                success = true
+            });
         }
 
         public IActionResult Privacy() => View();

@@ -58,7 +58,7 @@
     ViewData["PrevTabLabel"] =
         "Previous: Institution Details";
 
-    var documentMappings =  ViewBag.DocumentMappings as Dictionary<string, int> ?? new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase);
+    var documentMappings =  ViewBag.Documents as Dictionary<string, int> ?? new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase);
 
     int? GetDocumentId(string documentName)
     {
@@ -356,19 +356,21 @@
                         new DocumentViewerVm
                         {
                             Url = Url.Action(
-                                "ViewTrustDetailsPageDocument",
+                                "ViewAuditStatementDocument",
                                 "VerificationDashboard",
                                 new
                                 {
                                     id = Model.InstitutionId,
-                                    documentType = "AuditStatement",
-                                    DocumentId = GetDocumentId("Audit Statement"),
-
-                                    FacultyId = Convert.ToInt32(Model.FacultyCode),
-
-                                    CollegeCode = Model.CollegeCode
+                                    documentType = "AuditStatement"
                                 })!,
-                            Title = "Audit Statement"
+
+                            Title = "Audit Statement",
+
+                            DocumentId = GetDocumentId("Audit Statement"),
+
+                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+
+                            CollegeCode = Model.CollegeCode
                         })
                 }
                 else

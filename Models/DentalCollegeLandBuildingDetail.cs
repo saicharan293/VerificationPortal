@@ -91,6 +91,18 @@ public partial class DentalCollegeLandBuildingDetail
 
     public int? AffiliationTypeId { get; set; }
 
+    public bool? PrincipalStaffResidentialQuarter { get; set; }
+
+    public decimal? PrincipalStaffResidentialQuarterAreaSqFt { get; set; }
+
+    public bool? OtherStaffResidentialQuarter { get; set; }
+
+    public decimal? OtherStaffResidentialQuarterAreaSqFt { get; set; }
+
+    public bool? TeachingAncillaryStaffResidentialQuarter { get; set; }
+
+    public decimal? TeachingAncillaryStaffResidentialQuarterAreaSqFt { get; set; }
+
     public bool? IsDeoVerified { get; set; }
 
     public string? DeoRemarks { get; set; }
