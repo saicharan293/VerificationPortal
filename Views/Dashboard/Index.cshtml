@@ -1,8 +1,8 @@
-﻿@using System.Security.Claims
+﻿@* @using System.Security.Claims *@
 @model VerificationPortal.Models.DashboardViewModel
+
 @{
     ViewData["Title"] = "Dashboard";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @section Styles {
@@ -28,7 +28,7 @@
                     <i class="bi bi-person-circle"></i>
                 </div>
                 <div class="hero-text">
-                    <span class="hero-greeting">@GetGreeting(),</span>
+                    <span class="hero-greeting">@Model.Greeting,</span>
                     <h1 class="hero-name">@Model.User.UserName</h1>
                     <div class="hero-meta">
                         <span class="meta-item">
@@ -72,7 +72,7 @@
                     <i class="bi bi-patch-check-fill"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>0</h3>
+                    <h3>@Model.TotalVerified</h3>
                     <p>Verified</p>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     <i class="bi bi-hourglass-split"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>0</h3>
+                    <h3>@Model.TotalPending</h3>
                     <p>Pending</p>
                 </div>
             </div>
@@ -92,8 +92,8 @@
                     <i class="bi bi-calendar-event-fill"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>@DateTime.Now.ToString("dd")</h3>
-                    <p>@DateTime.Now.ToString("MMM yyyy")</p>
+                    <h3>@Model.CurrentDate.ToString("dd")</h3>
+                    <p>@Model.CurrentDate.ToString("MMM yyyy")</p>
                 </div>
             </div>
         </div>
@@ -184,66 +184,20 @@
                     </div>
                     <div class="content-card-body p-0">
                         <div class="resource-list">
-                            <a href="#" class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                </div>
-                                <div class="resource-text">
-                                    <strong>User Manual</strong>
-                                    <small>Complete guide for using the portal</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                            <a href="#" class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="bi bi-file-earmark-pdf"></i>
-                                </div>
-                                <div class="resource-text">
-                                    <strong>Guidelines 2024-25</strong>
-                                    <small>Latest affiliation guidelines</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                            <a href="#" class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                                </div>
-                                <div class="resource-text">
-                                    <strong>Data Templates</strong>
-                                    <small>Download submission formats</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                            <a href="#" class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="bi bi-question-circle"></i>
-                                </div>
-                                <div class="resource-text">
-                                    <strong>FAQs</strong>
-                                    <small>Frequently asked questions</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                            <a href="#" class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="bi bi-headset"></i>
-                                </div>
-                                <div class="resource-text">
-                                    <strong>Contact Support</strong>
-                                    <small>Get help from our team</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                            <a href="#" class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="bi bi-megaphone"></i>
-                                </div>
-                                <div class="resource-text">
-                                    <strong>Announcements</strong>
-                                    <small>Latest updates & circulars</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
+                            @foreach(var resource in Model.Resources)
+                            {
+                                <a href = "@resource.Url" class="resource-item">
+                                    <div class="resource-icon">
+                                        <i class="@resource.Icon"></i>
+                                    </div>
+
+                                    <div class="resource-text">
+                                        <strong>@resource.Title</strong>
+                                        <small>@resource.Description</small>
+                                    </div>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>
@@ -251,15 +205,3 @@
         </div>
     </div>
 </section>
-
-@* @await Component.InvokeAsync( "AffiliationSelector", new { affiliationTypeId = 2 }) *@
-
-@functions {
-    public string GetGreeting()
-    {
-        var hour = DateTime.Now.Hour;
-        if (hour < 12) return "Good Morning";
-        if (hour < 17) return "Good Afternoon";
-        return "Good Evening";
-    }
-}

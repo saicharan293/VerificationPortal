@@ -10,7 +10,7 @@
 }
 
 <aside class="verification-sidebar" id="verificationSidebar" role="navigation" aria-label="Verification sections">
-    <div class="sidebar-header">
+    @* <div class="sidebar-header">
         <div class="sidebar-brand">
             <i class="bi bi-shield-check"></i>
             <span>Verification Portal</span>
@@ -18,7 +18,7 @@
         <button class="sidebar-close d-md-none" id="sidebarClose" aria-label="Close sidebar">
             <i class="bi bi-x"></i>
         </button>
-    </div>
+    </div> *@
 
     <div class="sidebar-content">
         <!-- Institution Info Card -->
@@ -123,8 +123,8 @@
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="ChairDistribution"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab?.ToString() == "ChairDistribution" ? "active" : "")">
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "ChairDistribution" ? "active" : "")">
 
                         <i class="bi bi-grid-3x3-gap"></i>
                         <span>Chair Distribution</span>
@@ -133,8 +133,8 @@
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="BedDistribution"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "BedDistribution" ? "active" : "")">
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "BedDistribution" ? "active" : "")">
 
                         <i class="bi bi-hospital"></i>
 
@@ -144,8 +144,8 @@
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="HostelDetails"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab == "HostelDetails" ? "active" : "")">
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "HostelDetails" ? "active" : "")">
                         <i class="bi bi-house-door"></i>
                         <span>Hostel Details</span>
                     </a>
@@ -153,8 +153,8 @@
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="DepartmentOfficesAndEducationalUnit"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab == "DepartmentOfficesAndEducationalUnit" ? "active" : "")">
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "DepartmentOfficesAndEducationalUnit" ? "active" : "")">
                         <i class="bi bi-building"></i>
                         <span>Department Offices And Educational Unit</span>
                     </a>
@@ -162,8 +162,8 @@
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="EquipmentList"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab == "EquipmentList" ? "active" : "")">
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "EquipmentList" ? "active" : "")">
 
                         <i class="bi bi-tools"></i>
                         <span>Equipment List</span>
@@ -174,38 +174,44 @@
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="CA_VehicleDetails"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab == "CAVehicleDetails" ? "active" : "")">
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "CAVehicleDetails" ? "active" : "")">
 
                         <i class="bi bi-car-front"></i>
                         <span>Vehicle Details</span>
                     </a>
                 </li>
+                @if (existingCourseLevel == "UG")
+                {
+                    <li class="nav-item">
+                        <a asp-controller="VerificationDashboard"
+                        asp-action="UgAcademicMatters"
+                        asp-route-collegeCode="@collegeCode"
+                        class="nav-link @(activeTab == "UgAcademicMatters" ? "active" : "")">
 
+                            <i class="bi bi-mortarboard"></i>
+
+                            <span>UG Academic Matters</span>
+                        </a>
+                    </li>
+                }
+
+                @if (existingCourseLevel == "PG")
+                {
+                    <li class="nav-item">
+                        <a asp-controller="VerificationDashboard"
+                        asp-action="PgAcademicMatters"
+                        asp-route-collegeCode="@collegeCode"
+                        class="nav-link @(activeTab == "PgAcademicMatters" ? "active" : "")">
+
+                            <i class="bi bi-mortarboard"></i>
+                            <span>PG Academic Matters</span>
+                        </a>
+                    </li>
+                }
                 <li class="nav-item">
-                    <a asp-controller="VerificationDashboard"
-                       asp-action="UgAcademicMatters"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab == "UgAcademicMatters" ? "active" : "")">
-
-                        <i class="bi bi-mortarboard"></i>
-
-                        <span>UG Academic Matters</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a asp-controller="VerificationDashboard"
-                       asp-action="PgAcademicMatters"
-                       asp-route-collegeCode="@ViewBag.CollegeCode"
-                       class="nav-link @(ViewBag.ActiveTab == "PgAcademicMatters" ? "active" : "")">
-
-                        <i class="bi bi-mortarboard"></i>
-                        <span>PG Academic Matters</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="@Url.Action("StaffPayScale", "VerificationDashboard", new { collegeCode = ViewData["CollegeCode"] })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "StaffPayScale" ? "active" : "")">
+                    <a href="@Url.Action("StaffPayScale", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "StaffPayScale" ? "active" : "")">
 
                         <i class="bi bi-cash-stack me-2"></i>
                         <span> Staff Pay Scale </span>
@@ -213,8 +219,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="@Url.Action("StaffOtherDetails", "VerificationDashboard", new { collegeCode = ViewData["CollegeCode"] })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "StaffOtherDetails" ? "active" : "")">
+                    <a href="@Url.Action("StaffOtherDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "StaffOtherDetails" ? "active" : "")">
 
                         <i class="bi bi-people me-2"></i>
                         <span> Staff Other Details </span>
@@ -223,16 +229,16 @@
 
                 </li>
                 <li class="nav-item">
-                    <a href="@Url.Action( "FinanceDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "FinanceDetails" ? "active" : "")">
+                    <a href="@Url.Action( "FinanceDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "FinanceDetails" ? "active" : "")">
 
                         <i class="bi bi-cash-stack"></i>
                         <span>Finance Details</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="@Url.Action("LibraryServices", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "LibraryServices" ? "active" : "")">
+                    <a href="@Url.Action("LibraryServices", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "LibraryServices" ? "active" : "")">
 
                         <i class="bi bi-book"></i>
                         <span>Library Services</span>
@@ -240,25 +246,24 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="@Url.Action("ResearchPublications", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "ResearchPublications" ? "active" : "")">
+                    <a href="@Url.Action("ResearchPublications", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "ResearchPublications" ? "active" : "")">
 
                         <i class="bi bi-journal-text"></i>
                         <span>Research &amp; Publications</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="@Url.Action("LibraryDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "LibraryDetails" ? "active" : "")">
+                    <a href="@Url.Action("LibraryDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "LibraryDetails" ? "active" : "")">
 
                         <i class="bi bi-book-half"></i>
                         <span>Library Details</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="@Url.Action("FacultyDetails", "VerificationDashboard",
-                                    new { collegeCode = ViewBag.CollegeCode })"
-                       class="nav-link @(ViewData["ActiveTab"]?.ToString() == "FacultyDetails" ? "active" : "")">
+                    <a href="@Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "FacultyDetails" ? "active" : "")">
 
                         <i class="bi bi-person-badge"></i>
                         <span>Faculty Details</span>
@@ -266,10 +271,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link"
+                    <a class="nav-link @(activeTab == "TeachingExperience" ? "active" : "")"
                        asp-controller="VerificationDashboard"
                        asp-action="TeachingExperience"
-                       asp-route-collegeCode="@ViewBag.CollegeCode">
+                       asp-route-collegeCode="@collegeCode">
 
                         <i class="bi bi-clock-history me-2"></i>
 
@@ -277,10 +282,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link"
+                    <a class="nav-link @(activeTab == "ClinicalFacilities" ? "active" : "")"
                        asp-controller="VerificationDashboard"
                        asp-action="ClinicalFacilities"
-                       asp-route-collegeCode="@ViewBag.CollegeCode">
+                       asp-route-collegeCode="@collegeCode">
 
                         <i class="bi bi-hospital me-2"></i>
 
@@ -289,18 +294,6 @@
                 </li>
             </ul>
         </nav>
-
-        <!-- Quick Actions -->
-        @* <div class="sidebar-footer">
-            <div class="quick-actions">
-                <a href="#" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#verificationSummaryModal">
-                    <i class="bi bi-clipboard-check"></i> Verification Summary
-                </a>
-                <a asp-controller="VerificationDashboard" asp-action="CompleteVerification" asp-route-collegeCode="@collegeCode" class="btn btn-success w-100 mt-2">
-                    <i class="bi bi-check-circle"></i> Complete Verification
-                </a>
-            </div>
-        </div> *@
     </div>
 </aside>
 
@@ -308,169 +301,4 @@
 <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
 <!-- Verification Summary Modal -->
-<div class="modal fade" id="verificationSummaryModal" tabindex="-1" aria-labelledby="verificationSummaryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="verificationSummaryModalLabel">
-                    <i class="bi bi-clipboard-check me-2"></i>Verification Summary
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="verification-summary">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-building text-primary"></i>
-                                    <h6>Institution Details</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-primary" style="width: 75%"></div>
-                                    </div>
-                                    <small class="text-muted">75% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-building text-success"></i>
-                                    <h6>Trust Details</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-success" style="width: 60%"></div>
-                                    </div>
-                                    <small class="text-muted">60% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-people text-info"></i>
-                                    <h6>Trust Member Details</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-info" style="width: 80%"></div>
-                                    </div>
-                                    <small class="text-muted">80% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-person-badge text-warning"></i>
-                                    <h6>Dean / Director Details</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-warning" style="width: 45%"></div>
-                                    </div>
-                                    <small class="text-muted">45% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-mortarboard text-danger"></i>
-                                    <h6>Principal Details</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-danger" style="width: 55%"></div>
-                                    </div>
-                                    <small class="text-muted">55% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-book text-secondary"></i>
-                                    <h6>Courses & Intake</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-secondary" style="width: 90%"></div>
-                                    </div>
-                                    <small class="text-muted">90% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-building text-dark"></i>
-                                    <h6>Land & Building Details</h6>
-                                </div>
-
-                                <div class="summary-progress">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width:70%"></div>
-                                    </div>
-                                    <small class="text-muted">70% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-houses text-primary"></i>
-                                    <h6>Classroom & Laboratory</h6>
-                                </div>
-
-                                <div class="summary-progress">
-                                    <div class="progress">
-                                        <div class="progress-bar bg-primary" style="width:70%"></div>
-                                    </div>
-                                    <small class="text-muted">70% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-people text-primary"></i>
-                                    <h6>Faculty Details</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-primary" style="width: 40%"></div>
-                                    </div>
-                                    <small class="text-muted">40% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="summary-card">
-                                <div class="summary-card-header">
-                                    <i class="bi bi-file-earmark-text text-success"></i>
-                                    <h6>Documents</h6>
-                                </div>
-                                <div class="summary-progress">
-                                    <div class="progress" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-success" style="width: 30%"></div>
-                                    </div>
-                                    <small class="text-muted">30% Complete</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="exportSummaryBtn">
-                    <i class="bi bi-download me-1"></i> Export Report
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_VerificationSummaryModal" />

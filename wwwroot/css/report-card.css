@@ -145,7 +145,7 @@
 }
 
 .report-card-body {
-    padding: 1.5rem;
+    padding: 0.2rem;
     color: var(--report-text-secondary);
 }
 
@@ -699,7 +699,7 @@
     background: var(--report-card-bg);
     border: 1px solid var(--report-border);
     border-radius: var(--report-radius-lg);
-    padding: 1.5rem;
+    padding: .2rem;
     text-align: center;
     transition: var(--report-transition);
     height: 100%;

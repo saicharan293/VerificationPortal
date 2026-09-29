@@ -22,50 +22,48 @@ namespace VerificationPortal.Controllers
         public async Task<IActionResult> Index()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            if (!int.TryParse(userIdClaim, out var userId)) return RedirectToAction("Login", "Account");
 
-            int userDbId = int.Parse(userIdClaim);
+            // ========================================================= 
+            // USER DETAILS 
+            // =========================================================
+
             var user = await _context.TblRguhsFacultyUsers
-                .FirstOrDefaultAsync(u => u.UserId == userDbId);
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            // ========================================================= 
-            // USER DETAILS 
-            // =========================================================
-
-            var userDesignation = user.DesignationDescription ?? "";
-
-
             // Get user's college mappings (only active ones)
             var mappings = await _context.TblCollegeMappings
                 .Where(m => m.UserId == user.UserId && m.IsActive)
-                .Include(m => m.FacultyCodeNavigation)
                 .ToListAsync();
+
+            var model = new MyCollegesViewModel
+            {
+                UserName = user.UserName ?? string.Empty,
+                UserDesignation = user.DesignationDescription ?? string.Empty,
+                FacultyId = user.Faculty ?? 0
+
+            };
 
             if (mappings.Count == 0)
             {
-                ViewBag.Message = "You have no college mappings assigned.";
-                ViewBag.UserName = user.UserName;
-                ViewBag.UserDesignation = user.DesignationDescription ?? "";
-                ViewBag.FacultyId = user.Faculty ?? 0;
-                return View(new List<CollegeMappingWithCollegesViewModel>());
+                return View(model);
             }
 
             // Get faculty details
-            var facultyIds = mappings.Select(m => m.FacultyCode).Distinct().ToList();
+            var facultyIds = mappings
+                .Select(m => m.FacultyCode)
+                .Distinct()
+                .ToList();
+
             var faculties = await _context.Faculties
                 .Where(f => facultyIds.Contains(f.FacultyId))
                 .ToDictionaryAsync(f => f.FacultyId, f => f.FacultyName);
 
-
-            var viewModels = new List<CollegeMappingWithCollegesViewModel>();
 
             foreach (var mapping in mappings)
             {
@@ -93,27 +91,23 @@ namespace VerificationPortal.Controllers
                 //        && string.Compare(c.CollegeCode, mapping.CollegeTo, StringComparison.OrdinalIgnoreCase) <= 0)
                 //    .ToList();
 
-                var facultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty");
-
-                viewModels.Add(new CollegeMappingWithCollegesViewModel
+                model.Mappings.Add(new CollegeMappingWithCollegesViewModel
                 {
                     Mapping = mapping,
-                    FacultyName = facultyName,
-                    UserDesignation = userDesignation,
+                    FacultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty"),
                     Colleges = colleges,
+
                     CollegeCount = colleges.Count,
+
                     FromLetter = mapping.FromLetter,
                     ToLetter = mapping.ToLetter,
+
                     CollegeFromCode = mapping.CollegeFrom,
                     CollegeToCode = mapping.CollegeTo
                 });
             }
 
-            ViewBag.UserName = user.UserName;
-            ViewBag.UserDesignation = userDesignation;
-            ViewBag.FacultyId = user.Faculty ?? 0;
-
-            return View(viewModels);
+            return View(model);
         }
 
         [HttpGet]

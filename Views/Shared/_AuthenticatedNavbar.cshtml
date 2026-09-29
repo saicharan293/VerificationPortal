@@ -1,0 +1,111 @@
+﻿<!-- Authenticated User Navbar -->
+
+<style>
+    .affiliation-selector-link {
+        background: none;
+        border: none;
+        padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg sticky-top auth-navbar">
+    <div class="container">
+        <!-- Brand Logo -->
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <div class="brand-wrapper">
+                <div class="brand-logo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">RGUHS Affiliation</span>
+                    <span class="brand-subtitle">Verification Portal</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#authNavbar" aria-controls="authNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="authNavbar">
+            <ul class="navbar-nav me-auto align-items-lg-center gap-1">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+
+                @* ==================== ADMIN ONLY LINKS ==================== *@
+                @if (User.IsInRole("Admin") || 
+                    User.IsInRole("ViceChancellor") || 
+                    User.IsInRole("Director"))
+                {
+                    <partial name="_AdminMenu"/>
+                }
+
+                @* ==================== COMMON LINKS ==================== *@
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="MyColleges" asp-action="Index">
+                        <i class="bi bi-building"></i> My Colleges
+                    </a>
+                </li>
+                @* <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-file-earmark-text"></i> Reports
+                    </a>
+                </li> *@
+
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link affiliation-selector-link"
+                            id="openAffiliationSelector">
+                        <i class="bi bi-layers-fill"></i>
+                        Type of Affiliation and Course Level
+                    </button>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                <!-- Theme Toggle Button -->
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                    <i class="bi bi-moon-fill moon-icon"></i>
+                    <i class="bi bi-sun-fill sun-icon"></i>
+                </button>
+
+                <!-- User Dropdown -->
+                <div class="user-profile d-flex align-items-center gap-3">
+                    <!-- User Information -->
+                    <div class="user-info-text text-end d-none d-md-block">
+                        <strong class="id-name d-block">
+                            @User.Identity?.Name
+                        </strong>
+                        <small class="d-block">
+                            @User.FindFirst("Designation")?.Value
+                        </small>
+                    </div>
+
+                    <!-- Profile Icon -->
+                    @* <div class="user-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div> *@
+
+                    <!-- Logout -->
+                    <form asp-controller="Account"
+                            asp-action="Logout"
+                            asp-antiforgery="true"
+                            method="post"
+                            class="m-0">
+                        <button type="submit"
+                                class="logout-btn"
+                                title="Logout"
+                                aria-label="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

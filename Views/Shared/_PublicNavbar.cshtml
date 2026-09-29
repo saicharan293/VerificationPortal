@@ -1,0 +1,61 @@
+﻿<!-- Public/Guest Navbar -->
+<nav class="navbar navbar-expand-lg sticky-top custom-navbar">
+    <div class="container">
+        <!-- Brand Logo -->
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <div class="brand-wrapper">
+                <div class="brand-logo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">Karnataka Affiliation</span>
+                    <span class="brand-subtitle">Verification Portal</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="publicNavbar">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#verify">
+                        <i class="bi bi-search"></i> Verify
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#faculties">
+                        <i class="bi bi-mortarboard"></i> Faculties
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#stats">
+                        <i class="bi bi-graph-up"></i> Statistics
+                    </a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2 ms-lg-3 mt-2 mt-lg-0">
+                <!-- Theme Toggle Button -->
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle Light/Dark Mode">
+                    <i class="bi bi-moon-fill moon-icon"></i>
+                    <i class="bi bi-sun-fill sun-icon"></i>
+                </button>
+
+                <!-- Login Button -->
+                <a class="btn btn-login" asp-controller="Account" asp-action="Login">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

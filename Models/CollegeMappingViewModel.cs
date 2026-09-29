@@ -144,6 +144,15 @@ namespace VerificationPortal.Models
         } = new();
     }
 
+    public class MyCollegesViewModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string UserDesignation { get; set; } = string.Empty;
+        public int? FacultyId { get; set; }
+
+        public List<CollegeMappingWithCollegesViewModel> Mappings { get; set; } = new();
+    }
+
     public class CollegeFeedbackStatusViewModel
     {
         public string Status { get; set; } = "Not Started";

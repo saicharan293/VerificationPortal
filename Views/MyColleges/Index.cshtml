@@ -1,48 +1,14 @@
-@model List<VerificationPortal.Models.CollegeMappingWithCollegesViewModel>
+@model MyCollegesViewModel
+
 @{
     ViewData["Title"] = "My College Mappings";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/report-card.css" asp-append-version="true" />
 }
 
-@section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Add search/filter functionality for college tables
-            const searchInputs = document.querySelectorAll('.college-search');
-
-            searchInputs.forEach(input => {
-                input.addEventListener('keyup', function () {
-                    const filter = this.value.toUpperCase();
-                    const table = this.closest('.colleges-container').querySelector('table');
-                    const rows = table.querySelectorAll('tbody tr');
-
-                    rows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        let match = false;
-                        cells.forEach(cell => {
-                            if (cell.textContent.toUpperCase().includes(filter)) {
-                                match = true;
-                            }
-                        });
-                        row.style.display = match ? '' : 'none';
-                    });
-                });
-            });
-
-            // Initialize tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        });
-    </script>
-}
-
-<div class="container-fluid px-4 py-4">
+<div class="container-fluid px-4 py-4" id="myCollegePage" data-status-url="@Url.Action("GetVerificationStatuses","MyColleges")">
     <!-- Page Header -->
     <div class="report-page-header mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -60,7 +26,7 @@
             </div>
             <div class="d-flex gap-2">
                 <span class="badge bg-primary fs-6 px-3 py-2 align-self-center d-flex align-items-center gap-2">
-                    <i class="bi bi-person-circle me-1"></i> @ViewBag.UserDesignation
+                    <i class="bi bi-person-circle me-1"></i> @Model.UserDesignation
                 </span>
             </div>
         </div>
@@ -76,15 +42,15 @@
                             <i class="bi bi-person-badge fs-1"></i>
                         </div>
                         <div>
-                            <h5 class="mb-1">@ViewBag.UserName</h5>
-                            <small class="report-muted">@ViewBag.UserDesignation</small>
+                            <h5 class="mb-1">@Model.UserName</h5>
+                            <small class="report-muted">@Model.UserDesignation</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
                     <div class="d-flex gap-2 justify-content-md-end">
                         <span class="badge bg-secondary fs-6 px-3 py-2">
-                            <i class="bi bi-building me-1"></i> Faculty ID: @ViewBag.FacultyId
+                            <i class="bi bi-building me-1"></i> Faculty ID: @Model.FacultyId
                         </span>
                     </div>
                 </div>
@@ -92,7 +58,7 @@
         </div>
     </div>
 
-    @if (Model == null || Model.Count == 0)
+    @if (!Model.Mappings.Any())
     {
         <!-- No Mappings State -->
         <div class="report-card no-mappings-card">
@@ -111,7 +77,7 @@
             <div class="col-md-4">
                 <div class="report-card stat-card">
                     <div class="report-card-body text-center">
-                        <div class="stat-number">@Model.Count</div>
+                        <div class="stat-number">@Model.Mappings.Count</div>
                         <div class="stat-label">Active Mappings</div>
                     </div>
                 </div>
@@ -119,7 +85,7 @@
             <div class="col-md-4">
                 <div class="report-card stat-card">
                     <div class="report-card-body text-center">
-                        <div class="stat-number">@Model.Sum(m => m.CollegeCount)</div>
+                        <div class="stat-number">@Model.Mappings.Sum(m => m.CollegeCount)</div>
                         <div class="stat-label">Total Colleges Assigned</div>
                     </div>
                 </div>
@@ -127,7 +93,7 @@
             <div class="col-md-4">
                 <div class="report-card stat-card">
                     <div class="report-card-body text-center">
-                        <div class="stat-number">@Model.Select(m => m.FacultyName).Distinct().Count()</div>
+                        <div class="stat-number">@Model.Mappings.Select(m => m.FacultyName).Distinct().Count()</div>
                         <div class="stat-label">Faculties</div>
                     </div>
                 </div>
@@ -135,360 +101,13 @@
         </div>
 
         <!-- Mappings List - Report Style Cards -->
-        @foreach (var item in Model)
+        @foreach (var item in Model.Mappings)
         {
-            <div class="report-card college-report-card mb-4" data-mapping-id="@item.Mapping.Id">
-                <!-- Report Card Header -->
-                <div class="report-card-header">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="faculty-badge">
-                                <i class="bi bi-building"></i>
-                                <strong>@item.FacultyName</strong>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <span class="badge bg-primary fs-6 px-3 py-2 d-flex align-items-center gap-1">
-                                <i class="bi bi-hash me-1"></i> @item.CollegeCount Colleges
-                            </span>
-                            <span class="badge bg-info fs-6 px-3 py-2 d-flex align-items-center gap-1">
-                                <i class="bi bi-alpha me-1"></i> Range: @item.FromLetter - @item.ToLetter
-                            </span>
-                            <span class="badge bg-secondary fs-6 px-3 py-2 d-flex align-items-center gap-1">
-                                <i class="bi bi-code me-1"></i> Codes: @item.CollegeFromCode - @item.CollegeToCode
-                            </span>
-                        </div>
-                    </div>
-                    <div class="report-card-meta mt-3 d-flex flex-wrap gap-2">
-                        <span class="badge report-meta-badge px-3 py-2 d-flex align-items-center gap-1">
-                            <i class="bi bi-calendar me-1"></i> Created: @item.Mapping.CreatedDate?.ToString("dd MMM yyyy")
-                        </span>
-                        <span class="badge @(item.Mapping.IsActive ? "bg-success" : "bg-danger") px-3 py-2 d-flex align-items-center gap-1">
-                            <i class="bi bi-toggle@(item.Mapping.IsActive ? "2-on" : "2-off") me-1"></i> @(item.Mapping.IsActive ? "Active" : "Inactive")
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Colleges Table Section -->
-                <div class="report-card-body p-0">
-                    @if (item.Colleges.Count > 0)
-                    {
-                        <div class="colleges-container">
-                            <div class="p-3 border-bottom college-search-bar">
-                                <div class="row align-items-center">
-                                    <div class="col-md-6">
-                                        <input type="text"
-                                               class="form-control form-control-sm college-search"
-                                               placeholder="Search colleges... (type to filter)"
-                                               aria-label="Search colleges">
-                                    </div>
-                                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                        <small class="college-count-text">
-                                            Showing <strong>@item.Colleges.Count</strong> colleges
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-hover college-table mb-0">
-                                    <thead class="sticky-top">
-                                        <tr>
-                                            <th style="width: 5%;">#</th>
-                                            <th style="width: 15%;">College Code</th>
-                                            <th>College Name</th>
-                                            <th style="width: 20%;">Town</th>
-                                            <th style="width: 12%;">Verification Status</th>
-                                            <th style="width: 10%;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (int i = 0; i < item.Colleges.Count; i++)
-                                        {
-                                            var college = item.Colleges[i];
-                                            <tr data-college-code="@college.CollegeCode"
-                                                data-faculty-id="@item.Mapping.FacultyCode">
-                                                <td class="text-center report-muted">@(i + 1)</td>
-                                                <td>
-                                                    <span class="college-code">@college.CollegeCode</span>
-                                                </td>
-                                                <td>
-                                                    <a asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@college.CollegeCode"
-                                                       class="college-name-link" title="Verify this college">
-                                                        <i class="bi bi-arrow-right-circle me-1"></i> @college.CollegeName
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <span class="college-town">@(college.CollegeTown ?? "-")</span>
-                                                </td>
-                                                <td>
-                                                    <span class="status-badge pending verification-status"
-                                                          data-college-code="@college.CollegeCode"
-                                                          data-faculty-id="@item.Mapping.FacultyCode">
-
-                                                        <i class="bi bi-hourglass-split me-1"></i>
-                                                        <span class="status-text">Loading...</span>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group btn-group-sm" role="group">
-                                                        <a asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@college.CollegeCode"
-                                                           class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Verify">
-                                                            <i class="bi bi-clipboard-check"></i>
-                                                        </a>
-                                                        <a asp-controller="VerificationDashboard" asp-action="TrustDetails" asp-route-collegeCode="@college.CollegeCode"
-                                                           class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Trust Details">
-                                                            <i class="bi bi-building"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-center py-4 report-muted">
-                            <i class="bi bi-building-x fs-1 mb-2 d-block opacity-50"></i>
-                            <p class="mb-0">No colleges found in the assigned range for this faculty.</p>
-                        </div>
-                    }
-                </div>
-
-                <!-- Verification Feedback & Status Section (Report Format - Bottom of Each Card) -->
-                    
-            </div>
+            <partial name="_CollegeMappingCard" model="item"/>
         }
     }
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-
-        // =====================================================
-        // LOAD VERIFICATION STATUSES
-        // =====================================================
-
-        loadVerificationStatuses();
-
-        async function loadVerificationStatuses() {
-
-            // Group college codes by Faculty ID
-            const facultyGroups = {};
-
-            document.querySelectorAll(".verification-status").forEach(element => {
-
-                const facultyId = element.dataset.facultyId;
-                const collegeCode = element.dataset.collegeCode;
-
-                if (!facultyId || !collegeCode) {
-                    return;
-                }
-
-                if (!facultyGroups[facultyId]) {
-                    facultyGroups[facultyId] = [];
-                }
-
-                // Prevent duplicate college codes
-                if (!facultyGroups[facultyId].includes(collegeCode)) {
-                    facultyGroups[facultyId].push(collegeCode);
-                }
-            });
-
-            // Call API separately for each faculty
-            for (const facultyId in facultyGroups) {
-
-                const collegeCodes = facultyGroups[facultyId];
-
-                if (!collegeCodes || collegeCodes.length === 0) {
-                    continue;
-                }
-
-                try {
-
-                    // Build query string
-                    const params = new URLSearchParams();
-
-                    params.append("facultyId", facultyId);
-
-                    collegeCodes.forEach(code => {
-                        params.append("collegeCodes", code);
-                    });
-
-                    const response = await fetch(
-                        '@Url.Action("GetVerificationStatuses", "MyColleges")'
-                        + "?" + params.toString()
-                    );
-
-                    if (!response.ok) {
-                        throw new Error("Failed to load verification statuses.");
-                    }
-
-                    const statuses = await response.json();
-
-                    updateVerificationStatuses(statuses);
-
-                }
-                catch (error) {
-
-                    console.error(
-                        "Error loading verification statuses:",
-                        error
-                    );
-
-                    // Show error state
-                    collegeCodes.forEach(collegeCode => {
-
-                        const elements = document.querySelectorAll(
-                            `.verification-status[data-college-code="${collegeCode}"][data-faculty-id="${facultyId}"]`
-                        );
-
-                        elements.forEach(element => {
-
-                            element.className =
-                                "status-badge pending verification-status";
-
-                            element.innerHTML = `
-                                    <i class="bi bi-exclamation-circle me-1"></i>
-                                    <span class="status-text">Unable to Load</span>
-                                `;
-                        });
-                    });
-                }
-            }
-        }
-
-
-        // =====================================================
-        // UPDATE STATUS UI
-        // =====================================================
-
-        function updateVerificationStatuses(statuses) {
-
-            if (!statuses) {
-                return;
-            }
-
-            Object.keys(statuses).forEach(collegeCode => {
-
-                const statusData = statuses[collegeCode];
-
-                const elements = document.querySelectorAll(
-                    `.verification-status[data-college-code="${collegeCode}"]`
-                );
-
-                elements.forEach(element => {
-
-                    let statusClass = "";
-                    let icon = "";
-                    let statusText = statusData.status || "Pending";
-
-                    switch (statusText.toLowerCase()) {
-
-                        case "completed":
-                        case "verified":
-                            statusClass = "completed";
-                            icon = "bi-check-circle-fill";
-                            break;
-
-                        case "rejected":
-                            statusClass = "rejected";
-                            icon = "bi-x-circle-fill";
-                            break;
-
-                        case "pending":
-                        default:
-                            statusClass = "pending";
-                            icon = "bi-hourglass-split";
-                            statusText = "Pending";
-                            break;
-                    }
-
-                    element.className =
-                        "status-badge " +
-                        statusClass +
-                        " verification-status";
-
-                    element.innerHTML = `
-                            <i class="bi ${icon} me-1"></i>
-                            <span class="status-text">${statusText}</span>
-                        `;
-
-                    // Optional tooltip with section counts
-                    element.title =
-                        `Completed: ${statusData.completedSections ?? 0} / ${statusData.totalSections ?? 0}
-    Pending: ${statusData.pendingSections ?? 0}
-    Rejected: ${statusData.rejectedSections ?? 0}`;
-                });
-            });
-        }
-
-
-        // =====================================================
-        // SEARCH FUNCTIONALITY
-        // =====================================================
-
-        const searchInputs =
-            document.querySelectorAll('.college-search');
-
-        searchInputs.forEach(input => {
-
-            input.addEventListener('keyup', function() {
-
-                const filter =
-                    this.value.toUpperCase();
-
-                const table =
-                    this.closest('.colleges-container')
-                        .querySelector('table');
-
-                const rows =
-                    table.querySelectorAll('tbody tr');
-
-                rows.forEach(row => {
-
-                    const cells =
-                        row.querySelectorAll('td');
-
-                    let match = false;
-
-                    cells.forEach(cell => {
-
-                        if (
-                            cell.textContent
-                                .toUpperCase()
-                                .includes(filter)
-                        ) {
-                            match = true;
-                        }
-                    });
-
-                    row.style.display =
-                        match ? '' : 'none';
-                });
-            });
-        });
-
-
-        // =====================================================
-        // TOOLTIP INITIALIZATION
-        // =====================================================
-
-        const tooltipTriggerList =
-            [].slice.call(
-                document.querySelectorAll(
-                    '[data-bs-toggle="tooltip"]'
-                )
-            );
-
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
-
-            return new bootstrap.Tooltip(
-                tooltipTriggerEl
-            );
-        });
-    });
-</script>
+@section Scripts {
+    <script src="~/js/my-colleges.js" asp-append-version="true"></script>
+}

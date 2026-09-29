@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
-using VerificationPortal.Models.ViewModels;
 
 namespace VerificationPortal.Controllers
 {
@@ -24,13 +23,17 @@ namespace VerificationPortal.Controllers
         public async Task<IActionResult> Index()
         {
             // Get current user info from claims
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
+            //var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (string.IsNullOrEmpty(userIdClaim))
+            //{
+            //    return RedirectToAction("Login", "Account");
+            //}
+
+            if (!int.TryParse( User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userDbId))
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            int userDbId = int.Parse(userIdClaim);
             var user = await _context.TblRguhsFacultyUsers
                 .FirstOrDefaultAsync(u => u.UserId == userDbId);
 
@@ -65,7 +68,9 @@ namespace VerificationPortal.Controllers
                 TotalAssignedColleges = totalColleges,
                 Role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User",
                 IsAdmin = user.IsAdmin ?? false,
-                IsSection = user.IsSection ?? false
+                IsSection = user.IsSection ?? false,
+                CurrentDate = DateTime.Now,
+                Resources = GetResources()
             };
 
             //var affiliationTypeId = HttpContext.Session.GetInt32("AffiliationTypeId");
@@ -94,6 +99,55 @@ namespace VerificationPortal.Controllers
 
             ViewBag.Faculty = faculty;
             return View(user);
+        }
+
+        private static List<DashboardResourceViewModel> GetResources()
+        {
+            return new List<DashboardResourceViewModel>
+            {
+                new()
+                {
+                    Title = "User Manual",
+                    Description = "Complete guide for using the portal",
+                    Icon = "bi bi-file-earmark-text",
+                    Url = "#"
+                },
+                new()
+                {
+                    Title = "Guidelines 2024-25",
+                    Description = "Latest affiliation guidelines",
+                    Icon = "bi bi-file-earmark-pdf",
+                    Url = "#"
+                },
+                new()
+                {
+                    Title = "Data Templates",
+                    Description = "Download submission formats",
+                    Icon = "bi bi-file-earmark-spreadsheet",
+                    Url = "#"
+                },
+                new()
+                {
+                    Title = "FAQs",
+                    Description = "Frequently asked questions",
+                    Icon = "bi bi-question-circle",
+                    Url = "#"
+                },
+                new()
+                {
+                    Title = "Contact Support",
+                    Description = "Get help from our team",
+                    Icon = "bi bi-headset",
+                    Url = "#"
+                },
+                new()
+                {
+                    Title = "Announcements",
+                    Description = "Latest updates & circulars",
+                    Icon = "bi bi-megaphone",
+                    Url = "#"
+                }
+            };
         }
     }
 }
