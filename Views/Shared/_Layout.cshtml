@@ -4,6 +4,9 @@
     - Includes theme toggle and responsive navigation
 *@
 
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,19 +45,131 @@
     <!-- Application Styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout-header.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+
+    <header class="modern-header" role="banner">
+
+        <div class="modern-header-inner">
+
+            <!-- Brand -->
+            <div class="brand-block">
+
+                <img src="~/images/newLogo.jpeg"
+                     id="signupLogo"
+                     alt="University Logo" />
+
+                <div>
+                    <div class="brand-title">
+                        @Localizer["UniversityTitle"]
+                    </div>
+
+                    <div class="brand-subtitle">
+                        @Localizer["UniversityAddress"]
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Center -->
+            <div class="header-center">
+
+                <div class="page-title">
+                    @(Context.Session.GetString("CollegeName") ?? "")
+                </div>
+
+                <span class="page-tab-name">
+                    @ViewData["Title"]
+                </span>
+
+                @if(!String.IsNullOrEmpty(Context.Session.GetString("TypeOfAffiliation"))){
+                    <div class="page-subtitle">
+                        Affiliation Type:
+                        @(Context.Session.GetString("TypeOfAffiliation") ?? "Not available")
+                    </div>
+                }
+
+            </div>
+
+            <!-- Actions -->
+            <div class="header-actions">
+
+                <!-- Language -->
+                <div class="language-switcher">
+
+                    <select id="languageSelect"
+                            onchange="changeLanguage()"
+                            aria-label="@Localizer["SelectLanguage"]">
+
+                        <option value="en"
+                                selected="@(Thread.CurrentThread.CurrentUICulture.Name == "en")">
+                            English
+                        </option>
+
+                        <option value="kn"
+                                selected="@(Thread.CurrentThread.CurrentUICulture.Name == "kn")">
+                            ಕನ್ನಡ (Kannada)
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Logout -->
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          class="mb-0">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn logout-btn">
+
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Logout
+
+                        </button>
+
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="btn logout-btn">
+
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Login
+
+                    </a>
+                }
+
+              @*   <span class="chip">
+                    University Portal
+                </span> *@
+
+            </div>
+
+        </div>
+
+    </header>
+
+
     @* ==================== NAVBAR ==================== *@
-    @if (User.Identity?.IsAuthenticated == true)
+    @* @if (User.Identity?.IsAuthenticated == true)
     {
         <partial name="_AuthenticatedNavbar" />
     }
     else
     {
        <partial name="_PublicNavbar" />
-    }
+    } *@
 
     @* ==================== MAIN CONTENT ==================== *@
     <main role="main">
@@ -66,17 +181,14 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/language.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 
     @if (User.Identity?.IsAuthenticated == true)
     {
         @await Component.InvokeAsync("AffiliationSelector")
-    }
 
-
-    @if (User.Identity?.IsAuthenticated == true)
-    {
         <script src="~/js/affiliation-selector.js" asp-append-version="true"></script>
     }
 </body>
