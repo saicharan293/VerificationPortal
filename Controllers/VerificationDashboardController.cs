@@ -201,9 +201,21 @@ namespace VerificationPortal.Controllers
                     })
                 .ToListAsync();
 
-            var deanAppointmentOrderDocumentId = await _context.MstDocuments.Where(e => e.SectionId == 8).Select(e => e.DocumentId).FirstOrDefaultAsync();
-            var memberofGovBodyDocumentId = await _context.MstDocuments.Where(e => e.SectionId == 64).Select(e => e.DocumentId).FirstOrDefaultAsync();
-            var govAutonomousCertificateId = await _context.MstDocuments.Where(e => e.SectionId == 1).Select(e => e.DocumentId).FirstOrDefaultAsync();
+            var documentIds = await _context.MstDocuments
+                .AsNoTracking()
+                .Where(d =>
+                    d.DocumentName == "Members of Governing Body or Council" ||
+                    d.DocumentName == "Appointment Order of Dean" ||
+                    d.DocumentName == "Government Autonomous Certificate")
+                .ToDictionaryAsync(
+                    d => d.DocumentName,
+                    d => d.DocumentId);
+
+            documentIds.TryGetValue( "Members of Governing Body or Council", out var memberofGovBodyDocumentId);
+
+            documentIds.TryGetValue( "Appointment Order of Dean", out var deanAppointmentOrderDocumentId);
+
+            documentIds.TryGetValue( "Government Autonomous Certificate", out var govAutonomousCertificateId);
 
             // ---------------------------------------------------------
             // VERIFICATION
@@ -2205,32 +2217,184 @@ namespace VerificationPortal.Controllers
                 return NotFound("College code is required");
             }
 
-            var ugCourses = await _context.AffiliationCourseDetails
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyId = context.FacultyCodeInt;
+
+            var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+            var institution = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+            var courses = await _context.AffiliationCourseDetails
+                .AsNoTracking()
                 .Where(x => x.Collegecode == collegeCode)
                 .OrderBy(x => x.CourseName)
                 .ToListAsync();
 
-            if (!ugCourses.Any())
+            if (!courses.Any())
             {
                 return NotFound($"UG Course details not found for college code: {collegeCode}");
             }
 
-            var college = await _context.AffiliationCollegeMasters
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+            var documentNames = new[]
+            {
+                "Previous Year Notification",
+                "GOK Order",
+                "RGUHS Notification"
+            };
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.FacultyId = college?.FacultyCode;
-            ViewBag.CollegeName = college?.CollegeName+", "+college?.CollegeTown ?? "Unknown College";
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.NextTabAction = Url.Action("PgCourseDetails", new { collegeCode });
-            ViewBag.NextTabLabel = "Next: PG Course Details";
-            ViewBag.PrevTabAction = Url.Action("PrincipalDetails", new { collegeCode });
-            ViewBag.PrevTabLabel = "Previous: Principal Details";
-            ViewBag.UserDesignation = GetUserDesignation();
+            var documents = await _context.MstDocuments
+                .AsNoTracking()
+                .Where(x =>
+                    x.FacultyId == facultyId &&
+                    x.IsActive &&
+                    documentNames.Contains(x.DocumentName))
+                .ToListAsync();
+
+            var documentMap = documents
+                .GroupBy(x => x.DocumentName)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.First().DocumentId);
 
             await SetVerificationViewData<AffiliationCourseDetail>(collegeCode);
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 6);
-            return View(ugCourses);
+
+            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
+
+
+            // ---------------------------------------------------------
+            // PAGE CONTEXT
+            // ---------------------------------------------------------
+
+            var pageContext = new VerificationPageContextVm
+            {
+                FacultyId = facultyId,
+                CollegeCode = collegeCode,
+
+                CollegeName =
+                    college?.CollegeName ?? "Unknown College",
+
+                InstitutionName =
+                    institution?.NameOfInstitution
+                    ?? college?.CollegeName
+                    ?? "Unknown Institution",
+
+                CurrentVerifier =
+                    User.Identity?.Name
+                    + " - "
+                    + GetUserDesignation(),
+
+                VerificationStatus = "Pending",
+                StatusBadgeClass = "pending",
+
+                PrevTabAction = Url.Action(
+                    "InstitutionDetails",
+                    "VerificationDashboard",
+                    new { collegeCode }),
+
+                PrevTabLabel = "Previous: Institution Details",
+
+                NextTabAction = Url.Action(
+                    "PgCourseDetails",
+                    "VerificationDashboard",
+                    new { collegeCode }),
+
+                NextTabLabel = "Next: PG Course Details"
+            };
+
+
+
+            // ---------------------------------------------------------
+            // MAIN VIEW MODEL
+            // ---------------------------------------------------------
+
+            var vm = new UgCourseVerificationVm
+            {
+                PageContext = pageContext,
+                SectionFeedback = sectionFeedback
+            };
+
+            // ---------------------------------------------------------
+            // COURSE VIEW MODELS
+            // ---------------------------------------------------------
+
+            foreach (var course in courses)
+            {
+                var courseVm = new UgCourseDetailVerificationVm
+                {
+                    FacultyId = facultyId,
+                    CollegeCode = collegeCode,
+                    PreviousYearNotificationDocId =
+                        documentMap.TryGetValue("Previous Year Notification", out var previousNotificationId)
+                            ? previousNotificationId
+                            : null,
+
+                    GOKOrderDocId =
+                        documentMap.TryGetValue("GOK Order", out var gokOrderId)
+                            ? gokOrderId
+                            : null,
+
+                    RGUHSNotificationDocId =
+                        documentMap.TryGetValue("RGUHS Notification", out var rguhsNotificationId)
+                            ? rguhsNotificationId
+                            : null,
+                    Course = course,
+                    PresentIntakeFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 18),
+                    PreviousDetailsFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 19),
+                    PermissionFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 20),
+                    EcFcFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 21),
+                    LastAffiliationFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 22),
+                    PreviousLicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 23)
+                };
+
+                if (!string.IsNullOrWhiteSpace(course.PreviousNotificationFilesPath))
+                {
+                    documentMap.TryGetValue("Previous Year Notification", out var documentId);
+                    courseVm.Documents.Add(
+                        new VerificationDocumentVm
+                        {
+                            Label = "Previous Year Notification",
+                            Path = course.PreviousNotificationFilesPath,
+                            DocumentType = "PreviousNotification",
+                            Action = "PreviousNotification",
+                            DocumentId = documentId == 0 ? null : documentId
+                        });
+                }
+
+                if (!string.IsNullOrWhiteSpace(course.GokorderPath))
+                {
+                    documentMap.TryGetValue("GOK Order", out var documentId);
+                    courseVm.Documents.Add(
+                        new VerificationDocumentVm
+                        {
+                            Label = "GOK Order",
+                            Path = course.GokorderPath,
+                            DocumentType = "GokOrder",
+                            Action = "ViewGOKOrder",
+                            DocumentId = documentId == 0 ? null : documentId
+                        });
+                }
+
+                if (!string.IsNullOrWhiteSpace(course.LastAffiliationRguhsfilePath))
+                {
+                    documentMap.TryGetValue("RGUHS Notification", out var documentId);
+                    courseVm.Documents.Add(
+                        new VerificationDocumentVm
+                        {
+                            Label = "RGUHS Notification",
+                            Path = course.LastAffiliationRguhsfilePath,
+                            DocumentType = "LastAffiliation",
+                            Action = "ViewLastAffiliation",
+                            DocumentId = documentId == 0 ? null : documentId
+                        });
+                }
+                vm.Courses.Add(courseVm);
+            }
+            return View(vm);
         }
 
         [HttpGet]
@@ -2462,31 +2626,186 @@ namespace VerificationPortal.Controllers
             // VERIFICATION
             // ---------------------------------------------------------
 
-            await SetVerificationViewData<DentalCollegeLandBuildingDetail>(
-                collegeCode);
+            await SetVerificationViewData<DentalCollegeLandBuildingDetail>(collegeCode);
+
+            // ---------------------------------------------------------
+            // SECTION FEEDBACK
+            // ---------------------------------------------------------
+
+            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
+
+            var landFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 25);
+
+            var buildingFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 26);
+
+            var documentMasterMap = await _context.MstDocuments
+                .AsNoTracking()
+                .Where(x => x.FacultyId == 2 && x.IsActive)
+                .ToDictionaryAsync( x => x.DocumentName, x => x.DocumentId);
+
+            // ---------------------------------------------------------
+            // DOCUMENTS
+            // ---------------------------------------------------------
+
+            var landDocuments = new List<VerificationDocumentVm>
+            {
+                new()
+                {
+                    Label = "Sale Deed",
+                    Path = landBuilding.SaleDeedDocumentPath,
+                    DocumentType = "SaleDeed",
+                    Action = "ViewSaleDeedDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Sale Deed")
+                },
+
+                new()
+                {
+                    Label = "Encumbrance Certificate",
+                    Path = landBuilding.EncumbranceCertificateDocumentPath,
+                    DocumentType = "EncumbranceCertificate",
+                    Action = "ViewEncumbranceCertificate",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Encumbrance Certificate")
+                },
+
+                new()
+                {
+                    Label = "Land Use Certificate",
+                    Path = landBuilding.LandUseCertificateDocumentPath,
+                    DocumentType = "LandUseCertificate",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Land Use Certificate")
+                },
+
+                new()
+                {
+                    Label = "Approved Layout Plan",
+                    Path = landBuilding.ApprovedLayoutPlanDocumentPath,
+                    DocumentType = "ApprovedLayoutPlan",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Approved Layout Plan")
+                },
+
+                new()
+                {
+                    Label = "Land Sketch",
+                    Path = landBuilding.LandSketchDocumentPath,
+                    DocumentType = "LandSketch",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Land Sketch")
+                },
+
+                new()
+                {
+                    Label = "Distance Certificate",
+                    Path = landBuilding.DistanceCertificateDocumentPath,
+                    DocumentType = "DistanceCertificate",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Distance Certificate")
+                }
+            };
+
+            var buildingDocuments = new List<VerificationDocumentVm>
+            {
+                new()
+                {
+                    Label = "Completion Certificate",
+                    Path = landBuilding.CompletionCertificateDocumentPath,
+                    DocumentType = "CompletionCertificate",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Completion Certificate")
+                },
+
+                new()
+                {
+                    Label = "Structural Stability Certificate",
+                    Path = landBuilding.StructuralStabilityCertificateDocumentPath,
+                    DocumentType = "StructuralStabilityCertificate",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Structural Stability Certificate")
+                },
+
+                new()
+                {
+                    Label = "Fire Safety NOC",
+                    Path = landBuilding.FireSafetyNocDocumentPath,
+                    DocumentType = "FireSafetyNoc",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Fire Safety NOC")
+                },
+
+                new()
+                {
+                    Label = "Lift License",
+                    Path = landBuilding.LiftLicenseDocumentPath,
+                    DocumentType = "LiftLicense",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Lift License")
+                },
+
+                new()
+                {
+                    Label = "Electrical Safety Certificate",
+                    Path = landBuilding.ElectricalSafetyCertificateDocumentPath,
+                    DocumentType = "ElectricalSafetyCertificate",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Electrical Safety Certificate")
+                },
+
+                new()
+                {
+                    Label = "Water Supply Certificate",
+                    Path = landBuilding.WaterSupplyCertificateDocumentPath,
+                    DocumentType = "WaterSupplyCertificate",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Water Supply Certificate")
+                },
+
+                new()
+                {
+                    Label = "Sewage / Sanitation Approval",
+                    Path = landBuilding.SewageSanitationApprovalDocumentPath,
+                    DocumentType = "SewageSanitationApproval",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Sewage / Sanitation Approval")
+                }
+            };
 
 
             // ---------------------------------------------------------
             // NAVIGATION
             // ---------------------------------------------------------
 
-            ViewBag.PrevTabAction = Url.Action(
-                "PgCourseDetails",
-                "VerificationDashboard",
-                new { collegeCode });
+            ViewBag.PrevTabAction = Url.Action("PgCourseDetails", "VerificationDashboard", new { collegeCode });
 
-            ViewBag.PrevTabLabel =
-                "Previous: PG Course Details";
+            ViewBag.PrevTabLabel = "Previous: PG Course Details";
 
-            ViewBag.NextTabAction = Url.Action(
-                "ClassroomAndLaboratory",
-                "VerificationDashboard",
-                new { collegeCode });
+            ViewBag.NextTabAction = Url.Action( "ClassroomAndLaboratory", "VerificationDashboard", new { collegeCode });
 
-            ViewBag.NextTabLabel =
-                "Next: Classroom & Laboratory";
+            ViewBag.NextTabLabel = "Next: Classroom & Laboratory";
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
+
+            // ---------------------------------------------------------
+            // VIEW MODEL
+            // ---------------------------------------------------------
+
+            var vm = new DentalLandBuildingVerificationVm
+            {
+                LandBuilding = landBuilding,
+
+                LandDocuments = landDocuments,
+
+                BuildingDocuments = buildingDocuments,
+
+                LandFeedback = landFeedback,
+
+                BuildingFeedback = buildingFeedback,
+
+                FacultyId = context.FacultyCodeInt,
+
+                CollegeCode = collegeCode
+            };
+
 
             return View(landBuilding);
         }
@@ -2581,6 +2900,58 @@ namespace VerificationPortal.Controllers
             // this check is enough.
             if (!System.IO.File.Exists(filePath))
                 return NotFound("Approved Building Plan file not found.");
+
+            return PhysicalFile(
+                filePath,
+                GetContentType(filePath),
+                enableRangeProcessing: true);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewSaleDeedDocument(int id)
+        {
+            var record = await _context.DentalCollegeLandBuildingDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (record == null)
+                return NotFound();
+
+            var filePath = record.SaleDeedDocumentPath;
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("Sale Deed document not available.");
+
+            // If the database stores the complete physical path,
+            // this check is enough.
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Sale Deed document file not found.");
+
+            return PhysicalFile(
+                filePath,
+                GetContentType(filePath),
+                enableRangeProcessing: true);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEncumbranceCertificate(int id)
+        {
+            var record = await _context.DentalCollegeLandBuildingDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (record == null)
+                return NotFound();
+
+            var filePath = record.EncumbranceCertificateDocumentPath;
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return NotFound("Encumbrance document not available.");
+
+            // If the database stores the complete physical path,
+            // this check is enough.
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Encumbrance document document file not found.");
 
             return PhysicalFile(
                 filePath,

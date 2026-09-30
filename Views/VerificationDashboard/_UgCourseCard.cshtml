@@ -1,0 +1,465 @@
+﻿@model VerificationPortal.Models.UgCourseDetailVerificationVm
+
+<!-- ===================================================== -->
+<!-- COURSE HEADER -->
+<!-- ===================================================== -->
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-book-half"></i>
+            @Model.Course.CourseName
+        </h3>
+
+        <span class="badge bg-primary">
+            Course ID: @Model.Course.CourseId
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+
+        <!-- ================================================= -->
+        <!-- 1. PRESENT INTAKE -->
+        <!-- ================================================= -->
+
+        <div class="form-section mb-4">
+
+            <h5 class="form-section-title">
+                <i class="bi bi-bar-chart-line me-2"></i>
+                Present Intake
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Course Name
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.CourseName ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Present Intake 2025-26
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.IntakeDuring202526?.ToString() ?? "-")"
+                            disabled />
+
+                </div>
+
+            </div>
+
+        </div>
+
+        @if (Model.PresentIntakeFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", Model.PresentIntakeFeedback)
+        }
+
+        <!-- ================================================= -->
+        <!-- 2. PREVIOUS DETAILS -->
+        <!-- ================================================= -->
+
+        <div class="form-section mb-4">
+
+            <h5 class="form-section-title">
+                <i class="bi bi-clock-history me-2"></i>
+                Previous Details
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Course Name
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.CourseName ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Intake
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.IntakeSlab?.ToString() ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Year of Obtaining LOP
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.YearofLop?.ToString("dd-MM-yyyy") ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        Previous Year Notification Copy
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Course.PreviousNotificationFilesPath))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "PreviousNotification",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode = Model.CollegeCode
+                                    })!,
+
+                                Title = "Previous Year Notification",
+
+                                DocumentId = Model.PreviousYearNotificationDocId,
+                                FacultyId = Model.FacultyId,
+                                CollegeCode = Model.CollegeCode
+                            })
+                    }
+                    else
+                    {
+                        <div class="">
+                            <i class="bi bi-dash-circle me-1"></i>
+                            No document available
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+                
+        @if (Model.PreviousDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", Model.PreviousDetailsFeedback)
+        }
+
+        <!-- ================================================= -->
+        <!-- 3. PARTICULARS OF PERMISSION -->
+        <!-- ================================================= -->
+
+        <div class="form-section mb-4">
+
+            <h5 class="form-section-title">
+                <i class="bi bi-file-earmark-check me-2"></i>
+                Particulars of Permission
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Type of Permission
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.Typeofpermission ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Date of LOP &amp; Renewal from DCI/KSDC for UG
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.DateOfLoprenewalGoimci ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Sanctioned Intake
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.SanctionedIntakePermission?.ToString() ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Date of Recognition / Renewal by Apex Bodies
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.Dateofrecognition ?? "-")"
+                            disabled />
+
+                </div>
+
+            </div>
+
+        </div>
+
+        @if (Model.PermissionFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", Model.PermissionFeedback)
+        }
+
+        <!-- ================================================= -->
+        <!-- 4. EC / FC -->
+        <!-- ================================================= -->
+
+        <div class="form-section mb-4">
+
+            <h5 class="form-section-title">
+                <i class="bi bi-building-check me-2"></i>
+                Year of Obtaining EC &amp; FC from Government of Karnataka
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Year of Obtaining EC &amp; FC
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.YearofObtainingEcandFc?.ToString("yyyy") ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Sanctioned Intake
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.SannctionedIntakeEcFc?.ToString() ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        GOK Order (Supporting Document)
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Course.GokorderPath))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewGOKOrder",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode = Model.CollegeCode,
+                                        courseId = Model.Course.CourseId
+                                    })!,
+                                Title = "GOK Order",
+                                DocumentId = Model.GOKOrderDocId,
+                                FacultyId = Model.FacultyId,
+                                CollegeCode = Model.CollegeCode
+                            })
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            <i class="bi bi-dash-circle me-1"></i>
+                            No document available
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        @if (Model.EcFcFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", Model.EcFcFeedback)
+        }
+
+        <!-- ================================================= -->
+        <!-- 5. LAST AFFILIATION -->
+        <!-- ================================================= -->
+
+        <div class="form-section mb-4">
+
+            <h5 class="form-section-title">
+                <i class="bi bi-award me-2"></i>
+                Year of Last Affiliation Granted by RGUHS
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Year of Last Affiliation
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.YearOfLastAffiliationRguhs ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Sanctioned Intake
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.SanctionedIntakeLastAffiliation?.ToString() ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <label class="form-label">
+                        Supporting Document (RGUHS Notification)
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Course.LastAffiliationRguhsfilePath))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewLastAffiliation",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode = Model.CollegeCode,
+                                        courseId = Model.Course.CourseId
+                                    })!,
+                                Title = "RGUHS Notification",
+                                DocumentId = Model.RGUHSNotificationDocId,
+                                FacultyId = Model.FacultyId,
+                                CollegeCode = Model.CollegeCode
+                            })
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            <i class="bi bi-dash-circle me-1"></i>
+                            No document available
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.LastAffiliationFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", Model.LastAffiliationFeedback)
+        }
+
+        <!-- ================================================= -->
+        <!-- 6. PREVIOUS LIC INSPECTION -->
+        <!-- ================================================= -->
+
+        <div class="form-section">
+
+            <h5 class="form-section-title">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Previous Inspection by LIC
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Date of Previous Inspection by LIC
+                    </label>
+
+                    <input type="text"
+                            class="form-control"
+                            value="@(Model.Course.DateOfPreviousLicinspection?.ToString("dd-MM-yyyy") ?? "-")"
+                            disabled />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Action Taken to Rectify the Deficiencies – If Any
+                    </label>
+
+                    <textarea class="form-control"
+                                rows="3"
+                                style="resize: none"
+                                disabled>@(Model.Course.ActionTakenOnDeficiencies ?? "-")</textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+                    
+        @if (Model.PreviousLicFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", Model.PreviousLicFeedback)
+        }
+
+    </div>
+
+</div>

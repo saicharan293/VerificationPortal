@@ -26,7 +26,7 @@ namespace VerificationPortal.ViewModels
 
         // Indicates whether the document is mandatory
         // Default value is true
-        public bool IsMandatory { get; set; } = true;
+        public bool IsMandatory { get; set; } = false;
 
         // Controls the display order of the document
         public int? DisplayOrder { get; set; }

@@ -26,6 +26,109 @@
         new { collegeCode = ViewBag.CollegeCode });
 
     ViewData["NextTabLabel"] = "Next: Classroom & Laboratory";
+
+    var sectionFeedback =
+        ViewBag.SectionFeedback
+        as List<VerificationPortal.Models.SectionFeedbackViewModel>
+        ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+
+    var landFeedback =
+        sectionFeedback.FirstOrDefault(x => x.SectionId == 25);
+
+    var buildingFeedback =
+        sectionFeedback.FirstOrDefault(x => x.SectionId == 26);
+
+    var landDocuments = new[]
+    {
+        new
+        {
+            Label = "Sale Deed",
+            Path = Model.SaleDeedDocumentPath,
+            DocumentType = "SaleDeed",
+            Action = "ViewSaleDeedDocument",
+        },
+        new
+        {
+            Label = "Encumbrance Certificate",
+            Path = Model.EncumbranceCertificateDocumentPath,
+            DocumentType = "EncumbranceCertificate",
+            Action = "ViewEncumbranceCertificate",
+        },
+        new
+        {
+            Label = "Land Use Certificate",
+            Path = Model.LandUseCertificateDocumentPath,
+            DocumentType = "LandUseCertificate",
+            Action = "ViewLandBuildingDocument",
+        },
+        new
+        {
+            Label = "Approved Layout Plan",
+            Path = Model.ApprovedLayoutPlanDocumentPath,
+            DocumentType = "ApprovedLayoutPlan",
+            Action = "ViewLandBuildingDocument",
+        },
+        new
+        {
+            Label = "Land Sketch",
+            Path = Model.LandSketchDocumentPath,
+            DocumentType = "LandSketch",
+            Action = "ViewLandBuildingDocument",
+        },
+        new
+        {
+            Label = "Distance Certificate",
+            Path = Model.DistanceCertificateDocumentPath,
+            DocumentType = "DistanceCertificate",
+            Action = "ViewLandBuildingDocument",
+        }
+    };
+
+    var buildingDocuments = new[]
+    {
+        new
+        {
+            Label = "Completion Certificate",
+            Path = Model.CompletionCertificateDocumentPath,
+            DocumentType = "CompletionCertificate"
+        },
+        new
+        {
+            Label = "Structural Stability Certificate",
+            Path = Model.StructuralStabilityCertificateDocumentPath,
+            DocumentType = "StructuralStabilityCertificate"
+        },
+        new
+        {
+            Label = "Fire Safety NOC",
+            Path = Model.FireSafetyNocDocumentPath,
+            DocumentType = "FireSafetyNoc"
+        },
+        new
+        {
+            Label = "Lift License",
+            Path = Model.LiftLicenseDocumentPath,
+            DocumentType = "LiftLicense"
+        },
+        new
+        {
+            Label = "Electrical Safety Certificate",
+            Path = Model.ElectricalSafetyCertificateDocumentPath,
+            DocumentType = "ElectricalSafetyCertificate"
+        },
+        new
+        {
+            Label = "Water Supply Certificate",
+            Path = Model.WaterSupplyCertificateDocumentPath,
+            DocumentType = "WaterSupplyCertificate"
+        },
+        new
+        {
+            Label = "Sewage / Sanitation Approval",
+            Path = Model.SewageSanitationApprovalDocumentPath,
+            DocumentType = "SewageSanitationApproval"
+        }
+    };
 }
 
 @section Scripts {
@@ -107,15 +210,6 @@
 
         </div>
 
-        @{
-            var landFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionId == 25);
-        }
-
-        @if (landFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", landFeedback)
-        }
         <!-- Documents -->
 
         <h5 class="fw-bold mb-3 border-bottom pb-2">
@@ -124,199 +218,51 @@
         </h5>
 
         <div class="row g-3 mb-4">
+            @foreach (var document in landDocuments)
+            {
+                <div class="col-md-4">
 
-            <!-- Sale Deed -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Sale Deed
-                </label>
+                    <label class="form-label fw-bold">
+                        @document.Label
+                    </label>
 
-                @if (!string.IsNullOrWhiteSpace(Model.SaleDeedDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "SaleDeed"
-                                })!,
-                            Title = "Sale Deed"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
+                    @if (!string.IsNullOrWhiteSpace(document.Path))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    document.Action,
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        id = Model.Id,
+                                        documentType = document.DocumentType
+                                    })!,
 
+                                Title = document.Label
+                            })
+                    }
+                    else
+                    {
+                        <div class="form-control text-muted">
+                            Not Uploaded
+                        </div>
+                    }
 
-            <!-- Encumbrance Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Encumbrance Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.EncumbranceCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "EncumbranceCertificate"
-                                })!,
-                            Title = "Encumbrance Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Land Use Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Land Use Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.LandUseCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "LandUseCertificate"
-                                })!,
-                            Title = "Land Use Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Approved Layout Plan -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Approved Layout Plan
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.ApprovedLayoutPlanDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "ApprovedLayoutPlan"
-                                })!,
-                            Title = "Approved Layout Plan"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Land Sketch -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Land Sketch
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.LandSketchDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "LandSketch"
-                                })!,
-                            Title = "Land Sketch"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Distance Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Distance Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.DistanceCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "DistanceCertificate"
-                                })!,
-                            Title = "Distance Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
+                </div>
+            }
 
         </div>
+
+        
+        @if (landFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", landFeedback)
+        }
+
+
         <!-- Building -->
 
         <h5 class="fw-bold mb-3 border-bottom pb-2">
@@ -428,258 +374,44 @@
             </div>
 
 
-            <!-- Approved Building Plan -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Approved Building Plan
-                </label>
+            <div class="row g-3 mb-4">
 
-                @if (!string.IsNullOrWhiteSpace(Model.ApprovedBuildingPlanDocumentPath))
+                @foreach (var document in buildingDocuments)
                 {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
+                    <div class="col-md-4">
+
+                        <label class="form-label fw-bold">
+                            @document.Label
+                        </label>
+
+                        @if (!string.IsNullOrWhiteSpace(document.Path))
                         {
-                            Url = Url.Action(
-                                "ViewApprovedBuildingPlanDocument",
-                                "VerificationDashboard",
-                                new
+                            @await Html.PartialAsync(
+                                "_DocumentViewerButton",
+                                new DocumentViewerVm
                                 {
-                                    id = Model.Id
-                                })!,
-                            Title = "Approved Building Plan"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
+                                    Url = Url.Action(
+                                        "ViewLandBuildingDocument",
+                                        "VerificationDashboard",
+                                        new
+                                        {
+                                            id = Model.Id,
+                                            documentType = document.DocumentType
+                                        })!,
+
+                                    Title = document.Label
+                                })
+                        }
+                        else
+                        {
+                            <div class="form-control text-muted">
+                                Not Uploaded
+                            </div>
+                        }
+
                     </div>
                 }
-            </div>
 
-
-            <!-- Completion Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Completion Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.CompletionCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "CompletionCertificate"
-                                })!,
-                            Title = "Completion Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Structural Stability Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Structural Stability Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.StructuralStabilityCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "StructuralStabilityCertificate"
-                                })!,
-                            Title = "Structural Stability Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Fire Safety NOC -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Fire Safety NOC
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.FireSafetyNocDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "FireSafetyNoc"
-                                })!,
-                            Title = "Fire Safety NOC"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Lift License -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Lift License
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.LiftLicenseDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "LiftLicense"
-                                })!,
-                            Title = "Lift License"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Electrical Safety Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Electrical Safety Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.ElectricalSafetyCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "ElectricalSafetyCertificate"
-                                })!,
-                            Title = "Electrical Safety Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Water Supply Certificate -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Water Supply Certificate
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.WaterSupplyCertificateDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "WaterSupplyCertificate"
-                                })!,
-                            Title = "Water Supply Certificate"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
-            </div>
-
-
-            <!-- Sewage / Sanitation Approval -->
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Sewage / Sanitation Approval
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.SewageSanitationApprovalDocumentPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewLandBuildingDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Id,
-                                    documentType = "SewageSanitationApproval"
-                                })!,
-                            Title = "Sewage / Sanitation Approval"
-                        })
-                }
-                else
-                {
-                    <div class="form-control text-muted">
-                        Not Uploaded
-                    </div>
-                }
             </div>
 
         </div>
@@ -699,10 +431,6 @@
         }
 
 
-        @{
-            var buildingFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionId == 26);
-        }
         @if (buildingFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", buildingFeedback)

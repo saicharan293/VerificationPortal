@@ -491,4 +491,18 @@ function showFeedbackMessage(text, type) {
     message.className = `alert alert-${type} mb-3`;
 
     message.textContent = text;
+
+    message._fadeTimer = setTimeout(() => {
+
+        message.style.transition = "opacity 0.5s ease";
+        message.style.opacity = "0";
+
+        // Remove completely after fade animation
+        setTimeout(() => {
+            message.style.display = "none";
+            message.textContent = "";
+            message.style.opacity = "1";
+        }, 500);
+
+    }, 1200);
 }
