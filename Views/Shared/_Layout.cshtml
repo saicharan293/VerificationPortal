@@ -81,13 +81,12 @@
                     @(Context.Session.GetString("CollegeName") ?? "")
                 </div>
 
-                <span class="page-tab-name">
+                @* <span class="page-tab-name">
                     @ViewData["Title"]
-                </span>
+                </span> *@
 
                 @if(!String.IsNullOrEmpty(Context.Session.GetString("TypeOfAffiliation"))){
                     <div class="page-subtitle">
-                        Affiliation Type:
                         @(Context.Session.GetString("TypeOfAffiliation") ?? "Not available")
                     </div>
                 }
@@ -160,6 +159,10 @@
 
     </header>
 
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <partial name="_AuthenticatedNavbar" />
+    }
 
     @* ==================== NAVBAR ==================== *@
     @* @if (User.Identity?.IsAuthenticated == true)

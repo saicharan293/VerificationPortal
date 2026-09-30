@@ -1,8 +1,183 @@
-﻿<header class="top-bar">
-    <div class="top-bar-left" >
-        <button class="sidebar-toggle d-md-none" id="mobileSidebarToggle" aria-label="Open sidebar">
-            <i class="bi bi-list"></i>
-        </button>
-        <h1 class="page-title">@ViewData["Title"]</h1>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<header class="modern-header verification-header" role="banner">
+
+    <div class="modern-header-inner">
+
+        <!-- ================================================= -->
+        <!-- LEFT : UNIVERSITY BRAND -->
+        <!-- ================================================= -->
+
+        <div class="brand-block">
+
+            <img src="~/images/newLogo.jpeg"
+                 id="signupLogo"
+                 alt="University Logo" />
+
+            <div class="brand-details">
+
+                <div class="brand-title">
+                    @Localizer["UniversityShortTitle"]
+                </div>
+
+                <div class="brand-subtitle">
+                    @Localizer["UniversityAddress"]
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CENTER : VERIFICATION INFORMATION -->
+        <!-- ================================================= -->
+
+        <div class="header-center">
+
+            <!-- College -->
+            @if (!string.IsNullOrWhiteSpace(
+                Context.Session.GetString("CollegeName")))
+            {
+                <div class="page-title">
+                    @Context.Session.GetString("CollegeName")
+                </div>
+            }
+
+            <!-- Current Page -->
+            <span class="page-tab-name">
+                @ViewData["Title"]
+            </span>
+
+            <!-- Affiliation Type -->
+            @if (!string.IsNullOrWhiteSpace(
+                Context.Session.GetString("TypeOfAffiliation")))
+            {
+                <div class="page-subtitle">
+
+                    <i class="bi bi-layers-fill"></i>
+
+                    @Context.Session.GetString("TypeOfAffiliation")
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT : ACTIONS -->
+        <!-- ================================================= -->
+
+        <div class="header-actions">
+
+            <!-- Mobile Sidebar Toggle -->
+            <button class="sidebar-toggle d-md-none"
+                    id="mobileSidebarToggle"
+                    type="button"
+                    aria-label="Open sidebar">
+
+                <i class="bi bi-list"></i>
+
+            </button>
+
+
+            <!-- Language -->
+            <div class="language-switcher">
+
+                <select id="languageSelect"
+                        onchange="changeLanguage()"
+                        aria-label="@Localizer["SelectLanguage"]">
+
+                    <option value="en"
+                            selected="@(Thread.CurrentThread.CurrentUICulture.Name == "en")">
+                        English
+                    </option>
+
+                    <option value="kn"
+                            selected="@(Thread.CurrentThread.CurrentUICulture.Name == "kn")">
+                        ಕನ್ನಡ (Kannada)
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Theme -->
+            <button class="theme-toggle"
+                    id="themeToggle"
+                    type="button"
+                    aria-label="Toggle theme"
+                    title="Toggle Light/Dark Mode">
+
+                <i class="bi bi-moon-fill moon-icon"></i>
+                <i class="bi bi-sun-fill sun-icon"></i>
+
+            </button>
+
+
+            <!-- User -->
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="verification-user">
+
+                    <div class="verification-user-info">
+
+                        <strong>
+                            @User.Identity?.Name
+                        </strong>
+
+                        <small>
+                            @User.FindFirst("Designation")?.Value
+                        </small>
+
+                    </div>
+
+                    <!-- Logout -->
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          class="mb-0">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn logout-btn"
+                                title="Logout"
+                                aria-label="Logout">
+
+                            <i class="bi bi-box-arrow-right"></i>
+
+                            <span class="d-none d-lg-inline">
+                                Logout
+                            </span>
+
+                        </button>
+
+                    </form>
+
+                </div>
+            }
+            else
+            {
+                <!-- Login -->
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="btn logout-btn">
+
+                    <i class="bi bi-box-arrow-in-right"></i>
+
+                    <span class="d-none d-lg-inline">
+                        Login
+                    </span>
+
+                </a>
+            }
+
+        </div>
+
     </div>
+
 </header>

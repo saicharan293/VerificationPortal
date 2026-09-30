@@ -100,108 +100,57 @@
     </div>
 </section>
 
-<!-- ==================== MAIN CONTENT (TWO EQUAL SECTIONS) ==================== -->
-<section class="dashboard-main">
+<!-- ==================== MAIN CONTENT (TWO EQUAL SECTIONS - QUICK ACTIONS AND RESOURCES) ==================== -->
+
+<!-- ==================== DASHBOARD ACTIONS ==================== -->
+<section class="dashboard-actions-section">
     <div class="container">
         <div class="row g-4">
-            <!-- Quick Actions - Left -->
+
+            <!-- My Colleges -->
             <div class="col-lg-6">
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <div>
-                            <h5>Quick Actions</h5>
-                            <small>Access your most-used tools</small>
-                        </div>
-                        <i class="bi bi-lightning-charge-fill"></i>
+                <a asp-controller="MyColleges"
+                   asp-action="Index"
+                   class="dashboard-action-card">
+
+                    <div class="dashboard-action-icon">
+                        <i class="bi bi-building"></i>
                     </div>
-                    <div class="content-card-body">
-                        <div class="actions-grid">
-                            @if (Model.IsAdmin)
-                            {
-                                <a href="#" class="action-tile action-admin">
-                                    <div class="action-tile-icon"><i class="bi bi-people-fill"></i></div>
-                                    <div class="action-tile-text">
-                                        <strong>Manage Users</strong>
-                                        <small>Add, edit, or remove users</small>
-                                    </div>
-                                    <i class="bi bi-arrow-right action-tile-arrow"></i>
-                                </a>
-                                <a asp-controller="CollegeMapping" asp-action="Index" class="action-tile action-admin">
-                                    <div class="action-tile-icon"><i class="bi bi-building-add"></i></div>
-                                    <div class="action-tile-text">
-                                        <strong>Assign Colleges</strong>
-                                        <small>Map colleges to users</small>
-                                    </div>
-                                    <i class="bi bi-arrow-right action-tile-arrow"></i>
-                                </a>
 
-                                <a asp-controller="DocumentManager"
-                                   asp-action="Index"
-                                   class="action-tile action-admin">
-
-                                    <div class="action-tile-icon">
-                                        <i class="bi bi-file-earmark-text-fill"></i>
-                                    </div>
-
-                                    <div class="action-tile-text">
-                                        <strong>Manage Documents</strong>
-                                        <small>Add and manage verification documents</small>
-                                    </div>
-
-                                    <i class="bi bi-arrow-right action-tile-arrow"></i>
-                                </a>
-                            }
-                            <a href="#" class="action-tile">
-                                <div class="action-tile-icon"><i class="bi bi-search"></i></div>
-                                <div class="action-tile-text">
-                                    <strong>Search Colleges</strong>
-                                    <small>Find any college quickly</small>
-                                </div>
-                                <i class="bi bi-arrow-right action-tile-arrow"></i>
-                            </a>
-                            <a href="#" class="action-tile">
-                                <div class="action-tile-icon"><i class="bi bi-file-earmark-bar-graph"></i></div>
-                                <div class="action-tile-text">
-                                    <strong>View Reports</strong>
-                                    <small>Analytics & insights</small>
-                                </div>
-                                <i class="bi bi-arrow-right action-tile-arrow"></i>
-                            </a>
-                        </div>
+                    <div class="dashboard-action-content">
+                        <h5>My Colleges</h5>
+                        <p>View and manage colleges assigned to you.</p>
                     </div>
-                </div>
+
+                    <div class="dashboard-action-arrow">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </a>
             </div>
 
-            <!-- Resources - Right -->
+            <!-- Type of Affiliation -->
             <div class="col-lg-6">
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <div>
-                            <h5>Resources</h5>
-                            <small>Helpful documents & links</small>
-                        </div>
-                        <i class="bi bi-folder-fill"></i>
-                    </div>
-                    <div class="content-card-body p-0">
-                        <div class="resource-list">
-                            @foreach(var resource in Model.Resources)
-                            {
-                                <a href = "@resource.Url" class="resource-item">
-                                    <div class="resource-icon">
-                                        <i class="@resource.Icon"></i>
-                                    </div>
+                <button type="button"
+                        class="dashboard-action-card affiliation-selector-link w-100 border-0 text-start"
+                        id="openAffiliationSelector">
 
-                                    <div class="resource-text">
-                                        <strong>@resource.Title</strong>
-                                        <small>@resource.Description</small>
-                                    </div>
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            }
-                        </div>
+                    <div class="dashboard-action-icon">
+                        <i class="bi bi-layers-fill"></i>
                     </div>
-                </div>
+
+                    <div class="dashboard-action-content">
+                        <h5>Type of Affiliation & Course Level</h5>
+                        <p>Select the affiliation type and course level to continue.</p>
+                    </div>
+
+                    <div class="dashboard-action-arrow">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </button>
             </div>
+
         </div>
     </div>
 </section>

@@ -21,6 +21,7 @@
         public int AffiliationTypeId { get; set; }
 
         public string CourseLevel { get; set; } = string.Empty;
+        public string TypeOfAffiliation { get; set; } = string.Empty;
     }
 
     public class TypeOfAffiliationOptionVM

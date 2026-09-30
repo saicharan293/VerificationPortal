@@ -75,6 +75,8 @@ namespace VerificationPortal.Controllers
 
             HttpContext.Session.SetString("CourseLevel", request.CourseLevel);
 
+            HttpContext.Session.SetString("TypeOfAffiliation", request.TypeOfAffiliation);
+
 
             return Ok(new
             {

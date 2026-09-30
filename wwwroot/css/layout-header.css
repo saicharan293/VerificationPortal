@@ -19,12 +19,12 @@
 .modern-header-inner {
     max-width: 1500px;
     margin: 0 auto;
-    padding: 0.95rem 1.5rem;
+    padding: 0.95rem 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .brand-block {
@@ -32,7 +32,7 @@
     align-items: center;
     gap: 1rem;
     flex: 1 1 300px;
-    min-width: 240px;
+    min-width: 280px;
 }
 
 #signupLogo {
@@ -135,6 +135,7 @@
     border-radius: 0.5rem;
     padding: 0.45rem 0.95rem;
     transition: background 0.15s ease, border-color 0.15s ease;
+    min-width: 90px;
 }
 
     .logout-btn:hover {

@@ -1,21 +1,23 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
-    const openButton =
-        document.getElementById("openAffiliationSelector");
+    const openButtons =
+        document.querySelectorAll(".affiliation-selector-link");
 
     const overlay =
         document.getElementById("affiliationSelectorOverlay");
 
-    if (!openButton || !overlay) {
+    if (!openButtons.length || !overlay) {
         return;
     }
 
-    openButton.addEventListener("click", function (event) {
+    openButtons.forEach(function(btn){
+        btn.addEventListener("click", function (event) {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        overlay.classList.remove("is-hidden");
+            overlay.classList.remove("is-hidden");
 
-    });
+        });
+    })
 
 });

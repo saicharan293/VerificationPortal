@@ -36,7 +36,7 @@
                         <div class="brand-logo-large">
                             <i class="bi bi-shield-check"></i>
                         </div>
-                        <h2 class="brand-title-large">Karnataka Affiliation</h2>
+                        <h2 class="brand-title-large">RGUHS</h2>
                         <h3 class="brand-subtitle-large">Verification Portal</h3>
                         <p class="brand-tagline">Government of Karnataka</p>
 
@@ -52,7 +52,7 @@
                 <!-- Right Side - Login Form -->
                 <div class="col-lg-7 login-form-side">
                     <div class="login-form-container">
-                        <a href="/" class="back-home">
+                        <a asp-controller="Home" asp-action="Index" class="back-home">
                             <i class="bi bi-arrow-left"></i> Home
                         </a>
 
@@ -91,7 +91,6 @@
                                     <input asp-for="RememberMe" class="form-check-input" id="rememberMe" />
                                     <label class="form-check-label" for="rememberMe">Remember me</label>
                                 </div>
-                                <a href="#" class="forgot-link">Forgot?</a>
                             </div>
 
                             <button type="submit" class="btn btn-login-submit">
@@ -117,23 +116,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/theme.js" asp-append-version="true"></script>
-    <script>
-        // Password toggle
-        document.getElementById('togglePassword')?.addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            if (type === 'text') {
-                eyeIcon.classList.remove('bi-eye');
-                eyeIcon.classList.add('bi-eye-slash');
-                this.classList.add('active');
-            } else {
-                eyeIcon.classList.remove('bi-eye-slash');
-                eyeIcon.classList.add('bi-eye');
-                this.classList.remove('active');
-            }
-        });
-    </script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
 </body>
 </html>

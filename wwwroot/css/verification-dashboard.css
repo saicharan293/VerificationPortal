@@ -162,6 +162,7 @@ body {
 
 .main-content {
     flex: 1;
+    position: relative;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -412,6 +413,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
+    padding-top: 7rem;
 }
 
 .page-content {
@@ -2561,4 +2563,67 @@ body {
         align-items: flex-start;
         gap: 0.6rem;
     }
+}
+
+/* =========================================
+   FIXED VERIFICATION TOP BAR
+   ========================================= */
+
+.verification-header {
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    /* Leave space for the verification sidebar */
+    left: var(--sidebar-width, 280px);
+    width: auto;
+    z-index: 1050;
+    background: var(--header-bg, var(--bs-body-bg));
+    border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Header content */
+
+.verification-header .modern-header-inner {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0.75rem 1.5rem;
+}
+.verification-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-back {
+    padding: 15px 16px 10px;
+}
+
+.sidebar-back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.sidebar-back-link i {
+    font-size: 16px;
+}
+
+.sidebar-back-link:hover {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+    border-color: var(--primary-color);
+    transform: translateX(-2px);
 }

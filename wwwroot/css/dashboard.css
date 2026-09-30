@@ -1,6 +1,17 @@
 ﻿/* ============================================
    DASHBOARD - MODERN UI WITH FULL THEME
    ============================================ */
+:root {
+    --bg-primary: #ffffff;
+    --text-primary: #1f2937;
+    --card-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #111827;
+    --text-primary: #f9fafb;
+    --card-bg: #1f2937;
+}
 
 /* ===== HERO WELCOME ===== */
 .dashboard-hero {
@@ -644,4 +655,74 @@
     .resource-item:hover > i:last-child {
         color: #60a5fa;
     }
+}
+
+/* ==================== DASHBOARD ACTIONS ==================== */
+
+.dashboard-actions-section {
+    padding: 2rem 0 3rem;
+}
+
+.dashboard-action-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    min-height: 110px;
+    padding: 1.25rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dashboard-action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
+    color: var(--text-primary);
+}
+
+.dashboard-action-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-size: 1.4rem;
+}
+
+.dashboard-action-content {
+    flex: 1;
+}
+
+.dashboard-action-content h5 {
+    margin: 0 0 0.35rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.dashboard-action-content p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+}
+
+.dashboard-action-arrow {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.dashboard-action-card:hover .dashboard-action-arrow {
+    transform: translateX(4px);
+    color: var(--primary-color);
 }
