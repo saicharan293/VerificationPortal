@@ -3,7 +3,7 @@
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
-    ViewData["Title"] = "Trust Details - Verification Dashboard";
+    ViewData["Title"] = "Trust Details";
     ViewData["ActiveTab"] = "TrustDetails";
 
     ViewData["InstitutionName"] =
@@ -226,7 +226,7 @@
                         new DocumentViewerVm
                         {
                             Url = Url.Action(
-                                "ViewTrustDetailsPageDocument",
+                                "ViewGOKorderDocument",
                                 "VerificationDashboard",
                                 new
                                 {

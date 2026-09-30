@@ -53,13 +53,13 @@
                 as List<VerificationPortal.Models.SectionFeedbackViewModel>
                 ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
 
-    var basicFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 1);
+    var basicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 1);
 
-    var addressFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 2);
+    var addressFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 2);
 
-    var contactFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 3);
+    var contactFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 3);
 
-    var institutionFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 4);
+    var institutionFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 4);
 
     var headFeedback = sectionFeedback.FirstOrDefault( x => x.SectionId == 5);
 
@@ -292,11 +292,11 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label">Taluk</label>
-                <input type="text" class="form-control" value="@ViewBag.Taluk" disabled />
+                <input type="text" class="form-control" value="@Model.TalukText" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">District</label>
-                <input type="text" class="form-control" value="@ViewBag.District" disabled />
+                <input type="text" class="form-control" value="@Model.DistrictText" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Pin Code</label>
@@ -792,10 +792,3 @@
 
     </div>
 </div>
-
-<script>
-    window.documentViewerConfig = {
-        feedbackUrl: '@Url.Action("GetDocumentFeedback", "VerificationDashboard")',
-        saveFeedbackUrl: '@Url.Action("SaveDocumentFeedback", "VerificationDashboard")'
-    };
-</script>

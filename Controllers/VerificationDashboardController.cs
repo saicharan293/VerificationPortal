@@ -487,6 +487,30 @@ namespace VerificationPortal.Controllers
                 GetDocumentContentType(filePath));
         }
 
+        [HttpGet]
+        public IActionResult ViewGOKorderDocument(int id)
+        {
+            var institution = _context.InstitutionBasicDetails
+                .FirstOrDefault(x => x.InstitutionId == id);
+
+            if (institution == null)
+                return NotFound();
+
+            var storedPath = institution.GokOrderExistingCoursesFilePath;
+
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return NotFound();
+
+            var filePath = ResolveDocumentPath(storedPath);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile(
+                filePath,
+                GetDocumentContentType(filePath));
+        }
+
         private string ResolveDocumentPath(string? filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))

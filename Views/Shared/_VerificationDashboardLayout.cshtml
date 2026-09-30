@@ -101,6 +101,13 @@
     <script src="~/js/theme.js" asp-append-version="true"></script>
     <script src="~/js/document-viewer.js" asp-append-version="true"></script>
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+    
+    <script>
+        window.documentViewerConfig = {
+            feedbackUrl: '@Url.Action("GetDocumentFeedback", "VerificationDashboard")',
+            saveFeedbackUrl: '@Url.Action("SaveDocumentFeedback", "VerificationDashboard")'
+        };
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>
