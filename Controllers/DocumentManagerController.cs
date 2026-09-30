@@ -155,7 +155,8 @@ namespace VerificationPortal.Controllers
                 x.FacultyId == model.FacultyId &&
                 x.TabId == model.TabId &&
                 x.SectionId == model.SectionId &&
-                x.DocumentName.ToLower() == model.DocumentName.ToLower());
+                x.DocumentName.ToLower() == model.DocumentName.ToLower() &&
+                x.IsActive);
 
             if (documentExists)
             {
@@ -170,7 +171,8 @@ namespace VerificationPortal.Controllers
                 TabId = model.TabId,
                 SectionId = model.SectionId,
                 DocumentName = model.DocumentName.Trim(),
-                IsMandatory = model.IsMandatory
+                IsMandatory = model.IsMandatory,
+                IsActive = true
             };
 
             // Save to database

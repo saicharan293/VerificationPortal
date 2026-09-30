@@ -177,12 +177,12 @@
 
                             <!-- FEEDBACK FORM -->
 
-                            <form id="documentFeedbackForm">
+                            <form id="documentFeedbackForm"
+                                  asp-controller="VerificationDashboard"
+                                  asp-action="SaveDocumentFeedback"
+                                  method="post">
 
                                 @Html.AntiForgeryToken()
-
-
-                                <!-- DOCUMENT CONTEXT -->
 
                                 <input type="hidden"
                                        id="feedbackDocumentId"
@@ -196,23 +196,20 @@
                                        id="feedbackCollegeCode"
                                        name="CollegeCode" />
 
-
-                                <!-- STATUS -->
-
                                 <div class="mb-3">
 
                                     <label for="feedbackStatus"
                                            class="form-label">
 
                                         Verification Status
-
                                         <span class="text-danger">*</span>
 
                                     </label>
 
                                     <select id="feedbackStatus"
                                             name="Status"
-                                            class="form-select">
+                                            class="form-select"
+                                            required>
 
                                         <option value="">
                                             -- Select Status --
@@ -235,8 +232,6 @@
                                 </div>
 
 
-                                <!-- FEEDBACK -->
-
                                 <div class="mb-3">
 
                                     <label for="feedbackText"
@@ -255,21 +250,16 @@
                                 </div>
 
 
-                                <!-- FEEDBACK MESSAGE -->
-
                                 <div id="documentFeedbackMessage"
                                      class="d-none mb-3">
                                 </div>
 
-
-                                <!-- SAVE -->
 
                                 <button type="submit"
                                         id="saveDocumentFeedbackBtn"
                                         class="btn btn-primary w-100">
 
                                     <i class="bi bi-save me-1"></i>
-
                                     Save Feedback
 
                                 </button>

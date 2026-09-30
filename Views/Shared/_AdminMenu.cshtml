@@ -1,34 +1,44 @@
 ﻿<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown"
-                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-shield-lock-fill"></i> Admin
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                            <li>
-                                <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Index">
-                                    <i class="bi bi-diagram-3"></i> College Mappings
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Create">
-                                    <i class="bi bi-plus-circle"></i> New Assignment
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="AssignByRange">
-                                    <i class="bi bi-rulers"></i> Assign by Range
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="bi bi-people-fill"></i> Manage Users
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="bi bi-gear-fill"></i> System Settings
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown"
+        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-shield-lock-fill"></i> Admin
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+        <li>
+            <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Index">
+                <i class="bi bi-diagram-3"></i> College Mappings
+            </a>
+        </li>
+        <li>
+            <a asp-controller="DocumentManager"
+               asp-action="Index"
+               class="dropdown-item">
+
+                <i class="bi bi-file-earmark-text-fill me-2"></i>
+                Manage Documents
+
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="Create">
+                <i class="bi bi-plus-circle"></i> New Assignment
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" asp-controller="CollegeMapping" asp-action="AssignByRange">
+                <i class="bi bi-rulers"></i> Assign by Range
+            </a>
+        </li>
+        <li><hr class="dropdown-divider" /></li>
+        <li>
+            <a class="dropdown-item" href="#">
+                <i class="bi bi-people-fill"></i> Manage Users
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#">
+                <i class="bi bi-gear-fill"></i> System Settings
+            </a>
+        </li>
+    </ul>
+</li>

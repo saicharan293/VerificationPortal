@@ -2443,6 +2443,8 @@ BEGIN TRY
             (N'Institution Details', N'Principal Details'),
             (N'Institution Details', N'Dean / Director Details'),
             (N'Institution Details', N'Trust Details'),
+            (N'Institution Details', N'Administrative Section'),
+            (N'Institution Details', N'Managing Other Health Science Colleges'),
 
             /* Trust Details */
             (N'Trust Details', N'Trust Information'),
@@ -2562,6 +2564,38 @@ BEGIN CATCH
     THROW;
 
 END CATCH;
+
+------------------------ TEMPORARY QUERY -----------------
+INSERT INTO dbo.MstSections
+(
+    FacultyId,
+    TabId,
+    SectionName
+)
+SELECT
+    FacultyId,
+    TabId,
+    N'Administrative Section'
+FROM dbo.MstTabs
+WHERE FacultyId = 2
+  AND TabName = N'Institution Details';
+
+INSERT INTO dbo.MstSections
+(
+    FacultyId,
+    TabId,
+    SectionName
+)
+SELECT
+    FacultyId,
+    TabId,
+    N'Managing Other Health Science Colleges'
+FROM dbo.MstTabs
+WHERE FacultyId = 2
+  AND TabName = N'Institution Details';
+
+
+  -------------------------------------------------
 
 /* ============================================================
    3. SectionWiseFeedback

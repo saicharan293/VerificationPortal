@@ -63,8 +63,6 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-
             ViewBag.ActiveTab = "InstitutionDetails";
             ViewBag.UserDesignation = GetUserDesignation();
 
@@ -116,7 +114,7 @@ namespace VerificationPortal.Controllers
                     ?? institution.TypeOfInstitution;
             }
 
-            ViewBag.TypeOfInstitution = typeOfInstitution;
+            //ViewBag.TypeOfInstitution = typeOfInstitution;
 
 
             // ---------------------------------------------------------
@@ -138,7 +136,7 @@ namespace VerificationPortal.Controllers
                     ?? institution.StatusOfCollege;
             }
 
-            ViewBag.StatusOfCollege = statusOfCollege;
+            //ViewBag.StatusOfCollege = statusOfCollege;
 
 
             // ---------------------------------------------------------
@@ -159,7 +157,7 @@ namespace VerificationPortal.Controllers
                     ?? institution.Taluk;
             }
 
-            ViewBag.Taluk = taluk;
+            //ViewBag.Taluk = taluk;
 
 
             // ---------------------------------------------------------
@@ -180,8 +178,32 @@ namespace VerificationPortal.Controllers
                     ?? institution.District;
             }
 
-            ViewBag.District = district;
+            //ViewBag.District = district;
 
+            //-----------------------------------------------------------
+            // MANAGING OTHER HEALTH SCIENCE COLLEGES
+            //-----------------------------------------------------------
+
+            var otherHealthScienceColleges = await _context.OtherHealthScienceColleges
+                .AsNoTracking()
+                .Where(e => e.CollegeCode == collegeCode)
+                .Join(
+                    _context.MstCourses,
+                    ohs => ohs.CourseCode,
+                    course => course.CourseCode,
+                    (ohs, course) => new OtherHealthScienceCollegeVm
+                    {
+                        OtherCollegeCode = ohs.OtherCollegeCode,
+                        CollegeName = ohs.OtherCollegeCodeNavigation.CollegeName,
+                        FacultyName = ohs.Faculty.FacultyName,
+                        CourseCode = course.CourseCode,
+                        CourseName = course.CourseName
+                    })
+                .ToListAsync();
+
+            var deanAppointmentOrderDocumentId = await _context.MstDocuments.Where(e => e.SectionId == 8).Select(e => e.DocumentId).FirstOrDefaultAsync();
+            var memberofGovBodyDocumentId = await _context.MstDocuments.Where(e => e.SectionId == 64).Select(e => e.DocumentId).FirstOrDefaultAsync();
+            var govAutonomousCertificateId = await _context.MstDocuments.Where(e => e.SectionId == 1).Select(e => e.DocumentId).FirstOrDefaultAsync();
 
             // ---------------------------------------------------------
             // VERIFICATION
@@ -193,10 +215,88 @@ namespace VerificationPortal.Controllers
             ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 1);
 
             // ---------------------------------------------------------
-            // VIEW
+            // VIEW MODEL
             // ---------------------------------------------------------
 
-            return View(institution);
+            var vm = new InstitutionDetailsVerificationVm
+            {
+                Institution = institution,
+                TypeOfInstitutionText = typeOfInstitution,
+                StatusOfCollegeText = statusOfCollege,
+                TalukText = taluk,
+                DistrictText = district,
+                MemberOfGovBodyDocumentId = memberofGovBodyDocumentId,
+                AppointmentOrderDocumentId = deanAppointmentOrderDocumentId,
+                GovAutonomousDocumentId = govAutonomousCertificateId,
+                OtherHealthScienceColleges = otherHealthScienceColleges
+            };
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult ViewGoverningBodyCouncilDocument(int id)
+        {
+            var institution = _context.AffInstitutionsDetails
+                .FirstOrDefault(x => x.InstitutionId == id);
+
+            if (institution == null)
+                return NotFound();
+
+            var storedPath = institution.MembersOfGoverningBodyOrCouncilFilePath;
+
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return NotFound();
+
+            var filePath = ResolveDocumentPath(storedPath);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile( filePath, GetDocumentContentType(filePath));
+        }
+
+        [HttpGet]
+        public IActionResult ViewDeanAppointmentOrderDocument(int id)
+        {
+            var institution = _context.AffInstitutionsDetails
+                .FirstOrDefault(x => x.InstitutionId == id);
+
+            if (institution == null)
+                return NotFound();
+
+            var storedPath = institution.DocumentDataPath;
+
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return NotFound();
+
+            var filePath = ResolveDocumentPath(storedPath);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile( filePath, GetDocumentContentType(filePath));
+        }
+
+        [HttpGet]
+        public IActionResult ViewGovAutonomousCertificate(int id)
+        {
+            var institution = _context.AffInstitutionsDetails.FirstOrDefault(x => x.InstitutionId == id);
+
+            if (institution == null)
+                return NotFound();
+
+            var storedPath = institution.GovAutonomousCertPath;
+
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return NotFound();
+
+            var filePath = ResolveDocumentPath(storedPath);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile( filePath, GetDocumentContentType(filePath));
         }
 
         private async Task<List<SectionFeedbackViewModel>> GetTabSectionFeedbackAsync(string collegeCode, int tabId)
@@ -6046,6 +6146,153 @@ namespace VerificationPortal.Controllers
                     g => g.Key,
                     g => g.First().DocumentId,
                     StringComparer.OrdinalIgnoreCase);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveDocumentFeedback(int documentId, string collegeCode, string? feedback, string status)
+        {
+            if (documentId <= 0) return BadRequest("Invalid Document.");
+
+            if (string.IsNullOrWhiteSpace(collegeCode)) return BadRequest("College code is required");
+
+            if (string.IsNullOrWhiteSpace(status)) return BadRequest("Verification Status is required.");
+
+            // --------------------------------------
+            // LOGGED IN USER
+            // --------------------------------------
+
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId)) return Unauthorized();
+
+            // --------------------------------------
+            // GET DOCUMENT
+            // --------------------------------------
+
+            var document = await _context.MstDocuments.AsNoTracking().FirstOrDefaultAsync(e => e.DocumentId == documentId && e.IsActive);
+
+            if (document == null) return NotFound("Document not found");
+
+            // --------------------------------------
+            // GET FACULTY
+            // --------------------------------------
+
+            var facultyId = document.FacultyId;
+
+            // --------------------------------------
+            // CHECK EXISTING FEEDBACK
+            // --------------------------------------
+
+            var existingFeedback = await _context.DocumentWiseFeedbacks
+                .FirstOrDefaultAsync(e =>
+                    e.DocumentId == documentId &&
+                    e.CollegeCode == collegeCode &&
+                    e.UserId == userId &&
+                    e.IsActive
+                );
+
+            // --------------------------------------
+            // UPDATE EXISTING FEEDBACK
+            // --------------------------------------
+
+            if(existingFeedback != null)
+            {
+                existingFeedback.Feedback = string.IsNullOrWhiteSpace(feedback) ? null : feedback.Trim();
+                existingFeedback.Status = status.Trim();
+                existingFeedback.ModifiedOn = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Document feedback updated sucessfully."
+                });
+            }
+
+            // --------------------------------------
+            // CREATE NEW DOCUMENT FEEDBACK
+            // --------------------------------------
+
+            var documentFeedback = new DocumentWiseFeedback
+            {
+                FacultyId = facultyId,
+                CollegeCode = collegeCode,
+                DocumentId = documentId,
+                UserId = userId,
+
+                Feedback = string.IsNullOrWhiteSpace(feedback) ? null : feedback.Trim(),
+                Status = status.Trim(),
+
+                IsActive = true,
+
+                CreatedOn = DateTime.Now
+            };
+
+            _context.DocumentWiseFeedbacks.Add(documentFeedback);
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                message = "Document feedback saved successfully."
+            });
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDocumentFeedback(int documentId, int facultyId, string collegeCode)
+        {
+            if(documentId <= 0 || facultyId <=0 || string.IsNullOrWhiteSpace(collegeCode))
+            {
+                return BadRequest(new
+                {
+                    exists = false,
+                    message = "Invalid document Information."
+                });
+            }
+
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+            if(userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized(new
+                {
+                    exists = false,
+                    message = "User information not found."
+                });
+            }
+
+            var feedback = await _context.DocumentWiseFeedbacks
+                .AsNoTracking()
+                .Where(e =>
+                    e.DocumentId == documentId &&
+                    e.FacultyId == facultyId &&
+                    e.CollegeCode == collegeCode &&
+                    e.UserId == userId &&
+                    e.IsActive
+                )
+                .OrderByDescending(e => e.ModifiedOn ?? e.CreatedOn)
+                .FirstOrDefaultAsync();
+
+            if(feedback == null)
+            {
+                return Json(new
+                {
+                    exists = false,
+                    status = "",
+                    feedback = ""
+                });
+            }
+
+            return Json(new
+            {
+                exists = true,
+                status = feedback.Status,
+                feedback = feedback.Feedback ?? ""
+            });
         }
     }
 }

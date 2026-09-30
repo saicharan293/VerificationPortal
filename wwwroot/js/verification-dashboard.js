@@ -103,55 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Auto-save draft functionality
-    // const formInputs = document.querySelectorAll('.verification-card-body input, .verification-card-body select, .verification-card-body textarea');
-    // let autoSaveTimer;
-
-    // formInputs.forEach(input => {
-    //     input.addEventListener('change', function () {
-    //         clearTimeout(autoSaveTimer);
-    //         autoSaveTimer = setTimeout(() => {
-    //             saveDraft();
-    //         }, 2000);
-    //     });
-    // });
-
-    // Collect form data
-    // function saveDraft() {
-    //     const forms = document.querySelectorAll('form');
-    //     forms.forEach(form => {
-    //         const formData = new FormData(form);
-    //         const data = Object.fromEntries(formData);
-    //         const key = `draft_${form.id || form.action}`;
-    //         localStorage.setItem(key, JSON.stringify(data));
-    //     });
-    //     showToast('Draft saved automatically', 'info');
-    // }
-
-    // Load draft on page load
-    // function loadDrafts() {
-    //     const forms = document.querySelectorAll('form');
-    //     forms.forEach(form => {
-    //         const key = `draft_${form.id || form.action}`;
-    //         const draft = localStorage.getItem(key);
-    //         if (draft) {
-    //             try {
-    //                 const data = JSON.parse(draft);
-    //                 Object.keys(data).forEach(fieldName => {
-    //                     const input = form.querySelector(`[name="${fieldName}"]`);
-    //                     if (input && !input.value) {
-    //                         input.value = data[fieldName];
-    //                     }
-    //                 });
-    //             } catch (e) {
-    //                 console.warn('Failed to load draft:', e);
-    //             }
-    //         }
-    //     });
-    // }
-
-    // loadDrafts();
-
     // Clear draft on successful submit
     document.addEventListener('submit', function (event) {
         const form = event.target;
@@ -414,6 +365,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
         });
 
+    }
+    const scrollToTopBtn =
+        document.getElementById("scrollToTopBtn");
+
+    if (scrollToTopBtn) {
+
+        window.addEventListener("scroll", function () {
+
+            if (window.scrollY > 300) {
+                scrollToTopBtn.classList.add("show");
+            } else {
+                scrollToTopBtn.classList.remove("show");
+            }
+
+        });
+
+        scrollToTopBtn.addEventListener("click", function () {
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        });
     }
 
     // Document Viewer

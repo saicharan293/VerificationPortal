@@ -10,6 +10,8 @@ public class DocumentViewerVm
 
     public int? FacultyId { get; set; }
     public string? CollegeCode { get; set; }
+
+    public bool CanVerify { get; set; }
 }
 
 public class DocumentFeedbackViewModel
