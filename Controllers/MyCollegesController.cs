@@ -24,6 +24,10 @@ namespace VerificationPortal.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdClaim, out var userId)) return RedirectToAction("Login", "Account");
 
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            if (string.IsNullOrWhiteSpace(courseLevel)) return RedirectToAction("Login", "Account");
+
             // ========================================================= 
             // USER DETAILS 
             // =========================================================
@@ -64,13 +68,36 @@ namespace VerificationPortal.Controllers
                 .Where(f => facultyIds.Contains(f.FacultyId))
                 .ToDictionaryAsync(f => f.FacultyId, f => f.FacultyName);
 
+            // FILTERING BASED ON COURSE LEVEL FOR DENTAL FACULTY
+
+            var academicIntakes = await _context.AcademicIntakes
+                .AsNoTracking()
+                .Where(a => a.Ay2026TotalIntake > 0)
+                .ToListAsync();
+
+
+            var courses = await _context.MstCourses
+                .AsNoTracking()
+                .Where(e => e.CourseLevel == courseLevel)
+                .ToListAsync();
+
+            var courseCodes = courses.Select(e => e.CourseCode.ToString()).ToHashSet();
+
+            var eligibleCollegeCodes = academicIntakes
+                .Where(a =>
+                    !string.IsNullOrWhiteSpace(a.Courses) &&
+                    courseCodes.Contains(a.Courses.ToString()))
+                .Select(a => a.CollegeCode)
+                .Distinct()
+                .ToHashSet();
 
             foreach (var mapping in mappings)
             {
                 // Get all colleges in the mapped range for this faculty
                 var colleges = await _context.AffiliationCollegeMasters
                     .Where(c => c.FacultyCode == mapping.FacultyCode.ToString()
-                             && c.CollegeName != null)
+                             && c.CollegeName != null &&
+                             eligibleCollegeCodes.Contains(c.CollegeCode))
                     .OrderBy(c => c.CollegeName)
                     .ToListAsync();
 
@@ -78,9 +105,12 @@ namespace VerificationPortal.Controllers
                 colleges = colleges
                     .Where(c =>
                     {
-                        var letter = c.CollegeName![0].ToString().ToUpper();
-                        return string.Compare(letter, mapping.FromLetter, StringComparison.OrdinalIgnoreCase) >= 0
-                            && string.Compare(letter, mapping.ToLetter, StringComparison.OrdinalIgnoreCase) <= 0;
+                        var letter = c.CollegeName![0];
+
+                        var fromLetter = mapping.FromLetter?.FirstOrDefault() ?? 'A';
+                        var toLetter = mapping.ToLetter?.FirstOrDefault() ?? 'Z';
+                        return char.ToUpperInvariant(letter) >= char.ToUpperInvariant(fromLetter)
+                            && char.ToUpperInvariant(letter) <= char.ToUpperInvariant(toLetter);
                     })
                     .ToList();
 

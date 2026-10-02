@@ -191,8 +191,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // SEARCH FUNCTIONALITY
     // =====================================================
 
-    const searchInputs =
-        document.querySelectorAll('.college-search');
+    // const searchInputs =
+    //     document.querySelectorAll('.college-search');
 
     searchInputs.forEach(input => {
 
@@ -237,12 +237,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // TOOLTIP INITIALIZATION
     // =====================================================
 
-    const tooltipTriggerList =
-        [].slice.call(
-            document.querySelectorAll(
-                '[data-bs-toggle="tooltip"]'
-            )
-        );
+    // const tooltipTriggerList =
+    //     [].slice.call(
+    //         document.querySelectorAll(
+    //             '[data-bs-toggle="tooltip"]'
+    //         )
+    //     );
 
     tooltipTriggerList.map(function(tooltipTriggerEl) {
 

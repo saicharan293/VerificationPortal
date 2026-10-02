@@ -327,93 +327,74 @@ else
         /* ============================================
            CONTINUE
            ============================================ */
+        
+        continueButton.addEventListener("click", async function () {
 
-        continueButton.addEventListener(
-            "click",
-            async function () {
-
-                if (!selectedCourseLevel) {
-                    return;
-                }
-                const affiliationTypeId = overlay.getAttribute("data-affiliation-type-id");
-
-                continueButton.disabled = true;
-
-
-                const originalHtml =
-                    continueButton.innerHTML;
-
-
-                continueButton.innerHTML = `
-                    <span>Loading...</span>
-                    <i class="bi bi-arrow-repeat"></i>
-                `;
-
-
-                try {
-
-                    const setContextUrl = '@Url.Action("SetContext", "Home")';
-                    const myCollegesUrl = '@Url.Action("Index", "MyColleges")';
-
-                    const response = await fetch(
-                        setContextUrl,
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                courseLevel: selectedCourseLevel,
-                                affiliationTypeId: parseInt(
-                                    affiliationTypeId,
-                                    10
-                                ),
-                                typeOfAffiliation: typeOfAffiliation,
-                            })
-                        }
-                    );
-
-                    if (!response.ok) {
-
-                        const errorText =  await response.text();
-
-                        console.error( "SetContext failed:", response.status, errorText );
-
-                        throw new Error(
-                            "Unable to save affiliation context."
-                        );
-                    }
-
-                    const overlay = document.getElementById("affiliationSelectorOverlay");
-
-                    if (overlay) {
-                        overlay.style.display = "none";
-                    }
-
-                    // Small delay so the overlay closes visually
-                    setTimeout(function () {
-                        window.location.href = myCollegesUrl;
-                    }, 150);
-
-
-                }
-                catch (error) {
-
-                    console.error("SetContext error:", error);
-
-                    continueButton.disabled = false;
-
-                    continueButton.innerHTML = originalHtml;
-
-                    alert(
-                        "Unable to save your selection. Please try again."
-                    );
-                }
-
+            if (!selectedCourseLevel) {
+                return;
             }
-        );
+
+            const affiliationTypeId =
+                overlay.getAttribute("data-affiliation-type-id");
+
+            const setContextUrl = '@Url.Action("SetContext", "Home")';
+            const myCollegesUrl = '@Url.Action("Index", "MyColleges")';
+
+            const originalHtml = continueButton.innerHTML;
+
+            continueButton.disabled = true;
+            continueButton.innerHTML = `
+                <span>Loading...</span>
+                <i class="bi bi-arrow-repeat"></i>
+            `;
+
+            try {
+                // Display the global loader before the API request.
+                if (typeof window.showPageLoaderAndPaint === "function") {
+                    await window.showPageLoaderAndPaint();
+                } else {
+                    window.showPageLoader?.();
+                }
+
+                const response = await fetch(setContextUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        courseLevel: selectedCourseLevel,
+                        affiliationTypeId: parseInt(affiliationTypeId, 10),
+                        typeOfAffiliation: typeOfAffiliation
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+
+                    console.error(
+                        "SetContext failed:",
+                        response.status,
+                        errorText
+                    );
+
+                    throw new Error("Unable to save affiliation context.");
+                }
+
+                // Keep the loader visible while navigating.
+                window.location.href = myCollegesUrl;
+
+            } catch (error) {
+                console.error("SetContext error:", error);
+
+                window.hidePageLoader?.();
+
+                continueButton.disabled = false;
+                continueButton.innerHTML = originalHtml;
+
+                alert("Unable to save your selection. Please try again.");
+            }
+        });
+
 
     });
 

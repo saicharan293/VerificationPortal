@@ -1,0 +1,93 @@
+﻿
+/* =========================================
+   GLOBAL PAGE LOADER
+   ========================================= */
+
+.page-loader {
+    position: fixed !important;
+    inset: 0;
+    z-index: 2147483647 !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    /* Dark overlay */
+    background: rgba(2, 6, 23, 0.78);
+    /* Blur background content */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    /* Block interaction with underlying content */
+    pointer-events: all;
+}
+
+    /* Visible state */
+    .page-loader.is-visible {
+        display: flex !important;
+    }
+
+/* =========================================
+   LOADER CONTENT CARD
+   ========================================= */
+
+.page-loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 36px;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    /* Dark card */
+    background: #111827;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* =========================================
+   SPINNER
+   ========================================= */
+
+.page-loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #334155;
+    border-top-color: #60a5fa;
+    border-right-color: #3b82f6;
+    border-radius: 50%;
+    animation: pageLoaderSpin 0.75s linear infinite;
+}
+
+/* =========================================
+   LOADER TIMER
+   ========================================= */
+
+.page-loader-timer {
+    margin-top: 2px;
+    color: #94a3b8;
+    font-size: 13px;
+    text-align: center;
+}
+
+#pageLoaderTimer {
+    color: #60a5fa;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================
+   ANIMATION
+   ========================================= */
+
+@keyframes pageLoaderSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .page-loader-spinner {
+        animation-duration: 2s;
+    }
+}
