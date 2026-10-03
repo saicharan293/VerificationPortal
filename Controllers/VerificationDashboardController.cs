@@ -2807,7 +2807,7 @@ namespace VerificationPortal.Controllers
             };
 
 
-            return View(landBuilding);
+            return View(vm);
         }
 
 

@@ -1,4 +1,4 @@
-﻿@model VerificationPortal.Models.DentalCollegeLandBuildingDetail
+﻿@model VerificationPortal.Models.DentalLandBuildingVerificationVm
 
 
 @{
@@ -27,108 +27,7 @@
 
     ViewData["NextTabLabel"] = "Next: Classroom & Laboratory";
 
-    var sectionFeedback =
-        ViewBag.SectionFeedback
-        as List<VerificationPortal.Models.SectionFeedbackViewModel>
-        ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
-
-    var landFeedback =
-        sectionFeedback.FirstOrDefault(x => x.SectionId == 25);
-
-    var buildingFeedback =
-        sectionFeedback.FirstOrDefault(x => x.SectionId == 26);
-
-    var landDocuments = new[]
-    {
-        new
-        {
-            Label = "Sale Deed",
-            Path = Model.SaleDeedDocumentPath,
-            DocumentType = "SaleDeed",
-            Action = "ViewSaleDeedDocument",
-        },
-        new
-        {
-            Label = "Encumbrance Certificate",
-            Path = Model.EncumbranceCertificateDocumentPath,
-            DocumentType = "EncumbranceCertificate",
-            Action = "ViewEncumbranceCertificate",
-        },
-        new
-        {
-            Label = "Land Use Certificate",
-            Path = Model.LandUseCertificateDocumentPath,
-            DocumentType = "LandUseCertificate",
-            Action = "ViewLandBuildingDocument",
-        },
-        new
-        {
-            Label = "Approved Layout Plan",
-            Path = Model.ApprovedLayoutPlanDocumentPath,
-            DocumentType = "ApprovedLayoutPlan",
-            Action = "ViewLandBuildingDocument",
-        },
-        new
-        {
-            Label = "Land Sketch",
-            Path = Model.LandSketchDocumentPath,
-            DocumentType = "LandSketch",
-            Action = "ViewLandBuildingDocument",
-        },
-        new
-        {
-            Label = "Distance Certificate",
-            Path = Model.DistanceCertificateDocumentPath,
-            DocumentType = "DistanceCertificate",
-            Action = "ViewLandBuildingDocument",
-        }
-    };
-
-    var buildingDocuments = new[]
-    {
-        new
-        {
-            Label = "Completion Certificate",
-            Path = Model.CompletionCertificateDocumentPath,
-            DocumentType = "CompletionCertificate"
-        },
-        new
-        {
-            Label = "Structural Stability Certificate",
-            Path = Model.StructuralStabilityCertificateDocumentPath,
-            DocumentType = "StructuralStabilityCertificate"
-        },
-        new
-        {
-            Label = "Fire Safety NOC",
-            Path = Model.FireSafetyNocDocumentPath,
-            DocumentType = "FireSafetyNoc"
-        },
-        new
-        {
-            Label = "Lift License",
-            Path = Model.LiftLicenseDocumentPath,
-            DocumentType = "LiftLicense"
-        },
-        new
-        {
-            Label = "Electrical Safety Certificate",
-            Path = Model.ElectricalSafetyCertificateDocumentPath,
-            DocumentType = "ElectricalSafetyCertificate"
-        },
-        new
-        {
-            Label = "Water Supply Certificate",
-            Path = Model.WaterSupplyCertificateDocumentPath,
-            DocumentType = "WaterSupplyCertificate"
-        },
-        new
-        {
-            Label = "Sewage / Sanitation Approval",
-            Path = Model.SewageSanitationApprovalDocumentPath,
-            DocumentType = "SewageSanitationApproval"
-        }
-    };
+    var landBuilding = Model.LandBuilding;
 }
 
 @section Scripts {
@@ -182,21 +81,21 @@
             <div class="col-md-6">
                 <label class="form-label fw-bold">Total Land Area (Acres)</label>
                 <input class="form-control"
-                       value="@(Model.TotalLandAreaAcres?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.TotalLandAreaAcres?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
             <div class="col-md-6">
                 <label class="form-label fw-bold">Land Ownership Type</label>
                 <input class="form-control"
-                       value="@(Model.LandOwnershipType ?? "N/A")"
+                       value="@(Model.LandBuilding.LandOwnershipType ?? "N/A")"
                        disabled />
             </div>
 
             <div class="col-md-6">
                 <label class="form-label fw-bold">Land Category</label>
                 <input class="form-control"
-                       value="@(Model.LandCategory ?? "N/A")"
+                       value="@(Model.LandBuilding.LandCategory ?? "N/A")"
                        disabled />
             </div>
 
@@ -204,7 +103,7 @@
             <div class="col-md-6">
                 <label class="form-label fw-bold">Future Expansion Space</label>
                 <input class="form-control"
-                       value="@(Model.HasFutureExpansionSpace == true ? "Yes" : (Model.HasFutureExpansionSpace == false ? "No" : "N/A"))"
+                       value="@(Model.LandBuilding.HasFutureExpansionSpace == true ? "Yes" : (Model.LandBuilding.HasFutureExpansionSpace == false ? "No" : "N/A"))"
                        disabled />
             </div>
 
@@ -218,7 +117,7 @@
         </h5>
 
         <div class="row g-3 mb-4">
-            @foreach (var document in landDocuments)
+            @foreach (var document in Model.LandDocuments)
             {
                 <div class="col-md-4">
 
@@ -237,11 +136,14 @@
                                     "VerificationDashboard",
                                     new
                                     {
-                                        id = Model.Id,
+                                        id = Model.LandBuilding.Id,
                                         documentType = document.DocumentType
                                     })!,
 
-                                Title = document.Label
+                                Title = document.Label,
+                                DocumentId = document.DocumentId,
+                                FacultyId = Model.FacultyId,
+                                CollegeCode = Model.CollegeCode
                             })
                     }
                     else
@@ -257,9 +159,9 @@
         </div>
 
         
-        @if (landFeedback != null)
+        @if (Model.LandFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", landFeedback)
+            @await Html.PartialAsync("_SectionFeedback", Model.LandFeedback)
         }
 
 
@@ -279,7 +181,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -289,7 +191,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.LectureHallAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.LectureHallAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -299,7 +201,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.LectureHallSeatingCapacity?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.LectureHallSeatingCapacity?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -309,7 +211,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.LectureHallCount?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.LectureHallCount?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -319,7 +221,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -329,7 +231,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -339,7 +241,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.PreclinicalSkillLabAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.PreclinicalSkillLabAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -349,7 +251,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -359,7 +261,7 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.LibraryAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.LibraryAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
@@ -369,14 +271,14 @@
                 </label>
 
                 <input class="form-control"
-                       value="@(Model.HospitalAreaSqm?.ToString("N2") ?? "N/A")"
+                       value="@(Model.LandBuilding.HospitalAreaSqm?.ToString("N2") ?? "N/A")"
                        disabled />
             </div>
 
 
             <div class="row g-3 mb-4">
 
-                @foreach (var document in buildingDocuments)
+                @foreach (var document in Model.BuildingDocuments)
                 {
                     <div class="col-md-4">
 
@@ -395,11 +297,14 @@
                                         "VerificationDashboard",
                                         new
                                         {
-                                            id = Model.Id,
+                                            id = Model.LandBuilding.Id,
                                             documentType = document.DocumentType
                                         })!,
 
-                                    Title = document.Label
+                                    Title = document.Label, 
+                                    DocumentId = document.DocumentId,
+                                    FacultyId = Model.FacultyId,
+                                    CollegeCode = Model.CollegeCode
                                 })
                         }
                         else
@@ -416,7 +321,7 @@
 
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+        @if (!string.IsNullOrWhiteSpace(Model.LandBuilding.Remarks))
         {
             <hr />
 
@@ -426,14 +331,14 @@
             </h5>
 
             <div class="alert alert-secondary">
-                @Model.Remarks
+                @Model.LandBuilding.Remarks
             </div>
         }
 
 
-        @if (buildingFeedback != null)
+        @if (Model.BuildingFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", buildingFeedback)
+            @await Html.PartialAsync("_SectionFeedback", Model.BuildingFeedback)
         }
 
     </div>
