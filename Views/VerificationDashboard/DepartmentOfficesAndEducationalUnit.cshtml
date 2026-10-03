@@ -197,6 +197,27 @@
                                disabled />
                     </div>
 
+                    <!-- DEU Year of Starting -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            DEU Year of Starting
+                        </label>
+
+                        <input class="form-control"
+                               value="@Model.DEUYearOfStarting"
+                               disabled />
+                    </div>
+
+                    <!-- DEU Nature of Activities -->
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">
+                            Nature of Activities
+                        </label>
+
+                        <textarea class="form-control"
+                                  rows="4"
+                                  disabled>@Model.NatureOfActivities</textarea>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">
                             Coordinator Name
@@ -417,7 +438,10 @@ else
                                             {
                                                 collegeCode = ViewBag.CollegeCode
                                             })!,
-                                        Title = "DEU Members List"
+                                        Title = "DEU Members List",
+                                        DocumentId = Model.DeuMembersListDocumentId,
+                                        CollegeCode = Model.CollegeCode,
+                                        FacultyId = Convert.ToInt32(Model.FacultyCode)
                                     })
                             </div>
 

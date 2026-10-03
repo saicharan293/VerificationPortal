@@ -6,6 +6,9 @@ namespace VerificationPortal.Models
     {
         public string? CourseLevel { get; set; }
 
+        public string CollegeCode { get; set; }
+        public int FacultyCode { get; set; }
+
         [Required]
         public bool? HasHodRoomWithOfficeAndRecords { get; set; }
 
@@ -52,6 +55,12 @@ namespace VerificationPortal.Models
 
         public IFormFile? DeuMembersListFile { get; set; }
         public bool HasDeuMembersListFile { get; set; }
+
+        public string? DEUYearOfStarting { get; set; }
+        public string? NatureOfActivities { get; set; }
+
+        public string? DeuMembersListFilePath { get; set; }
+        public int? DeuMembersListDocumentId { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -114,6 +123,20 @@ namespace VerificationPortal.Models
                 if (DentalEducationUnitHasInternet == null)
                     yield return new ValidationResult("Select Internet facilities.",
                         new[] { nameof(DentalEducationUnitHasInternet) });
+
+                if (string.IsNullOrWhiteSpace(DEUYearOfStarting))
+                {
+                    yield return new ValidationResult(
+                        "DEU Year of Starting is required.",
+                        new[] { nameof(DEUYearOfStarting) });
+                }
+
+                if (string.IsNullOrWhiteSpace(NatureOfActivities))
+                {
+                    yield return new ValidationResult(
+                        "Nature of Activities is required.",
+                        new[] { nameof(NatureOfActivities) });
+                }
 
                 if (string.IsNullOrWhiteSpace(DeuCoordinatorName))
                     yield return new ValidationResult("Coordinator name is required.",

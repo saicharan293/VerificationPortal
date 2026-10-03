@@ -3459,6 +3459,8 @@ namespace VerificationPortal.Controllers
             var vm = new DepartmentOfficesMeuViewModel
             {
                 CourseLevel = entity.CourseLevel,
+                CollegeCode = context.CollegeCode,
+                FacultyCode = Convert.ToInt32(facultyCode),
 
                 // Common Department / Office details
                 HasHodRoomWithOfficeAndRecords =
@@ -3490,6 +3492,13 @@ namespace VerificationPortal.Controllers
 
                 vm.DentalEducationUnitHasInternet =
                     entity.DentalEducationUnitHasInternet;
+
+                vm.DEUYearOfStarting = entity.DeuyearOfStarting;
+
+                vm.NatureOfActivities = entity.NatureOfActivities;
+                vm.DeuMembersListFilePath = entity.DeuMembersListFilePath;
+
+                vm.DeuMembersListDocumentId = await GetDocumentIdAsync("DEU Members List");
 
                 vm.DeuCoordinatorName =
                     entity.DeuCoordinatorName;
