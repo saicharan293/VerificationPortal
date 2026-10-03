@@ -257,6 +257,20 @@ namespace VerificationPortal.Models
 
         public string? CourseLevel {  get; set; }
 
+        public int? PossessionProofDocumentId { get; set; }
+
+        public string CollegeName { get; set; } = "Unknown College";
+        public string CollegeCode { get; set; }
+
+        public string? UserDesignation { get; set; }
+
+        public string? ActiveTab { get; set; }
+
+        //public object? SectionFeedback { get; set; }
+
+        public string? FacultyName { get; set; }
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
         //public string? OwnOrRented { get; set; }
     }
 

@@ -6,30 +6,37 @@
     ViewData["Title"] = "Hostel Details";
     ViewData["ActiveTab"] = "HostelDetails";
 
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
-    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+    ViewData["InstitutionName"] = Model.CollegeName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model.FacultyName ?? "";
 
     ViewData["ShowFeedbackSection"] = true;
 
     ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+        User.Identity?.Name + " - " + Model.UserDesignation;
 
     ViewData["PrevTabAction"] = Url.Action(
         "BedDistribution",
         "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+        new { collegeCode = Model.CollegeCode });
 
     ViewData["PrevTabLabel"] = "Previous : Bed Distribution";
 
     ViewData["NextTabAction"] = Url.Action(
         "HospitalDetails",
         "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+        new { collegeCode = Model.CollegeCode });
 
     ViewData["NextTabLabel"] = "Next : Hospital Details";
-}
 
+    var hostelInfoFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 30);
+
+    var studentAccomodationFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 31);
+
+    var commonRoomFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 32);
+
+    var hostelFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 33);
+}
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
 }
@@ -59,10 +66,7 @@
 </div>
 
 <div class="verification-card">
-    @{
-        var hostelInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionId == 30);
-    }
+    
 
     <div class="verification-card-header">
         <h3 class="verification-card-title">
@@ -176,7 +180,10 @@
                                     collegeCode = Model.Hostel.CollegeCode,
                                     documentType = "PossessionProof"
                                 })!,
-                            Title = "Possession Proof"
+                            Title = "Possession Proof",
+                            DocumentId = Model.PossessionProofDocumentId,
+                            CollegeCode = Model.Hostel.CollegeCode,
+                            FacultyId = Convert.ToInt32(Model.Hostel.FacultyCode)
                         })
                 </div>
             }
@@ -209,10 +216,7 @@
 
 
 <div class="verification-card mt-4">
-    @{
-        var studentAccomodationFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionId == 31);
-    }
+
     <div class="verification-card-header">
         <h3 class="verification-card-title">
             <i class="bi bi-people"></i>
@@ -261,12 +265,6 @@
         }
     </div>
 </div>
-
-
-@{
-    var commonRoomFacilitiesFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 32);
-}
 
 <div class="verification-card mt-4">
 
@@ -344,12 +342,6 @@
     </div>
 
 </div>
-
-                   
-@{
-    var hostelFacilitiesFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 33);
-}
 
 <div class="verification-card mt-4">
 

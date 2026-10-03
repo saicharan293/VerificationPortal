@@ -355,6 +355,24 @@ namespace VerificationPortal.Controllers
             }).ToList();
         }
 
+        private async Task<int?> GetDocumentIdAsync(string documentName)
+        {
+            if (string.IsNullOrWhiteSpace(documentName)) return null;
+
+            return await _context.MstDocuments.AsNoTracking().Where(d => d.DocumentName == documentName)
+                .Select(e => (int?)e.DocumentId)
+                .FirstOrDefaultAsync();
+        }
+
+        private async Task<String> GetFacultyName(int facultyId)
+        {
+            if (facultyId==0) return null;
+
+            return await _context.Faculties.AsNoTracking().Where(d => d.FacultyId == facultyId)
+                .Select(e => e.FacultyName)
+                .FirstOrDefaultAsync();
+        }
+
         // GET: /VerificationDashboard/TrustDetails/{collegeCode}
         [HttpGet]
         public async Task<IActionResult> TrustDetails(string collegeCode)
@@ -3327,26 +3345,34 @@ namespace VerificationPortal.Controllers
                 return NotFound("College code is required.");
 
             var context = await GetPageContextAsync(collegeCode);
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
             PopulateCommonViewBags(context);
 
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
+            //ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
+            //ViewBag.UserDesignation = GetUserDesignation();
 
             var college = await _context.AffiliationCollegeMasters
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
+                .Where(c => c.CollegeCode == collegeCode)
+                .FirstOrDefaultAsync();
 
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
+            //ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
 
             var hostel = await _context.AffHostelDetails
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode &&
-                    x.FacultyCode == context.FacultyCode);
+                    x.FacultyCode == context.FacultyCode &&
+                    x.CourseLevel == courseLevel);
 
             if (hostel != null && !string.IsNullOrWhiteSpace(hostel.OwnOrRented))
                 hostel.OwnOrRented = hostel.OwnOrRented.Trim();
+
+            await SetVerificationViewData<AffHostelDetail>(collegeCode);
+
+            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 13);
+
 
             var vm = new AffHostelDetailsCreateVm
             {
@@ -3354,12 +3380,19 @@ namespace VerificationPortal.Controllers
                 {
                     CollegeCode = collegeCode,
                     FacultyCode = context.FacultyCode
-                }
+                }, 
+                CourseLevel = courseLevel,
+                CollegeName = college.CollegeName,
+                CollegeCode = college.CollegeCode,
+                UserDesignation = GetUserDesignation(),
+                ActiveTab = nameof(HostelDetails),
+                SectionFeedback = sectionFeedback
             };
 
-            await SetVerificationViewData<AffHostelDetail>(collegeCode);
+            vm.PossessionProofDocumentId = await GetDocumentIdAsync("Possession Proof");
+            vm.FacultyName = await GetFacultyName(Convert.ToInt32(college.FacultyCode));
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 13);
+          
 
             return View(vm);
         }
