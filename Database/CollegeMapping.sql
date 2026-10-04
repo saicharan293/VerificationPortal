@@ -2385,6 +2385,61 @@ ADD
     LastUpdatedDate DATETIME NULL;
 
 
+ALTER TABLE [dbo].[AnimalHouseDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
 -------------------
 
 /* ============================================================
@@ -2686,6 +2741,27 @@ SELECT
 FROM dbo.MstTabs
 WHERE FacultyId = 2
   AND TabName = N'Workshop Details';
+
+--------------------------------------------------
+
+
+INSERT INTO dbo.MstTabs (FacultyId, TabName)
+    VALUES
+        (2, N'Animal House Details');
+
+INSERT INTO dbo.MstSections
+(
+    FacultyId,
+    TabId,
+    SectionName
+)
+SELECT
+    FacultyId,
+    TabId,
+    N'Animal House Details'
+FROM dbo.MstTabs
+WHERE FacultyId = 2
+  AND TabName = N'Animal House Details';
 
   -------------------------------------------------
 

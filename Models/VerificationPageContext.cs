@@ -11,5 +11,8 @@
         public int FacultyCodeInt => int.Parse(Institution.FacultyCode);
 
         public string InstitutionName => Institution.NameOfInstitution ?? string.Empty;
+
+        public Faculty Faculty { get; set; } = null!;
+        public string FacultyName => Faculty.FacultyName;
     }
 }

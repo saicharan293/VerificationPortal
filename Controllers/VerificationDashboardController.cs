@@ -2218,6 +2218,7 @@ namespace VerificationPortal.Controllers
 
                 { "FacultyDetails", typeof(FacultyDetail) },
                 { "WorkShopDetails", typeof(WorkShopDetail) },
+                { "AnimalHouseDetails", typeof(AnimalHouseDetail) },
                 { "TeachingExperience", typeof(TeachingStaffDepartmentWiseDetail) },
 
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
@@ -3246,9 +3247,12 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(institution.FacultyCode))
                 throw new Exception("Faculty code not found.");
 
+            var faculty = await _context.Faculties.AsNoTracking().FirstOrDefaultAsync(x => x.FacultyId.ToString() == institution.FacultyCode);
+
             return new VerificationPageContext
             {
-                Institution = institution
+                Institution = institution,
+                Faculty = faculty
             };
         }
 
@@ -3634,6 +3638,45 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<WorkShopDetail>(collegeCode);
 
             vm.FacultyName = await _context.Faculties.Where(e => e.FacultyId == context.FacultyCodeInt).Select(e => e.FacultyName).FirstOrDefaultAsync();
+            return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AnimalHouseDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode)) return BadRequest("College code is required");
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var animalHouseDetails = await _context.AnimalHouseDetails
+                .AsNoTracking()
+                .Where(e => e.CollegeCode == collegeCode &&
+                          e.FacultyId == context.FacultyCodeInt)
+                .OrderBy(e => e.CourseLevel)
+                .ToListAsync();
+
+            var vm = new AnimalHouseDetailsVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = context.FacultyCodeInt,
+                    CollegeCode = collegeCode,
+                    CollegeName = context.InstitutionName,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+                    VerificationStatus = "Pending",
+                    StatusBadgeClass = "pending",
+                    PrevTabAction = "Previous : Workshop Details",
+                    NextTabAction = Url.Action("HospitalDetails", "VerificationDashboard", new { collegeCode }),
+                    NextTabLabel = "Next : Hospital Details"
+                },
+
+                AnimalHouseDetails = animalHouseDetails,
+                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 29)
+            };
+
+            await SetVerificationViewData<AnimalHouseDetail>(collegeCode);
+
             return View(vm);
         }
 
@@ -4999,6 +5042,14 @@ namespace VerificationPortal.Controllers
                     ["WorkShopDetails"] =  async () =>
                     {
                         await _verificationService.SaveVerificationAsync<WorkShopDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyId == facultyCode,
+                            request);
+                    },
+
+                    ["AnimalHouseDetails"] =  async () =>
+                    {
+                        await _verificationService.SaveVerificationAsync<AnimalHouseDetail>(
                             x => x.CollegeCode == collegeCode &&
                                  x.FacultyId == facultyCode,
                             request);
