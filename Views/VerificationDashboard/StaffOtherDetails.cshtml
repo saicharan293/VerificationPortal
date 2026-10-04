@@ -6,23 +6,43 @@
     ViewData["Title"] = "Staff Other Details";
     ViewData["ActiveTab"] = "StaffOtherDetails";
 
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-
-    ViewData["CollegeCode"] =  ViewBag.CollegeCode ?? "";
-
-    ViewData["FacultyCode"] =  ViewBag.FacultyCode ?? "";
-
     ViewData["ShowFeedbackSection"] = true;
 
-    ViewData["CurrentVerifier"] =  User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    var staffOther = Model.StaffOther;
+    var page = staffOther?.PageContext;
 
-    ViewData["PrevTabAction"] = Url.Action( "StaffPayScale", "VerificationDashboard",  new { collegeCode = ViewBag.CollegeCode } );
+    ViewData["InstitutionName"] =  page?.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =   page?.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =   page?.FacultyId;
+
+
+    ViewData["CurrentVerifier"] =  page?.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = Url.Action( "StaffPayScale", "VerificationDashboard",  new { collegeCode =  page?.CollegeCode } );
 
     ViewData["PrevTabLabel"] = "Previous : Staff Pay Scale";
 
-    ViewData["NextTabAction"] = Url.Action( "NextTab", "VerificationDashboard",  new { collegeCode = ViewBag.CollegeCode } );
+    ViewData["NextTabAction"] = Url.Action( "NextTab", "VerificationDashboard",  new { collegeCode =  page?.CollegeCode } );
 
     ViewData["NextTabLabel"] = "Next : Next Section";
+
+    var staffOtherDetailsFeedback = staffOther?.SectionFeedback?.FirstOrDefault(x => x.SectionId == 41);
+
+    var documents = new List<(string Label, string? FileName, int? Id,string FileType, string Title)>
+    {
+        ("Examiners List", staffOther?.TeachersUpdatedPdfName, staffOther?.TeachersUpdatedPdfId,"EmsList", "Examiners List"),
+        ("Form 16 Details", staffOther?.ExaminerDetailsPdfName, staffOther?.ExaminerDetailsPdfId, "Examiner", "Examiner Details"),
+        ("Form 16 Details Upload 2", staffOther?.ExaminerDetailsPdfName2, staffOther?.ExaminerDetailsPdf2Id, "Examiner2", "Examiner Details"),
+        ("Form 16 Details Upload 3", staffOther?.ExaminerDetailsPdfName3, staffOther?.ExaminerDetailsPdf3Id, "Examiner3", "Examiner Details"),
+        ("Form 16 Details Upload 4", staffOther?.ExaminerDetailsPdfName4, staffOther?.ExaminerDetailsPdf4Id, "Examiner4", "Examiner Details Upload 4"),
+        ("Form 16 Details Upload 5", staffOther?.ExaminerDetailsPdfName5, staffOther?.ExaminerDetailsPdf5Id, "Examiner5", "Examiner Details Upload 5"),
+        ("AEBAS – Last Three Months", staffOther?.AEBASLastThreeMonthsPdfName, staffOther?.AEBASLastThreeMonthsPdfId, "AEBAS3Months", "AEBAS – Last Three Months"),
+        ("AEBAS – Inspection Day", staffOther?.AEBASInspectionDayPdfName, staffOther?.AEBASInspectionDayPdfId, "AEBASInspection", "AEBAS – Inspection Day"),
+        ("Provident Fund", staffOther?.ProvidentFundPdfName, staffOther?.ProvidentFundPdfId, "PF", "Provident Fund"),
+        ("ESI", staffOther?.ESIPdfName, staffOther?.ESIPdfId, "ESI", "ESI")
+    };
 }
 
 <div class="verification-page-header">
@@ -66,9 +86,9 @@
 
                     <div class="verification-value">
                         @(string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.TeachersUpdatedInEMS)
+                            staffOther?.TeachersUpdatedInEMS)
                             ? "-"
-                            : Model.StaffOther.TeachersUpdatedInEMS)
+                            : staffOther.TeachersUpdatedInEMS)
                     </div>
 
                 </div>
@@ -86,9 +106,9 @@
 
                     <div class="verification-value">
                         @(string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ExaminerDetailsAttached)
+                            staffOther?.ExaminerDetailsAttached)
                             ? "-"
-                            : Model.StaffOther.ExaminerDetailsAttached)
+                            : staffOther.ExaminerDetailsAttached)
                     </div>
 
                 </div>
@@ -106,9 +126,9 @@
 
                     <div class="verification-value">
                         @(string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ServiceRegisterMaintained)
+                            staffOther?.ServiceRegisterMaintained)
                             ? "-"
-                            : Model.StaffOther.ServiceRegisterMaintained)
+                            : staffOther.ServiceRegisterMaintained)
                     </div>
 
                 </div>
@@ -126,9 +146,9 @@
 
                     <div class="verification-value">
                         @(string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.AcquittanceRegisterMaintained)
+                            staffOther?.AcquittanceRegisterMaintained)
                             ? "-"
-                            : Model.StaffOther.AcquittanceRegisterMaintained)
+                            : staffOther.AcquittanceRegisterMaintained)
                     </div>
 
                 </div>
@@ -136,11 +156,6 @@
             </div>
 
         </div>
-
-        @{
-            var staffOtherDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                                    ?.FirstOrDefault(x => x.SectionId == 41);
-        }
 
         @if (staffOtherDetailsFeedback != null)
         {
@@ -157,440 +172,56 @@
         </h5>
 
         <div class="row g-3">
+            @foreach (var document in documents)
+            {
+                <div class="col-md-6" key="@document.FileType">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            @document.Label
+                        </label>
 
-            @* Examiners List *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Examiners List
-                    </label>
+                        <div class="verification-value">
+                            @if (!string.IsNullOrWhiteSpace(document.FileName))
+                            {
+                                <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <span class="text-break">
+                                        @document.FileName
+                                    </span>
 
-                    <div class="verification-value">
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
+                                        {
+                                            Url = Url.Action(
+                                                "ViewStaffOtherPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = Model.CollegeCode,
+                                                    fileType = document.FileType
+                                                })!,
 
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.TeachersUpdatedInEMS))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
+                                            Title = document.Title,
 
-                                <span>
-                                    @Model.StaffOther.TeachersUpdatedPdfName
-                                </span>
+                                            FacultyId = Convert.ToInt32(
+                                                staffOther?.FacultyCode),
 
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "EmsList"
-                                            })!,
-                                        Title = "Examiners List"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
+                                            DocumentId = document.Id, // Replace with the actual document ID property
 
+                                            CollegeCode = Model.CollegeCode,
+
+                                            CanVerify = true
+                                        })
+                                </div>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            @* Form 16 Details *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Form 16 Details
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ExaminerDetailsPdfName))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ExaminerDetailsPdfName
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "Examiner"
-                                            })!,
-                                        Title = "Examiner Details"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-            @* Form 16 Details 2 *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Form 16 Details Upload 2
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ExaminerDetailsPdfName2))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ExaminerDetailsPdfName2
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "Examiner2"
-                                            })!,
-                                        Title = "Examiner Details"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-            @* Form 16 Details 3 *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Form 16 Details Upload 3
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ExaminerDetailsPdfName3))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ExaminerDetailsPdfName3
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "Examiner3"
-                                            })!,
-                                        Title = "Examiner Details"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-            @* Form 16 Details 4 *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Form 16 Details Upload 4
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ExaminerDetailsPdfName4))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ExaminerDetailsPdfName4
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "Examiner4"
-                                            })!,
-                                        Title = "Examiner Details Upload 4"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-            @* Form 16 Details 5 *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Form 16 Details Upload 5
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ExaminerDetailsPdfName5))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ExaminerDetailsPdfName5
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "Examiner5"
-                                            })!,
-                                        Title = "Examiner Details Upload 5"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-
-            @* AEBAS Last Three Months *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        AEBAS – Last Three Months
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.AEBASLastThreeMonthsPdfName))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.AEBASLastThreeMonthsPdfName
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "AEBAS3Months"
-                                            })!,
-                                        Title = "AEBAS – Last Three Months"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-
-            @* AEBAS Inspection Day *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        AEBAS – Inspection Day
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.AEBASInspectionDayPdfName))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.AEBASInspectionDayPdfName
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "AEBASInspection"
-                                            })!,
-                                        Title = "AEBAS – Inspection Day"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-
-            @* Provident Fund *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        Provident Fund
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ProvidentFundPdfName))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ProvidentFundPdfName
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "PF"
-                                            })!,
-                                        Title = "Provident Fund"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
-
-
-            @* ESI *@
-            <div class="col-md-6">
-                <div class="verification-field">
-                    <label class="verification-label">
-                        ESI
-                    </label>
-
-                    <div class="verification-value">
-
-                        @if (!string.IsNullOrWhiteSpace(
-                            Model.StaffOther?.ESIPdfName))
-                        {
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-
-                                <span>
-                                    @Model.StaffOther.ESIPdfName
-                                </span>
-
-                                @await Html.PartialAsync(
-                                    "_DocumentViewerButton",
-                                    new DocumentViewerVm
-                                    {
-                                        Url = Url.Action(
-                                            "ViewStaffOtherPdf",
-                                            "VerificationDashboard",
-                                            new
-                                            {
-                                                collegeCode = Model.CollegeCode,
-                                                fileType = "ESI"
-                                            })!,
-                                        Title = "ESI"
-                                    })
-                            </div>
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-
-                    </div>
-                </div>
-            </div>
+            }
 
         </div>
     </div>

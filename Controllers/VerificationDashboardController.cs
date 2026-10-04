@@ -5642,11 +5642,6 @@ namespace VerificationPortal.Controllers
 
             var pageContext = await GetPageContextAsync(collegeCode);
 
-            var facultyCode = pageContext.Institution.FacultyCode?.Trim();
-
-            if (string.IsNullOrWhiteSpace(facultyCode))
-                return NotFound("Faculty code not found.");
-
             // Course levels
             var levels = await GetSortedCourseLevels(collegeCode);
 
@@ -5658,9 +5653,31 @@ namespace VerificationPortal.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode &&
-                    x.FacultyCode == facultyCode);
+                    x.FacultyCode == pageContext.FacultyCode);
 
-            var staffOther = new CA_Med_StaffParticularsOtherVM();
+            var staffOther = new CA_Med_StaffParticularsOtherVM
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = pageContext.FacultyCodeInt,
+                    CollegeCode = collegeCode,
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+                    FacultyName = pageContext.FacultyName,
+
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action("PreviousAction", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Previous Section",
+
+                    NextTabAction = Url.Action( "NextAction", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Next Section"
+                }
+            };
 
             if (otherDetails != null)
             {
@@ -5687,38 +5704,58 @@ namespace VerificationPortal.Controllers
                 staffOther.TeachersUpdatedPdfName =
                     otherDetails.TeachersUpdatedPdfName;
 
+                staffOther.TeachersUpdatedPdfId = await GetDocumentIdAsync("Examiners List");
+
                 staffOther.ExaminerDetailsPdfName =
                     otherDetails.ExaminerDetailsPdfName;
+
+                staffOther.ExaminerDetailsPdfId = await GetDocumentIdAsync("Form 16 Details");
 
                 staffOther.ExaminerDetailsPdfName2 =
                     otherDetails.ExaminerDetailsPdfName2;
 
+                staffOther.ExaminerDetailsPdf2Id = await GetDocumentIdAsync("Form 16 Details Upload 2");
+
                 staffOther.ExaminerDetailsPdfName3 =
                     otherDetails.ExaminerDetailsPdfName3;
+
+                staffOther.ExaminerDetailsPdf3Id = await GetDocumentIdAsync("Form 16 Details Upload 3");
 
                 staffOther.ExaminerDetailsPdfName4 =
                     otherDetails.ExaminerDetailsPdfName4;
 
+                staffOther.ExaminerDetailsPdf4Id = await GetDocumentIdAsync("Form 16 Details Upload 4");
+
                 staffOther.ExaminerDetailsPdfName5 =
                     otherDetails.ExaminerDetailsPdfName5;
+
+                staffOther.ExaminerDetailsPdf5Id = await GetDocumentIdAsync("Form 16 Details Upload 5");
 
                 staffOther.AEBASLastThreeMonthsPdfName =
                     otherDetails.AebaslastThreeMonthsPdfName;
 
+                staffOther.AEBASLastThreeMonthsPdfId = await GetDocumentIdAsync("AEBAS – Last Three Months");
+
                 staffOther.AEBASInspectionDayPdfName =
                     otherDetails.AebasinspectionDayPdfName;
+
+                staffOther.AEBASInspectionDayPdfId = await GetDocumentIdAsync("AEBAS – Inspection Day");
 
                 staffOther.ProvidentFundPdfName =
                     otherDetails.ProvidentFundPdfName;
 
+                staffOther.ProvidentFundPdfId = await GetDocumentIdAsync("Provident Fund");
+
                 staffOther.ESIPdfName =
                     otherDetails.EsipdfName;
+
+                staffOther.ESIPdfId = await GetDocumentIdAsync("ESI");
             }
 
             var vm = new StaffDetailsCombinedViewModel
             {
                 CollegeCode = collegeCode,
-                FacultyCode = facultyCode,
+                FacultyCode = pageContext.FacultyCode,
                 StaffOther = staffOther,
                 ExistingCourseLevels = levels
             };
@@ -5727,13 +5764,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<CaMedStaffParticularsOther>(
                 collegeCode);
 
-            ViewBag.InstitutionName =
-                pageContext.Institution.NameOfInstitution;
-
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.FacultyCode = facultyCode;
-
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 20);
+            staffOther.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 20);
 
             return View("StaffOtherDetails", vm);
         }

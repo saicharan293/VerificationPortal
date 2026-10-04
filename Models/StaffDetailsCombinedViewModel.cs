@@ -52,6 +52,9 @@ namespace VerificationPortal.Models
 
     public class CA_Med_StaffParticularsOtherVM
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
+
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; }
         public int Id { get; set; }
 
         public string? CourseLevel { get; set; }
@@ -71,12 +74,19 @@ namespace VerificationPortal.Models
 
         // Saved File Names (for view button)
         public string? ExaminerDetailsPdfName { get; set; }
+        public int? ExaminerDetailsPdfId { get; set; }
         public string? ExaminerDetailsPdfName2 { get; set; }
+        public int? ExaminerDetailsPdf2Id { get; set; }
         public string? ExaminerDetailsPdfName3 { get; set; }
+        public int? ExaminerDetailsPdf3Id { get; set; }
         public string? ExaminerDetailsPdfName4 { get; set; }
+        public int? ExaminerDetailsPdf4Id { get; set; }
         public string? ExaminerDetailsPdfName5 { get; set; }
+        public int? ExaminerDetailsPdf5Id { get; set; }
         public string? AEBASLastThreeMonthsPdfName { get; set; }
+        public int? AEBASLastThreeMonthsPdfId { get; set; }
         public string? AEBASInspectionDayPdfName { get; set; }
+        public int? AEBASInspectionDayPdfId { get; set; }
 
         [Required(ErrorMessage = "Please select Service Register option")]
         public string? ServiceRegisterMaintained { get; set; }
@@ -85,8 +95,11 @@ namespace VerificationPortal.Models
         public string? AcquittanceRegisterMaintained { get; set; }
 
         public string? ProvidentFundPdfName { get; set; }
+        public int? ProvidentFundPdfId { get; set; }
 
         public string? TeachersUpdatedPdfName { get; set; }
+        public int? TeachersUpdatedPdfId { get; set; }
         public string? ESIPdfName { get; set; }
+        public int? ESIPdfId { get; set; }
     }
 }
