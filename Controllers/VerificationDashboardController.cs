@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
 using VerificationPortal.Models.ViewModels;
@@ -1265,7 +1266,7 @@ namespace VerificationPortal.Controllers
             return View(model);
         }
 
-        private async Task SetVerificationViewData<T>(string collegeCode) where T : class
+        private async Task SetVerificationViewData<T>(  string collegeCode,  int? facultyId = null) where T : class
         {
             var property = typeof(T).GetProperties()
                 .FirstOrDefault(p =>
@@ -1274,27 +1275,88 @@ namespace VerificationPortal.Controllers
                         StringComparison.OrdinalIgnoreCase));
 
             if (property == null)
-                throw new Exception(
-                    $"{typeof(T).Name} does not contain a CollegeCode property.");
+            {
+                throw new Exception( $"{typeof(T).Name} does not contain a CollegeCode property.");
+            }
 
             var designation = GetUserDesignation();
 
             ViewData["IsAdmin"] = IsAdminUser();
 
+            // Build a college predicate first.
+            Expression<Func<T, bool>> predicate = x => EF.Property<string>(x, property.Name) == collegeCode;
+
+            // Apply FacultyId only to entities that actually have the mapped property.
+            var facultyProperty = _context.Model
+                .FindEntityType(typeof(T))?
+                .FindProperty("FacultyId");
+
+            if (facultyId.HasValue && facultyProperty != null)
+            {
+                var parameter = Expression.Parameter(typeof(T), "x");
+
+                var collegeProperty = Expression.Call(
+                    typeof(EF),
+                    nameof(EF.Property),
+                    new[] { typeof(string) },
+                    parameter,
+                    Expression.Constant(property.Name));
+
+                var collegeCondition = Expression.Equal(
+                    collegeProperty,
+                    Expression.Constant(collegeCode));
+
+                var facultyClrType = facultyProperty.ClrType;
+                var underlyingFacultyType =
+                    Nullable.GetUnderlyingType(facultyClrType)
+                    ?? facultyClrType;
+
+                var facultyValue = Convert.ChangeType(
+                    facultyId.Value,
+                    underlyingFacultyType);
+
+                var facultyPropertyExpression = Expression.Call(
+                    typeof(EF),
+                    nameof(EF.Property),
+                    new[] { facultyClrType },
+                    parameter,
+                    Expression.Constant("FacultyId"));
+
+                var facultyConstant = Expression.Constant(
+                    facultyValue,
+                    underlyingFacultyType);
+
+                Expression facultyValueExpression =
+                    facultyConstant.Type == facultyClrType
+                        ? facultyConstant
+                        : Expression.Convert(
+                            facultyConstant,
+                            facultyClrType);
+
+                var facultyCondition = Expression.Equal(
+                    facultyPropertyExpression,
+                    facultyValueExpression);
+
+                var body = Expression.AndAlso(
+                    collegeCondition,
+                    facultyCondition);
+
+                predicate = Expression.Lambda<Func<T, bool>>(
+                    body,
+                    parameter);
+            }
+
             // =========================================================
-            // ADMIN (Admin, Director, Vice Chancellor)
+            // ADMIN
             // =========================================================
 
             if (IsAdminUser())
             {
                 var entity = await _context.Set<T>()
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x =>
-                        EF.Property<string>(x, property.Name) == collegeCode);
+                    .FirstOrDefaultAsync(predicate);
 
-                var history = await _verificationService
-                    .GetVerificationHistoryAsync<T>(
-                        x => EF.Property<string>(x, property.Name) == collegeCode);
+                var history = await _verificationService.GetVerificationHistoryAsync<T>(predicate);
 
                 ViewData["VerificationHistory"] = history;
 
@@ -1304,21 +1366,12 @@ namespace VerificationPortal.Controllers
                     return;
                 }
 
-                // =====================================================
-                // GET VERIFICATION PREFIX FROM DESIGNATION
-                // =====================================================
-
                 var verificationPrefix = GetVerificationPrefix(designation);
 
                 if (string.IsNullOrWhiteSpace(verificationPrefix))
                 {
-                    throw new Exception(
-                        $"No verification mapping found for designation: {designation}");
+                    throw new Exception( $"No verification mapping found for designation: {designation}");
                 }
-
-                // =====================================================
-                // GET DESIGNATION-SPECIFIC PROPERTIES DYNAMICALLY
-                // =====================================================
 
                 var properties = typeof(T).GetProperties();
 
@@ -1349,99 +1402,71 @@ namespace VerificationPortal.Controllers
                         $"for designation: {designation}");
                 }
 
-                bool? isVerified =
-                    statusProperty.GetValue(entity) as bool?;
+                var isVerified = statusProperty.GetValue(entity) as bool?;
 
-                string? remarks =
-                    remarksProperty?.GetValue(entity) as string;
+                var remarks = remarksProperty?.GetValue(entity) as string;
 
-                DateTime? verifiedDate =
-                    dateProperty?.GetValue(entity) as DateTime?;
+                var verifiedDate = dateProperty?.GetValue(entity) as DateTime?;
 
-                string? verifiedBy =
-                    nameProperty?.GetValue(entity) as string;
+                var verifiedBy = nameProperty?.GetValue(entity) as string;
 
-                // =====================================================
-                // NO VERIFICATION YET
-                // =====================================================
-
-                if (isVerified == null &&
-                    string.IsNullOrWhiteSpace(remarks))
+                if (isVerified == null && string.IsNullOrWhiteSpace(remarks))
                 {
                     SetPendingVerificationViewData();
                     return;
                 }
 
-                // =====================================================
-                // EXISTING VERIFICATION
-                // =====================================================
-
                 ViewData["ExistingRemarks"] = remarks;
 
-                ViewData["ExistingStatus"] =
-                    isVerified switch
-                    {
-                        true => "Approved",
-                        false => "Rejected",
-                        null => "Pending"
-                    };
-
-                ViewData["ExistingStatusClass"] =
-                    isVerified switch
-                    {
-                        true => "bg-success",
-                        false => "bg-danger",
-                        null => "bg-warning"
-                    };
-
-                ViewData["VerifiedBy"] =
-                    verifiedBy ?? designation;
-
-                ViewData["VerifiedDate"] =
-                    verifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
-
-                ViewData["ShowFeedbackForm"] =
-                    isVerified == null;
-
-                return;
-            }
-            // =========================================================
-            // NORMAL USER
-            // =========================================================
-
-            var verification = await _verificationService
-                .GetVerificationAsync<T>(
-                    x => EF.Property<string>(x, property.Name) == collegeCode,
-                    designation);
-
-            // Also fetch full verification history for display
-            var verificationHistory = await _verificationService
-                .GetVerificationHistoryAsync<T>(
-                    x => EF.Property<string>(x, property.Name) == collegeCode);
-
-            if (verification == null)
-            {
-                ViewData["ExistingRemarks"] = null;
-                ViewData["ExistingStatus"] = "Pending";
-                ViewData["ExistingStatusClass"] = "bg-warning";
-                ViewData["VerifiedBy"] = null;
-                ViewData["VerifiedDate"] = null;
-                ViewData["ShowFeedbackForm"] = true;
-
-                ViewData["VerificationHistory"] = verificationHistory;
-
-                return;
-            }
-
-            ViewData["ExistingRemarks"] = verification.Remarks;
-
-            ViewData["ExistingStatus"] =
-                verification.IsVerified switch
+                ViewData["ExistingStatus"] = isVerified switch
                 {
                     true => "Approved",
                     false => "Rejected",
                     null => "Pending"
                 };
+
+                ViewData["ExistingStatusClass"] = isVerified switch
+                {
+                    true => "bg-success",
+                    false => "bg-danger",
+                    null => "bg-warning"
+                };
+
+                ViewData["VerifiedBy"] = verifiedBy ?? designation;
+
+                ViewData["VerifiedDate"] = verifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
+
+                ViewData["ShowFeedbackForm"] = isVerified == null;
+
+                return;
+            }
+
+            // =========================================================
+            // NORMAL USER
+            // =========================================================
+
+            var verification = await _verificationService
+                .GetVerificationAsync<T>(predicate, designation);
+
+            var verificationHistory = await _verificationService
+                .GetVerificationHistoryAsync<T>(predicate);
+
+            ViewData["VerificationHistory"] = verificationHistory;
+
+            if (verification == null)
+            {
+                SetPendingVerificationViewData();
+                return;
+            }
+
+            ViewData["ExistingRemarks"] = verification.Remarks;
+
+            ViewData["ExistingStatus"] = verification.IsVerified switch
+            {
+                true => "Approved",
+                false => "Rejected",
+                null => "Pending"
+            };
 
             ViewData["ExistingStatusClass"] =
                 verification.IsVerified switch
@@ -1456,10 +1481,7 @@ namespace VerificationPortal.Controllers
             ViewData["VerifiedDate"] = verification.VerifiedDate?.ToString("dd-MM-yyyy hh:mm tt");
 
             ViewData["ShowFeedbackForm"] = verification.IsVerified == null;
-
-            ViewData["VerificationHistory"] = verificationHistory;
         }
-
 
 
         private string? GetVerificationPrefix(string? designation)
@@ -2219,6 +2241,9 @@ namespace VerificationPortal.Controllers
                 { "FacultyDetails", typeof(FacultyDetail) },
                 { "WorkShopDetails", typeof(WorkShopDetail) },
                 { "AnimalHouseDetails", typeof(AnimalHouseDetail) },
+                { "DentalFieldPracticeArea", typeof(DentalFieldPracticeArea) },
+
+
                 { "TeachingExperience", typeof(TeachingStaffDepartmentWiseDetail) },
 
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
@@ -3680,6 +3705,132 @@ namespace VerificationPortal.Controllers
             return View(vm);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> DentalFieldPracticeArea(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return BadRequest("College code is required.");
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var fieldTypes = await _context.MstFieldTypeChps
+                .AsNoTracking()
+                .Where(x => x.FacultyCode == context.FacultyCodeInt)
+                .ToListAsync();
+
+            var ruralFieldTypeIds = fieldTypes
+                .Where(x => x.FieldType.Contains(
+                    "Rural", StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.Id)
+                .ToList();
+
+            var urbanFieldTypeIds = fieldTypes
+                .Where(x => x.FieldType.Contains(
+                    "Urban", StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.Id)
+                .ToList();
+
+            var ruralRecord = await _context.DentalFieldPracticeAreas
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == context.FacultyCodeInt &&
+                    x.IsActive &&
+                    ruralFieldTypeIds.Contains(x.FieldTypeId))
+                .FirstOrDefaultAsync();
+
+            var urbanRecord = await _context.DentalFieldPracticeAreas
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == context.FacultyCodeInt &&
+                    x.IsActive &&
+                    urbanFieldTypeIds.Contains(x.FieldTypeId))
+                .FirstOrDefaultAsync();
+
+
+            var vm = new DentalFieldPracticeAreaVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = context.FacultyCodeInt,
+                    CollegeCode = collegeCode,
+                    InstitutionName = context.Institution.NameOfInstitution,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action("AnimalHouseDetails", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Animal House Details",
+
+                    NextTabAction = Url.Action("HospitalDetails", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Hospital Details"
+                },
+
+                RuralFieldPracticeArea = new RuralFieldPracticeAreaVm
+                {
+                    FieldPracticeArea = ruralRecord ?? new DentalFieldPracticeArea(),
+
+                    // Populate from your existing document source.
+                    StaffListId = await GetDocumentIdAsync("Rural Field Practice Area - Staff List"),
+                },
+
+                UrbanFieldPracticeArea = new DentalFieldPracticeAreaVm
+                {
+                    FieldPracticeArea = urbanRecord ?? new DentalFieldPracticeArea(),
+
+                    // Populate from your existing document source.
+                    StaffListId = await GetDocumentIdAsync("Urban Field Practice Area - Staff List"),
+                },
+
+                FieldTypes = fieldTypes,
+
+                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 30)
+            };
+
+
+            await SetVerificationViewData<DentalFieldPracticeArea>(collegeCode, context.FacultyCodeInt);
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewFpaList(string collegeCode, string staffListPath)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            // Get common verification context
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.FacultyCode;
+
+            var entity = await _context.DentalFieldPracticeAreas
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == context.CollegeCode &&
+                    x.FacultyId.ToString() == facultyCode &&
+                    x.StaffList == staffListPath);
+
+            if (entity == null)
+                return NotFound("Field Practice Area details not found.");
+
+            if (string.IsNullOrWhiteSpace(entity.StaffList))
+                return NotFound("Field Practice Area file not found.");
+
+            if (!System.IO.File.Exists(entity.StaffList))
+                return NotFound("Field Practice Area file does not exist.");
+
+            // Open PDF directly in browser
+            Response.Headers["Content-Disposition"] = "inline";
+
+            return PhysicalFile( entity.StaffList, "application/pdf");
+        }
+
         private async Task PopulateCommonViewBags(string collegeCode)
         {
             var institution = await _context.AffInstitutionsDetails
@@ -5050,6 +5201,14 @@ namespace VerificationPortal.Controllers
                     ["AnimalHouseDetails"] =  async () =>
                     {
                         await _verificationService.SaveVerificationAsync<AnimalHouseDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyId == facultyCode,
+                            request);
+                    },
+
+                    ["DentalFieldPracticeArea"] =  async () =>
+                    {
+                        await _verificationService.SaveVerificationAsync<DentalFieldPracticeArea>(
                             x => x.CollegeCode == collegeCode &&
                                  x.FacultyId == facultyCode,
                             request);

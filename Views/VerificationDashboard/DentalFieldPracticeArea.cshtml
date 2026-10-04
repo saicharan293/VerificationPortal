@@ -1,0 +1,457 @@
+﻿
+@model VerificationPortal.Models.DentalFieldPracticeAreaVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Dental Field Practice Area";
+    ViewData["ActiveTab"] = "DentalFieldPracticeArea";
+
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? string.Empty;
+
+    ViewData["FacultyName"] = Model.PageContext.FacultyName ?? string.Empty;
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["CurrentVerifier"] = Model.PageContext.CurrentVerifier ?? string.Empty;
+
+    ViewData["PrevTabAction"] = Model.PageContext.PrevTabAction;
+    ViewData["PrevTabLabel"] = Model.PageContext.PrevTabLabel;
+    ViewData["NextTabAction"] = Model.PageContext.NextTabAction;
+    ViewData["NextTabLabel"] = Model.PageContext.NextTabLabel;
+
+    // Replace these IDs with the actual Rural and Urban section IDs.
+    var ruralFeedback = Model.SectionFeedback
+        .FirstOrDefault(x => x.SectionId == 67);
+
+    var urbanFeedback = Model.SectionFeedback
+        .FirstOrDefault(x => x.SectionId == 68);
+
+    var rural = Model.RuralFieldPracticeArea.FieldPracticeArea;
+    var urban = Model.UrbanFieldPracticeArea.FieldPracticeArea;
+
+    var ruralFieldType = Model.FieldTypes
+        .FirstOrDefault(x => x.Id == rural.FieldTypeId);
+
+    var urbanFieldType = Model.FieldTypes
+        .FirstOrDefault(x => x.Id == urban.FieldTypeId);
+}
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}
+
+<div class="container-fluid px-0">
+
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+                    Dental Field Practice Area
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Verify Rural and Urban Field Practice Area details,
+                    supporting documents, and facilities.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Information Note -->
+    <div class="note-box mb-4">
+        <div class="d-flex align-items-start gap-2">
+            <i class="bi bi-info-circle-fill mt-1"></i>
+            <div>
+                <strong>Verification Instructions</strong>
+                <p class="mb-0 mt-1">
+                    Review the Rural and Urban Field Practice Area
+                    information separately. Open the uploaded staff-list
+                    documents, where available, and provide feedback for
+                    each section.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rural Field Practice Area -->
+    <div class="verification-card mb-4">
+
+        <div class="verification-card-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="bi bi-tree-fill me-2"></i>
+                    Rural Field Practice Area
+                </h5>
+
+                <span class="badge bg-light text-dark border">
+                    Rural
+                </span>
+            </div>
+        </div>
+
+        <div class="verification-card-body">
+
+            @if (rural.DentalFieldPracticeAreaId > 0)
+            {
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Location
+                        </label>
+                        <div class="form-control bg-light">
+                            @(rural.Location ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Managed By
+                        </label>
+                        <div class="form-control bg-light">
+                            @(rural.ManagedBy ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Address
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.Address ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Population Served
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.PopulationServed)
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Staff List
+                        </label>
+
+                        @if (!string.IsNullOrWhiteSpace(rural.StaffList))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewFpaList",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.PageContext.CollegeCode,
+                                                staffListPath = rural.StaffList
+                                            })!,
+
+                                        Title = "Rural Field Practice Area - Staff List",
+                                        DocumentId = Model.RuralFieldPracticeArea.StaffListId,
+                                        FacultyId = Model.PageContext.FacultyId,
+                                        CollegeCode = Model.PageContext.CollegeCode
+                                    })
+                            }
+                            else
+                            {
+                                <div class="form-control text-muted">
+                                    <i class="bi bi-file-earmark-x me-2"></i>
+                                    Not Uploaded
+                                </div>
+                            }
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Activities and Services
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.ActivitiesAndServices ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Records Maintained by the Centres
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.RecordsMaintained ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Equipment Available
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.EquipmentsAvailable ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Residential / Non-Residential Training Activities
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.TrainingActivities ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            How Supervision is Done
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.SupervisionMethod ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Accommodation Available for Trainees and Supervisors 
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(rural.TraineeSupervisorAccommodation ?? "Not Provided")
+                        </div>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light border mb-0">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    No Rural Field Practice Area record was found.
+                </div>
+            }
+
+            <hr class="my-4" />
+
+            <h6 class="fw-bold mb-3">
+                <i class="bi bi-chat-left-text me-2"></i>
+                Rural Section Feedback
+            </h6>
+
+            @if (ruralFeedback != null)
+            {
+                @await Html.PartialAsync(
+                    "_SectionFeedback",
+                    ruralFeedback)
+            }
+            else
+            {
+                <div class="alert alert-light border mb-0">
+                    No Rural section feedback data was found.
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- Urban Field Practice Area -->
+    <div class="verification-card mb-4">
+
+        <div class="verification-card-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="bi bi-buildings-fill me-2"></i>
+                    Urban Field Practice Area
+                </h5>
+
+                <span class="badge bg-light text-dark border">
+                    Urban
+                </span>
+            </div>
+        </div>
+
+        <div class="verification-card-body">
+
+            @if (urban.DentalFieldPracticeAreaId > 0)
+            {
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Location
+                        </label>
+                        <div class="form-control bg-light">
+                            @(urban.Location ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Managed By
+                        </label>
+                        <div class="form-control bg-light">
+                            @(urban.ManagedBy ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Address
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.Address ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Population Served
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.PopulationServed)
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Staff List
+                        </label>
+
+                        @if (!string.IsNullOrWhiteSpace(urban.StaffList))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewFpaList",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.PageContext.CollegeCode,
+                                                staffListPath = urban.StaffList
+                                            })!,
+
+                                        Title = "Urban Field Practice Area - Staff List",
+                                        DocumentId = Model.UrbanFieldPracticeArea.StaffListId,
+                                        FacultyId = Model.PageContext.FacultyId,
+                                        CollegeCode = Model.PageContext.CollegeCode
+                                    })
+                            }
+                            else
+                            {
+                                <div class="form-control text-muted">
+                                    <i class="bi bi-file-earmark-x me-2"></i>
+                                    Not Uploaded
+                                </div>
+                            }
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Activities and Services Provided
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.ActivitiesAndServices ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Records Maintained by the Centres
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.RecordsMaintained ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Equipment Available
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.EquipmentsAvailable ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Residential / Non-Residential Training Activities
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.TrainingActivities ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            How Supervision is Done
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.SupervisionMethod ?? "Not Provided")
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                             Accommodation Available for Trainees and Supervisors
+                        </label>
+                        <div class="form-control bg-light"
+                             style="min-height: 60px; height: auto; white-space: pre-wrap;">
+                            @(urban.TraineeSupervisorAccommodation ?? "Not Provided")
+                        </div>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light border mb-0">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    No Urban Field Practice Area record was found.
+                </div>
+            }
+
+            <hr class="my-4" />
+
+            <h6 class="fw-bold mb-3">
+                <i class="bi bi-chat-left-text me-2"></i>
+                Urban Section Feedback
+            </h6>
+
+            @if (urbanFeedback != null)
+            {
+                @await Html.PartialAsync(
+                    "_SectionFeedback",
+                    urbanFeedback)
+            }
+            else
+            {
+                <div class="alert alert-light border mb-0">
+                    No Urban section feedback data was found.
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
