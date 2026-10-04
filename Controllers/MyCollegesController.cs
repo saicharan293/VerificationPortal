@@ -58,6 +58,7 @@ namespace VerificationPortal.Controllers
                 return View(model);
             }
 
+
             // Get faculty details
             var facultyIds = mappings
                 .Select(m => m.FacultyCode)
@@ -65,76 +66,110 @@ namespace VerificationPortal.Controllers
                 .ToList();
 
             var faculties = await _context.Faculties
+                .AsNoTracking()
                 .Where(f => facultyIds.Contains(f.FacultyId))
                 .ToDictionaryAsync(f => f.FacultyId, f => f.FacultyName);
 
-            // FILTERING BASED ON COURSE LEVEL FOR DENTAL FACULTY
+            // Get eligible course codes for the selected course level
+            var courses = await _context.MstCourses
+                .AsNoTracking()
+                .Where(c => c.CourseLevel == courseLevel)
+                .Select(c => c.CourseCode)
+                .ToListAsync();
 
+            var courseCodes = courses
+                .Select(c => c.ToString())
+                .ToHashSet();
+
+            // Get college codes with a positive 2026 intake
             var academicIntakes = await _context.AcademicIntakes
                 .AsNoTracking()
                 .Where(a => a.Ay2026TotalIntake > 0)
+                .Select(a => new
+                {
+                    a.CollegeCode,
+                    a.Courses
+                })
                 .ToListAsync();
-
-
-            var courses = await _context.MstCourses
-                .AsNoTracking()
-                .Where(e => e.CourseLevel == courseLevel)
-                .ToListAsync();
-
-            var courseCodes = courses.Select(e => e.CourseCode.ToString()).ToHashSet();
 
             var eligibleCollegeCodes = academicIntakes
                 .Where(a =>
                     !string.IsNullOrWhiteSpace(a.Courses) &&
                     courseCodes.Contains(a.Courses.ToString()))
                 .Select(a => a.CollegeCode)
+                .Where(code => code != null)
                 .Distinct()
                 .ToHashSet();
 
+            // Prepare faculty codes for the database query
+            var facultyCodeStrings = mappings
+                .Select(m => m.FacultyCode.ToString())
+                .Distinct()
+                .ToList();
+
+            // Fetch eligible colleges only ONCE
+            var allEligibleColleges = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .Where(c =>
+                    facultyCodeStrings.Contains(c.FacultyCode) &&
+                    c.CollegeName != null &&
+                    eligibleCollegeCodes.Contains(c.CollegeCode))
+                .OrderBy(c => c.CollegeName)
+                .ToListAsync();
+
+            // Dictionary for quick faculty-based lookup
+            var collegesByFaculty = allEligibleColleges
+                .GroupBy(c => c.FacultyCode)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToList());
+
+            // Process each mapping without additional database queries
             foreach (var mapping in mappings)
             {
-                // Get all colleges in the mapped range for this faculty
-                var colleges = await _context.AffiliationCollegeMasters
-                    .Where(c => c.FacultyCode == mapping.FacultyCode.ToString()
-                             && c.CollegeName != null &&
-                             eligibleCollegeCodes.Contains(c.CollegeCode))
-                    .OrderBy(c => c.CollegeName)
-                    .ToListAsync();
+                var facultyCode = mapping.FacultyCode.ToString();
 
-                // Filter by the alphabetical range (FromLetter to ToLetter)
-                colleges = colleges
+                var fromLetter =
+                    char.ToUpperInvariant(
+                        mapping.FromLetter?.FirstOrDefault() ?? 'A');
+
+                var toLetter =
+                    char.ToUpperInvariant(
+                        mapping.ToLetter?.FirstOrDefault() ?? 'Z');
+
+                // Dictionary lookup instead of fetching from DB again
+                var facultyColleges = collegesByFaculty
+                    .GetValueOrDefault(facultyCode) ?? new();
+
+                var colleges = facultyColleges
                     .Where(c =>
                     {
-                        var letter = c.CollegeName![0];
+                        var firstLetter =
+                            char.ToUpperInvariant(c.CollegeName![0]);
 
-                        var fromLetter = mapping.FromLetter?.FirstOrDefault() ?? 'A';
-                        var toLetter = mapping.ToLetter?.FirstOrDefault() ?? 'Z';
-                        return char.ToUpperInvariant(letter) >= char.ToUpperInvariant(fromLetter)
-                            && char.ToUpperInvariant(letter) <= char.ToUpperInvariant(toLetter);
+                        return firstLetter >= fromLetter &&
+                               firstLetter <= toLetter;
                     })
                     .ToList();
 
-                // Further filter by college code range (CollegeFrom to CollegeTo)
-                //colleges = colleges
-                //    .Where(c =>
-                //        string.Compare(c.CollegeCode, mapping.CollegeFrom, StringComparison.OrdinalIgnoreCase) >= 0
-                //        && string.Compare(c.CollegeCode, mapping.CollegeTo, StringComparison.OrdinalIgnoreCase) <= 0)
-                //    .ToList();
+                model.Mappings.Add(
+                    new CollegeMappingWithCollegesViewModel
+                    {
+                        Mapping = mapping,
 
-                model.Mappings.Add(new CollegeMappingWithCollegesViewModel
-                {
-                    Mapping = mapping,
-                    FacultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty"),
-                    Colleges = colleges,
+                        FacultyName = faculties.GetValueOrDefault(
+                            mapping.FacultyCode,
+                            "Unknown Faculty"),
 
-                    CollegeCount = colleges.Count,
+                        Colleges = colleges,
+                        CollegeCount = colleges.Count,
 
-                    FromLetter = mapping.FromLetter,
-                    ToLetter = mapping.ToLetter,
+                        FromLetter = mapping.FromLetter,
+                        ToLetter = mapping.ToLetter,
 
-                    CollegeFromCode = mapping.CollegeFrom,
-                    CollegeToCode = mapping.CollegeTo
-                });
+                        CollegeFromCode = mapping.CollegeFrom,
+                        CollegeToCode = mapping.CollegeTo
+                    });
             }
 
             return View(model);
