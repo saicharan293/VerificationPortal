@@ -179,7 +179,16 @@
 
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a asp-controller="VerificationDashboard"
+                       asp-action="WorkShopDetails"
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "WorkShopDetails" ? "active" : "")">
 
+                        <i class="bi bi-building-gear"></i>
+                        <span>Workshop Details</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="CA_VehicleDetails"

@@ -27,6 +27,8 @@ public partial class MstDentalFeeType
 
     public DateTime? ModifiedDate { get; set; }
 
+    public DateTime? ActivationDate { get; set; }
+
     public virtual MstDentalAffiliationType AffiliationType { get; set; } = null!;
 
     public virtual Faculty FacultyCodeNavigation { get; set; } = null!;

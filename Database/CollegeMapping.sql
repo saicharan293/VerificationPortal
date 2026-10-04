@@ -2328,6 +2328,63 @@ ADD
     LastUpdatedDate DATETIME NULL;
 
 
+
+ALTER TABLE [dbo].[WorkShopDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+
 -------------------
 
 /* ============================================================
@@ -2374,6 +2431,9 @@ CREATE TABLE dbo.MstSections
 GO
 
 
+SELECT * FROM MstSections
+WHERE FacultyId = 2
+
 /* ============================================================
    DENTAL FACULTY (FacultyId = 2)
    TABS + SECTIONS
@@ -2393,9 +2453,11 @@ BEGIN TRY
         (2, N'Trust Member Details'),
         (2, N'Dean / Director Details'),
         (2, N'Principal Details'),
+
         (2, N'UG Course Details'),
         (2, N'PG Course Details'),
         (2, N'Courses & Intake'),
+
         (2, N'Land & Building Details'),
         (2, N'Classroom & Laboratory'),
         (2, N'Chair Distribution'),
@@ -2404,16 +2466,26 @@ BEGIN TRY
         (2, N'Department Offices And Educational Unit'),
         (2, N'Equipment List'),
         (2, N'Vehicle Details'),
+        (2, N'Workshop Details'),
+        (2, N'Animal House Details'),
+        (2, N'Field Practice Area'),
         (2, N'UG Academic Matters'),
         (2, N'PG Academic Matters'),
         (2, N'Staff Pay Scale'),
         (2, N'Staff Other Details'),
         (2, N'Finance Details'),
+        (2, N'Addition Information'),
         (2, N'Library Services'),
         (2, N'Research & Publications'),
         (2, N'Library Details'),
+        (2, N'Library Expenditure and Services'),
+        (2, N'Library Staff'),
+        (2, N'Library User Details'),
         (2, N'Faculty Details'),
         (2, N'Teaching Experience'),
+        (2, N'Non Teaching Experience'),
+        (2, N'Payment Calculation'),
+        (2, N'Action Taken Report'),
         (2, N'Clinical Facilities');
 
 
@@ -2594,6 +2666,26 @@ FROM dbo.MstTabs
 WHERE FacultyId = 2
   AND TabName = N'Institution Details';
 
+
+---------------------------
+
+INSERT INTO dbo.MstTabs (FacultyId, TabName)
+    VALUES
+        (2, N'Workshop Details');
+
+INSERT INTO dbo.MstSections
+(
+    FacultyId,
+    TabId,
+    SectionName
+)
+SELECT
+    FacultyId,
+    TabId,
+    N'Workshop Details'
+FROM dbo.MstTabs
+WHERE FacultyId = 2
+  AND TabName = N'Workshop Details';
 
   -------------------------------------------------
 

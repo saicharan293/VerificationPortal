@@ -2217,7 +2217,7 @@ namespace VerificationPortal.Controllers
                 { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
 
                 { "FacultyDetails", typeof(FacultyDetail) },
-
+                { "WorkShopDetails", typeof(WorkShopDetail) },
                 { "TeachingExperience", typeof(TeachingStaffDepartmentWiseDetail) },
 
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
@@ -3596,6 +3596,47 @@ namespace VerificationPortal.Controllers
             );
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> WorkShopDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return BadRequest("College code is required.");
+
+            // Retrieve institution and verifier context
+            var context = await GetPageContextAsync(collegeCode);
+
+            // Load only active workshop records for this institution and faculty
+            var workshopDetails = await _context.WorkShopDetails
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == context.FacultyCodeInt)
+                .OrderBy(x => x.CourseLevel)
+                .ThenBy(x => x.TypeId)
+                .ToListAsync();
+
+
+            // Build strongly typed ViewModel
+            var vm = new WorkShopDetailsVerificationVm
+            {
+                CollegeCode = collegeCode,
+                InstitutionName = context.InstitutionName,
+                FacultyCode = context.FacultyCodeInt,
+                UserDesignation = GetUserDesignation(),
+
+                WorkshopDetails = workshopDetails,
+
+                // Use the actual tab ID configured for Workshop Details.
+                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 28)
+            };
+
+            await SetVerificationViewData<WorkShopDetail>(collegeCode);
+
+            vm.FacultyName = await _context.Faculties.Where(e => e.FacultyId == context.FacultyCodeInt).Select(e => e.FacultyName).FirstOrDefaultAsync();
+            return View(vm);
+        }
+
         private async Task PopulateCommonViewBags(string collegeCode)
         {
             var institution = await _context.AffInstitutionsDetails
@@ -4952,6 +4993,14 @@ namespace VerificationPortal.Controllers
                         await _verificationService.SaveVerificationAsync<CaDentalLibraryRecord>(
                             x => x.CollegeCode == collegeCode &&
                                  x.FacultyCode == facultyCode,
+                            request);
+                    },
+
+                    ["WorkShopDetails"] =  async () =>
+                    {
+                        await _verificationService.SaveVerificationAsync<WorkShopDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyId == facultyCode,
                             request);
                     },
 
