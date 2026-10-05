@@ -1,0 +1,219 @@
+﻿@model VerificationPortal.Models.LibraryStaffVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Library Staff Details";
+    ViewData["ActiveTab"] = "LibraryStaffDetails";
+    ViewData["ShowFeedbackSection"] = true;
+
+    var page = Model.PageContext;
+
+    ViewData["InstitutionName"] = page.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =  page.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] = page.FacultyId;
+
+    ViewData["CurrentVerifier"] = page.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = page.PrevTabAction;
+
+    ViewData["PrevTabLabel"] = page.PrevTabLabel;
+
+    ViewData["NextTabAction"] = page.NextTabAction;
+
+    ViewData["NextTabLabel"] = page.NextTabLabel;
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Library Staff Details
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Details of library staff employed by the institution
+    </p>
+
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge me-2"></i>
+            Library Staff Details
+        </h3>
+
+        <span class="badge bg-primary">
+            Library Staff
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.Staff?.Any() == true)
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+
+                            <th style="width: 60px;">
+                                #
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Designation
+                            </th>
+
+                            <th>
+                                Qualification
+                            </th>
+
+                            <th>
+                                Course Level
+                            </th>
+
+                            <th>
+                                Experience
+                            </th>
+
+                            <th>
+                                Pay Scale
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var staff in Model.Staff.Select((item, index) => new
+                        {
+                            Item = item,
+                            Index = index + 1
+                        }))
+                        {
+                            <tr>
+
+                                <td>
+                                    @staff.Index
+                                </td>
+
+                                <td>
+                                    <span class="fw-semibold">
+                                        @staff.Item.Name
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        staff.Item.Designation)
+                                        ? "-"
+                                        : staff.Item.Designation)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        staff.Item.Qualification)
+                                        ? "-"
+                                        : staff.Item.Qualification)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(
+                                        staff.Item.CourseLevel)
+                                        ? "-"
+                                        : staff.Item.CourseLevel)
+                                </td>
+
+                                <td>
+                                    @{
+                                        var experience = "-";
+
+                                        if (staff.Item.ExperienceFrom.HasValue)
+                                        {
+                                            if (staff.Item.ExperienceTo.HasValue)
+                                            {
+                                                experience = $"{staff.Item.ExperienceFrom.Value:dd-MM-yyyy} " + $"to {staff.Item.ExperienceTo.Value:dd-MM-yyyy}";
+                                            }
+                                            else
+                                            {
+                                                experience = $"{staff.Item.ExperienceFrom.Value:dd-MM-yyyy} onwards";
+                                            }
+                                        }
+                                    }
+
+                                    @experience
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(staff.Item.PayScale) ? "-" : staff.Item.PayScale)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(staff.Item.Category) ? "-" : staff.Item.Category)
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                No library staff details are available
+                for verification.
+
+            </div>
+        }
+
+
+        @* =====================================================
+           SECTION FEEDBACK
+           ===================================================== *@
+
+        @{
+            var libraryStaffFeedback = Model.SectionFeedback? .FirstOrDefault(x => x.SectionId == 71);
+        }
+
+        @if (libraryStaffFeedback != null)
+        {
+            <div class="mt-4">
+
+                @await Html.PartialAsync("_SectionFeedback", libraryStaffFeedback)
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+
+}

@@ -310,6 +310,16 @@
                         <span>Library Expenditure</span>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="@Url.Action("LibraryStaffDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "LibraryStaffDetails" ? "active" : "")">
+
+                        <i class="bi bi-person-badge"></i>
+                        <span>Library Staff Details</span>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="@Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
                        class="nav-link @(activeTab == "FacultyDetails" ? "active" : "")">

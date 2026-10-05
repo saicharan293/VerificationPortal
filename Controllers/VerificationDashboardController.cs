@@ -2238,6 +2238,8 @@ namespace VerificationPortal.Controllers
 
                 { "LibraryExpenditure", typeof(LibraryExpenditure) },
 
+                { "LibraryStaffDetails", typeof(LibraryStaffDetail) },
+
                 { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
 
                 { "FacultyDetails", typeof(FacultyDetail) },
@@ -5200,6 +5202,14 @@ namespace VerificationPortal.Controllers
                             request);
                     },
 
+                    ["LibraryStaffDetails"] =  async () =>
+                    {
+                        await _verificationService.SaveVerificationAsync<LibraryStaffDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyId == facultyCode,
+                            request);
+                    },
+
                     ["AnimalHouseDetails"] =  async () =>
                     {
                         await _verificationService.SaveVerificationAsync<AnimalHouseDetail>(
@@ -5859,6 +5869,93 @@ namespace VerificationPortal.Controllers
             return View("LibraryExpenditure", vm);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> LibraryStaffDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            // Common institution and faculty context
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyId = pageContext.FacultyCodeInt;
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            // Load library staff details for this college
+            var staff = await _context.LibraryStaffDetails
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.CourseLevel == courseLevel &&
+                    x.IsActive)
+                .Select(x => new LibraryStaffItemVm
+                {
+                    LibraryStaffId = x.LibraryStaffId,
+
+                    Name = x.Name,
+
+                    Designation = x.Designation,
+
+                    Qualification = x.Qualification,
+
+                    CourseLevel = x.CourseLevel,
+
+                    ExperienceFrom = x.ExperienceFrom,
+
+                    ExperienceTo = x.ExperienceTo,
+
+                    PayScale = x.PayScale,
+
+                    Category = x.Category
+                })
+                .OrderBy(x => x.Name)
+                .ToListAsync();
+
+            // Load section feedback
+            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 32);
+
+            // Prepare verification ViewModel
+            var vm = new LibraryStaffVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyId,
+
+                    CollegeCode = collegeCode,
+
+                    InstitutionName =
+                        pageContext.Institution.NameOfInstitution,
+
+                    FacultyName =
+                        pageContext.FacultyName,
+
+                    CurrentVerifier =
+                        $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action( "LibraryExpenditure", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Library Expenditure",
+
+                    NextTabAction = Url.Action( "NextSection", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Next Section"
+                },
+
+                Staff = staff,
+
+                SectionFeedback = sectionFeedback
+            };
+
+            // Common verification data
+            await SetVerificationViewData<LibraryStaffDetail>(collegeCode);
+
+            return View("LibraryStaffDetails", vm);
+        }
 
         public IActionResult DataNotAvailable( string entityName,  string collegeCode, string pageName)
         {

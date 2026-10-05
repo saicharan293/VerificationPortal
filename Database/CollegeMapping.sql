@@ -2500,6 +2500,64 @@ ADD
 
 -------------------
 
+
+ALTER TABLE [dbo].[LibraryStaffDetails]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+-------------------
+
 /* ============================================================
    1. MstTabs
    ============================================================ */
@@ -2955,9 +3013,30 @@ BEGIN
 END;
 
 -------------------------------------------------
+-- Insert the tab only if it does not already exist
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Library Staff'
+)
+BEGIN
+    INSERT INTO dbo.MstTabs
+    (
+        FacultyId,
+        TabName
+    )
+    VALUES
+    (
+        2,
+        N'Library Staff'
+    );
+END;
 
+-------------------------------------------------
 
--- Insert Library Expenditure section if it does not exist
+-- Insert Library Staff section if it does not exist
 IF NOT EXISTS
 (
     SELECT 1
@@ -2966,8 +3045,8 @@ IF NOT EXISTS
         ON T.TabId = S.TabId
     WHERE S.FacultyId = 2
       AND T.FacultyId = 2
-      AND T.TabName = N'Library Expenditure and Services'
-      AND S.SectionName = N'Library Expenditure'
+      AND T.TabName = N'Library Staff Details'
+      AND S.SectionName = N'Library Staff Details'
 )
 BEGIN
     INSERT INTO dbo.MstSections
@@ -2979,10 +3058,10 @@ BEGIN
     SELECT
         FacultyId,
         TabId,
-        N'Library Expenditure'
+        N'Library Staff  Details'
     FROM dbo.MstTabs
     WHERE FacultyId = 2
-      AND TabName = N'Library Expenditure and Services';
+      AND TabName = N'Library Staff  Details';
 END;
 
 -------------------------------------------------
