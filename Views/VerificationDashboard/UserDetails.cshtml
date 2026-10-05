@@ -1,0 +1,296 @@
+﻿@model VerificationPortal.Models.UserDetailsVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "User Details";
+    ViewData["ActiveTab"] = "UserDetails";
+    ViewData["ShowFeedbackSection"] = true;
+
+    var page = Model.PageContext;
+    var details = Model.Details;
+
+    ViewData["InstitutionName"] = page.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] = page.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =  page.FacultyId;
+
+    ViewData["CurrentVerifier"] = page.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = page.PrevTabAction;
+
+    ViewData["PrevTabLabel"] = page.PrevTabLabel;
+
+    ViewData["NextTabAction"] = page.NextTabAction;
+
+    ViewData["NextTabLabel"] = page.NextTabLabel;
+
+    // Replace 43 with the actual User Details SectionId
+    var userDetailsFeedback = Model.SectionFeedback? .FirstOrDefault(x => x.SectionId == 72);
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        User Details
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Details of teaching staff, students, administrative staff and other users
+    </p>
+
+</div>
+
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-people me-2"></i>
+            User Details
+        </h3>
+
+        <span class="badge bg-primary">
+            User Details
+        </span>
+
+    </div>
+
+
+    <div class="verification-card-body">
+
+        @if (details != null)
+        {
+            <div class="row g-4">
+
+                @* Course Level *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            Course Level
+                        </label>
+
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(details.CourseLevel)
+                                ? "-"
+                                : details.CourseLevel)
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Teaching Staff *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Teaching Staff
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfTeachingStaff?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Research Scholars / Assistants *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Research Scholars / Assistants
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfResearchScholarsAssistants?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Post Graduate Students *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Post Graduate Students
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfPostGraduateStudents?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Under Graduate Students *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Under Graduate Students
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfUnderGraduateStudents?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Administrative Staff *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Administrative Staff
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfAdministrativeStaff?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Para Medical Staff *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Para Medical Staff
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfParaMedicalStaff?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* Outsiders *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            No. of Outsiders
+                        </label>
+
+                        <div class="verification-value">
+                            @(details.NoOfOutsiders?.ToString() ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* User Education Programmes *@
+
+                <div class="col-md-6">
+
+                    <div class="verification-field">
+
+                        <label class="verification-label">
+                            User Education Programmes
+                        </label>
+
+                        <div class="verification-value">
+
+                            @if (details.ProvideUserEducationProgrammes == true)
+                            {
+                                <span class="badge bg-success">
+                                    Yes
+                                </span>
+                            }
+                            else if (details.ProvideUserEducationProgrammes == false)
+                            {
+                                <span class="badge bg-danger">
+                                    No
+                                </span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                No user details are available for verification.
+
+            </div>
+        }
+
+
+        @* =====================================================
+           SECTION FEEDBACK
+           ===================================================== *@
+
+        @if (userDetailsFeedback != null)
+        {
+            <div class="mt-4">
+
+                @await Html.PartialAsync(
+                    "_SectionFeedback",
+                    userDetailsFeedback)
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+
+}

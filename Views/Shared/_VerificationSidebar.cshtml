@@ -321,6 +321,15 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="@Url.Action("UserDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "UserDetails" ? "active" : "")">
+
+                        <i class="bi bi-people"></i>
+                        <span>User Details</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="@Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
                        class="nav-link @(activeTab == "FacultyDetails" ? "active" : "")">
 

@@ -2240,6 +2240,8 @@ namespace VerificationPortal.Controllers
 
                 { "LibraryStaffDetails", typeof(LibraryStaffDetail) },
 
+                { "UserDetails", typeof(UserDetail) },
+
                 { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
 
                 { "FacultyDetails", typeof(FacultyDetail) },
@@ -5280,6 +5282,12 @@ namespace VerificationPortal.Controllers
                                  x.FacultyCode == facultyCode.ToString(),
                             request),
 
+                    ["UserDetails"] = () =>
+                        _verificationService.SaveVerificationAsync<UserDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyId == facultyCode,
+                            request),
+
                     ["LibraryExpenditure"] = async () =>
                     {
 
@@ -5955,6 +5963,94 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<LibraryStaffDetail>(collegeCode);
 
             return View("LibraryStaffDetails", vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UserDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            // Common institution and faculty context
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyId = pageContext.FacultyCodeInt;
+
+            // Load existing User Details
+            var details = await _context.UserDetails
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyId == facultyId &&
+                    x.IsActive)
+                .Select(x => new UserDetailsItemVm
+                {
+                    UserDetailsId = x.UserDetailsId,
+
+                    CourseLevel = x.CourseLevel,
+
+                    NoOfTeachingStaff = x.NoOfTeachingStaff,
+
+                    NoOfResearchScholarsAssistants =
+                        x.NoOfResearchScholarsAssistants,
+
+                    NoOfPostGraduateStudents =
+                        x.NoOfPostGraduateStudents,
+
+                    NoOfUnderGraduateStudents =
+                        x.NoOfUnderGraduateStudents,
+
+                    NoOfAdministrativeStaff =
+                        x.NoOfAdministrativeStaff,
+
+                    NoOfParaMedicalStaff =
+                        x.NoOfParaMedicalStaff,
+
+                    NoOfOutsiders =
+                        x.NoOfOutsiders,
+
+                    ProvideUserEducationProgrammes =
+                        x.ProvideUserEducationProgrammes
+                })
+                .FirstOrDefaultAsync();
+
+            // Prepare verification ViewModel
+            var vm = new UserDetailsVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyId,
+
+                    CollegeCode = collegeCode,
+
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+
+                    FacultyName = pageContext.FacultyName,
+
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action( "LibraryStaffDetails", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Library Staff Details",
+
+                    NextTabAction = Url.Action("NextSection", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Next Section"
+                },
+
+                Details = details ?? new UserDetailsItemVm(),
+
+                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 33)
+            };
+
+            // Common verification data
+            await SetVerificationViewData<UserDetail>(collegeCode);
+
+            return View("UserDetails", vm);
         }
 
         public IActionResult DataNotAvailable( string entityName,  string collegeCode, string pageName)
