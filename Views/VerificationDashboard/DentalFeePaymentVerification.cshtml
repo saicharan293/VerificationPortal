@@ -1,0 +1,854 @@
+﻿@model VerificationPortal.Models.DentalFeePaymentVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Dental Fee Structure & Transaction";
+    ViewData["ActiveTab"] = "DentalFeePaymentVerification";
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["InstitutionName"] =
+        Model.PageContext.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] =
+        Model.PageContext.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =
+        Model.PageContext.FacultyId;
+
+    ViewData["CurrentVerifier"] =
+        Model.PageContext.CurrentVerifier;
+
+    ViewData["PrevTabAction"] =
+        Model.PageContext.PrevTabAction;
+
+    ViewData["PrevTabLabel"] =
+        Model.PageContext.PrevTabLabel;
+
+    ViewData["NextTabAction"] =
+        Model.PageContext.NextTabAction;
+
+    ViewData["NextTabLabel"] =
+        Model.PageContext.NextTabLabel;
+
+    var feeStructureFeedback =
+        Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionId == 73);
+
+    var transactionFeedback =
+        Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionId == 74);
+}
+
+<div class="container-fluid px-3 px-md-4 py-3">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body py-3">
+
+            <div class="d-flex flex-wrap
+                        justify-content-between
+                        align-items-center gap-3">
+
+                <div>
+                    <h4 class="fw-bold mb-1 text-primary">
+                        <i class="bi bi-cash-coin me-2"></i>
+                        Dental Fee Structure & Payment
+                    </h4>
+
+                    <div class="text-muted small">
+                        Review applicable courses, fee breakdown,
+                        payment transaction and receipt.
+                    </div>
+                </div>
+
+                <div class="text-end">
+
+                    <div class="small text-muted">
+                        College Code
+                    </div>
+
+                    <div class="fw-bold">
+                        @Model.PageContext.CollegeCode
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SECTION 1 : APPLICABLE COURSES
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header border-bottom py-3">
+
+            <div class="d-flex justify-content-between
+                        align-items-center">
+
+                <h5 class="fw-bold mb-0 text-primary">
+
+                    <i class="bi bi-mortarboard me-2"></i>
+
+                    Applicable Courses
+                    (@Model.ApplicableCourses.Count)
+
+                </h5>
+
+                @if (Model.ApplicableCourses.Any())
+                {
+                    <span class="badge bg-primary">
+                        @Model.ApplicableCourses.Count Course@(Model.ApplicableCourses.Count == 1 ? "" : "s")
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="card-body p-3">
+
+            @if (Model.ApplicableCourses?.Any() == true)
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered
+                                  align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th style="width:40%;">
+                                    Course Name
+                                </th>
+
+                                <th style="width:25%;">
+                                    Course Level
+                                </th>
+
+                                <th class="text-end"
+                                    style="width:35%;">
+                                    Academic Intake 2026
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var course in Model.ApplicableCourses)
+                            {
+                                <tr>
+
+                                    <td class="fw-semibold">
+
+                                        @(course.CourseName ?? "-")
+
+                                    </td>
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            course.CourseLevel))
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @course.CourseLevel
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+
+                                        @course.AcademicIntake2026
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning mb-0">
+
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+
+                    No applicable courses found.
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SECTION 2 : FEE BREAKDOWN
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header  border-bottom py-3">
+
+            <div class="d-flex justify-content-between
+                        align-items-center">
+
+                <h5 class="fw-bold mb-0 text-primary">
+
+                    <i class="bi bi-receipt-cutoff me-2"></i>
+
+                    Fee Breakdown
+
+                </h5>
+
+                <span class="badge bg-primary">
+                    Fee Structure
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="card-body p-3">
+
+            @if (Model.FeeTypes?.Any() == true)
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered
+                                  align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th>
+                                    Fee Head
+                                </th>
+
+                                <th>
+                                    Course
+                                </th>
+
+                                <th>
+                                    Course Level
+                                </th>
+
+                                <th class="text-center">
+                                    Intake
+                                </th>
+
+                                <th class="text-end">
+                                    Unit Amount
+                                </th>
+
+                                <th>
+                                    Basis
+                                </th>
+
+                                <th class="text-center">
+                                    Multiplier
+                                </th>
+
+                                <th class="text-end">
+                                    Line Amount
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var feeType in Model.FeeTypes)
+                            {
+                                foreach (var item in feeType.FeeItems)
+                                {
+                                    <tr>
+
+                                        <!-- Fee Head -->
+
+                                        <td class="fw-semibold">
+
+                                            @feeType.FeeType
+
+                                        </td>
+
+
+                                        <!-- Course -->
+
+                                        <td>
+
+                                            @(
+                                                string.IsNullOrWhiteSpace(
+                                                    item.CourseName)
+                                                    ? "All Courses"
+                                                    : item.CourseName
+                                            )
+
+                                        </td>
+
+
+                                        <!-- Course Level -->
+
+                                        <td>
+
+                                            @if (!string.IsNullOrWhiteSpace(
+                                                item.CourseLevel))
+                                            {
+                                                <span class="badge bg-secondary">
+
+                                                    @item.CourseLevel
+
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    -
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- Intake -->
+
+                                        <td class="text-center">
+
+                                            @if (item.AcademicIntake2026.HasValue)
+                                            {
+                                                @item.AcademicIntake2026.Value
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    -
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- Unit Amount -->
+
+                                        <td class="text-end">
+
+                                            ₹@item.AmountToBePaid.ToString("N2")
+
+                                        </td>
+
+
+                                        <!-- Basis -->
+
+                                        <td>
+
+                                            @if (string.Equals(
+                                                item.CalculationType,
+                                                "Fixed",
+                                                StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    Fixed
+                                                </span>
+                                            }
+                                            else if (string.Equals(
+                                                item.CalculationType,
+                                                "Per Seat",
+                                                StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-primary">
+                                                    Per Seat
+                                                </span>
+                                            }
+                                            else if (string.Equals(
+                                                item.CalculationType,
+                                                "Per Course",
+                                                StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-info text-dark">
+                                                    Per Course
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    @(item.CalculationType ?? "-")
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- Multiplier -->
+
+                                        <td class="text-center fw-semibold">
+
+                                            @item.Multiplier
+
+                                        </td>
+
+
+                                        <!-- Line Amount -->
+
+                                        <td class="text-end">
+
+                                            <span class="fw-bold text-primary">
+
+                                                ₹@item.CalculatedAmount.ToString("N2")
+
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                        <tfoot class="table-light">
+
+                            <tr>
+
+                                <th colspan="7"
+                                    class="text-end">
+
+                                    Total Fee Amount
+
+                                </th>
+
+                                <th class="text-end">
+
+                                    <span class="fw-bold text-primary">
+
+                                        ₹@Model.Summary.TotalFeeAmount.ToString("N2")
+
+                                    </span>
+
+                                </th>
+
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning mb-0">
+
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+
+                    No fee structure has been submitted.
+
+                </div>
+            }
+
+            <!-- =================================================
+                 FEE STRUCTURE FEEDBACK
+            ================================================== -->
+
+            @if (feeStructureFeedback != null)
+            {
+                <div class="mt-4 pt-3 border-top">
+
+                    <h6 class="fw-bold mb-1">
+
+                        <i class="bi bi-chat-left-text me-2"></i>
+
+                        Fee Structure Feedback
+
+                    </h6>
+
+                    <small class="text-muted d-block mb-3">
+
+                        Verification feedback for the fee structure.
+
+                    </small>
+
+                    @await Html.PartialAsync(
+                        "_SectionFeedback",
+                        feeStructureFeedback)
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SECTION 3 : TRANSACTION RECEIPT
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header  border-bottom py-3">
+
+            <div class="d-flex justify-content-between
+                        align-items-center">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1 text-primary">
+
+                        <i class="bi bi-credit-card me-2"></i>
+
+                        Transaction Receipt
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Payment transaction and uploaded receipt
+
+                    </small>
+
+                </div>
+
+
+                @if (Model.Payment.IsPaymentAvailable)
+                {
+                    <span class="badge bg-success">
+
+                        <i class="bi bi-check-circle me-1"></i>
+
+                        Payment Available
+
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">
+
+                        <i class="bi bi-clock me-1"></i>
+
+                        Payment Not Available
+
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-3">
+
+            <!-- =================================================
+                 TRANSACTION DETAILS
+            ================================================== -->
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="small form-label mb-1">
+                            Course Level
+                        </div>
+
+                        <div class="fw-semibold">
+                            @(Model.Payment.CourseLevel ?? "-")
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="small form-label mb-1">
+                            Transaction ID
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.Payment.TransactionId))
+                        {
+                            <div class="fw-semibold text-break">
+
+                                @Model.Payment.TransactionId
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                Not Available
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="small form-label mb-1">
+                            Amount Paid
+                        </div>
+
+                        <div class="fw-bold text-success fs-5">
+
+                            ₹@Model.Payment.AmountPaid.ToString("N2")
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 TRANSACTION RECEIPT DOCUMENT
+            ================================================== -->
+
+            <div class="mt-4 pt-3 border-top">
+
+                <h6 class="fw-bold mb-3">
+
+                    <i class="bi bi-file-earmark-pdf me-2"></i>
+
+                    Uploaded Transaction Receipt
+
+                </h6>
+
+
+                @if (Model.Payment.HasTransactionReceipt)
+                {
+                    <div class="border rounded-3 p-3">
+
+                        <div class="d-flex flex-wrap
+                                    justify-content-between
+                                    align-items-center gap-3">
+
+                            <div class="d-flex align-items-center">
+
+                                <div class="rounded-circle
+                                            bg-danger bg-opacity-10
+                                            text-danger
+                                            d-flex
+                                            align-items-center
+                                            justify-content-center me-3"
+                                     style="width:44px;height:44px;">
+
+                                    <i class="bi bi-file-earmark-pdf fs-5"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <div class="fw-semibold">
+                                        Transaction Receipt
+                                    </div>
+
+                                    <small class="text-muted">
+                                        Payment receipt submitted by the college
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div>
+
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewFeeTransactionReceipt",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                id =
+                                                    Model.Payment.PaymentId,
+
+                                                collegeCode =
+                                                    Model.PageContext.CollegeCode
+                                            })!,
+
+                                        Title =
+                                            "Transaction Receipt",
+
+                                        FacultyId =
+                                            Model.PageContext.FacultyId,
+
+                                        DocumentId =
+                                            Model.Payment.TransactionReceiptDocId,
+
+                                        CollegeCode =
+                                            Model.PageContext.CollegeCode,
+
+                                        CanVerify =
+                                            true
+                                    })
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">
+
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+
+                        Transaction receipt has not been uploaded.
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- =================================================
+                 TRANSACTION FEEDBACK
+            ================================================== -->
+
+            @if (transactionFeedback != null)
+            {
+                <div class="mt-4 pt-3 border-top">
+
+                    <h6 class="fw-bold mb-1">
+
+                        <i class="bi bi-chat-left-text me-2"></i>
+
+                        Transaction Receipt Feedback
+
+                    </h6>
+
+                    <small class="text-muted d-block mb-3">
+
+                        Verification feedback for the payment
+                        transaction and receipt.
+
+                    </small>
+
+                    @await Html.PartialAsync(
+                        "_SectionFeedback",
+                        transactionFeedback)
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FINAL SUMMARY
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center g-3">
+
+                <div class="col-md-8">
+
+                    <h6 class="fw-bold mb-1">
+
+                        <i class="bi bi-clipboard-check me-2"></i>
+
+                        Payment Verification Summary
+
+                    </h6>
+
+                    <small class="text-muted">
+
+                        Compare the calculated fee amount with
+                        the amount paid by the college.
+
+                    </small>
+
+                </div>
+
+                <div class="col-md-4 text-md-end">
+
+                    @if (Model.Summary.IsPaymentCompleted)
+                    {
+                        <span class="badge bg-success fs-6 px-3 py-2">
+
+                            <i class="bi bi-check-circle me-1"></i>
+
+                            Payment Completed
+
+                        </span>
+                    }
+                    else if (Model.Payment.IsPaymentAvailable)
+                    {
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+
+                            <i class="bi bi-exclamation-circle me-1"></i>
+
+                            Payment Amount Incomplete
+
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger fs-6 px-3 py-2">
+
+                            <i class="bi bi-x-circle me-1"></i>
+
+                            Payment Not Available
+
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script src="~/js/verification-dashboard.js"></script>
+}

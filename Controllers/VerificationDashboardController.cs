@@ -2242,6 +2242,8 @@ namespace VerificationPortal.Controllers
 
                 { "UserDetails", typeof(UserDetail) },
 
+                { "DentalFeePaymentVerification", typeof(TxnDentalFeeStructure) },
+
                 { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
 
                 { "FacultyDetails", typeof(FacultyDetail) },
@@ -5300,6 +5302,18 @@ namespace VerificationPortal.Controllers
                             request);
                     },
 
+                    ["DentalFeePaymentVerification"] = async () =>
+                    {
+
+                        await _verificationService.SaveVerificationAsync<TxnDentalFeeStructure>(
+                            x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode,
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<TxnDentalPayment>(
+                            x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode,
+                            request);
+                    },
+
 
                     ["TeachingExperience"] = async () =>
                     {
@@ -6051,6 +6065,520 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<UserDetail>(collegeCode);
 
             return View("UserDetails", vm);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> DentalFeePaymentVerification(string collegeCode)
+        {
+            // =========================================================
+            // 1. Validate College
+            // =========================================================
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // =========================================================
+            // 2. Get Page Context
+            // =========================================================
+
+            var pageContext =
+                await GetPageContextAsync(collegeCode);
+
+            var facultyId =
+                pageContext.FacultyCodeInt;
+
+            if (facultyId <= 0)
+                return NotFound("Faculty information not found.");
+
+
+            // =========================================================
+            // 3. Affiliation Type
+            // =========================================================
+
+            var affiliationTypeId = HttpContext.Session.GetInt32("AffiliationTypeId");
+
+            if ( affiliationTypeId <= 0)
+            {
+                return BadRequest(
+                    "Affiliation type is not configured.");
+            }
+
+
+            // =========================================================
+            // 4. Course Level
+            // =========================================================
+
+            var requiredCourseLevel =
+                HttpContext.Session.GetString("CourseLevel");
+
+            if (string.IsNullOrWhiteSpace(requiredCourseLevel))
+            {
+                return BadRequest(
+                    "Course level is not configured.");
+            }
+
+
+            // =========================================================
+            // 5. GET ACADEMIC INTAKE
+            // =========================================================
+
+            var academicIntake =
+                await _context.AcademicIntakes
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyId.ToString())
+                    .ToListAsync();
+
+
+            // =========================================================
+            // 6. GET DENTAL COURSES
+            // =========================================================
+
+            var dentalCourses =
+                await _context.MstCourses
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.FacultyCode == facultyId)
+                    .ToListAsync();
+
+
+            // =========================================================
+            // 7. BUILD APPLICABLE COURSES
+            // =========================================================
+
+            var applicableCourses =
+                new List<DentalApplicableCourseVerificationVm>();
+
+
+            foreach (var intake in academicIntake)
+            {
+                if (string.IsNullOrWhiteSpace(intake.Courses))
+                    continue;
+
+
+                if (!int.TryParse(
+                        intake.Courses.Trim(),
+                        out var courseCode))
+                {
+                    continue;
+                }
+
+
+                var course =
+                    dentalCourses.FirstOrDefault(x =>
+                        x.CourseCode == courseCode &&
+                        string.Equals(
+                            NormalizeCourseLevel(x.CourseLevel),
+                            NormalizeCourseLevel(requiredCourseLevel),
+                            StringComparison.OrdinalIgnoreCase));
+
+
+                if (course == null)
+                    continue;
+
+
+                if (applicableCourses.Any(x =>
+                        x.CourseCode == course.CourseCode))
+                {
+                    continue;
+                }
+
+
+                applicableCourses.Add(
+                    new DentalApplicableCourseVerificationVm
+                    {
+                        CourseCode =
+                            course.CourseCode,
+
+                        CourseName =
+                            course.CourseName,
+
+                        CourseLevel =
+                            course.CourseLevel,
+
+                        AcademicIntake2026 =
+                            intake.Ay2026TotalIntake
+                    });
+            }
+
+
+            // =========================================================
+            // 8. GET SAVED FEE STRUCTURE
+            // =========================================================
+
+            var feeStructures =
+                await _context.TxnDentalFeeStructures
+                    .AsNoTracking()
+                    .Include(x => x.FeeType)
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyId &&
+                        x.AffiliationTypeId == affiliationTypeId &&
+                        x.IsActive)
+                    .OrderBy(x => x.FeeType.DisplayOrder)
+                    .ThenBy(x => x.CourseLevel)
+                    .ThenBy(x => x.CourseName)
+                    .ToListAsync();
+
+
+            // =========================================================
+            // 9. BUILD FEE STRUCTURE
+            // =========================================================
+
+            var feeTypes =
+                feeStructures
+                    .GroupBy(x => new
+                    {
+                        x.FeeTypeId,
+                        FeeType = x.FeeType.FeeType,
+                        x.FeeType.DisplayOrder
+                    })
+                    .OrderBy(x => x.Key.DisplayOrder)
+                    .Select(group =>
+                        new DentalFeeTypeVerificationVm
+                        {
+                            FeeTypeId =
+                                group.Key.FeeTypeId,
+
+                            FeeType =
+                                group.Key.FeeType,
+
+                            DisplayOrder =
+                                group.Key.DisplayOrder,
+
+                            FeeItems =
+                                group.Select(x =>
+                                {
+                                    var calculationType =
+                                        x.CalculationType?.Trim();
+
+
+                                    // =============================================
+                                    // INTAKE
+                                    // =============================================
+
+                                    int? intake = null;
+
+                                    if (string.Equals(
+                                            calculationType,
+                                            "Per Seat",
+                                            StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        intake =
+                                            x.AcademicIntake2026;
+                                    }
+
+
+                                    // =============================================
+                                    // MULTIPLIER
+                                    // =============================================
+
+                                    var multiplier =
+                                        x.AcademicIntake2026
+                                        ?? (
+                                            string.Equals(
+                                                calculationType,
+                                                "Fixed",
+                                                StringComparison.OrdinalIgnoreCase)
+                                                ? 1
+                                                : 0
+                                        );
+
+
+                                    // =============================================
+                                    // BUILD VM
+                                    // =============================================
+
+                                    return new DentalFeeVerificationItemVm
+                                    {
+                                        Id =
+                                            x.Id,
+
+                                        DentalFeeStructureId =
+                                            x.DentalFeeStructureId,
+
+                                        CourseName =
+                                            x.CourseName,
+
+                                        CourseCode =
+                                            x.CourseCode,
+
+                                        CourseLevel =
+                                            x.CourseLevel,
+
+                                        AcademicIntake2026 =
+                                            intake,
+
+                                        AmountToBePaid =
+                                            x.AmountToBePaid,
+
+                                        CalculationType =
+                                            calculationType,
+
+                                        Multiplier =
+                                            multiplier,
+
+                                        CalculatedAmount =
+                                            x.CalculatedAmount,
+
+                                        IsApplicable =
+                                            true
+                                    };
+
+                                }).ToList()
+                        })
+                    .ToList();
+
+
+            // =========================================================
+            // 10. GET PAYMENT
+            // =========================================================
+
+            var payment =
+                await _context.TxnDentalPayments
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyId &&
+                        x.AffiliationTypeId == affiliationTypeId &&
+                        x.IsActive &&
+                        x.CourseLevel == requiredCourseLevel)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .FirstOrDefaultAsync();
+
+
+            // =========================================================
+            // 11. PAYMENT VM
+            // =========================================================
+
+            var paymentVm =
+                new DentalPaymentVerificationVm
+                {
+                    PaymentId =
+                        payment?.Id,
+
+                    CourseLevel =
+                        payment?.CourseLevel ??
+                        requiredCourseLevel,
+
+                    TransactionId =
+                        payment?.TransactionId,
+
+                    TransactionReceiptPath =
+                        payment?.TransactionReceiptPath,
+
+                    TransactionReceiptDocId = await GetDocumentIdAsync("Transaction Receipt"),
+
+                    AmountPaid =
+                        payment?.AmountPaid ?? 0m,
+
+                    IsPaymentAvailable =
+                        payment != null &&
+                        payment.AmountPaid > 0
+                };
+
+
+            // =========================================================
+            // 12. TOTAL FEE
+            // =========================================================
+
+            var totalFeeAmount =
+                feeStructures.Sum(x => x.CalculatedAmount);
+
+
+            var amountPaid =
+                payment?.AmountPaid ?? 0m;
+
+
+            var balanceAmount =
+                totalFeeAmount - amountPaid;
+
+
+            if (balanceAmount < 0)
+                balanceAmount = 0;
+
+
+            var isPaymentCompleted =
+                payment != null &&
+                totalFeeAmount > 0 &&
+                amountPaid >= totalFeeAmount;
+
+
+            // =========================================================
+            // 13. SUMMARY
+            // =========================================================
+
+            var summaryVm =
+                new DentalFeeSummaryVm
+                {
+                    TotalFeeAmount =
+                        totalFeeAmount,
+
+                    AmountPaid =
+                        amountPaid,
+
+                    BalanceAmount =
+                        balanceAmount,
+
+                    CourseLevel =
+                        payment?.CourseLevel ??
+                        requiredCourseLevel,
+
+                    IsPaymentCompleted =
+                        isPaymentCompleted
+                };
+
+
+            // =========================================================
+            // 14. FEE STRUCTURE FEEDBACK
+            // =========================================================
+
+            var feeStructureFeedback =
+                await GetTabSectionFeedbackAsync(
+                    collegeCode,
+                    34); // TODO: actual section ID
+
+
+            // =========================================================
+            // 15. TRANSACTION FEEDBACK
+            // =========================================================
+
+            var transactionFeedback =
+                await GetTabSectionFeedbackAsync(
+                    collegeCode,
+                    35); // TODO: actual section ID
+
+
+            // =========================================================
+            // 16. FINAL VM
+            // =========================================================
+
+            var vm =
+                new DentalFeePaymentVerificationVm
+                {
+                    PageContext =
+                        new VerificationPageContextVm
+                        {
+                            FacultyId =
+                                facultyId,
+
+                            CollegeCode =
+                                collegeCode,
+
+                            InstitutionName =
+                                pageContext.Institution.NameOfInstitution,
+
+                            FacultyName =
+                                pageContext.FacultyName,
+
+                            CurrentVerifier =
+                                $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                            VerificationStatus =
+                                "Pending",
+
+                            StatusBadgeClass =
+                                "pending",
+
+                            PrevTabAction =
+                                Url.Action(
+                                    "PreviousSection",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode
+                                    }),
+
+                            PrevTabLabel =
+                                "Previous : Previous Section",
+
+                            NextTabAction =
+                                Url.Action(
+                                    "NextSection",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode
+                                    }),
+
+                            NextTabLabel =
+                                "Next : Next Section"
+                        },
+
+                    ApplicableCourses =
+                        applicableCourses,
+
+                    FeeTypes =
+                        feeTypes,
+
+                    Summary =
+                        summaryVm,
+
+                    FeeStructureFeedback =
+                        feeStructureFeedback,
+
+                    Payment =
+                        paymentVm,
+
+                };
+
+
+            // =========================================================
+            // 17. COMMON VERIFICATION DATA
+            // =========================================================
+
+            await SetVerificationViewData<TxnDentalFeeStructure>(
+                collegeCode);
+
+
+            // =========================================================
+            // 18. RETURN VIEW
+            // =========================================================
+
+            return View("DentalFeePaymentVerification", vm);
+        }
+
+        private static string NormalizeCourseLevel(string? courseLevel)
+        {
+            if (string.IsNullOrWhiteSpace(courseLevel))
+                return string.Empty;
+
+            return courseLevel
+                .Trim()
+                .Replace("-", "")
+                .Replace("_", "")
+                .Replace(" ", "")
+                .ToUpperInvariant();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewFeeTransactionReceipt(string collegeCode, int id)
+        {
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return Unauthorized();
+
+            var context =
+                await GetPageContextAsync(collegeCode);
+
+            var payment = await _context.TxnDentalPayments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e =>
+                    e.Id == id &&
+                    e.CollegeCode == collegeCode &&
+                    e.FacultyCode == context.FacultyCodeInt &&
+                    e.IsActive);
+
+            if (payment == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(payment.TransactionReceiptPath)) return NotFound("Receipt not found.");
+
+            if (!System.IO.File.Exists(payment.TransactionReceiptPath)) return NotFound("Receipt file not found.");
+
+            return PhysicalFile(payment.TransactionReceiptPath, GetDocumentContentType(payment.TransactionReceiptPath));
         }
 
         public IActionResult DataNotAvailable( string entityName,  string collegeCode, string pageName)
