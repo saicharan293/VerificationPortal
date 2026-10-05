@@ -2236,6 +2236,8 @@ namespace VerificationPortal.Controllers
 
                 { "LibraryDetails", typeof(CaMedLibraryGeneral) },
 
+                { "LibraryExpenditure", typeof(LibraryExpenditure) },
+
                 { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
 
                 { "FacultyDetails", typeof(FacultyDetail) },
@@ -5268,6 +5270,18 @@ namespace VerificationPortal.Controllers
                                  x.FacultyCode == facultyCode.ToString(),
                             request),
 
+                    ["LibraryExpenditure"] = async () =>
+                    {
+
+                        await _verificationService.SaveVerificationAsync<LibraryExpenditure>(
+                            x => x.CollegeCode == collegeCode,
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<DentalLibraryService>(
+                            x => x.CollegeCode == collegeCode,
+                            request);
+                    },
+
 
                     ["TeachingExperience"] = async () =>
                     {
@@ -5769,6 +5783,81 @@ namespace VerificationPortal.Controllers
             return View("StaffOtherDetails", vm);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> LibraryExpenditure(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode)) return RedirectToAction("Login", "Account");
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            //----------------------------------------
+            // LIBRARY EXPENDITURES
+            //----------------------------------------
+            
+            var items = await _context.LibraryExpenditures
+                .AsNoTracking()
+                .Include(e => e.Item)
+                .Where(e => e.CollegeCode == collegeCode)
+                .Select(e => new LibraryExpenditureItemVm
+                {
+                    ItemId = e.ItemId,
+                    ItemName = e.Item.ItemName,
+                    ExpenditureProposed = e.ExpenditureProposed,
+                    CourseLevel = e.CourseLevel
+                })
+                .OrderBy(e => e.ItemName)
+                .ToListAsync();
+
+            //----------------------------------------
+            // LIBRARY SERVICES
+            //----------------------------------------
+
+            var services = await _context.DentalLibraryServices
+                .AsNoTracking()
+                .Where(e => e.CollegeCode == collegeCode)
+                .Select(e => new LibraryServiceItemVm
+                {
+                    ServiceId = e.DentalLibraryServiceId,
+                    ServiceName = e.Service.ServiceName,
+                    IsAvailable = e.IsAvailable,
+                    CourseLevel = e.CourseLevel
+                })
+                .OrderBy(e => e.ServiceName)
+                .ToListAsync();
+
+            var vm = new LibraryExpenditureVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = pageContext.FacultyCodeInt,
+                    CollegeCode = collegeCode,
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+                    FacultyName = pageContext.FacultyName,
+
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action("PreviousSection", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Previous Section",
+
+                    NextTabAction = Url.Action("NextSection", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Next Section"
+                },
+
+                Items = items,
+                Services = services,
+                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 31)
+            };
+
+            // 5. Load verification status for this section
+            await SetVerificationViewData<LibraryExpenditure>(collegeCode);
+
+            return View("LibraryExpenditure", vm);
+        }
 
 
         public IActionResult DataNotAvailable( string entityName,  string collegeCode, string pageName)

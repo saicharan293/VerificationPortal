@@ -303,6 +303,14 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="@Url.Action("LibraryExpenditure", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "LibraryExpenditure" ? "active" : "")">
+
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Library Expenditure</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="@Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
                        class="nav-link @(activeTab == "FacultyDetails" ? "active" : "")">
 

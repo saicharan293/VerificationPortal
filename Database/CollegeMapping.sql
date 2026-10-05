@@ -2443,7 +2443,7 @@ ADD
 -------------------
 
 
-ALTER TABLE [dbo].[DentalFieldPracticeArea]
+ALTER TABLE [dbo].[LibraryExpenditure]
 ADD
     -- DEO
     IsDeoVerified BIT NULL,
@@ -2903,6 +2903,100 @@ BEGIN
       AND TabName = N'Field Practice Area';
 END;
   -------------------------------------------------
+
+-- Insert the tab only if it does not already exist
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Library Expenditure and Services'
+)
+BEGIN
+    INSERT INTO dbo.MstTabs
+    (
+        FacultyId,
+        TabName
+    )
+    VALUES
+    (
+        2,
+        N'Library Expenditure and Services'
+    );
+END;
+
+
+-- Insert Library services availability section if it does not exist
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstSections S
+    INNER JOIN dbo.MstTabs T
+        ON T.TabId = S.TabId
+    WHERE S.FacultyId = 2
+      AND T.FacultyId = 2
+      AND T.TabName = N'Library Expenditure and Services'
+      AND S.SectionName = N'Library services availability'
+)
+BEGIN
+    INSERT INTO dbo.MstSections
+    (
+        FacultyId,
+        TabId,
+        SectionName
+    )
+    SELECT
+        FacultyId,
+        TabId,
+        N'Library services availability'
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Library Expenditure and Services';
+END;
+
+-------------------------------------------------
+
+
+-- Insert Library Expenditure section if it does not exist
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstSections S
+    INNER JOIN dbo.MstTabs T
+        ON T.TabId = S.TabId
+    WHERE S.FacultyId = 2
+      AND T.FacultyId = 2
+      AND T.TabName = N'Library Expenditure and Services'
+      AND S.SectionName = N'Library Expenditure'
+)
+BEGIN
+    INSERT INTO dbo.MstSections
+    (
+        FacultyId,
+        TabId,
+        SectionName
+    )
+    SELECT
+        FacultyId,
+        TabId,
+        N'Library Expenditure'
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Library Expenditure and Services';
+END;
+
+-------------------------------------------------
+SELECT TOP (1000) [SectionId]
+      ,[FacultyId]
+      ,[TabId]
+      ,[SectionName]
+  FROM [Admission_Affiliation].[dbo].[MstSections];
+
+  select * from msttabs;
+
+  SELECT *
+FROM [Admission_Affiliation].[dbo].[CA_AcademicPerformance]
+WHERE CollegeCode LIKE 'D%' and CourseLevel is not null;
 
 /* ============================================================
    3. SectionWiseFeedback

@@ -1,0 +1,239 @@
+﻿@model VerificationPortal.Models.LibraryExpenditureVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Library Expenditure and Services";
+    ViewData["ActiveTab"] = "LibraryExpenditure";
+    ViewData["ShowFeedbackSection"] = true;
+
+    var page = Model.PageContext;
+
+    ViewData["InstitutionName"] = page.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = page.CollegeCode ?? "";
+    ViewData["FacultyCode"] = page.FacultyId;
+    ViewData["CurrentVerifier"] = page.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = page.PrevTabAction;
+    ViewData["PrevTabLabel"] = page.PrevTabLabel;
+
+    ViewData["NextTabAction"] = page.NextTabAction;
+    ViewData["NextTabLabel"] = page.NextTabLabel;
+
+    // Feedback for each section
+    var libraryServicesFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 69);
+
+    var libraryExpenditureFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 70);
+
+}
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Library Expenditure and Services
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Library services availability and expenditure details
+    </p>
+
+</div>
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-book me-2"></i>
+            Library Details
+        </h3>
+
+        <span class="badge bg-primary">
+            Library
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @* =========================================================
+           SECTION 1 : LIBRARY SERVICES AVAILABILITY
+           ========================================================= *@
+
+        <div class="mb-4">
+
+            <h5 class="fw-semibold mb-3">
+                <i class="bi bi-journal-check me-2"></i>
+                Library Services Availability
+            </h5>
+
+            @if (Model.Services?.Any() == true)
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th>Library Service</th>
+                            <th style="width: 180px;" class="text-center">
+                                Availability
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var service in Model.Services.Select((item, index) => new
+                        {
+                            Item = item,
+                            Index = index + 1
+                        }))
+                        {
+                            <tr>
+                                <td>
+                                    @service.Index
+                                </td>
+
+                                <td>
+                                    <span class="fw-semibold">
+                                        @service.Item.ServiceName
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @if (service.Item.IsAvailable)
+                                    {
+                                        <span class="badge bg-success">
+                                            Available
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Not Available
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                No library service details are available for verification.
+            </div>
+        }
+
+        @* Library Services Availability Feedback *@
+
+
+        @if (libraryServicesFeedback != null)
+        {
+            <div class="mt-4">
+
+                @await Html.PartialAsync("_SectionFeedback", libraryServicesFeedback)
+
+            </div>
+        }
+
+        </div>
+
+
+        <hr class="my-4" />
+
+
+        @* =========================================================
+           SECTION 2 : LIBRARY EXPENDITURE
+           ========================================================= *@
+
+        <section>
+
+            <h5 class="fw-semibold mb-3">
+                <i class="bi bi-cash-stack me-2"></i>
+                Library Expenditure
+            </h5>
+
+            @if (Model.Items?.Any() == true)
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">#</th>
+                                <th>Library Expenditure</th>
+                                <th style="width: 220px;" class="text-end">
+                                    Expenditure Proposed
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var expenditure in Model.Items.Select((item, index) => new
+                            {
+                                Item = item,
+                                Index = index + 1
+                            }))
+                            {
+                                <tr>
+                                    <td>
+                                        @expenditure.Index
+                                    </td>
+
+                                    <td>
+                                        <span class="fw-semibold">
+                                            @expenditure.Item.ItemName
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        @(expenditure.Item.ExpenditureProposed.HasValue
+                                            ? expenditure.Item.ExpenditureProposed.Value.ToString("N2")
+                                            : "-")
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No library expenditure details are available for verification.
+                </div>
+            }
+
+            @if (libraryExpenditureFeedback != null)
+            {
+                <div class="mt-4">
+                    @await Html.PartialAsync( "_SectionFeedback", libraryExpenditureFeedback)
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+
+}
