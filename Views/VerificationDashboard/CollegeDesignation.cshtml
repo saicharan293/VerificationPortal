@@ -1,0 +1,282 @@
+﻿@model VerificationPortal.Models.CollegeDesignationVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "College Designation Details";
+    ViewData["ActiveTab"] = "CollegeDesignation";
+
+    ViewData["ShowFeedbackSection"] = true;
+
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] =  Model.PageContext.FacultyId;
+
+    ViewData["CurrentVerifier"] = Model.PageContext.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = Model.PageContext.PrevTabAction;
+
+    ViewData["PrevTabLabel"] = Model.PageContext.PrevTabLabel;
+
+    ViewData["NextTabAction"] = Model.PageContext.NextTabAction;
+
+    ViewData["NextTabLabel"] = Model.PageContext.NextTabLabel;
+
+    var sectionFeedback =
+            Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 76);
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+
+    <!-- ========================================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================================= -->
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+            <h4 class="fw-bold mb-1">
+                <i class="bi bi-person-badge me-2"></i>
+                College Designation Details
+            </h4>
+
+            <div class=" small">
+                Designation and intake details submitted by the institution
+            </div>
+        </div>
+
+        <div class="text-md-end">
+
+            @if (!string.IsNullOrWhiteSpace(Model.PageContext.FacultyName))
+            {
+                <div class="fw-semibold">
+                    @Model.PageContext.FacultyName
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.PageContext.CollegeCode))
+            {
+                <small class="">
+                    College Code:
+                    <span class="fw-semibold">
+                        @Model.PageContext.CollegeCode
+                    </span>
+                </small>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- DESIGNATION DETAILS -->
+    <!-- ========================================================= -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header border-bottom py-3">
+
+            <div class="d-flex align-items-center">
+
+                <div class="rounded-circle bg-primary bg-opacity-10
+                            text-primary d-flex align-items-center
+                            justify-content-center me-2"
+                     style="width:38px;height:38px;">
+
+                    <i class="bi bi-person-badge"></i>
+
+                </div>
+
+                <div>
+                    <h6 class="fw-bold mb-0">
+                        Designation Details
+                    </h6>
+
+                    <small class="">
+                        Faculty designation and intake information
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            @if (Model.Designations != null &&
+                 Model.Designations.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered
+                                  table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th style="width:50px;">
+                                    #
+                                </th>
+
+                                <th>
+                                    Department
+                                </th>
+
+                                <th>
+                                    Designation
+                                </th>
+
+                                <th>
+                                    Required Intake
+                                </th>
+
+                                <th>
+                                    Available Intake
+                                </th>
+
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @{
+                                var departmentGroups = Model.Designations
+                                    .GroupBy(x => string.IsNullOrWhiteSpace(x.Department)
+                                        ? "Not Available"
+                                        : x.Department)
+                                    .ToList();
+
+                                var serialNo = 1;
+                            }
+
+                            @foreach (var department in departmentGroups)
+                            {
+                                var rowSpan = department.Count();
+                                var firstRow = true;
+
+                                foreach (var item in department)
+                                {
+                                    <tr>
+
+                                        <!-- SERIAL NUMBER -->
+                                        <td class="text-center fw-semibold">
+                                            @serialNo
+                                        </td>
+
+                                        <!-- DEPARTMENT -->
+                                        @if (firstRow)
+                                        {
+                                            <td rowspan="@rowSpan" class="align-middle">
+
+                                                <div class="fw-semibold">
+                                                    @department.Key
+                                                </div>
+
+                                            </td>
+
+                                            firstRow = false;
+                                        }
+
+
+                                        <!-- DESIGNATION -->
+                                        <td>
+                                            <div class="fw-semibold">
+                                                @item.Designation
+                                            </div>
+                                        </td>
+
+
+                                        <!-- REQUIRED INTAKE -->
+                                        <td class="text-center">
+
+                                            <span class="fs-6">
+                                                @item.RequiredIntake
+                                            </span>
+
+                                        </td>
+
+
+                                        <!-- AVAILABLE INTAKE -->
+                                        <td class="text-center">
+
+                                            <span class="fs-6">
+                                                @item.AvailableIntake
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                    serialNo++;
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <!-- ================================================= -->
+                <!-- NO DATA -->
+                <!-- ================================================= -->
+
+                <div class="text-center py-5">
+
+                    <div class="mb-3">
+
+                        <i class="bi bi-person-badge
+                                  "
+                           style="font-size:3rem;">
+                        </i>
+
+                    </div>
+
+                    <h6 class="fw-bold">
+                        No Designation Details Found
+                    </h6>
+
+                    <p class=" mb-0">
+                        No designation details have been submitted
+                        by the institution.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SECTION FEEDBACK -->
+    <!-- ========================================================= -->
+
+    @if (sectionFeedback != null)
+    {
+        <div class="mb-4">
+
+            @await Html.PartialAsync("_SectionFeedback", sectionFeedback)
+
+        </div>
+    }
+
+
+</div>
+
+
+@section Scripts
+{
+    <script src="~/js/verification-dashboard.js"></script>
+}

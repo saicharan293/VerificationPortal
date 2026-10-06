@@ -251,10 +251,19 @@
                     </li>
                 }
                 <li class="nav-item">
+                    <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
+
+                        <i class="bi bi-people-fill"></i>
+                        <span> Faculty Repository </span>
+
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="@Url.Action("StaffPayScale", "VerificationDashboard", new { collegeCode = collegeCode })"
                        class="nav-link @(activeTab == "StaffPayScale" ? "active" : "")">
 
-                        <i class="bi bi-cash-stack me-2"></i>
+                        <i class="bi bi-cash-stack"></i>
                         <span> Staff Pay Scale </span>
 
                     </a>
@@ -263,7 +272,7 @@
                     <a href="@Url.Action("StaffOtherDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
                        class="nav-link @(activeTab == "StaffOtherDetails" ? "active" : "")">
 
-                        <i class="bi bi-people me-2"></i>
+                        <i class="bi bi-people"></i>
                         <span> Staff Other Details </span>
 
                     </a>
@@ -353,7 +362,7 @@
                        asp-action="TeachingExperience"
                        asp-route-collegeCode="@collegeCode">
 
-                        <i class="bi bi-clock-history me-2"></i>
+                        <i class="bi bi-clock-history"></i>
 
                         <span>Teaching Experience</span>
                     </a>
@@ -364,7 +373,7 @@
                        asp-action="ClinicalFacilities"
                        asp-route-collegeCode="@collegeCode">
 
-                        <i class="bi bi-hospital me-2"></i>
+                        <i class="bi bi-hospital"></i>
 
                         <span>Clinical Facilities</span>
                     </a>
@@ -373,7 +382,7 @@
                     <a class="nav-link @(activeTab == "ActionTakenDeficiencyReport" ? "active" : "")"
                        href="@Url.Action("ActionTakenDeficiencyReport", "VerificationDashboard", new { collegeCode = collegeCode })">
 
-                        <i class="bi bi-file-earmark-check me-2"></i>
+                        <i class="bi bi-file-earmark-check"></i>
 
                         <span>Action Taken Deficiency Report</span>
                     </a>

@@ -2225,6 +2225,7 @@ namespace VerificationPortal.Controllers
                 { "CA_VehicleDetails", typeof(CaVehicleDetail) },
 
                 { "UgAcademicMatters", typeof(CaAcademicPerformance) },
+                { "CollegeDesignation", typeof(CollegeDesignationDetail) },
 
                 { "PgAcademicMatters",typeof(CaAcademicPerformance) },
 
@@ -5116,6 +5117,12 @@ namespace VerificationPortal.Controllers
                             x => x.CollegeCode == collegeCode,
                             request),
 
+                    ["CollegeDesignation"] = async () =>
+                        await _verificationService.SaveVerificationAsync<CollegeDesignationDetail>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyCode == facultyCode.ToString(),
+                            request),
+
                     ["LandAndBuildingDetails"] = () =>
                         _verificationService.SaveVerificationAsync<DentalCollegeLandBuildingDetail>(
                             x => x.CollegeCode == collegeCode,
@@ -6757,7 +6764,119 @@ namespace VerificationPortal.Controllers
                 vm);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CollegeDesignation( string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
 
+            // --------------------------------------------------
+            // 1. Get common verification page context
+            // --------------------------------------------------
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyId = pageContext.FacultyCodeInt;
+
+            if (facultyId <= 0)
+                return NotFound("Faculty information not found.");
+
+            // --------------------------------------------------
+            // 2. Get Affiliation Type
+            // --------------------------------------------------
+
+            var affiliationTypeId = HttpContext.Session.GetInt32("AffiliationTypeId");
+
+            if (affiliationTypeId <= 0)
+            {
+                return BadRequest("Affiliation type is not configured.");
+            }
+
+            // --------------------------------------------------
+            // 3. Get College Designation Details
+            // --------------------------------------------------
+            var designations =
+                await _context.CollegeDesignationDetails
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyId.ToString() )
+                    .Select(x => new CollegeDesignationItemVm
+                    {
+                        Id = x.Id,
+
+                        FacultyCode = x.FacultyCode,
+
+                        CollegeCode = x.CollegeCode,
+
+                        Designation = x.Designation,
+
+                        DesignationCode = x.DesignationCode,
+
+                        Department = x.Department,
+
+                        DepartmentCode = x.DepartmentCode,
+
+                        SeatSlabId = x.SeatSlabId,
+
+                        RequiredIntake = x.RequiredIntake,
+
+                        AvailableIntake = x.AvailableIntake,
+
+                    })
+                    .OrderBy(x => x.Department)
+                    .ThenBy(x => x.Designation)
+                    .ToListAsync();
+
+            // --------------------------------------------------
+            // 4. Get Section Feedback
+            // --------------------------------------------------
+            var sectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 36); // TODO: replace with actual SectionId
+
+            // --------------------------------------------------
+            // 5. Build ViewModel
+            // --------------------------------------------------
+            var vm = new CollegeDesignationVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyId,
+
+                    CollegeCode = collegeCode,
+
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+
+                    FacultyName = pageContext.FacultyName,
+
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action("PreviousSection", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Previous Section",
+
+                    NextTabAction = Url.Action( "NextSection", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Next Section"
+                },
+
+                Designations = designations,
+
+                SectionFeedback = sectionFeedback
+            };
+
+            // --------------------------------------------------
+            // 6. Common verification ViewData
+            // --------------------------------------------------
+            await SetVerificationViewData<CollegeDesignationDetail>( collegeCode);
+
+            // --------------------------------------------------
+            // 7. Return View
+            // --------------------------------------------------
+            return View("CollegeDesignation", vm);
+        }
 
         [HttpGet]
         public async Task<IActionResult> ViewReport( int reportId, string collegeCode)
