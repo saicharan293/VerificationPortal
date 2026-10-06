@@ -7924,6 +7924,40 @@ namespace VerificationPortal.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> ViewAllDocs(string collegeCode, string docType)
+        {
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return Unauthorized();
+
+            var context =
+                await GetPageContextAsync(collegeCode);
+
+            var certificateData = await _context.HospitalDetailsForAffiliations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e =>
+                    e.CollegeCode == collegeCode &&
+                    e.FacultyCode == context.FacultyCode);
+
+            if (certificateData == null) return NotFound();
+
+            string? filePath = docType?.ToLowerInvariant() switch
+            {
+                "kpme" => certificateData.KpmecertificatePdfPath,
+                "pcb" => certificateData.PollutionControlBoardCertificatePdfPath,
+                "bio" => certificateData.BioMedicalCertificatePdfPath,
+                "drugfree" => certificateData.DrugFreeCampusCertificationPdfPath,
+                "proposedplan" => certificateData.ProposedPlansForFutureDevelopmentsPdfPath,
+                _ => null
+            };
+
+            if (string.IsNullOrWhiteSpace(filePath)) return NotFound("Receipt not found.");
+
+            if (!System.IO.File.Exists(filePath)) return NotFound("Receipt file not found.");
+
+            return PhysicalFile(filePath, GetDocumentContentType(filePath));
+        }
 
         // Helper method to get current user's designation
         private string GetUserDesignation()

@@ -3594,6 +3594,42 @@ BEGIN
       AND TabName = N'Faculty Repository';
 END;
 
+-------------------------------------------------
+select * from MstSections
+where facultyid = 2
+
+select * from MstTabs
+where facultyid = 2
+
+-- Insert Certificates section if it does not exist
+
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstSections S
+    INNER JOIN dbo.MstTabs T
+        ON T.TabId = S.TabId
+    WHERE S.FacultyId = 2
+      AND T.FacultyId = 2
+      AND T.TabName = N'Clinical Facilities'
+      AND S.SectionName = N'Certificates and Future Development Documents'
+)
+BEGIN
+    INSERT INTO dbo.MstSections
+    (
+        FacultyId,
+        TabId,
+        SectionName
+    )
+    SELECT
+        FacultyId,
+        TabId,
+        N'Certificates and Future Development Documents'
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Clinical Facilities';
+END;
+
 
 -------------------------------------------------
 SELECT TOP (1000) [SectionId]

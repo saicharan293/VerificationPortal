@@ -103,10 +103,30 @@
                     </li>
                 }
                 <li class="nav-item">
+                    <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
+                       class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
+
+                        <i class="bi bi-people-fill"></i>
+                        <span> Faculty Repository </span>
+
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link @(activeTab == "Courses" ? "active" : "")"
                        asp-controller="VerificationDashboard" asp-action="Courses" asp-route-collegeCode="@collegeCode">
                         <i class="bi bi-book"></i>
                         <span>Courses & Intake</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(activeTab == "ClinicalFacilities" ? "active" : "")"
+                       asp-controller="VerificationDashboard"
+                       asp-action="ClinicalFacilities"
+                       asp-route-collegeCode="@collegeCode">
+
+                        <i class="bi bi-hospital"></i>
+
+                        <span>Clinical Facilities</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -179,6 +199,17 @@
 
                     </a>
                 </li>
+                
+                <li class="nav-item">
+                    <a asp-controller="VerificationDashboard"
+                       asp-action="CA_VehicleDetails"
+                       asp-route-collegeCode="@collegeCode"
+                       class="nav-link @(activeTab == "CAVehicleDetails" ? "active" : "")">
+
+                        <i class="bi bi-car-front"></i>
+                        <span>Vehicle Details</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a asp-controller="VerificationDashboard"
                        asp-action="WorkShopDetails"
@@ -212,16 +243,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a asp-controller="VerificationDashboard"
-                       asp-action="CA_VehicleDetails"
-                       asp-route-collegeCode="@collegeCode"
-                       class="nav-link @(activeTab == "CAVehicleDetails" ? "active" : "")">
-
-                        <i class="bi bi-car-front"></i>
-                        <span>Vehicle Details</span>
-                    </a>
-                </li>
                 @if (existingCourseLevel == "UG")
                 {
                     <li class="nav-item">
@@ -250,15 +271,7 @@
                         </a>
                     </li>
                 }
-                <li class="nav-item">
-                    <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
-                       class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
-
-                        <i class="bi bi-people-fill"></i>
-                        <span> Faculty Repository </span>
-
-                    </a>
-                </li>
+                
                 <li class="nav-item">
                     <a href="@Url.Action("StaffPayScale", "VerificationDashboard", new { collegeCode = collegeCode })"
                        class="nav-link @(activeTab == "StaffPayScale" ? "active" : "")">
@@ -367,17 +380,7 @@
                         <span>Teaching Experience</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link @(activeTab == "ClinicalFacilities" ? "active" : "")"
-                       asp-controller="VerificationDashboard"
-                       asp-action="ClinicalFacilities"
-                       asp-route-collegeCode="@collegeCode">
-
-                        <i class="bi bi-hospital"></i>
-
-                        <span>Clinical Facilities</span>
-                    </a>
-                </li>
+                
                 <li class="nav-item">
                     <a class="nav-link @(activeTab == "ActionTakenDeficiencyReport" ? "active" : "")"
                        href="@Url.Action("ActionTakenDeficiencyReport", "VerificationDashboard", new { collegeCode = collegeCode })">

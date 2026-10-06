@@ -1,0 +1,154 @@
+﻿@model VerificationPortal.Models.HospitalCertificatesVm
+
+<div class="verification-card mt-4">
+    <div class="verification-card-header">
+        <h3 class="verfication-card-title">
+            <i class="bi bi-file-earmark-check me-2"></i>
+            Hospital Certificates & Future Development
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Document</th>
+                        <th style="width: 160px">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class="fw-semibold">
+                            KPME Certificate
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model?.KPMECertificatePath))
+                            {
+                                @await Html.PartialAsync("_DocumentViewerButton", new DocumentViewerVm
+                                    {
+                                        Url = Url.Action("ViewAllDocs","VerificationDashboard", new
+                                        {
+                                            collegeCode = Model.PageContext.CollegeCode,
+                                            docType = "KPME"
+                                        })!,
+
+                                        Title = "KPME Certificate",
+                                        FacultyId = Model.PageContext.FacultyCodeInt,
+                                        CollegeCode = Model.PageContext.CollegeCode,
+                                        DocumentId = Model.KPMECertificateFileId,
+                                        CanVerify = true
+                                    })
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td class="fw-semibold">
+                            Pollution Control Board Certificate
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model?.PollutionControlBoardCertificatePath))
+                            {
+                                @await Html.PartialAsync("_DocumentViewerButton", new DocumentViewerVm
+                                    {
+                                        Url = Url.Action("ViewAllDocs","VerificationDashboard", new
+                                        {
+                                            collegeCode = Model.PageContext.CollegeCode,
+                                            docType = "PCB"
+                                        })!,
+
+                                        Title = "Pollution Control Board Certificate",
+                                        FacultyId = Model.PageContext.FacultyCodeInt,
+                                        CollegeCode = Model.PageContext.CollegeCode,
+                                        DocumentId = Model.PollutionControlBoardCertificateFileID,
+                                        CanVerify = true
+                                    })
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+
+                        <td class="fw-semibold">
+                            Bio-Medical Waste Certificate
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model?.BioMedicalCertificatePath))
+                            {
+                                @await Html.PartialAsync("_DocumentViewerButton", new DocumentViewerVm
+                                    {
+                                        Url = Url.Action("ViewAllDocs","VerificationDashboard", new
+                                        {
+                                            collegeCode = Model.PageContext.CollegeCode,
+                                            docType = "Bio"
+                                        })!,
+
+                                        Title = "Bio-Medical Waste Certificate",
+                                        FacultyId = Model.PageContext.FacultyCodeInt,
+                                        CollegeCode = Model.PageContext.CollegeCode,
+                                        DocumentId = Model.BioMedicalCertificateFileId,
+                                        CanVerify = true
+                                    })
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+
+                        <td class="fw-semibold">
+                            Drug Free Campus Certification
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model?.BioMedicalCertificatePath))
+                            {
+                                @await Html.PartialAsync("_DocumentViewerButton", new DocumentViewerVm
+                                    {
+                                        Url = Url.Action("ViewAllDocs","VerificationDashboard", new
+                                        {
+                                            collegeCode = Model.PageContext.CollegeCode,
+                                            docType = "DrugFree"
+                                        })!,
+
+                                        Title = "Drug Free Campus Certification",
+                                        FacultyId = Model.PageContext.FacultyCodeInt,
+                                        CollegeCode = Model.PageContext.CollegeCode,
+                                        DocumentId = Model.DrugFreeCampusCertificationFileId,
+                                        CanVerify = true
+                                    })
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="fw-semibold">
+                            Proposed Plans for Future Developments
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model?.ProposedPlansForFutureDevelopmentsPath))
+                            {
+                                @await Html.PartialAsync("_DocumentViewerButton", new DocumentViewerVm
+                                    {
+                                        Url = Url.Action("ViewAllDocs","VerificationDashboard", new
+                                        {
+                                            collegeCode = Model.PageContext.CollegeCode,
+                                            docType = "ProposedPlan"
+                                        })!,
+
+                                        Title = "Proposed Plans for Future Developments",
+                                        FacultyId = Model.PageContext.FacultyCodeInt,
+                                        CollegeCode = Model.PageContext.CollegeCode,
+                                        DocumentId = Model.ProposedPlansForFutureDevelopmentsId,
+                                        CanVerify = true
+                                    })
+                            }
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

@@ -498,43 +498,69 @@ namespace VerificationPortal.Services.Verification
                         })
                         .ToList();
 
+                model.HospitalCertificates = await GetHospitalCertificatesAsync(collegeCode, facultyCodeInt, hospital.HospitalDetailsId);
+
             }
 
-            // =========================================================
-            // NEXT CLINICAL FACILITIES SECTIONS
-            // =========================================================
+            return model;
+        }
 
-            // Later we will populate these from the same composite service:
-            //
-            // model.ClinicalCapacity = ...
-            // model.HospitalFacilities = ...
-            // model.HospitalDocumentsToBeUploadedList = ...
-            // model.AffiliatedDocumentsPostVM = ...
-            // model.FieldPracticeAreaPostVM = ...
-            // model.IndoorDepartment = ...
-            // model.OTRequirements = ...
-            // model.CasualityRequirements = ...
-            // model.CSSDandLaundryRequirements = ...
-            // model.RadioDiagnosisRequirements = ...
-            // model.AnaesthesiologyRequirements = ...
-            // model.CentralLaboratoryRequirements = ...
-            // model.BloodBankRequirements = ...
-            // model.YogaRequirements = ...
-            // model.RadiationOncologyRequirements = ...
-            // model.ArtCenterRequirements = ...
-            // model.PharmacyRequirements = ...
-            // model.UtilitiesRequirements = ...
-            // model.OutPatientRequirements = ...
-            // model.IndoorBedsUnitsRequirements = ...
-            // model.IndoorBedsOccupancy = ...
-            // model.SuperVisionInFieldPracticeArea = ...
-            // model.NptaRequirementPostvm = ...
-            // model.EngAlliedRequirementPostvm = ...
-            // model.AdmAncRequirementPostvm = ...
-            // model.DisciplineVm = ...
-            // model.DentalWardBedDistribution = ...
+        private async Task<int?> GetDocumentIdAsync(string documentName)
+        {
+            if (string.IsNullOrWhiteSpace(documentName)) return null;
+
+            return await _context.MstDocuments.AsNoTracking().Where(d => d.DocumentName == documentName)
+                .Select(e => (int?)e.DocumentId)
+                .FirstOrDefaultAsync();
+        }
+
+
+        private async Task<HospitalCertificatesVm> GetHospitalCertificatesAsync(string collegeCode, int facultyCode, int hospitalDetailsId)
+        {
+
+            var hospital = await _context.HospitalDetailsForAffiliations.AsNoTracking()
+                .FirstOrDefaultAsync(e => e.CollegeCode == collegeCode && e.HospitalDetailsId == hospitalDetailsId);
+
+            if (hospital == null) return new HospitalCertificatesVm();
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+            var model = new HospitalCertificatesVm
+            {
+                PageContext = pageContext,
+                KPMECertificatePath = hospital.KpmecertificatePdfPath,
+                KPMECertificateFileId = await GetDocumentIdAsync("KPME Certificate"),
+                PollutionControlBoardCertificatePath = hospital.PollutionControlBoardCertificatePdfPath,
+                PollutionControlBoardCertificateFileID = await GetDocumentIdAsync("Pollution Control Board Certificate"),
+                BioMedicalCertificatePath = hospital.BioMedicalCertificatePdfPath,
+                BioMedicalCertificateFileId = await GetDocumentIdAsync("Bio-Medical Waste Certificate"),
+                DrugFreeCampusCertificationPath = hospital.DrugFreeCampusCertificationPdfPath,
+                DrugFreeCampusCertificationFileId = await GetDocumentIdAsync("Drug Free Campus Certification"),
+                ProposedPlansForFutureDevelopmentsPath = hospital.ProposedPlansForFutureDevelopmentsPdfPath,
+                ProposedPlansForFutureDevelopmentsId = await GetDocumentIdAsync("Proposed Plans for Future Developments"),
+            };
 
             return model;
+        }
+
+        private async Task<VerificationPageContext> GetPageContextAsync(string collegeCode)
+        {
+            var institution = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
+
+            if (institution == null)
+                throw new Exception($"Institution not found for college code '{collegeCode}'.");
+
+            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
+                throw new Exception("Faculty code not found.");
+
+            var faculty = await _context.Faculties.AsNoTracking().FirstOrDefaultAsync(x => x.FacultyId.ToString() == institution.FacultyCode);
+
+            return new VerificationPageContext
+            {
+                Institution = institution,
+                Faculty = faculty
+            };
         }
 
         private int GetSeatSlab(int seatIntake)
@@ -550,6 +576,8 @@ namespace VerificationPortal.Services.Verification
                 _ => 300
             };
         }
+
+
 
     }
 }
