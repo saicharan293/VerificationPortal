@@ -862,13 +862,40 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("ActionTakenDeficiencyReport");
 
+            entity.Property(e => e.ArName).HasMaxLength(200);
+            entity.Property(e => e.ArRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ArVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.CollegeCode).HasMaxLength(100);
             entity.Property(e => e.CourseLevel).HasMaxLength(50);
             entity.Property(e => e.CreatedBy).HasMaxLength(100);
             entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CurrentVerificationLevel).HasMaxLength(50);
+            entity.Property(e => e.DeoName).HasMaxLength(200);
+            entity.Property(e => e.DeoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DeoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.DrName).HasMaxLength(200);
+            entity.Property(e => e.DrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DrVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.JrName).HasMaxLength(200);
+            entity.Property(e => e.JrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.JrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+            entity.Property(e => e.OverallStatus).HasMaxLength(30);
+            entity.Property(e => e.ReName).HasMaxLength(200);
+            entity.Property(e => e.ReRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ReVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.RelevantReportPath).HasMaxLength(500);
+            entity.Property(e => e.RgName).HasMaxLength(200);
+            entity.Property(e => e.RgRemarks).HasMaxLength(1000);
+            entity.Property(e => e.RgVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.SoName).HasMaxLength(200);
+            entity.Property(e => e.SoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.SoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.VcName).HasMaxLength(200);
+            entity.Property(e => e.VcRemarks).HasMaxLength(1000);
+            entity.Property(e => e.VcVerifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.CollegeCodeNavigation).WithMany(p => p.ActionTakenDeficiencyReports)
                 .HasForeignKey(d => d.CollegeCode)

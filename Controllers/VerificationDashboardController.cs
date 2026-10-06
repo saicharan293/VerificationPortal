@@ -2257,7 +2257,8 @@ namespace VerificationPortal.Controllers
                 { "ClassroomAndLaboratory", typeof(DentalInfrastructure) },
                 { "TeachingStaffDepartmentWise", typeof(TeachingStaffDepartmentWiseDetail) },
                 { "AcademicIntake", typeof(CollegeCourseIntakeDetail) },
-                { "ResearchPublications", typeof(CaMedResearchPublicationsDetail) }
+                { "ResearchPublications", typeof(CaMedResearchPublicationsDetail) },
+                { "ActionTakenDeficiencyReport", typeof(ActionTakenDeficiencyReport) }
             };
         }
 
@@ -5330,6 +5331,12 @@ namespace VerificationPortal.Controllers
                                  x.FacultyCode == facultyCode.ToString(),
                             request),
 
+                    ["ActionTakenDeficiencyReport"] = async() =>
+                        await _verificationService.SaveVerificationAsync<ActionTakenDeficiencyReport>(
+                            x => x.CollegeCode == collegeCode &&
+                                 x.FacultyId == facultyCode,
+                            request),
+
                     // Continue adding the remaining tabs...
                 };
 
@@ -6579,6 +6586,204 @@ namespace VerificationPortal.Controllers
             if (!System.IO.File.Exists(payment.TransactionReceiptPath)) return NotFound("Receipt file not found.");
 
             return PhysicalFile(payment.TransactionReceiptPath, GetDocumentContentType(payment.TransactionReceiptPath));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ActionTakenDeficiencyReport(string collegeCode)
+        {
+            // =========================================================
+            // 1. Validate College Code
+            // =========================================================
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+
+            // =========================================================
+            // 2. Get Page Context
+            // =========================================================
+
+            var pageContext =
+                await GetPageContextAsync(collegeCode);
+
+            var facultyId =
+                pageContext.FacultyCodeInt;
+
+            if (facultyId <= 0)
+                return NotFound("Faculty information not found.");
+
+
+            // =========================================================
+            // 3. Get Type Of Affiliation
+            // =========================================================
+
+            var affiliationTypeId = HttpContext.Session.GetInt32("AffiliationTypeId");
+
+            if (affiliationTypeId <= 0)
+            {
+                return BadRequest("Affiliation type is not configured.");
+            }
+
+
+            // =========================================================
+            // 4. Get Action Taken / Deficiency Details
+            // =========================================================
+
+            var deficiencies =
+                await _context.ActionTakenDeficiencyReports
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyId == facultyId &&
+                        x.TypeId == affiliationTypeId &&
+                        x.IsActive)
+                    .Select(x => new ActionTakenDeficiencyItemVm
+                    {
+                        ActionTakenDeficiencyReportId =
+                            x.ActionTakenDeficiencyReportId,
+
+                        CourseLevel =
+                            x.CourseLevel,
+
+                        DeficiencyPointedOut =
+                            x.DeficiencyPointedOut,
+
+                        ExtentRemedied =
+                            x.ExtentRemedied,
+
+                        RelevantReportPath =
+                            x.RelevantReportPath,
+
+                    })
+                    .OrderBy(x => x.CourseLevel)
+                    .ThenBy(x => x.ActionTakenDeficiencyReportId)
+                    .ToListAsync();
+
+
+            // =========================================================
+            // 5. Get Section Feedback
+            // =========================================================
+            //
+            // Replace 36 with the actual section/page ID.
+            // =========================================================
+
+            var sectionFeedback =
+                await GetTabSectionFeedbackAsync(
+                    collegeCode,
+                    35);
+
+
+            // =========================================================
+            // 6. Build View Model
+            // =========================================================
+
+            var vm =
+                new ActionTakenDeficiencyVerificationVm
+                {
+                    PageContext =
+                        new VerificationPageContextVm
+                        {
+                            FacultyId =
+                                facultyId,
+
+                            CollegeCode =
+                                collegeCode,
+
+                            InstitutionName =
+                                pageContext.Institution.NameOfInstitution,
+
+                            FacultyName =
+                                pageContext.FacultyName,
+
+                            CurrentVerifier =
+                                $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                            VerificationStatus =
+                                "Pending",
+
+                            StatusBadgeClass =
+                                "pending",
+
+                            PrevTabAction =
+                                Url.Action(
+                                    "PreviousSection",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode
+                                    }),
+
+                            PrevTabLabel =
+                                "Previous : Previous Section",
+
+                            NextTabAction =
+                                Url.Action(
+                                    "NextSection",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode
+                                    }),
+
+                            NextTabLabel =
+                                "Next : Next Section"
+                        },
+
+                    Deficiencies =
+                        deficiencies,
+
+                    SectionFeedback =
+                        sectionFeedback
+                };
+
+
+            // =========================================================
+            // 7. Common Verification ViewData
+            // =========================================================
+
+            await SetVerificationViewData<ActionTakenDeficiencyReport>(
+                collegeCode);
+
+
+            vm.RelevantReportDocId = await GetDocumentIdAsync("Relevant Report");
+
+
+            // =========================================================
+            // 8. Return View
+            // =========================================================
+
+            return View(
+                "ActionTakenDeficiencyReport",
+                vm);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewReport( int reportId, string collegeCode)
+        {
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return Unauthorized();
+
+            var context =
+                await GetPageContextAsync(collegeCode);
+
+            var actionTakenReport = await _context.ActionTakenDeficiencyReports
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e =>
+                    e.ActionTakenDeficiencyReportId == reportId &&
+                    e.CollegeCode == collegeCode &&
+                    e.FacultyId == context.FacultyCodeInt &&
+                    e.IsActive);
+
+            if (actionTakenReport == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(actionTakenReport.RelevantReportPath)) return NotFound("Relevant Report file not Uploaded.");
+
+            if (!System.IO.File.Exists(actionTakenReport.RelevantReportPath)) return NotFound("Relevant Report file not Found.");
+
+            return PhysicalFile(actionTakenReport.RelevantReportPath, GetDocumentContentType(actionTakenReport.RelevantReportPath));
         }
 
         public IActionResult DataNotAvailable( string entityName,  string collegeCode, string pageName)

@@ -2733,6 +2733,63 @@ ADD
 
 -------------------
 
+ALTER TABLE [dbo].[ActionTakenDeficiencyReport]
+ADD
+    -- DEO
+    IsDeoVerified BIT NULL,
+    DeoRemarks NVARCHAR(1000) NULL,
+    DeoVerifiedDate DATETIME NULL,
+    DeoName NVARCHAR(200) NULL,
+
+    -- JR
+    IsJrVerified BIT NULL,
+    JrRemarks NVARCHAR(1000) NULL,
+    JrVerifiedDate DATETIME NULL,
+    JrName NVARCHAR(200) NULL,
+
+    -- SO
+    IsSoVerified BIT NULL,
+    SoRemarks NVARCHAR(1000) NULL,
+    SoVerifiedDate DATETIME NULL,
+    SoName NVARCHAR(200) NULL,
+
+    -- AR
+    IsArVerified BIT NULL,
+    ArRemarks NVARCHAR(1000) NULL,
+    ArVerifiedDate DATETIME NULL,
+    ArName NVARCHAR(200) NULL,
+
+    -- RG
+    IsRgVerified BIT NULL,
+    RgRemarks NVARCHAR(1000) NULL,
+    RgVerifiedDate DATETIME NULL,
+    RgName NVARCHAR(200) NULL,
+
+    -- RE
+    IsReVerified BIT NULL,
+    ReRemarks NVARCHAR(1000) NULL,
+    ReVerifiedDate DATETIME NULL,
+    ReName NVARCHAR(200) NULL,
+
+    -- DR
+    IsDrVerified BIT NULL,
+    DrRemarks NVARCHAR(1000) NULL,
+    DrVerifiedDate DATETIME NULL,
+    DrName NVARCHAR(200) NULL,
+
+    -- VC
+    IsVcVerified BIT NULL,
+    VcRemarks NVARCHAR(1000) NULL,
+    VcVerifiedDate DATETIME NULL,
+    VcName NVARCHAR(200) NULL,
+
+    -- Overall Workflow
+    CurrentVerificationLevel NVARCHAR(50) NULL,
+    OverallStatus NVARCHAR(30) NULL,
+    LastUpdatedDate DATETIME NULL;
+
+-------------------
+
 /* ============================================================
    1. MstTabs
    ============================================================ */
@@ -2963,7 +3020,8 @@ BEGIN TRY
             (N'Clinical Facilities', N'Discipline Details'),
             (N'Clinical Facilities', N'Nursing, Paramedical, Technical & Allied Services'),
             (N'Clinical Facilities', N'Engineering & Allied Services'),
-            (N'Clinical Facilities', N'Ward-wise Bed Distribution in Attached Hospital')
+            (N'Clinical Facilities', N'Ward-wise Bed Distribution in Attached Hospital'),
+            (N'Action Taken Report', N'Action Taken Report'),
     ) V(TabName, SectionName)
     INNER JOIN dbo.MstTabs T
         ON T.TabName = V.TabName
@@ -3376,7 +3434,56 @@ BEGIN
       AND TabName = N'Payment Details';
 END;
 ------------------------------------------------
+-- Insert the tab only if it does not already exist
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Action Taken Report'
+)
+BEGIN
+    INSERT INTO dbo.MstTabs
+    (
+        FacultyId,
+        TabName
+    )
+    VALUES
+    (
+        2,
+        N'Action Taken Report'
+    );
+END;
 
+-------------------------------------------------
+
+-- Insert Payment section if it does not exist
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstSections S
+    INNER JOIN dbo.MstTabs T
+        ON T.TabId = S.TabId
+    WHERE S.FacultyId = 2
+      AND T.FacultyId = 2
+      AND T.TabName = N'Action Taken Report'
+      AND S.SectionName = N'Action Taken Report'
+)
+BEGIN
+    INSERT INTO dbo.MstSections
+    (
+        FacultyId,
+        TabId,
+        SectionName
+    )
+    SELECT
+        FacultyId,
+        TabId,
+        N'Action Taken Report'
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Action Taken Report';
+END;
 
 
 -------------------------------------------------
