@@ -192,15 +192,15 @@ namespace VerificationPortal.Services.Verification
 
 
         private static void AddHistory<T>(
-    List<VerificationHistoryViewModel> result,
-    PropertyInfo[] properties,
-    T entity,
-    string role,
-    string statusProperty,
-    string remarksProperty,
-    string dateProperty,
-    string verifiedByProperty)
-    where T : class
+            List<VerificationHistoryViewModel> result,
+            PropertyInfo[] properties,
+            T entity,
+            string role,
+            string statusProperty,
+            string remarksProperty,
+            string dateProperty,
+            string verifiedByProperty
+        )where T : class
         {
             var statusProp = properties
                 .FirstOrDefault(x => x.Name == statusProperty);
