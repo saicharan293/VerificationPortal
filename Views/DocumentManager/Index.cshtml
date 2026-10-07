@@ -305,6 +305,31 @@
         </div>
 
 
+        @* SEARCH BAR  *@
+        @if(Model.Documents.Any())
+        {
+            <div class="document-search-wrapper">
+                <div class="document-search-box">
+                    <i class="bi bi-search document-search-icon"></i>
+
+                    <input type="text"
+                           class="document-search-input"  
+                           id="documentSearch" 
+                           placeholder = "Search faculty, tab, section, document name, type..."/>
+
+                    <button type="button"
+                            id="clearDocumentSearch"
+                            class="document-search-clear"
+                            title="Clear search"
+                            style="display:none;">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
+                </div>
+            </div>
+        }
+
         <!-- ========================================================
              DOCUMENT TABLE
              ======================================================== -->
@@ -313,7 +338,7 @@
 
             @if (Model.Documents.Any())
             {
-                <table class="document-table">
+                <table class="document-table" id="documentTable">
 
                     <thead>
 
@@ -360,7 +385,7 @@
 
                         @foreach (var document in Model.Documents)
                         {
-                            <tr>
+                            <tr class="document-row">
 
                                 <!-- Serial Number -->
 
@@ -511,6 +536,23 @@
                     </tbody>
 
                 </table>
+
+                @* NO SEARCH RESULTS  *@
+
+                <div id="noSearchResults" class="document-empty-statse" style="display: none">
+                    
+                    <div class="document-empty-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <h5 class="document-empty-title">
+                        No Documents found
+                    </h5>
+
+                    <p class="document-empty-text">
+                        No documents match your search
+                    </p>
+                </div>
             }
             else
             {
@@ -1048,6 +1090,79 @@
                     })
                 });
 
+
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput = document.getElementById("documentSearch");
+            const clearButton = document.getElementById("clearDocumentSearch");
+            const table = document.getElementById("documentTable");
+            const countElement = document.getElementById("documentCount");
+            const noResults = document.getElementById("noSearchResults");
+
+            if (!searchInput || !table) {
+                return;
+            }
+
+            const rows = table.querySelectorAll("tbody .document-row");
+
+            function searchDocuments() {
+
+                const searchValue = searchInput.value.trim().toLowerCase();
+
+                let visibleCount = 0;
+
+                rows.forEach(function (row) {
+
+                    /*
+                     * Search the complete row.
+                     *
+                     * This includes:
+                     * Faculty
+                     * Tab
+                     * Section
+                     * Document Name
+                     * Mandatory / Optional
+                     */
+
+                    const rowText = row.innerText.toLowerCase();
+
+                    if (rowText.includes(searchValue)) {
+                        row.style.display = "";
+                        visibleCount++;
+                    } else {
+                        row.style.display = "none";
+
+                    }
+
+                });
+
+                // Update count
+                countElement.textContent = visibleCount;
+
+                // Show / hide clear button
+                clearButton.style.display = searchValue.length > 0 ? "flex" : "none";
+
+                // Show / hide no-results message
+                noResults.style.display = visibleCount === 0 ? "block" : "none";
+            }
+
+
+            // Search while typing
+            searchInput.addEventListener("input", searchDocuments);
+
+
+            // Clear search
+            clearButton.addEventListener("click", function () {
+
+                searchInput.value = "";
+
+                searchDocuments();
+
+                searchInput.focus();
+
+            });
 
         });
 

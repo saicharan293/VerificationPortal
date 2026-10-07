@@ -504,6 +504,7 @@ namespace VerificationPortal.Services.Verification
                 model.HospitalCertificates = await GetHospitalCertificatesAsync(collegeCode, facultyCodeInt, hospital.HospitalDetailsId);
 
                 model.AnatomyActRegistration = await GetAnatomyActRegistrationAsync(collegeCode, facultyCodeInt, hospital.HospitalDetailsId);
+                model.HospitalTieUp = await GetHospitalTieUpAsync(collegeCode, hospital.HospitalDetailsId, 27);
             }
 
             return model;
@@ -611,6 +612,65 @@ namespace VerificationPortal.Services.Verification
             };
         }
 
+        private async Task<HospitalTieUpVm> GetHospitalTieUpAsync(string collegeCode, int hospitalDetailsId, int tabId)
+        {
+            var hospital = await _context.HospitalDetailsForAffiliations.AsNoTracking().Include(e => e.HospitalTieUpDetails)
+                .FirstOrDefaultAsync(e => e.CollegeCode == collegeCode && e.HospitalDetailsId == hospitalDetailsId);
+
+            if (hospital == null) return new HospitalTieUpVm();
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var returnUrl = $"/VerificationDashboard/ClinicalFacilities?collegeCode={collegeCode}";
+
+            var sectionFeedback = await _verificationPageService.GetTabSectionFeedbackAsync(collegeCode, tabId, returnUrl);
+
+            var tieUps = new List<HospitalTieUpDetailVM>();
+
+            foreach (var e in hospital.HospitalTieUpDetails
+                         .Where(e => !e.IsDeleted))
+            {
+                var documentId =
+                    await _verificationPageService.GetDocumentIdAsync("Hospital Tie up Document");
+
+                tieUps.Add(new HospitalTieUpDetailVM
+                {
+                    Id = e.Id,
+                    HospitalDetailsId = e.HospitalDetailsId,
+                    CollegeCode = e.CollegeCode,
+                    FacultyCode = e.FacultyCode,
+                    CourseLevel = e.CourseLevel,
+                    TieUpType = e.TieUpType,
+                    HospitalName = e.HospitalName,
+                    HospitalAddress = e.HospitalAddress,
+                    TieUpDetails = e.TieUpDetails,
+
+                    SupportingDocumentContentType = e.SupportingDocumentContentType,
+
+                    SupportingDocumentFileId =
+                        documentId,
+
+                    SupportingDocumentName =
+                        e.SupportingDocumentName,
+
+                    SupportingDocumentPath =
+                        e.SupportingDocumentPath,
+
+                    IsDeleted = e.IsDeleted,
+                    CreatedOn = e.CreatedOn,
+                    ModifiedOn = e.ModifiedOn
+                });
+            }
+
+            return new HospitalTieUpVm
+            {
+                PageContext = pageContext,
+                HasHospitalTieUp = hospital.HasHospitalTieUp,
+                HospitalTieUps = tieUps,
+                SectionFeedback = sectionFeedback
+            };
+
+        }
 
     }
 }

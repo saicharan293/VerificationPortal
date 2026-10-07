@@ -5333,10 +5333,17 @@ namespace VerificationPortal.Controllers
                     },
 
                     ["ClinicalFacilities"] = async() =>
+                    {
+
                         await _verificationService.SaveVerificationAsync<HospitalDetailsForAffiliation>(
                             x => x.CollegeCode == collegeCode &&
                                  x.FacultyCode == facultyCode.ToString(),
-                            request),
+                            request);
+
+                        await _verificationService.SaveVerificationAsync<HospitalTieUpDetail>(
+                            x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode,
+                            request);
+                    },
 
                     ["ActionTakenDeficiencyReport"] = async() =>
                         await _verificationService.SaveVerificationAsync<ActionTakenDeficiencyReport>(
@@ -7936,6 +7943,7 @@ namespace VerificationPortal.Controllers
 
             var certificateData = await _context.HospitalDetailsForAffiliations
                 .AsNoTracking()
+                .Include(e=>e.HospitalTieUpDetails)
                 .FirstOrDefaultAsync(e =>
                     e.CollegeCode == collegeCode &&
                     e.FacultyCode == context.FacultyCode);
@@ -7950,6 +7958,10 @@ namespace VerificationPortal.Controllers
                 "drugfree" => certificateData.DrugFreeCampusCertificationPdfPath,
                 "proposedplan" => certificateData.ProposedPlansForFutureDevelopmentsPdfPath,
                 "anatomyact" => certificateData.AnatomyActRegistrationPdfPath,
+                "tieup" => certificateData.HospitalTieUpDetails
+                        .Where(e=>!e.IsDeleted)
+                        .Select(e => e.SupportingDocumentPath)
+                        .FirstOrDefault(),
                 _ => null
             };
 

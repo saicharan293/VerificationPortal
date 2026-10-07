@@ -118,6 +118,8 @@
         public bool? HasHospitalTieUp { get; set; }
 
         public List<HospitalTieUpDetailVM> HospitalTieUps { get; set; } = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
     }
 
     public class HospitalTieUpDetailVM
