@@ -102,6 +102,7 @@
 
     public class AnatomyActRegistrationVm
     {
+        public VerificationPageContext PageContext { get; set; } = new();
         public bool? HasAnatomyActRegistration { get; set; }
 
         public string? AnatomyActRegistrationDetails { get; set; }
@@ -109,9 +110,11 @@
         public int? AnatomyActRegistrationPdfFileId { get; set; }
 
         public string? AnatomyActRegistrationPdfPath { get; set; }
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
     }
     public class HospitalTieUpVm
     {
+        public VerificationPageContext PageContext { get; set; } = new();
         public bool? HasHospitalTieUp { get; set; }
 
         public List<HospitalTieUpDetailVM> HospitalTieUps { get; set; } = new();

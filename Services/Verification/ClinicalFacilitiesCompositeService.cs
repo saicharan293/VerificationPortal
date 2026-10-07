@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
 using VerificationPortal.Services.Verification.Interfaces;
@@ -9,10 +10,12 @@ namespace VerificationPortal.Services.Verification
         : IClinicalFacilitiesCompositeService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IVerificationPageService _verificationPageService;
 
-        public ClinicalFacilitiesCompositeService(ApplicationDbContext context)
+        public ClinicalFacilitiesCompositeService(ApplicationDbContext context, IVerificationPageService verificationPageService)
         {
             _context = context;
+            _verificationPageService = verificationPageService;
         }
 
 
@@ -500,19 +503,20 @@ namespace VerificationPortal.Services.Verification
 
                 model.HospitalCertificates = await GetHospitalCertificatesAsync(collegeCode, facultyCodeInt, hospital.HospitalDetailsId);
 
+                model.AnatomyActRegistration = await GetAnatomyActRegistrationAsync(collegeCode, facultyCodeInt, hospital.HospitalDetailsId);
             }
 
             return model;
         }
 
-        private async Task<int?> GetDocumentIdAsync(string documentName)
-        {
-            if (string.IsNullOrWhiteSpace(documentName)) return null;
+        //private async Task<int?> GetDocumentIdAsync(string documentName)
+        //{
+        //    if (string.IsNullOrWhiteSpace(documentName)) return null;
 
-            return await _context.MstDocuments.AsNoTracking().Where(d => d.DocumentName == documentName)
-                .Select(e => (int?)e.DocumentId)
-                .FirstOrDefaultAsync();
-        }
+        //    return await _context.MstDocuments.AsNoTracking().Where(d => d.DocumentName == documentName)
+        //        .Select(e => (int?)e.DocumentId)
+        //        .FirstOrDefaultAsync();
+        //}
 
 
         private async Task<HospitalCertificatesVm> GetHospitalCertificatesAsync(string collegeCode, int facultyCode, int hospitalDetailsId)
@@ -528,15 +532,15 @@ namespace VerificationPortal.Services.Verification
             {
                 PageContext = pageContext,
                 KPMECertificatePath = hospital.KpmecertificatePdfPath,
-                KPMECertificateFileId = await GetDocumentIdAsync("KPME Certificate"),
+                KPMECertificateFileId = await _verificationPageService.GetDocumentIdAsync("KPME Certificate"),
                 PollutionControlBoardCertificatePath = hospital.PollutionControlBoardCertificatePdfPath,
-                PollutionControlBoardCertificateFileID = await GetDocumentIdAsync("Pollution Control Board Certificate"),
+                PollutionControlBoardCertificateFileID = await _verificationPageService.GetDocumentIdAsync("Pollution Control Board Certificate"),
                 BioMedicalCertificatePath = hospital.BioMedicalCertificatePdfPath,
-                BioMedicalCertificateFileId = await GetDocumentIdAsync("Bio-Medical Waste Certificate"),
+                BioMedicalCertificateFileId = await _verificationPageService.GetDocumentIdAsync("Bio-Medical Waste Certificate"),
                 DrugFreeCampusCertificationPath = hospital.DrugFreeCampusCertificationPdfPath,
-                DrugFreeCampusCertificationFileId = await GetDocumentIdAsync("Drug Free Campus Certification"),
+                DrugFreeCampusCertificationFileId = await _verificationPageService.GetDocumentIdAsync("Drug Free Campus Certification"),
                 ProposedPlansForFutureDevelopmentsPath = hospital.ProposedPlansForFutureDevelopmentsPdfPath,
-                ProposedPlansForFutureDevelopmentsId = await GetDocumentIdAsync("Proposed Plans for Future Developments"),
+                ProposedPlansForFutureDevelopmentsId = await _verificationPageService.GetDocumentIdAsync("Proposed Plans for Future Developments"),
             };
 
             return model;
@@ -577,6 +581,35 @@ namespace VerificationPortal.Services.Verification
             };
         }
 
+        private async Task<AnatomyActRegistrationVm> GetAnatomyActRegistrationAsync(string collegeCode, int facultyCode, int hospitalDetailsId)
+        {
+            var hospital = await _context.HospitalDetailsForAffiliations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e =>
+                    e.CollegeCode == collegeCode &&
+                    e.HospitalDetailsId == hospitalDetailsId);
+
+            if (hospital == null)
+                return new AnatomyActRegistrationVm();
+
+            var pageContext =
+                await GetPageContextAsync(collegeCode);
+
+            var sectionFeedback = await _verificationPageService.GetTabSectionFeedbackAsync(collegeCode, 27);
+
+            return new AnatomyActRegistrationVm
+            {
+                PageContext = pageContext,
+
+                HasAnatomyActRegistration = hospital.HasAnatomyActRegistration,
+
+                AnatomyActRegistrationDetails = hospital.AnatomyActRegistrationDetails,
+
+                AnatomyActRegistrationPdfPath = hospital.AnatomyActRegistrationPdfPath,
+                AnatomyActRegistrationPdfFileId = await _verificationPageService.GetDocumentIdAsync("Anatomy Act Registration"),
+                SectionFeedback = sectionFeedback,
+            };
+        }
 
 
     }

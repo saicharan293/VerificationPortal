@@ -7949,6 +7949,7 @@ namespace VerificationPortal.Controllers
                 "bio" => certificateData.BioMedicalCertificatePdfPath,
                 "drugfree" => certificateData.DrugFreeCampusCertificationPdfPath,
                 "proposedplan" => certificateData.ProposedPlansForFutureDevelopmentsPdfPath,
+                "anatomyact" => certificateData.AnatomyActRegistrationPdfPath,
                 _ => null
             };
 

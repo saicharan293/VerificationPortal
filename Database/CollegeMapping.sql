@@ -3630,6 +3630,35 @@ BEGIN
       AND TabName = N'Clinical Facilities';
 END;
 
+-- Insert Anatomy Act Registration section if it does not exist
+
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM dbo.MstSections S
+    INNER JOIN dbo.MstTabs T
+        ON T.TabId = S.TabId
+    WHERE S.FacultyId = 2
+      AND T.FacultyId = 2
+      AND T.TabName = N'Clinical Facilities'
+      AND S.SectionName = N'Anatomy Act Registration'
+)
+BEGIN
+    INSERT INTO dbo.MstSections
+    (
+        FacultyId,
+        TabId,
+        SectionName
+    )
+    SELECT
+        FacultyId,
+        TabId,
+        N'Anatomy Act Registration'
+    FROM dbo.MstTabs
+    WHERE FacultyId = 2
+      AND TabName = N'Clinical Facilities';
+END;
+
 
 -------------------------------------------------
 SELECT TOP (1000) [SectionId]

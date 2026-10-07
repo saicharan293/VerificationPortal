@@ -1,0 +1,122 @@
+﻿@model VerificationPortal.Models.AnatomyActRegistrationVm
+@{
+    var sectionFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 78);
+}
+
+<div class="verification-card mt-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-file-earmark-medical me-2"></i>
+            Anatomy Act Registration
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0">
+
+                <tbody>
+
+                    <tr>
+                        <th style="width: 35%;">
+                            Anatomy Act Registration
+                        </th>
+
+                        <td>
+                            @if (Model.HasAnatomyActRegistration == true)
+                            {
+                                <span class="badge bg-success">
+                                    Yes
+                                </span>
+                            }
+                            else if (Model.HasAnatomyActRegistration == false)
+                            {
+                                <span class="badge bg-danger">
+                                    No
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    Not Available
+                                </span>
+                            }
+                        </td>
+                    </tr>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model.AnatomyActRegistrationDetails))
+                    {
+                        <tr>
+                            <th>
+                                Registration Details
+                            </th>
+
+                            <td>
+                                @Model.AnatomyActRegistrationDetails
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <th>
+                            Supporting Document
+                        </th>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(
+                                Model.AnatomyActRegistrationPdfPath))
+                            {
+                                @await Html.PartialAsync("_DocumentViewerButton", new DocumentViewerVm
+                                    {
+                                        Url = Url.Action("ViewAllDocs","VerificationDashboard", new
+                                        {
+                                            collegeCode = Model.PageContext.CollegeCode,
+                                            docType = "anatomyact"
+                                        })!,
+
+                                        Title = "Anatomy act registration Document",
+                                        FacultyId = Model.PageContext.FacultyCodeInt,
+                                        CollegeCode = Model.PageContext.CollegeCode,
+                                        DocumentId = Model.AnatomyActRegistrationPdfFileId,
+                                        CanVerify = true
+                                    })
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    Not Available
+                                </span>
+                            }
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+
+        @* ================= Section Feedback ================= *@
+
+        @if (sectionFeedback != null )
+        {
+            <div class="mt-4 pt-3 border-top">
+
+                <h6 class="fw-bold mb-1">
+                    <i class="bi bi-chat-left-text me-2"></i>
+                    Section Feedback
+                </h6>
+
+                <small class="form-label d-block mb-3">
+                    Verification feedback for the action taken on deficiency report.
+                </small>
+
+                @await Html.PartialAsync( "_SectionFeedback", sectionFeedback)
+            </div>
+        }
+
+    </div>
+</div>

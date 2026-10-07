@@ -61,9 +61,16 @@
         "ClinicalFacilities/_ClinicalStatistics",
         Model.ClinicalStatistics)
 
-    @await Html.PartialAsync(
-        "ClinicalFacilities/_CertificatesAndDocuments",
-        Model.HospitalCertificates)
+    @if(Model?.FacultyCode.ToString() == "2")
+    {
+        @await Html.PartialAsync(
+            "ClinicalFacilities/_CertificatesAndDocuments",
+            Model.HospitalCertificates)
+
+        @await Html.PartialAsync(
+            "ClinicalFacilities/_AnatomyActRegistration",
+            Model.AnatomyActRegistration)
+    }
 
     @await Html.PartialAsync(
         "ClinicalFacilities/_DisciplineDetails",
