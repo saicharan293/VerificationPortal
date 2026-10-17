@@ -324,10 +324,13 @@ namespace VerificationPortal.Controllers
                 .OrderBy(x => x.SectionId)
                 .ToListAsync();
 
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
             var feedback = await _context.SectionWiseFeedbacks
                 .AsNoTracking()
                 .Where(x =>
                     x.CollegeCode == collegeCode &&
+                    x.CourseLevel == courseLevel &&
                     x.TabId == tabId)
                 .ToListAsync();
 
@@ -4997,10 +5000,13 @@ namespace VerificationPortal.Controllers
                 );
             }
 
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
             var feedback = await _context.SectionWiseFeedbacks
                 .FirstOrDefaultAsync(x =>
                     x.FacultyId == model.FacultyId &&
                     x.CollegeCode == model.CollegeCode &&
+                    x.CourseLevel == courseLevel &&
                     x.TabId == model.TabId &&
                     x.SectionId == model.SectionId);
 
@@ -5013,7 +5019,8 @@ namespace VerificationPortal.Controllers
                     FacultyId = model.FacultyId,
                     CollegeCode = model.CollegeCode,
                     TabId = model.TabId,
-                    SectionId = model.SectionId
+                    SectionId = model.SectionId,
+                    CourseLevel = courseLevel,
                 };
 
                 _context.SectionWiseFeedbacks.Add(feedback);
@@ -5023,6 +5030,7 @@ namespace VerificationPortal.Controllers
             feedback.Remarks = model.Remarks;
             feedback.VerifiedBy = User.Identity?.Name;
             feedback.VerifiedOn = DateTime.Now;
+            feedback.CourseLevel = courseLevel;
 
             await _context.SaveChangesAsync();
 
@@ -5078,13 +5086,15 @@ namespace VerificationPortal.Controllers
                     return RedirectToAction(tabName, new { collegeCode });
                 }
 
+                var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
                 var facultyCode = Convert.ToInt32(institution.FacultyCode);
 
                 var verificationHandlers = new Dictionary<string, Func<Task>>
                 {
                     ["InstitutionDetails"] = () =>
                         _verificationService.SaveVerificationAsync<AffInstitutionsDetail>(
-                            x => x.CollegeCode == collegeCode,
+                            x => x.CollegeCode == collegeCode && x.CourseLevel == courseLevel,
                             request),
 
                     ["TrustDetails"] = () =>
@@ -5094,7 +5104,7 @@ namespace VerificationPortal.Controllers
 
                     ["PrincipalDetails"] = () =>
                         _verificationService.SaveVerificationAsync<AffPrincipalDetail>(
-                            x => x.CollegeCode == collegeCode,
+                            x => x.CollegeCode == collegeCode && x.CourseLevel == courseLevel,
                             request),
 
                     ["TrustMemberDetails"] = () =>

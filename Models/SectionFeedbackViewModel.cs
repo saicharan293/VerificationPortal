@@ -7,6 +7,7 @@ namespace VerificationPortal.Models
         public int FacultyId { get; set; }
 
         public string CollegeCode { get; set; } = null!;
+        public string CourseLevel { get; set; }
 
         public int TabId { get; set; }
 

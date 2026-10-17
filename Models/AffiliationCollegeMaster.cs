@@ -77,6 +77,8 @@ public partial class AffiliationCollegeMaster
 
     public virtual ICollection<DocumentWiseFeedback> DocumentWiseFeedbacks { get; set; } = new List<DocumentWiseFeedback>();
 
+    public virtual ICollection<FinalDentalSubmission> FinalDentalSubmissions { get; set; } = new List<FinalDentalSubmission>();
+
     public virtual ICollection<LibraryExpenditure> LibraryExpenditures { get; set; } = new List<LibraryExpenditure>();
 
     public virtual ICollection<LibraryStaffDetail> LibraryStaffDetails { get; set; } = new List<LibraryStaffDetail>();

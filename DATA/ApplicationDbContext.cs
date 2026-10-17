@@ -98,6 +98,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<AffiliationPgSsCourseDetailsRguh> AffiliationPgSsCourseDetailsRguhs { get; set; }
 
+    public virtual DbSet<AffiliationSealedSignedReupload> AffiliationSealedSignedReuploads { get; set; }
+
     public virtual DbSet<AhsAffiliatedYearwiseMaterialsDatum> AhsAffiliatedYearwiseMaterialsData { get; set; }
 
     public virtual DbSet<AhsExpectedIntakeMaster> AhsExpectedIntakeMasters { get; set; }
@@ -304,6 +306,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<DocumentWiseFeedback> DocumentWiseFeedbacks { get; set; }
 
+    public virtual DbSet<DummyList> DummyLists { get; set; }
+
     public virtual DbSet<Edited2207CourseMasterMedicalData1> Edited2207CourseMasterMedicalData1s { get; set; }
 
     public virtual DbSet<EligibleFacultyDetail> EligibleFacultyDetails { get; set; }
@@ -327,6 +331,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<FeesType> FeesTypes { get; set; }
 
     public virtual DbSet<FellowShipMedical> FellowShipMedicals { get; set; }
+
+    public virtual DbSet<FinalDentalSubmission> FinalDentalSubmissions { get; set; }
 
     public virtual DbSet<FreshOrIncreaseMaster> FreshOrIncreaseMasters { get; set; }
 
@@ -2137,6 +2143,31 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(500)
                 .HasColumnName("RGUHSsupportingDocumentPath");
             entity.Property(e => e.TypeOfAffiliation)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<AffiliationSealedSignedReupload>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasFillFactor(80);
+
+            entity.ToTable("AffiliationSealedSignedReupload");
+
+            entity.HasIndex(e => new { e.CollegeCode, e.FacultyCode, e.TypeOfApplication }, "IX_AffSealedSignedReupload_College_Faculty").HasFillFactor(80);
+
+            entity.Property(e => e.CollegeCode)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.CreatedOn)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysdatetime())", "DF_AffSealedSignedReupload_CreatedOn");
+            entity.Property(e => e.FacultyCode)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.ReuploadedDoc)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.TypeOfApplication)
                 .HasMaxLength(100)
                 .IsUnicode(false);
         });
@@ -5295,6 +5326,30 @@ public partial class ApplicationDbContext : DbContext
                 .HasConstraintName("FK_DocumentWiseFeedback_User");
         });
 
+        modelBuilder.Entity<DummyList>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("DummyList");
+
+            entity.Property(e => e.CollegeCode).HasMaxLength(500);
+            entity.Property(e => e.DeanMobileNumber)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.DeanName).HasMaxLength(150);
+            entity.Property(e => e.FacultyCode).HasMaxLength(500);
+            entity.Property(e => e.HeadOfInstitutionMobNo)
+                .HasMaxLength(250)
+                .HasColumnName("HeadOfInstitution_Mob_NO");
+            entity.Property(e => e.NameOfInstitution).HasMaxLength(500);
+            entity.Property(e => e.PrincipalMobNo)
+                .HasMaxLength(250)
+                .HasColumnName("Principal_Mob_No");
+            entity.Property(e => e.PrincipalName)
+                .HasMaxLength(250)
+                .HasColumnName("Principal_Name");
+        });
+
         modelBuilder.Entity<Edited2207CourseMasterMedicalData1>(entity =>
         {
             entity
@@ -5590,12 +5645,17 @@ public partial class ApplicationDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AdmissionOpeningDate).HasColumnName("Admission_openingDate");
-            entity.Property(e => e.AppointmentLetterDoc).HasColumnName("AppointmentLetter_Doc");
+            entity.Property(e => e.AppointmentLetterDoc)
+                .HasMaxLength(500)
+                .HasColumnName("AppointmentLetter_Doc");
+            entity.Property(e => e.AppointmentLetterDocGuid).HasColumnName("AppointmentLetter_Doc_Guid");
             entity.Property(e => e.ApprovalRemark).HasMaxLength(500);
             entity.Property(e => e.ApprovalStatus)
                 .HasMaxLength(20)
                 .IsUnicode(false);
+            entity.Property(e => e.CandidateRegisteredNumber).HasMaxLength(100);
             entity.Property(e => e.Collegecode).HasMaxLength(50);
+            entity.Property(e => e.ContactNumber).HasMaxLength(20);
             entity.Property(e => e.Course).HasMaxLength(150);
             entity.Property(e => e.Dob).HasColumnName("DOB");
             entity.Property(e => e.DrApprovalRemark)
@@ -5605,13 +5665,35 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("DR_ApprovalStatus");
-            entity.Property(e => e.ExperienceLetterDoc).HasColumnName("Experience_Letter_Doc");
+            entity.Property(e => e.Email).HasMaxLength(150);
+            entity.Property(e => e.ExperienceCollege).HasMaxLength(200);
+            entity.Property(e => e.ExperienceLetterDoc)
+                .HasMaxLength(500)
+                .HasColumnName("Experience_Letter_Doc");
+            entity.Property(e => e.ExperienceLetterDocGuid).HasColumnName("Experience_Letter_Doc_Guid");
             entity.Property(e => e.FacultyCode).HasMaxLength(50);
+            entity.Property(e => e.FatherGuardianName).HasMaxLength(200);
             entity.Property(e => e.FellowshipCode).HasMaxLength(150);
+            entity.Property(e => e.Gender).HasMaxLength(20);
             entity.Property(e => e.KmcCertificateNumber)
                 .HasMaxLength(150)
                 .HasColumnName("KMC_CertificateNumber");
-            entity.Property(e => e.KmcDoc).HasColumnName("KMC_Doc");
+            entity.Property(e => e.KmcDoc)
+                .HasMaxLength(500)
+                .HasColumnName("KMC_Doc");
+            entity.Property(e => e.KmcDocGuid).HasColumnName("KMC_Doc_Guid");
+            entity.Property(e => e.Nationality).HasMaxLength(100);
+            entity.Property(e => e.PgDegree)
+                .HasMaxLength(200)
+                .HasColumnName("PG_Degree");
+            entity.Property(e => e.PgDegreeCertificateGuid).HasColumnName("PG_DegreeCertificate_Guid");
+            entity.Property(e => e.PgDegreeCertificatePath)
+                .HasMaxLength(500)
+                .HasColumnName("PG_DegreeCertificate_Path");
+            entity.Property(e => e.PgUniversityCollegeName)
+                .HasMaxLength(250)
+                .HasColumnName("PG_UniversityCollegeName");
+            entity.Property(e => e.PgYearOfPassing).HasColumnName("PG_YearOfPassing");
             entity.Property(e => e.PrincipalDeclaration)
                 .HasMaxLength(10)
                 .IsUnicode(false)
@@ -5619,8 +5701,71 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.PrincipalName)
                 .HasMaxLength(200)
                 .HasColumnName("principal_name");
-            entity.Property(e => e.SslcDoc).HasColumnName("SSLC_Doc");
+            entity.Property(e => e.SslcDoc)
+                .HasMaxLength(500)
+                .HasColumnName("SSLC_Doc");
+            entity.Property(e => e.SslcDocGuid).HasColumnName("SSLC_Doc_Guid");
             entity.Property(e => e.StudentName).HasMaxLength(150);
+            entity.Property(e => e.UgDegree)
+                .HasMaxLength(200)
+                .HasColumnName("UG_Degree");
+            entity.Property(e => e.UgDegreeCertificateGuid).HasColumnName("UG_DegreeCertificate_Guid");
+            entity.Property(e => e.UgDegreeCertificatePath)
+                .HasMaxLength(500)
+                .HasColumnName("UG_DegreeCertificate_Path");
+            entity.Property(e => e.UgUniversityCollegeName)
+                .HasMaxLength(250)
+                .HasColumnName("UG_UniversityCollegeName");
+            entity.Property(e => e.UgYearOfPassing).HasColumnName("UG_YearOfPassing");
+        });
+
+        modelBuilder.Entity<FinalDentalSubmission>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasFillFactor(80);
+
+            entity.ToTable("FinalDentalSubmission");
+
+            entity.HasIndex(e => e.ApplicationNumber, "IX_FinalDentalSubmission_ApplicationNumber").HasFillFactor(80);
+
+            entity.HasIndex(e => new { e.FacultyCode, e.CourseLevel, e.AcademicYear }, "IX_FinalDentalSubmission_Faculty_Course_Year").HasFillFactor(80);
+
+            entity.HasIndex(e => new { e.CollegeCode, e.FacultyCode, e.CourseLevel, e.AffiliationTypeId, e.AcademicYear }, "UX_FinalDentalSubmission_Submission")
+                .IsUnique()
+                .HasFillFactor(80);
+
+            entity.Property(e => e.AcademicYear)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.ApplicationNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.CollegeCode).HasMaxLength(100);
+            entity.Property(e => e.CourseLevel)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())", "DF_FinalDentalSubmission_CreatedDate")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true, "DF_FinalDentalSubmission_IsActive");
+            entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.SubmittedDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.AffiliationType).WithMany(p => p.FinalDentalSubmissions)
+                .HasForeignKey(d => d.AffiliationTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FinalDentalSubmission_AffiliationType");
+
+            entity.HasOne(d => d.CollegeCodeNavigation).WithMany(p => p.FinalDentalSubmissions)
+                .HasForeignKey(d => d.CollegeCode)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FinalDentalSubmission_College");
+
+            entity.HasOne(d => d.FacultyCodeNavigation).WithMany(p => p.FinalDentalSubmissions)
+                .HasForeignKey(d => d.FacultyCode)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FinalDentalSubmission_Faculty");
         });
 
         modelBuilder.Entity<FreshOrIncreaseMaster>(entity =>
@@ -5919,6 +6064,9 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasFillFactor(80);
 
+            entity.Property(e => e.ArName).HasMaxLength(200);
+            entity.Property(e => e.ArRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ArVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.CollegeCode).HasMaxLength(100);
             entity.Property(e => e.CourseLevel)
                 .HasMaxLength(10)
@@ -5926,13 +6074,37 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("(getdate())", "DF_HospitalTieUpDetails_CreatedOn")
                 .HasColumnType("datetime");
+            entity.Property(e => e.CurrentVerificationLevel).HasMaxLength(50);
+            entity.Property(e => e.DeoName).HasMaxLength(200);
+            entity.Property(e => e.DeoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DeoVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.DrName).HasMaxLength(200);
+            entity.Property(e => e.DrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.DrVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.HospitalAddress).HasMaxLength(500);
             entity.Property(e => e.HospitalName).HasMaxLength(300);
+            entity.Property(e => e.JrName).HasMaxLength(200);
+            entity.Property(e => e.JrRemarks).HasMaxLength(1000);
+            entity.Property(e => e.JrVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.OverallStatus).HasMaxLength(30);
+            entity.Property(e => e.ReName).HasMaxLength(200);
+            entity.Property(e => e.ReRemarks).HasMaxLength(1000);
+            entity.Property(e => e.ReVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.RgName).HasMaxLength(200);
+            entity.Property(e => e.RgRemarks).HasMaxLength(1000);
+            entity.Property(e => e.RgVerifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.SoName).HasMaxLength(200);
+            entity.Property(e => e.SoRemarks).HasMaxLength(1000);
+            entity.Property(e => e.SoVerifiedDate).HasColumnType("datetime");
             entity.Property(e => e.SupportingDocumentContentType).HasMaxLength(100);
             entity.Property(e => e.SupportingDocumentName).HasMaxLength(255);
             entity.Property(e => e.SupportingDocumentPath).HasMaxLength(500);
             entity.Property(e => e.TieUpType).HasMaxLength(200);
+            entity.Property(e => e.VcName).HasMaxLength(200);
+            entity.Property(e => e.VcRemarks).HasMaxLength(1000);
+            entity.Property(e => e.VcVerifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.FacultyCodeNavigation).WithMany(p => p.HospitalTieUpDetails)
                 .HasForeignKey(d => d.FacultyCode)
@@ -7910,7 +8082,7 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<MstDocument>(entity =>
         {
-            entity.HasKey(e => e.DocumentId).HasName("PK__MstDocum__1ABEEF0F1597065D");
+            entity.HasKey(e => e.DocumentId).HasName("PK__MstDocum__1ABEEF0F03069DC2");
 
             entity.ToTable("MstDocument");
 
@@ -9068,9 +9240,10 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => e.TabId, "IX_SectionWiseFeedback_TabId");
 
-            entity.HasIndex(e => new { e.CollegeCode, e.FacultyId, e.TabId, e.SectionId }, "UX_SectionWiseFeedback_College_Faculty_Tab_Section").IsUnique();
-
             entity.Property(e => e.CollegeCode).HasMaxLength(100);
+            entity.Property(e => e.CourseLevel)
+                .HasMaxLength(10)
+                .IsUnicode(false);
             entity.Property(e => e.VerificationStatus).HasMaxLength(50);
             entity.Property(e => e.VerifiedBy).HasMaxLength(200);
 

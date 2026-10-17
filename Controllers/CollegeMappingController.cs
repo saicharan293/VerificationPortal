@@ -497,6 +497,8 @@ namespace VerificationPortal.Controllers
             if (userIdClaim == null)
                 return RedirectToAction("Login", "Account");
 
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
             int userId = int.Parse(userIdClaim.Value);
 
             // Get the user details
@@ -547,12 +549,50 @@ namespace VerificationPortal.Controllers
                     })
                     .ToList();
 
+
+                var collegeCodes = collegesInRange
+                    .Select(c => c.CollegeCode)
+                    .Where(c => !string.IsNullOrWhiteSpace(c))
+                    .Distinct()
+                    .ToList();
+
+                var applicationNumbers = await _context.FinalDentalSubmissions
+                    .AsNoTracking()
+                    .Where(e => e.IsActive &&
+                                e.CourseLevel == courseLevel &&
+                                collegeCodes.Contains(e.CollegeCode))
+                    .Select(e => new
+                    {
+                        e.CollegeCode,
+                        e.ApplicationNumber
+                    })
+                    .ToListAsync();
+
+                var applicationNumberByCollege = applicationNumbers
+                    .GroupBy(e => e.CollegeCode)
+                    .ToDictionary(
+                        e => e.Key,
+                        e => e.Select(d => d.ApplicationNumber).FirstOrDefault()
+                    );
+
+                // Convert to display model
+                var collegeDisplayList = collegesInRange
+                    .Select(c => new CollegeDisplayViewModel
+                    {
+                        CollegeCode = c.CollegeCode,
+                        CollegeName = c.CollegeName ?? "",
+                        CollegeTown = c.CollegeTown,
+
+                        ApplicationNumber = applicationNumberByCollege.GetValueOrDefault(c.CollegeCode)
+                    })
+                    .ToList();
+
                 result.Add(new CollegeMappingWithCollegesViewModel
                 {
                     Mapping = mapping,
                     FacultyName = faculty?.FacultyName ?? "Unknown Faculty",
                     UserDesignation = user.DesignationDescription ?? "",
-                    Colleges = collegesInRange,
+                    Colleges = collegeDisplayList,
                     CollegeCount = collegesInRange.Count,
                     FromLetter = mapping.FromLetter,
                     ToLetter = mapping.ToLetter,

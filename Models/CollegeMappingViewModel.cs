@@ -130,7 +130,7 @@ namespace VerificationPortal.Models
         public TblCollegeMapping Mapping { get; set; } = null!;
         public string FacultyName { get; set; } = "";
         public string UserDesignation { get; set; } = "";
-        public List<AffiliationCollegeMaster> Colleges { get; set; } = new();
+        public List<CollegeDisplayViewModel> Colleges { get; set; } = new();
         public int CollegeCount { get; set; }
         public string FromLetter { get; set; } = "";
         public string ToLetter { get; set; } = "";
@@ -142,6 +142,14 @@ namespace VerificationPortal.Models
             get;
             set;
         } = new();
+    }
+
+    public class CollegeDisplayViewModel
+    {
+        public string CollegeCode { get; set; } = "";
+        public string CollegeName { get; set; } = "";
+        public string? CollegeTown { get; set; }
+        public string? ApplicationNumber { get; set; }
     }
 
     public class MyCollegesViewModel

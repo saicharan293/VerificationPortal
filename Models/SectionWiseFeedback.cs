@@ -11,6 +11,8 @@ public partial class SectionWiseFeedback
 
     public string CollegeCode { get; set; } = null!;
 
+    public string? CourseLevel { get; set; }
+
     public int TabId { get; set; }
 
     public int SectionId { get; set; }

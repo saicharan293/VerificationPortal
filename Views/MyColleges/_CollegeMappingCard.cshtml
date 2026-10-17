@@ -58,7 +58,7 @@
                         <thead class="sticky-top">
                             <tr>
                                 <th style="width: 5%;">#</th>
-                                <th style="width: 15%;">College Code</th>
+                                <th style="width: 15%;">Application Number</th>
                                 <th>College Name</th>
                                 <th style="width: 20%;">Town</th>
                                 <th style="width: 12%;">Verification Status</th>
@@ -73,7 +73,7 @@
                                     data-faculty-id="@Model.Mapping.FacultyCode">
                                     <td class="text-center report-muted">@(i + 1)</td>
                                     <td>
-                                        <span class="college-code">@college.CollegeCode</span>
+                                        <span class="college-application-number">@(string.IsNullOrWhiteSpace(college.ApplicationNumber) ? "-" : college.ApplicationNumber)</span>
                                     </td>
                                     <td>
                                         <a asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@college.CollegeCode"

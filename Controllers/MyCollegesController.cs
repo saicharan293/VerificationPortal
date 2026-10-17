@@ -124,6 +124,28 @@ namespace VerificationPortal.Controllers
                     g => g.Key,
                     g => g.ToList());
 
+            var academicYear = "2026-27";
+
+            var applicationNumbers = await _context.FinalDentalSubmissions
+                .AsNoTracking()
+                .Where(e => 
+                    e.IsActive && 
+                    e.AcademicYear == academicYear &&
+                    allEligibleColleges
+                        .Select(c => c.CollegeCode)
+                        .Contains(e.CollegeCode) && 
+                    e.CourseLevel == courseLevel)
+                .Select(e => new
+                {
+                    e.CollegeCode,
+                    e.CourseLevel,
+                    e.ApplicationNumber
+                })
+                .ToListAsync();
+
+            var applicationNumberByCollege = applicationNumbers
+                .ToDictionary(e => e.CollegeCode, e => e.ApplicationNumber);
+
             // Process each mapping without additional database queries
             foreach (var mapping in mappings)
             {
@@ -149,6 +171,13 @@ namespace VerificationPortal.Controllers
 
                         return firstLetter >= fromLetter &&
                                firstLetter <= toLetter;
+                    })
+                    .Select(e => new CollegeDisplayViewModel
+                    {
+                        CollegeCode = e.CollegeCode,
+                        CollegeName = e.CollegeName,
+                        CollegeTown = e.CollegeTown,
+                        ApplicationNumber = applicationNumberByCollege.GetValueOrDefault(e.CollegeCode)
                     })
                     .ToList();
 
