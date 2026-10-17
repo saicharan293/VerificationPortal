@@ -11,6 +11,8 @@ namespace VerificationPortal.Models
 
         public int TabId { get; set; }
 
+        public string TabName { get; set; } = "";
+
         public int SectionId { get; set; }
 
         public string SectionName { get; set; } = null!;

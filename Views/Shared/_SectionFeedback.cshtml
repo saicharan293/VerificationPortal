@@ -17,8 +17,8 @@
         {
             <div id="verificationForm_@Model.SectionId">
 
-                <form asp-controller="VerificationDashboard"
-                      asp-action="SaveSectionFeedback"
+                <form asp-controller="SectionWiseTabWise"
+                      asp-action="SaveSectionBySectionNameFeedback"
                       method="post"
                       class="section-feedback-form">
 
@@ -27,9 +27,11 @@
                     <input type="hidden" name="FacultyId" value="@Model.FacultyId" />
                     <input type="hidden" name="CollegeCode" value="@Model.CollegeCode" />
                     <input type="hidden" name="TabId" value="@Model.TabId" />
+                    <input type="hidden" name="TabName" value="@Model.TabName" />
                     <input type="hidden" name="SectionId" value="@Model.SectionId" />
                     <input type="hidden" name="SectionName" value="@Model.SectionName" />
                     <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+                    <input type="hidden" name="CourseLevel" value="@Model.CourseLevel" />
 
                     <div class="row g-4">
 
@@ -283,8 +285,8 @@
                  class="verification-edit-form"
                  style="display:none;">
 
-                <form asp-controller="VerificationDashboard"
-                      asp-action="SaveSectionFeedback"
+                <form asp-controller="SectionWiseTabWise"
+                      asp-action="SaveSectionBySectionNameFeedback"
                       method="post"
                       class="section-feedback-form">
 
@@ -301,6 +303,10 @@
                     <input type="hidden"
                            name="TabId"
                            value="@Model.TabId" />
+
+                    <input type="hidden"
+                           name="TabName"
+                           value="@Model.TabName" />
 
                     <input type="hidden"
                            name="SectionId"

@@ -53,7 +53,7 @@
                 as List<VerificationPortal.Models.SectionFeedbackViewModel>
                 ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
 
-    var basicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 1);
+    var basicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Basic Information");
 
     var addressFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 2);
 

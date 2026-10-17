@@ -225,7 +225,8 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffInstitutionsDetail>(
                 collegeCode);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 1);
+            //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 1);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, "Institution Details");
 
             // ---------------------------------------------------------
             // VIEW MODEL
@@ -359,6 +360,55 @@ namespace VerificationPortal.Controllers
             }).ToList();
         }
 
+        private async Task<List<SectionFeedbackViewModel>> GetTabSectionFeedbackByTabNameAsync(string collegeCode, string tabName)
+        {
+            if (IsAdminUser()) 
+                return new List<SectionFeedbackViewModel>();
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            var tab = await _context.MstTabs.AsNoTracking().FirstOrDefaultAsync(e => e.TabName == tabName);
+
+            if (tab == null) 
+                return new List<SectionFeedbackViewModel>();
+
+            var sections = await _context.MstSections
+                .AsNoTracking()
+                .Where(e => e.TabId == tab.TabId)
+                .OrderBy(e => e.SectionId)
+                .ToListAsync();
+
+            var feedback = await _context.SectionWiseFeedbacks
+                .AsNoTracking()
+                .Where(e =>
+                    e.CollegeCode == collegeCode &&
+                    e.CourseLevel == courseLevel &&
+                    e.TabId == tab.TabId
+                ).ToListAsync();
+
+            var returnUrl = $"{Request.Path}{Request.QueryString}";
+
+            return sections.Select(section =>
+            {
+                var sectionFeeback = feedback.FirstOrDefault(e => e.SectionId == section.SectionId);
+
+                return new SectionFeedbackViewModel
+                {
+                    FacultyId = sectionFeeback?.FacultyId ?? 2,
+                    CollegeCode = collegeCode,
+                    TabId = tab.TabId,
+                    TabName = tab.TabName,
+                    SectionId = section.SectionId,
+                    SectionName = section.SectionName,
+                    VerificationStatus = sectionFeeback?.VerificationStatus,
+                    Remarks = sectionFeeback?.Remarks,
+                    VerifiedBy = sectionFeeback?.VerifiedBy,
+                    VerifiedOn = sectionFeeback?.VerifiedOn,
+                    IsSaved = sectionFeeback != null,
+                    ReturnUrl = returnUrl
+                };
+            }).ToList();
+        }        
         private async Task<int?> GetDocumentIdAsync(string documentName)
         {
             if (string.IsNullOrWhiteSpace(documentName)) return null;
@@ -1271,11 +1321,7 @@ namespace VerificationPortal.Controllers
 
         private async Task SetVerificationViewData<T>(  string collegeCode,  int? facultyId = null) where T : class
         {
-            var property = typeof(T).GetProperties()
-                .FirstOrDefault(p =>
-                    p.Name.Equals(
-                        "CollegeCode",
-                        StringComparison.OrdinalIgnoreCase));
+            var property = typeof(T).GetProperties().FirstOrDefault(p => p.Name.Equals("CollegeCode", StringComparison.OrdinalIgnoreCase));
 
             if (property == null)
             {
@@ -1290,9 +1336,7 @@ namespace VerificationPortal.Controllers
             Expression<Func<T, bool>> predicate = x => EF.Property<string>(x, property.Name) == collegeCode;
 
             // Apply FacultyId only to entities that actually have the mapped property.
-            var facultyProperty = _context.Model
-                .FindEntityType(typeof(T))?
-                .FindProperty("FacultyId");
+            var facultyProperty = _context.Model.FindEntityType(typeof(T))?.FindProperty("FacultyId");
 
             if (facultyId.HasValue && facultyProperty != null)
             {
@@ -5008,6 +5052,102 @@ namespace VerificationPortal.Controllers
                     x.CollegeCode == model.CollegeCode &&
                     x.CourseLevel == courseLevel &&
                     x.TabId == model.TabId &&
+                    x.SectionId == model.SectionId);
+
+            bool isNew = feedback == null;
+
+            if (feedback == null)
+            {
+                feedback = new SectionWiseFeedback
+                {
+                    FacultyId = model.FacultyId,
+                    CollegeCode = model.CollegeCode,
+                    TabId = model.TabId,
+                    SectionId = model.SectionId,
+                    CourseLevel = courseLevel,
+                };
+
+                _context.SectionWiseFeedbacks.Add(feedback);
+            }
+
+            feedback.VerificationStatus = model.VerificationStatus;
+            feedback.Remarks = model.Remarks;
+            feedback.VerifiedBy = User.Identity?.Name;
+            feedback.VerifiedOn = DateTime.Now;
+            feedback.CourseLevel = courseLevel;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = isNew ? "Section verification saved successfully." : "Section verification updated successfully.";
+
+            // Redirect back to the page from which the form was submitted
+            var refererUrl = Request.Headers.Referer.ToString();
+
+            if (!string.IsNullOrWhiteSpace(refererUrl))
+            {
+                var uri = new Uri(refererUrl);
+                var localUrl = uri.PathAndQuery;
+
+                if (Url.IsLocalUrl(localUrl))
+                {
+                    return Redirect(localUrl);
+                }
+            }
+
+            // Fallback
+            return RedirectToAction(
+                "InstitutionDetails",
+                new { collegeCode = model.CollegeCode }
+            );
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveSectionBySectionNameFeedback(SectionFeedbackViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var referer = Request.Headers.Referer.ToString();
+
+                if (!string.IsNullOrWhiteSpace(referer))
+                {
+                    var uri = new Uri(referer);
+                    var localUrl = uri.PathAndQuery;
+
+                    if (Url.IsLocalUrl(localUrl))
+                    {
+                        return Redirect(localUrl);
+                    }
+                }
+
+                return RedirectToAction(
+                    "InstitutionDetails",
+                    new { collegeCode = model.CollegeCode }
+                );
+            }
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            if (string.IsNullOrWhiteSpace(courseLevel))
+                return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
+
+            var tab = await _context.MstTabs.AsNoTracking().FirstOrDefaultAsync(e => e.TabName == model.TabName && e.FacultyId == model.FacultyId);
+
+            if(tab == null)
+            {
+                TempData["ErrorMessage"] = "Invalid tab specified.";
+
+                return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+            }
+
+
+            var feedback = await _context.SectionWiseFeedbacks
+                .FirstOrDefaultAsync(x =>
+                    x.FacultyId == model.FacultyId &&
+                    x.CollegeCode == model.CollegeCode &&
+                    x.CourseLevel == courseLevel &&
+                    x.TabId == tab.TabId &&
                     x.SectionId == model.SectionId);
 
             bool isNew = feedback == null;
