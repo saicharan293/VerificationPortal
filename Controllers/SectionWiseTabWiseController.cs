@@ -15,14 +15,16 @@ namespace VerificationPortal.Controllers
 
         private readonly ApplicationDbContext _context;
         private readonly IVerificationService _verificationService;
+        private readonly ILogger<SectionWiseTabWiseController> _logger;
         private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
         private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
 
-        public SectionWiseTabWiseController(ApplicationDbContext context, IVerificationService verificationService, IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService)
+        public SectionWiseTabWiseController(ApplicationDbContext context, IVerificationService verificationService, IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService, ILogger<SectionWiseTabWiseController> logger)
         {
             _context = context;
             _verificationService = verificationService;
             _clinicalFacilitiesCompositeService = clinicalFacilitiesCompositeService;
+            _logger = logger;
         }
 
 
@@ -122,6 +124,16 @@ namespace VerificationPortal.Controllers
             return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
         }
 
+        private IActionResult RedirectToReturnUrl(string? returnUrl, string fallbackAction, object? routeValues = null)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(fallbackAction, routeValues);
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -129,27 +141,16 @@ namespace VerificationPortal.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var referer = Request.Headers.Referer.ToString();
-
-                if (!string.IsNullOrWhiteSpace(referer))
-                {
-                    var uri = new Uri(referer);
-                    var localUrl = uri.PathAndQuery;
-
-                    if (Url.IsLocalUrl(localUrl))
-                    {
-                        return Redirect(localUrl);
-                    }
-                }
-
-                return RedirectToAction("InstitutionDetails",new { collegeCode = model.CollegeCode });
+                return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
             }
 
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
             if (string.IsNullOrWhiteSpace(courseLevel))
             {
-                return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+                return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
             }
+
             try
             {
                 var connection = _context.Database.GetDbConnection();
@@ -181,7 +182,7 @@ namespace VerificationPortal.Controllers
                     if(!await reader.ReadAsync())
                     {
                         TempData["ErrorMessage"] = "No result was returned from the feedback procedure.";
-                        return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+                        return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
                     }
 
                     var result = new SectionFeedbackSaveResult
@@ -191,8 +192,9 @@ namespace VerificationPortal.Controllers
                         SectionId = Convert.ToInt32(reader["SectionId"])
                     };
 
-                    TempData["SuccessMessage"] = result.SaveStatus == "Accepted" ? "Section verification saved successfully."
-                            : "Section verification updated successfully.";
+                    TempData["SuccessMessage"] = result.SaveStatus == "Accepted" 
+                        ? "Section verification saved successfully."
+                        : "Section verification updated successfully.";
                 }
 
                 finally
@@ -202,27 +204,21 @@ namespace VerificationPortal.Controllers
             }
             catch(Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Error saving section feedback for Collegecode {CollegeCode}, FacultyId {FacultyId}, TabName {TabName}, Section name {SectionName}",
+                    model.CollegeCode,
+                    model.FacultyId,
+                    model.TabName,
+                    model.SectionId
+                );
                 TempData["ErrorMessage"] = "Unable to save section verification";
 
-                return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+                return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
             }
-            
-            // Redirect back to the page from which the form was submitted
-            var refererUrl = Request.Headers.Referer.ToString();
-
-            if (!string.IsNullOrWhiteSpace(refererUrl))
-            {
-                var uri = new Uri(refererUrl);
-                var localUrl = uri.PathAndQuery;
-
-                if (Url.IsLocalUrl(localUrl))
-                {
-                    return Redirect(localUrl);
-                }
-            }
-
+           
             // Fallback
-            return RedirectToAction( "InstitutionDetails", new { collegeCode = model.CollegeCode });
+            return RedirectToReturnUrl(model.ReturnUrl, "InstitutionDetails", new { collegeCode = model.CollegeCode });
         }
 
     }
