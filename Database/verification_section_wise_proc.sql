@@ -99,3 +99,30 @@ BEGIN
 	END CATCH
 END;
 GO
+
+
+---------------------------------
+
+SELECT NAME
+FROM sys.procedures
+WHERE name = 'verification_SectionWiseFeedback'
+
+------------------------------------------------------
+
+select * from MstTabs;
+
+select * from MstSections;
+
+--EXEC dbo.verification_SectionWiseFeedback
+--	@FacultyId = 2,
+--	@CollegeCode  = 'D038',
+--	@CourseLevel = 'UG',
+--	@TabName = 'Institution Details',
+--	@SectionName = 'Basic Information',
+--	@VerificationStatus = 'Accepted',
+--	@Remarks = 'Test feedback',
+--	@VerifiedBy = 'Test User';
+
+select * from SectionWiseFeedback
+
+--delete from SectionWiseFeedback

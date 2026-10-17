@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
 using VerificationPortal.Services.Verification.Interfaces;
+using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace VerificationPortal.Controllers
 {
+    [Authorize]
     public class SectionWiseTabWiseController : Controller
     {
 
@@ -142,54 +146,67 @@ namespace VerificationPortal.Controllers
             }
 
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
-
             if (string.IsNullOrWhiteSpace(courseLevel))
-                return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
-
-            var tab = await _context.MstTabs.AsNoTracking().FirstOrDefaultAsync(e => e.TabName == model.TabName && e.FacultyId == model.FacultyId);
-
-            if (tab == null)
             {
-                TempData["ErrorMessage"] = "Invalid tab specified.";
+                return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+            }
+            try
+            {
+                var connection = _context.Database.GetDbConnection();
+
+                bool shouldCloseConnection = connection.State != ConnectionState.Open;
+
+                if (shouldCloseConnection)
+                {
+                    await connection.OpenAsync();
+                }
+                try
+                {
+                    await using var command = connection.CreateCommand();
+
+                    command.CommandText = "dbo.verification_SectionWiseFeedback";
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.Add(new SqlParameter("@FacultyId", SqlDbType.Int) { Value = model.FacultyId });
+                    command.Parameters.Add(new SqlParameter("@CollegeCode", SqlDbType.NVarChar, 50) { Value = model.CollegeCode });
+                    command.Parameters.Add(new SqlParameter("@CourseLevel", SqlDbType.NVarChar, 50) { Value = courseLevel });
+                    command.Parameters.Add(new SqlParameter("@TabName", SqlDbType.NVarChar, 255) { Value = model.TabName });
+                    command.Parameters.Add(new SqlParameter("@SectionName", SqlDbType.NVarChar, 255) { Value = model.SectionName });
+                    command.Parameters.Add(new SqlParameter("@VerificationStatus", SqlDbType.NVarChar, 50) { Value = (object?)model.VerificationStatus ?? DBNull.Value });
+                    command.Parameters.Add(new SqlParameter("@Remarks", SqlDbType.NVarChar, -1) { Value = (object?)model.Remarks ?? DBNull.Value });
+                    command.Parameters.Add(new SqlParameter("@VerifiedBy", SqlDbType.NVarChar, 255) { Value = (object?)User.Identity?.Name ?? DBNull.Value });
+
+                    await using var reader = await command.ExecuteReaderAsync();
+
+                    if(!await reader.ReadAsync())
+                    {
+                        TempData["ErrorMessage"] = "No result was returned from the feedback procedure.";
+                        return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+                    }
+
+                    var result = new SectionFeedbackSaveResult
+                    {
+                        SaveStatus = reader["SaveStatus"]?.ToString() ?? "",
+                        TabId = Convert.ToInt32(reader["TabId"]),
+                        SectionId = Convert.ToInt32(reader["SectionId"])
+                    };
+
+                    TempData["SuccessMessage"] = result.SaveStatus == "Accepted" ? "Section verification saved successfully."
+                            : "Section verification updated successfully.";
+                }
+
+                finally
+                {
+                    if (shouldCloseConnection) await connection.CloseAsync();
+                }
+            }
+            catch(Exception ex)
+            {
+                TempData["ErrorMessage"] = "Unable to save section verification";
 
                 return RedirectToAction(nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
             }
-
-
-            var feedback = await _context.SectionWiseFeedbacks
-                .FirstOrDefaultAsync(x =>
-                    x.FacultyId == model.FacultyId &&
-                    x.CollegeCode == model.CollegeCode &&
-                    x.CourseLevel == courseLevel &&
-                    x.TabId == tab.TabId &&
-                    x.SectionId == model.SectionId);
-
-            bool isNew = feedback == null;
-
-            if (feedback == null)
-            {
-                feedback = new SectionWiseFeedback
-                {
-                    FacultyId = model.FacultyId,
-                    CollegeCode = model.CollegeCode,
-                    TabId = model.TabId,
-                    SectionId = model.SectionId,
-                    CourseLevel = courseLevel,
-                };
-
-                _context.SectionWiseFeedbacks.Add(feedback);
-            }
-
-            feedback.VerificationStatus = model.VerificationStatus;
-            feedback.Remarks = model.Remarks;
-            feedback.VerifiedBy = User.Identity?.Name;
-            feedback.VerifiedOn = DateTime.Now;
-            feedback.CourseLevel = courseLevel;
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = isNew ? "Section verification saved successfully." : "Section verification updated successfully.";
-
+            
             // Redirect back to the page from which the form was submitted
             var refererUrl = Request.Headers.Referer.ToString();
 
