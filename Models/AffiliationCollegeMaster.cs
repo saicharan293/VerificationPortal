@@ -93,6 +93,8 @@ public partial class AffiliationCollegeMaster
 
     public virtual ICollection<StaffShortageDetail> StaffShortageDetails { get; set; } = new List<StaffShortageDetail>();
 
+    public virtual ICollection<TabWiseFeedback> TabWiseFeedbacks { get; set; } = new List<TabWiseFeedback>();
+
     public virtual ICollection<UserDetail> UserDetails { get; set; } = new List<UserDetail>();
 
     public virtual ICollection<WorkShopDetail> WorkShopDetails { get; set; } = new List<WorkShopDetail>();

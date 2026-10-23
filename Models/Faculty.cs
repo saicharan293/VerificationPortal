@@ -131,6 +131,8 @@ public partial class Faculty
 
     public virtual ICollection<SuperVisionInFieldPracticeArea> SuperVisionInFieldPracticeAreas { get; set; } = new List<SuperVisionInFieldPracticeArea>();
 
+    public virtual ICollection<TabWiseFeedback> TabWiseFeedbacks { get; set; } = new List<TabWiseFeedback>();
+
     public virtual ICollection<TblCollegeMapping> TblCollegeMappings { get; set; } = new List<TblCollegeMapping>();
 
     public virtual ICollection<TxnDentalFeeStructure> TxnDentalFeeStructures { get; set; } = new List<TxnDentalFeeStructure>();

@@ -598,6 +598,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<SuperVisionInFieldPracticeArea> SuperVisionInFieldPracticeAreas { get; set; }
 
+    public virtual DbSet<TabWiseFeedback> TabWiseFeedbacks { get; set; }
+
     public virtual DbSet<TalukMaster> TalukMasters { get; set; }
 
     public virtual DbSet<TblClassroomAvailability> TblClassroomAvailabilities { get; set; }
@@ -9521,6 +9523,40 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.HospitalDetailsId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SuperVisionInFieldPracticeArea_HospitalDetails");
+        });
+
+        modelBuilder.Entity<TabWiseFeedback>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TabWiseF__3214EC077671E6A1");
+
+            entity.ToTable("TabWiseFeedback");
+
+            entity.Property(e => e.CollegeCode).HasMaxLength(100);
+            entity.Property(e => e.CourseLevel)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.VerificationStatus)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.VerifiedBy)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.VerifiedOn).HasColumnType("datetime");
+
+            entity.HasOne(d => d.CollegeCodeNavigation).WithMany(p => p.TabWiseFeedbacks)
+                .HasForeignKey(d => d.CollegeCode)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TabWiseFeedback_College");
+
+            entity.HasOne(d => d.Faculty).WithMany(p => p.TabWiseFeedbacks)
+                .HasForeignKey(d => d.FacultyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TabWiseFeedback_Faculty");
+
+            entity.HasOne(d => d.Tab).WithMany(p => p.TabWiseFeedbacks)
+                .HasForeignKey(d => d.TabId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TabWiseFeedback_Tab");
         });
 
         modelBuilder.Entity<TalukMaster>(entity =>

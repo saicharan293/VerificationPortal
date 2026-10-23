@@ -596,7 +596,7 @@ namespace VerificationPortal.Services.Verification
             var pageContext =
                 await GetPageContextAsync(collegeCode);
 
-            var sectionFeedback = await _verificationPageService.GetTabSectionFeedbackAsync(collegeCode, 27);
+            var sectionFeedback = await _verificationPageService.GetSectionFeedbackByTabNameAsync(collegeCode, "Clinical Facilities");
 
             return new AnatomyActRegistrationVm
             {
@@ -623,7 +623,7 @@ namespace VerificationPortal.Services.Verification
 
             var returnUrl = $"/VerificationDashboard/ClinicalFacilities?collegeCode={collegeCode}";
 
-            var sectionFeedback = await _verificationPageService.GetTabSectionFeedbackAsync(collegeCode, tabId, returnUrl);
+            var sectionFeedback = await _verificationPageService.GetSectionFeedbackByTabNameAsync(collegeCode, "Clinical Facilities");
 
             var tieUps = new List<HospitalTieUpDetailVM>();
 

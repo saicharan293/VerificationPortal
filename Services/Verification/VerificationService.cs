@@ -20,6 +20,45 @@ namespace VerificationPortal.Services.Verification
             _provider = provider;
         }
 
+        public async Task SaveTabWiseFeedbackAsync(
+            int facultyId,
+            string collegeCode,
+            string courseLevel,
+            int tabId,
+            VerificationRequest request)
+        {
+            var existing = await _context.TabWiseFeedbacks
+                .FirstOrDefaultAsync(x =>
+                    x.FacultyId == facultyId &&
+                    x.CollegeCode == collegeCode &&
+                    x.CourseLevel == courseLevel &&
+                    x.TabId == tabId);
+
+            if (existing != null)
+            {
+                existing.VerificationStatus = request.Status;
+                existing.Remarks = request.Remarks;
+                existing.VerifiedBy = request.VerifiedBy;
+                existing.VerifiedOn = DateTime.Now;
+            }
+            else
+            {
+                _context.TabWiseFeedbacks.Add(new TabWiseFeedback
+                {
+                    FacultyId = facultyId,
+                    CollegeCode = collegeCode,
+                    CourseLevel = courseLevel,
+                    TabId = tabId,
+                    VerificationStatus = request.Status,
+                    Remarks = request.Remarks,
+                    VerifiedBy = request.VerifiedBy,
+                    VerifiedOn = DateTime.Now
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SaveVerificationAsync<T>(
             Expression<Func<T, bool>> predicate,
             VerificationRequest request)

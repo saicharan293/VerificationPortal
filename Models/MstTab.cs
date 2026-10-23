@@ -18,4 +18,6 @@ public partial class MstTab
     public virtual ICollection<MstSection> MstSections { get; set; } = new List<MstSection>();
 
     public virtual ICollection<SectionWiseFeedback> SectionWiseFeedbacks { get; set; } = new List<SectionWiseFeedback>();
+
+    public virtual ICollection<TabWiseFeedback> TabWiseFeedbacks { get; set; } = new List<TabWiseFeedback>();
 }

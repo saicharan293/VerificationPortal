@@ -49,6 +49,39 @@ namespace VerificationPortal.Controllers
             }
         }
 
+        private string GetDatabaseTabName(string activeTab)
+        {
+            return activeTab switch
+            {
+                "InstitutionDetails" => "Institution Details",
+                "TrustDetails" => "Trust Details",
+                "TrustMemberDetails" => "Trust Member Details",
+                "DeanDirectorDetails" => "Dean / Director Details",
+                "PrincipalDetails" => "Principal Details",
+                "UGCourseDetails" => "UG Course Details",
+                "CollegeDesignation" => "Faculty Repository",
+                "ClinicalFacilities" => "Clinical Facilities",
+                "LandAndBuildingDetails" => "Land & Building Details",
+                "ClassroomAndLaboratory" => "Classroom & Laboratory",
+                "ChairDistribution" => "Chair Distribution",
+                "BedDistribution" => "Bed Distribution",
+                "HostelDetails" => "Hostel Details",
+                "DepartmentOfficesAndEducationalUnit" => "Department Offices And Educational Unit",
+                "EquipmentList" => "Equipment List",
+                "CA_VehicleDetails" => "Vehicle Details",
+                "WorkShopDetails" => "Workshop Details",
+                "AnimalHouseDetails" => "Animal House Details",
+
+
+
+
+                // Add other mappings here later
+                // "OtherTab" => "Other Tab",
+
+                _ => activeTab
+            };
+        }
+
         // GET: /VerificationDashboard/InstitutionDetails/{collegeCode}
         [HttpGet]
         public async Task<IActionResult> InstitutionDetails(string collegeCode)
@@ -222,11 +255,14 @@ namespace VerificationPortal.Controllers
             // VERIFICATION
             // ---------------------------------------------------------
 
-            await SetVerificationViewData<AffInstitutionsDetail>(
-                collegeCode);
+            //await SetVerificationViewData<AffInstitutionsDetail>(collegeCode);
+
+            var databaseTabName = GetDatabaseTabName("InstitutionDetails");
+
+            await SetTabWiseVerificationViewData( collegeCode, databaseTabName, context.FacultyCodeInt);
 
             //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 1);
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, "Institution Details");
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, databaseTabName);
 
             // ---------------------------------------------------------
             // VIEW MODEL
@@ -495,12 +531,14 @@ namespace VerificationPortal.Controllers
                 verification = null;
             }
 
-            SetVerificationViewData(
-                verification,
-                hasSectionData,
-                "Institution details have not been submitted for this college.");
+            //SetVerificationViewData(
+            //    verification,
+            //    hasSectionData,
+            //    "Institution details have not been submitted for this college.");
 
+            var databaseTabName = GetDatabaseTabName("TrustDetails");
 
+            await SetTabWiseVerificationViewData(collegeCode, databaseTabName, context.FacultyCodeInt);
 
             //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
             ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Trust Details");
@@ -682,24 +720,27 @@ namespace VerificationPortal.Controllers
             // VERIFICATION
             // ---------------------------------------------------------
 
-            VerificationDisplayModel? verification = null;
+            //VerificationDisplayModel? verification = null;
 
-            bool hasSectionData = institution != null;
+            //bool hasSectionData = institution != null;
 
-            try
-            {
-                verification = await _verificationService
-                    .GetVerificationAsync<ContinuationTrustMemberDetail>(
-                        x => x.CollegeCode == collegeCode,
-                        GetUserDesignation());
-            }
-            catch (Exception ex) when (
-                ex.Message.Contains("record not found"))
-            {
-                verification = null;
-            }
+            //try
+            //{
+            //    verification = await _verificationService
+            //        .GetVerificationAsync<ContinuationTrustMemberDetail>(
+            //            x => x.CollegeCode == collegeCode,
+            //            GetUserDesignation());
+            //}
+            //catch (Exception ex) when (
+            //    ex.Message.Contains("record not found"))
+            //{
+            //    verification = null;
+            //}
 
-            SetVerificationViewData( verification, hasSectionData, "Institution details have not been submitted for this college.");
+            //SetVerificationViewData( verification, hasSectionData, "Institution details have not been submitted for this college.");
+            var context = await GetPageContextAsync(collegeCode);
+
+            await SetTabWiseVerificationViewData( collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Trust Member Details");
@@ -1154,8 +1195,12 @@ namespace VerificationPortal.Controllers
             // VERIFICATION
             // ---------------------------------------------------------
 
-            await SetVerificationViewData<AffDeanOrDirectorDetail>(
-                collegeCode);
+            //await SetVerificationViewData<AffDeanOrDirectorDetail>(
+            //    collegeCode);
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Dean / Director Details");
 
@@ -1776,8 +1821,12 @@ namespace VerificationPortal.Controllers
             // VERIFICATION
             // ---------------------------------------------------------
 
-            await SetVerificationViewData<AffPrincipalDetail>(
-                collegeCode);
+            //await SetVerificationViewData<AffPrincipalDetail>(
+            //    collegeCode);
+
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
 
             ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Principal Details");
 
@@ -2364,10 +2413,12 @@ namespace VerificationPortal.Controllers
                     x => x.Key,
                     x => x.First().DocumentId);
 
-            await SetVerificationViewData<AffiliationCourseDetail>(collegeCode);
+            //await SetVerificationViewData<AffiliationCourseDetail>(collegeCode);
 
-            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
+
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "UG Course Details");
 
             // ---------------------------------------------------------
             // PAGE CONTEXT
@@ -2446,12 +2497,12 @@ namespace VerificationPortal.Controllers
                             ? rguhsNotificationId
                             : null,
                     Course = course,
-                    PresentIntakeFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 18),
-                    PreviousDetailsFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 19),
-                    PermissionFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 20),
-                    EcFcFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 21),
-                    LastAffiliationFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 22),
-                    PreviousLicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionId == 23)
+                    PresentIntakeFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Present Intake"),
+                    PreviousDetailsFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Previous Details"),
+                    PermissionFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Particulars of Permission"),
+                    EcFcFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Year of Obtaining EC & FC from Government of Karnataka"),
+                    LastAffiliationFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Year of Last Affiliation Granted by RGUHS"),
+                    PreviousLicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Previous Inspection by LIC")
                 };
 
                 if (!string.IsNullOrWhiteSpace(course.PreviousNotificationFilesPath))
@@ -5021,7 +5072,7 @@ namespace VerificationPortal.Controllers
                 GetDocumentContentType(resolvedPath));
         }
 
-        // POST: Save verification remarks and status
+        // POST: Save verification remarks and status to TabWiseFeedback table
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveVerification(string collegeCode, string tabName, string remarks, string status)
@@ -5036,12 +5087,6 @@ namespace VerificationPortal.Controllers
                     VerifiedBy = User.Identity?.Name ?? GetUserDesignation()
                 };
 
-                if (!VerificationRouteMapper.EntityMappings.TryGetValue(tabName, out var entityType))
-                {
-                    TempData["ErrorMessage"] = $"Verification is not configured for '{tabName}'.";
-                    return RedirectToAction(tabName, new { collegeCode });
-                }
-
                 var institution = await _context.AffInstitutionsDetails.FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
 
                 if (institution == null || string.IsNullOrWhiteSpace(institution.FacultyCode))
@@ -5051,290 +5096,29 @@ namespace VerificationPortal.Controllers
                 }
 
                 var courseLevel = HttpContext.Session.GetString("CourseLevel");
-
                 var facultyCode = Convert.ToInt32(institution.FacultyCode);
 
-                var verificationHandlers = new Dictionary<string, Func<Task>>
-                {
-                    ["InstitutionDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<AffInstitutionsDetail>(
-                            x => x.CollegeCode == collegeCode && x.CourseLevel == courseLevel,
-                            request),
 
-                    ["TrustDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<InstitutionBasicDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["PrincipalDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<AffPrincipalDetail>(
-                            x => x.CollegeCode == collegeCode && x.CourseLevel == courseLevel,
-                            request),
-
-                    ["TrustMemberDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<ContinuationTrustMemberDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["DeanDirectorDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<AffDeanOrDirectorDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["UgCourseDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<AffiliationCourseDetail>(
-                            x => x.Collegecode == collegeCode,
-                            request),
-
-                    ["PgCourseDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<AffiliationPgSsCourseDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["CollegeDesignation"] = async () =>
-                        await _verificationService.SaveVerificationAsync<CollegeDesignationDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request),
-
-                    ["LandAndBuildingDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<DentalCollegeLandBuildingDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["ClassroomAndLaboratory"] = () =>
-                        _verificationService.SaveVerificationAsync<DentalInfrastructure>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["ChairDistribution"] = () =>
-                        _verificationService.SaveVerificationAsync<DentalChair>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["BedDistribution"] = () =>
-                        _verificationService.SaveVerificationAsync<MedicalUgbedDistribution>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["HostelDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<AffHostelDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["DepartmentOfficesAndEducationalUnit"] = () =>
-                        _verificationService.SaveVerificationAsync<MedicalDepartmentOfficesMeu>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["EquipmentList"] = () =>
-                        _verificationService.SaveVerificationAsync<DentalCollegeEquipmentDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode,
-                            request),
-
-                    ["CA_VehicleDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<CaVehicleDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["UgAcademicMatters"] = () =>
-                        _verificationService.SaveVerificationAsync<CaAcademicPerformance>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["PgAcademicMatters"] = () =>
-                        _verificationService.SaveVerificationAsync<CaAcademicPerformance>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["FinanceDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<MedCaAccountAndFeeDetail>(
-                            x => x.CollegeCode == collegeCode,
-                            request),
-
-                    ["StaffPayScale"] = () =>
-                        _verificationService.SaveVerificationAsync<MedCaStaffParticular>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request),
-
-                    ["StaffOtherDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<CaMedStaffParticularsOther>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request),
-
-                    ["LibraryServices"] = async () =>
-                    {
-                        // Department Library verification
-                        await _verificationService.SaveVerificationAsync<CaMedicalDepartmentLibrary>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode,
-                            request);
-
-                        // Dental Library Records verification
-                        await _verificationService.SaveVerificationAsync<CaDentalLibraryRecord>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode,
-                            request);
-                    },
-
-                    ["WorkShopDetails"] =  async () =>
-                    {
-                        await _verificationService.SaveVerificationAsync<WorkShopDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyId == facultyCode,
-                            request);
-                    },
-
-                    ["LibraryStaffDetails"] =  async () =>
-                    {
-                        await _verificationService.SaveVerificationAsync<LibraryStaffDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyId == facultyCode,
-                            request);
-                    },
-
-                    ["AnimalHouseDetails"] =  async () =>
-                    {
-                        await _verificationService.SaveVerificationAsync<AnimalHouseDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyId == facultyCode,
-                            request);
-                    },
-
-                    ["DentalFieldPracticeArea"] =  async () =>
-                    {
-                        await _verificationService.SaveVerificationAsync<DentalFieldPracticeArea>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyId == facultyCode,
-                            request);
-                    },
-
-                    ["ResearchPublications"] = async () =>
-                    {
-                        // Main Research & Publications details
-                        await _verificationService.SaveVerificationAsync<CaMedResearchPublicationsDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        // Department-wise Publications
-                        await _verificationService.SaveVerificationAsync<DeptWisePublication>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode,
-                            request);
-                    },
-
-                    ["LibraryDetails"] = async () =>
-                    {
-                        await _verificationService.SaveVerificationAsync<CaMedLibraryGeneral>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<CaMedLibraryItem>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<CaMedLibraryBuilding>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<CaMedLibTechnicalProcess>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<CaMedLibraryEquipment>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<CaMedLibraryFinance>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-                    },
-
-                    ["FacultyDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<FacultyDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request),
-
-                    ["UserDetails"] = () =>
-                        _verificationService.SaveVerificationAsync<UserDetail>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyId == facultyCode,
-                            request),
-
-                    ["LibraryExpenditure"] = async () =>
-                    {
-
-                        await _verificationService.SaveVerificationAsync<LibraryExpenditure>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<DentalLibraryService>(
-                            x => x.CollegeCode == collegeCode,
-                            request);
-                    },
-
-                    ["DentalFeePaymentVerification"] = async () =>
-                    {
-
-                        await _verificationService.SaveVerificationAsync<TxnDentalFeeStructure>(
-                            x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode,
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<TxnDentalPayment>(
-                            x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode,
-                            request);
-                    },
+                var databaseTabName = GetDatabaseTabName(tabName);
 
 
-                    ["TeachingExperience"] = async () =>
-                    {
-                        await _verificationService.SaveVerificationAsync<TeachingStaffDepartmentWiseDetail>(
-                            x =>
-                                x.CollegeCode == collegeCode &&
-                                x.FacultyCode == facultyCode.ToString(),
-                            request);
-                    },
+                var tab = await _context.MstTabs
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.FacultyId == facultyCode && t.TabName == databaseTabName);
 
-                    ["ClinicalFacilities"] = async() =>
-                    {
-
-                        await _verificationService.SaveVerificationAsync<HospitalDetailsForAffiliation>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyCode == facultyCode.ToString(),
-                            request);
-
-                        await _verificationService.SaveVerificationAsync<HospitalTieUpDetail>(
-                            x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode,
-                            request);
-                    },
-
-                    ["ActionTakenDeficiencyReport"] = async() =>
-                        await _verificationService.SaveVerificationAsync<ActionTakenDeficiencyReport>(
-                            x => x.CollegeCode == collegeCode &&
-                                 x.FacultyId == facultyCode,
-                            request),
-
-                    // Continue adding the remaining tabs...
-                };
-
-                if (!verificationHandlers.TryGetValue(tabName, out var handler))
+                if (tab == null)
                 {
                     TempData["ErrorMessage"] = $"Verification is not configured for '{tabName}'.";
                     return RedirectToAction(tabName, new { collegeCode });
                 }
 
-                await handler();
+                // Save only to TabWiseFeedback table
+                await _verificationService.SaveTabWiseFeedbackAsync(
+                    facultyCode,
+                    collegeCode,
+                    courseLevel ?? string.Empty,
+                    tab.TabId,
+                    request);
 
                 TempData["SuccessMessage"] = "Verification saved successfully.";
             }
@@ -5345,9 +5129,6 @@ namespace VerificationPortal.Controllers
 
             return RedirectToAction(tabName, new { collegeCode });
         }
-
-
-        [HttpGet]
         public async Task<IActionResult> FinanceDetails(string collegeCode)
         {
             if (string.IsNullOrWhiteSpace(collegeCode))
@@ -6811,7 +6592,7 @@ namespace VerificationPortal.Controllers
             // --------------------------------------------------
             // 4. Get Section Feedback
             // --------------------------------------------------
-            var sectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 36); // TODO: replace with actual SectionId
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, "Faculty Repository"); // TODO: replace with actual SectionId
 
             // --------------------------------------------------
             // 5. Build ViewModel
@@ -6851,7 +6632,11 @@ namespace VerificationPortal.Controllers
             // --------------------------------------------------
             // 6. Common verification ViewData
             // --------------------------------------------------
-            await SetVerificationViewData<CollegeDesignationDetail>( collegeCode);
+            //await SetVerificationViewData<CollegeDesignationDetail>( collegeCode);
+
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
+
 
             // --------------------------------------------------
             // 7. Return View
@@ -6952,6 +6737,92 @@ namespace VerificationPortal.Controllers
             ViewData["ShowFeedbackForm"] =
                 verification?.IsVerified == null;
         }
+
+
+        private async Task SetTabWiseVerificationViewData( string collegeCode, string tabName, int? facultyId = null)
+        {
+            ViewData["IsAdmin"] = IsAdminUser();
+
+            var databaseTabName = GetDatabaseTabName(tabName);
+
+
+            var tabQuery = _context.MstTabs.AsNoTracking().Where(t => t.TabName == databaseTabName);
+
+            if (facultyId.HasValue)
+            {
+                tabQuery = tabQuery.Where(t => t.FacultyId == facultyId.Value);
+            }
+
+            var tab = await tabQuery.FirstOrDefaultAsync();
+
+            if (tab == null)
+            {
+                SetPendingVerificationViewData();
+                return;
+            }
+
+            var feedbackQuery = _context.TabWiseFeedbacks
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.TabId == tab.TabId);
+
+            if (facultyId.HasValue)
+            {
+                feedbackQuery = feedbackQuery.Where(x => x.FacultyId == facultyId.Value);
+            }
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                feedbackQuery = feedbackQuery.Where(x => x.CourseLevel == courseLevel);
+            }
+
+            var feedback = await feedbackQuery.FirstOrDefaultAsync();
+
+            // No feedback yet
+            if (feedback == null)
+            {
+                SetPendingVerificationViewData();
+                return;
+            }
+
+            ViewData["ExistingRemarks"] = feedback.Remarks;
+
+            ViewData["ExistingStatus"] =
+                feedback.VerificationStatus?.ToLower() switch
+                {
+                    "accept" => "Approved",
+                    "approved" => "Approved",
+
+                    "reject" => "Rejected",
+                    "rejected" => "Rejected",
+
+                    "pending" => "Pending",
+
+                    _ => "Pending"
+                };
+
+            ViewData["ExistingStatusClass"] =
+                ViewData["ExistingStatus"]?.ToString() switch
+                {
+                    "Approved" => "bg-success",
+                    "Rejected" => "bg-danger",
+                    _ => "bg-warning"
+                };
+
+            ViewData["VerifiedBy"] = feedback.VerifiedBy;
+
+            ViewData["VerifiedDate"] = feedback.VerifiedOn?.ToString("dd-MM-yyyy hh:mm tt");
+
+            ViewData["ShowFeedbackForm"] = string.IsNullOrWhiteSpace(feedback.VerificationStatus);
+
+            ViewData["TabId"] = feedback.TabId;
+
+            ViewData["TabName"] = tab.TabName;
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> ViewStaffOtherPdf( string collegeCode, string fileType)
@@ -7896,10 +7767,11 @@ namespace VerificationPortal.Controllers
             // IMPORTANT:
             // This loads existing verification status / remarks
             // and sets the ViewData required by the feedback form.
-            await SetVerificationViewData<HospitalDetailsForAffiliation>(
-                collegeCode);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 27);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Clinical Facilities");
 
             return View(model);
         }

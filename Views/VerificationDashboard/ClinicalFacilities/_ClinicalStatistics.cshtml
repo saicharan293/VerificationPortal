@@ -5,7 +5,7 @@
     <div class="verification-card-header">
         @{
             var clinicalStatsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionId == 58);
+                                        ?.FirstOrDefault(x => x.SectionName == "Clinical Statistics");
         }
 
         <h3 class="verification-card-title">

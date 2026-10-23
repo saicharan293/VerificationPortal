@@ -6,11 +6,12 @@ namespace VerificationPortal.Services.Verification.Interfaces
 {
     public interface IVerificationService
     {
-        Task SaveVerificationAsync<T>(  Expression<Func<T, bool>> predicate, VerificationRequest request) where T : class;
+        Task SaveVerificationAsync<T>(Expression<Func<T, bool>> predicate, VerificationRequest request) where T : class;
 
+        Task<VerificationDisplayModel> GetVerificationAsync<T>(Expression<Func<T, bool>> predicate, string role) where T : class;
 
-        Task<VerificationDisplayModel> GetVerificationAsync<T>( Expression<Func<T, bool>> predicate, string role) where T : class;
+        Task<List<VerificationHistoryViewModel>> GetVerificationHistoryAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
 
-        Task<List<VerificationHistoryViewModel>> GetVerificationHistoryAsync<T>( Expression<Func<T, bool>> predicate) where T : class;
+        Task SaveTabWiseFeedbackAsync(int facultyId, string collegeCode, string courseLevel, int tabId, VerificationRequest request);
     }
 }
