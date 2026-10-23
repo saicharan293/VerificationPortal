@@ -28,7 +28,7 @@
 
     ViewData["NextTabLabel"] = "Next : Next Section";
 
-    var staffOtherDetailsFeedback = staffOther?.SectionFeedback?.FirstOrDefault(x => x.SectionId == 41);
+    var staffOtherDetailsFeedback = staffOther?.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Staff Other Details");
 
     var documents = new List<(string Label, string? FileName, int? Id,string FileType, string Title)>
     {

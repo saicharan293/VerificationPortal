@@ -81,39 +81,41 @@
             @{
                 var courseLevel = section.CourseLevel?.ToLower();
 
-                var authoritySectionId = courseLevel switch
+                var authoritySectionName = courseLevel switch
                 {
-                    "ug" => 42,
-                    "pg" => 45,
-                    _ => 0
+                    "ug" => "Authority & Account Details - UG",
+                    "pg" => "Authority & Account Details - PG",
+                    _ => null
                 };
 
-                var annualSectionId = courseLevel switch
+                var annualSectionName = courseLevel switch
                 {
-                    "ug" => 43,
-                    "pg" => 46
+                    "ug" => "Annual Financial Details - UG",
+                    "pg" => "Annual Financial Details - PG",
+                    _ => null
                 };
 
-                var accountSectionId = courseLevel switch
+                var accountSectionName = courseLevel switch
                 {
-                    "ug" => 44,
-                    "pg" => 47
+                    "ug" => "Account & Audit Details - UG",
+                    "pg" => "Account & Audit Details - PG",
+                    _ => null
                 };
 
                 var authorityFeedback =
                     (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
                     ?.FirstOrDefault(x =>
-                        x.SectionId == authoritySectionId);
+                        x.SectionName == authoritySectionName);
 
                 var annualFeedback =
                     (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
                     ?.FirstOrDefault(x =>
-                        x.SectionId == annualSectionId);
+                        x.SectionName == annualSectionName);
 
                 var accountFeedback =
                     (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
                     ?.FirstOrDefault(x =>
-                        x.SectionId == accountSectionId);
+                        x.SectionName == accountSectionName);
             }
 
 

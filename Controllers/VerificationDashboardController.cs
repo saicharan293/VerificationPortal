@@ -5284,9 +5284,10 @@ namespace VerificationPortal.Controllers
                 ViewBag.UserDesignation = GetUserDesignation();
 
                 // Verification feedback
-                await SetVerificationViewData<MedCaAccountAndFeeDetail>(collegeCode);
+                //await SetVerificationViewData<MedCaAccountAndFeeDetail>(collegeCode);
+                await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-                ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 21);
+                ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Finance Details");
 
                 return View("FinanceDetails", vm);
             }
@@ -5486,8 +5487,10 @@ namespace VerificationPortal.Controllers
             };
 
             // Verification data for THIS section only
-            await SetVerificationViewData<MedCaStaffParticular>(
-                collegeCode);
+            //await SetVerificationViewData<MedCaStaffParticular>(
+            //    collegeCode);
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
             ViewBag.InstitutionName =
                 pageContext.Institution.NameOfInstitution;
@@ -5495,7 +5498,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeCode = collegeCode;
             ViewBag.FacultyCode = facultyCode;
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 19);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Staff Pay Scale");
             return View("StaffPayScale", vm);
         }
 
@@ -5627,10 +5630,12 @@ namespace VerificationPortal.Controllers
             };
 
             // Verification data for THIS section only
-            await SetVerificationViewData<CaMedStaffParticularsOther>(
-                collegeCode);
+            //await SetVerificationViewData<CaMedStaffParticularsOther>(
+            //    collegeCode);
 
-            staffOther.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 20);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
+
+            staffOther.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Staff Other Details");
 
             return View("StaffOtherDetails", vm);
         }

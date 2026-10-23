@@ -52,7 +52,7 @@
     <div class="verification-card-body">
         @{
             var staffPayFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                                    ?.FirstOrDefault(x => x.SectionId == 40);
+                                                    ?.FirstOrDefault(x => x.SectionName == "Staff Pay Scale");
         }
 
         @if (Model.StaffPayScaleList != null &&
