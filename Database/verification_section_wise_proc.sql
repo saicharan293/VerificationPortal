@@ -106,12 +106,13 @@ GO
 SELECT NAME
 FROM sys.procedures
 WHERE name = 'verification_SectionWiseFeedback'
-
 ------------------------------------------------------
 
 select * from MstTabs;
 
-select * from MstSections;
+select * from MstSections
+where tabid =2
+
 
 --EXEC dbo.verification_SectionWiseFeedback
 --	@FacultyId = 2,

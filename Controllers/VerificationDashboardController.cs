@@ -502,7 +502,8 @@ namespace VerificationPortal.Controllers
 
 
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
+            //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Trust Details");
 
             return View(institution);
         }
@@ -688,7 +689,7 @@ namespace VerificationPortal.Controllers
             try
             {
                 verification = await _verificationService
-                    .GetVerificationAsync<AffInstitutionsDetail>(
+                    .GetVerificationAsync<ContinuationTrustMemberDetail>(
                         x => x.CollegeCode == collegeCode,
                         GetUserDesignation());
             }
@@ -701,7 +702,7 @@ namespace VerificationPortal.Controllers
             SetVerificationViewData( verification, hasSectionData, "Institution details have not been submitted for this college.");
 
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 3);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Trust Member Details");
 
             return View(trustMembers);
         }
@@ -1156,7 +1157,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffDeanOrDirectorDetail>(
                 collegeCode);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 4);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Dean / Director Details");
 
             return View(vm);
         }
@@ -1778,7 +1779,7 @@ namespace VerificationPortal.Controllers
             await SetVerificationViewData<AffPrincipalDetail>(
                 collegeCode);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 5);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Principal Details");
 
             return View(institution);
         }

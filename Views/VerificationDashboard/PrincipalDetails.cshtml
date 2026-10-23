@@ -119,7 +119,7 @@
 <!-- ========================================================= -->
 @{
     var principalInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 15);
+                                ?.FirstOrDefault(x => x.SectionName == "Principal Information");
 }
 
 <div class="verification-card mb-4">
@@ -250,7 +250,7 @@
 <!-- ========================================================= -->
 @{
     var principalTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 16);
+                                ?.FirstOrDefault(x => x.SectionName == "Teaching Experience");
 }
 
 <div class="verification-card mb-4">
@@ -407,7 +407,7 @@
 
 @{
     var principalAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 17);
+                                ?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
 }
 
 <div class="verification-card mb-4">

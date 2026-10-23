@@ -48,81 +48,83 @@ namespace VerificationPortal.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveSectionFeedback(SectionFeedbackViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                var referer = Request.Headers.Referer.ToString();
+        // Old Method
+        //------------
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> SaveSectionFeedback(SectionFeedbackViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        var referer = Request.Headers.Referer.ToString();
 
-                if (!string.IsNullOrWhiteSpace(referer))
-                {
-                    var uri = new Uri(referer);
-                    var localUrl = uri.PathAndQuery;
+        //        if (!string.IsNullOrWhiteSpace(referer))
+        //        {
+        //            var uri = new Uri(referer);
+        //            var localUrl = uri.PathAndQuery;
 
-                    if (Url.IsLocalUrl(localUrl))
-                    {
-                        return Redirect(localUrl);
-                    }
-                }
+        //            if (Url.IsLocalUrl(localUrl))
+        //            {
+        //                return Redirect(localUrl);
+        //            }
+        //        }
 
-                return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
-            }
+        //        return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
+        //    }
 
-            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+        //    var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
-            var feedback = await _context.SectionWiseFeedbacks
-                .FirstOrDefaultAsync(x =>
-                    x.FacultyId == model.FacultyId &&
-                    x.CollegeCode == model.CollegeCode &&
-                    x.CourseLevel == courseLevel &&
-                    x.TabId == model.TabId &&
-                    x.SectionId == model.SectionId);
+        //    var feedback = await _context.SectionWiseFeedbacks
+        //        .FirstOrDefaultAsync(x =>
+        //            x.FacultyId == model.FacultyId &&
+        //            x.CollegeCode == model.CollegeCode &&
+        //            x.CourseLevel == courseLevel &&
+        //            x.TabId == model.TabId &&
+        //            x.SectionId == model.SectionId);
 
-            bool isNew = feedback == null;
+        //    bool isNew = feedback == null;
 
-            if (feedback == null)
-            {
-                feedback = new SectionWiseFeedback
-                {
-                    FacultyId = model.FacultyId,
-                    CollegeCode = model.CollegeCode,
-                    TabId = model.TabId,
-                    SectionId = model.SectionId,
-                    CourseLevel = courseLevel,
-                };
+        //    if (feedback == null)
+        //    {
+        //        feedback = new SectionWiseFeedback
+        //        {
+        //            FacultyId = model.FacultyId,
+        //            CollegeCode = model.CollegeCode,
+        //            TabId = model.TabId,
+        //            SectionId = model.SectionId,
+        //            CourseLevel = courseLevel,
+        //        };
 
-                _context.SectionWiseFeedbacks.Add(feedback);
-            }
+        //        _context.SectionWiseFeedbacks.Add(feedback);
+        //    }
 
-            feedback.VerificationStatus = model.VerificationStatus;
-            feedback.Remarks = model.Remarks;
-            feedback.VerifiedBy = User.Identity?.Name;
-            feedback.VerifiedOn = DateTime.Now;
-            feedback.CourseLevel = courseLevel;
+        //    feedback.VerificationStatus = model.VerificationStatus;
+        //    feedback.Remarks = model.Remarks;
+        //    feedback.VerifiedBy = User.Identity?.Name;
+        //    feedback.VerifiedOn = DateTime.Now;
+        //    feedback.CourseLevel = courseLevel;
 
-            await _context.SaveChangesAsync();
+        //    await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = isNew ? "Section verification saved successfully." : "Section verification updated successfully.";
+        //    TempData["SuccessMessage"] = isNew ? "Section verification saved successfully." : "Section verification updated successfully.";
 
-            // Redirect back to the page from which the form was submitted
-            var refererUrl = Request.Headers.Referer.ToString();
+        //    // Redirect back to the page from which the form was submitted
+        //    var refererUrl = Request.Headers.Referer.ToString();
 
-            if (!string.IsNullOrWhiteSpace(refererUrl))
-            {
-                var uri = new Uri(refererUrl);
-                var localUrl = uri.PathAndQuery;
+        //    if (!string.IsNullOrWhiteSpace(refererUrl))
+        //    {
+        //        var uri = new Uri(refererUrl);
+        //        var localUrl = uri.PathAndQuery;
 
-                if (Url.IsLocalUrl(localUrl))
-                {
-                    return Redirect(localUrl);
-                }
-            }
+        //        if (Url.IsLocalUrl(localUrl))
+        //        {
+        //            return Redirect(localUrl);
+        //        }
+        //    }
 
-            // Fallback
-            return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
-        }
+        //    // Fallback
+        //    return RedirectToAction("InstitutionDetails", new { collegeCode = model.CollegeCode });
+        //}
 
         private IActionResult RedirectToReturnUrl(string? returnUrl, string fallbackAction, object? routeValues = null)
         {

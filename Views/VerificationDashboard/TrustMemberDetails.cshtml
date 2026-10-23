@@ -41,7 +41,7 @@
 </div>
 @{
     var trustMemberFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 11);
+                                ?.FirstOrDefault(x => x.SectionName == "Trust Members");
 }
 
     <div class="verification-card mb-4">
