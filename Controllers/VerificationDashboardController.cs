@@ -1359,9 +1359,12 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
-            await SetVerificationViewData<DentalChair>(collegeCode);
+            //await SetVerificationViewData<DentalChair>(collegeCode);
+            var context = await GetPageContextAsync(collegeCode);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 11);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Chair Distribution");
 
             return View(model);
         }
@@ -3222,7 +3225,11 @@ namespace VerificationPortal.Controllers
                 verification = null;
             }
 
-            SetVerificationViewData( verification, hasSectionData, "Classroom and Laboratory details have not been submitted for this college.");
+            //SetVerificationViewData( verification, hasSectionData, "Classroom and Laboratory details have not been submitted for this college.");
+
+            var context = await GetPageContextAsync(collegeCode);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
 
             ViewBag.ActiveTab = "ClassroomAndLaboratory";
             var model = new ClassroomAndLaboratoryViewModel
@@ -3256,7 +3263,7 @@ namespace VerificationPortal.Controllers
                 }).ToList()
             };
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 10);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Classroom & Laboratory");
 
             return View(model);
         }
@@ -3471,9 +3478,11 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
 
-            await SetVerificationViewData<MedicalUgbedDistribution>(collegeCode);
+            //await SetVerificationViewData<MedicalUgbedDistribution>(collegeCode);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 12);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Bed Distribution");
 
             return View(vm);
         }
@@ -3510,9 +3519,11 @@ namespace VerificationPortal.Controllers
             if (hostel != null && !string.IsNullOrWhiteSpace(hostel.OwnOrRented))
                 hostel.OwnOrRented = hostel.OwnOrRented.Trim();
 
-            await SetVerificationViewData<AffHostelDetail>(collegeCode);
+            //await SetVerificationViewData<AffHostelDetail>(collegeCode);
 
-            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 13);
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Hostel Details");
 
 
             var vm = new AffHostelDetailsCreateVm

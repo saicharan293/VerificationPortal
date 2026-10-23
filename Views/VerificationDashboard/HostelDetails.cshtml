@@ -29,13 +29,13 @@
 
     ViewData["NextTabLabel"] = "Next : Hospital Details";
 
-    var hostelInfoFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 30);
+    var hostelInfoFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Hostel Information");
 
-    var studentAccomodationFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 31);
+    var studentAccomodationFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Student Accommodation");
 
-    var commonRoomFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 32);
+    var commonRoomFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Common Room Facilities");
 
-    var hostelFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 33);
+    var hostelFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Hostel Facilities");
 }
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>

@@ -129,7 +129,7 @@ else
             </div>
             @{
                 var classroomFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                                        ?.FirstOrDefault(x => x.SectionId == 27);
+                                                        ?.FirstOrDefault(x => x.SectionName == "Facility Requirements");
             }
 
             <div class="verification-card-body">
