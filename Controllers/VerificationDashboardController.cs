@@ -2780,17 +2780,19 @@ namespace VerificationPortal.Controllers
             // VERIFICATION
             // ---------------------------------------------------------
 
-            await SetVerificationViewData<DentalCollegeLandBuildingDetail>(collegeCode);
+            //await SetVerificationViewData<DentalCollegeLandBuildingDetail>(collegeCode);
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
             // ---------------------------------------------------------
             // SECTION FEEDBACK
             // ---------------------------------------------------------
 
-            var sectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land & Building Details");
 
-            var landFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 25);
+            var landFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionName == "Land Details");
 
-            var buildingFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionId == 26);
+            var buildingFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionName == "Building Details");
 
             var documentMasterMap = await _context.MstDocuments
                 .AsNoTracking()
