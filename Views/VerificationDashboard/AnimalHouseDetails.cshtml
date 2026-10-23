@@ -24,7 +24,7 @@
     ViewData["NextTabLabel"] = Model.PageContext.NextTabLabel;
 
     // Replace 13 with the configured Animal House section ID.
-    var animalHouseFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionId == 66);
+    var animalHouseFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Animal House Details");
 }
 
 @section Scripts {

@@ -62,7 +62,7 @@
 
 @{
     var deptInfraFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 34);
+                                ?.FirstOrDefault(x => x.SectionName == "Department Office Infrastructure");
 }
 
 <div class="verification-card">
@@ -135,7 +135,7 @@
 
 @{
     var deuFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                        ?.FirstOrDefault(x => x.SectionId == 35);
+                        ?.FirstOrDefault(x => x.SectionName == "Dental Education Unit");
 }
 
 @if ((ViewBag.FacultyCode?.ToString() ?? "") == "2")
