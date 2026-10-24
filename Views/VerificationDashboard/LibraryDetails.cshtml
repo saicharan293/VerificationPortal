@@ -58,7 +58,7 @@
 
 @{
     var generalLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 50);
+                                ?.FirstOrDefault(x => x.SectionName == "General Library Details");
 }
 
 <div class="verification-card mt-4">
@@ -173,7 +173,7 @@
    ========================================================= *@
 @{
     var libraryItemsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 51);
+                                ?.FirstOrDefault(x => x.SectionName == "Library Items");
 }
 
 <div class="verification-card mt-4">
@@ -280,7 +280,7 @@
 
 @{
     var libraryBuildingFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 52);
+                                ?.FirstOrDefault(x => x.SectionName == "Library Building");
 }
 
 <div class="verification-card mt-4">
@@ -357,7 +357,7 @@
 
 @{
     var techProcessFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 53);
+                                ?.FirstOrDefault(x => x.SectionName == "Technical Processes");
 }
 
 <div class="verification-card mt-4">
@@ -429,7 +429,7 @@
 
 @{
     var libraryEquipmentFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 54);
+                                ?.FirstOrDefault(x => x.SectionName == "Library Equipment");
 }
 
 <div class="verification-card mt-4">
@@ -502,7 +502,7 @@
 
 @{
     var libraryFinanceFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 55);
+                                ?.FirstOrDefault(x => x.SectionName == "Library Finance");
 }
 
 <div class="verification-card mt-4">

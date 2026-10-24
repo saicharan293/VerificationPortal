@@ -188,7 +188,7 @@
 
         @{
             var researchDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionId == 49);
+                                        ?.FirstOrDefault(x => x.SectionName == "Research & Publication Details");
         }
 
         @if (researchDetailsFeedback != null)

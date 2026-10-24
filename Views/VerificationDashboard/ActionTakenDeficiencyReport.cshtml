@@ -30,8 +30,7 @@
     ViewData["NextTabLabel"] =
         Model.PageContext.NextTabLabel;
 
-    var sectionFeedback =
-        Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 75);
+    var sectionFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Action Taken Report");
 
 }
 

@@ -31,10 +31,10 @@
         Model.PageContext.NextTabLabel;
 
     var feeStructureFeedback =
-        Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionId == 73);
+        Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionName == "Payment Details");
 
     var transactionFeedback =
-        Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionId == 74);
+        Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionName == "Payment Receipt Details");
 }
 
 <div class="container-fluid px-3 px-md-4 py-3">

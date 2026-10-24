@@ -21,9 +21,9 @@
     ViewData["NextTabLabel"] = page.NextTabLabel;
 
     // Feedback for each section
-    var libraryServicesFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 69);
+    var libraryServicesFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Library services availability");
 
-    var libraryExpenditureFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionId == 70);
+    var libraryExpenditureFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Library Expenditure");
 
 }
 

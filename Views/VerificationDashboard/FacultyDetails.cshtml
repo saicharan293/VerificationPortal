@@ -54,7 +54,7 @@
 
 @{
     var facultyDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 56);
+                                ?.FirstOrDefault(x => x.SectionName == "Faculty Details");
 }
 
 <div class="verification-card mt-4">
@@ -66,17 +66,14 @@
             Faculty Details
         </h3>
 
-        <span class="badge bg-primary">
-            @(Model.FacultyDetails?.Count ?? 0) Faculty
-        </span>
+        <span class="badge bg-primary"> @(Model.FacultyDetails?.Count ?? 0) Faculty </span>
 
     </div>
 
 
     <div class="verification-card-body">
 
-        @if (Model.FacultyDetails == null ||
-             !Model.FacultyDetails.Any())
+        @if (Model.FacultyDetails == null || !Model.FacultyDetails.Any())
         {
             <div class="alert alert-info mb-0">
                 No faculty details found.
@@ -91,85 +88,25 @@
                     <thead>
                         <tr>
 
-                            <th>
-                                #
-                            </th>
-
-                            <th>
-                                Faculty Name
-                            </th>
-
-                            <th>
-                                Designation
-                            </th>
-
-                            <th>
-                                Department
-                            </th>
-
-                            <th>
-                                Recognized PG Teacher
-                            </th>
-
-                            
-                            <th>
-                                PG Recognition
-                            </th>
-
-
-                            <th>
-                                Recognized PhD Teacher
-                            </th>
-
-                            <th>
-                                PhD Recognition
-                            </th>
-
-                            <th>
-                                Examiner
-                            </th>
-
-                            <th>
-                                Examiner For
-                            </th>
-
-                            <th>
-                                Litigation Pending
-                            </th>
-
-                            <th>
-                                Mobile
-                            </th>
-
-                            <th>
-                                Email
-                            </th>
-
-                            <th>
-                                PAN
-                            </th>
-
-                            <th>
-                                Aadhaar
-                            </th>
-
-                            <th>
-                                Validity From
-                            </th>
-
-                            <th>
-                                Validity To
-                            </th>
-
-
-                            <th>
-                                Litigation Document
-                            </th>
-
-                            <th>
-                                Remarks
-                            </th>
-
+                            <th>Sl. No </th>
+                            <th>Faculty Name </th>
+                            <th>Designation</th>
+                            <th>Department</th>
+                            <th>Recognized PG Teacher</th>
+                            <th>PG Recognition</th>
+                            <th>Recognized PhD Teacher</th>
+                            <th>PhD Recognition</th>
+                            <th>Examiner</th>
+                            <th>Examiner For</th>
+                            <th>Litigation Pending</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>PAN</th>
+                            <th>Aadhaar</th>
+                            <th>Validity From</th>
+                            <th>Validity To</th>
+                            <th>Litigation Document</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
 
@@ -183,34 +120,15 @@
                         @foreach (var faculty in Model.FacultyDetails)
                         {
                             <tr>
+                                <td>@serialNo</td>
 
-                                <td>
-                                    @serialNo
-                                </td>
+                                <td class="fw-semibold">@(string.IsNullOrWhiteSpace(faculty.NameOfFaculty) ? "-" : faculty.NameOfFaculty)</td>
 
-                                <td class="fw-semibold">
-                                    @(string.IsNullOrWhiteSpace(faculty.NameOfFaculty)
-                                        ? "-"
-                                        : faculty.NameOfFaculty)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.Designation) ? "-" : faculty.Designation)</td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.Designation)
-                                        ? "-"
-                                        : faculty.Designation)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.DepartmentDetails) ? "-" : faculty.DepartmentDetails)</td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.DepartmentDetails)
-                                        ? "-"
-                                        : faculty.DepartmentDetails)
-                                </td>
-
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.RecognizedPgTeacher)
-                                        ? "-"
-                                        : faculty.RecognizedPgTeacher)
-                                </td>
+                                <td> @(string.IsNullOrWhiteSpace(faculty.RecognizedPgTeacher) ? "-" : faculty.RecognizedPgTeacher)</td>
                                 @* ============================================================
                                    PG Recognition Document
                                    ============================================================ *@
@@ -242,11 +160,7 @@
 
                                 </td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.RecognizedPhDteacher)
-                                        ? "-"
-                                        : faculty.RecognizedPhDteacher)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.RecognizedPhDteacher) ? "-" : faculty.RecognizedPhDteacher) </td>
 
                                 @* ============================================================
                                    PhD Recognition Document
@@ -279,55 +193,23 @@
 
                                 </td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.IsExaminer)
-                                        ? "-"
-                                        : faculty.IsExaminer)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.IsExaminer) ? "-" : faculty.IsExaminer)</td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.ExaminerFor)
-                                        ? "-"
-                                        : faculty.ExaminerFor)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.ExaminerFor) ? "-" : faculty.ExaminerFor)</td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.LitigationPending)
-                                        ? "-"
-                                        : faculty.LitigationPending)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.LitigationPending) ? "-" : faculty.LitigationPending) </td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.Mobile)
-                                        ? "-"
-                                        : faculty.Mobile)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.Mobile) ? "-" : faculty.Mobile)</td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.Email)
-                                        ? "-"
-                                        : faculty.Email)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.Email) ? "-" : faculty.Email) </td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.Pan)
-                                        ? "-"
-                                        : faculty.Pan)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.Pan) ? "-" : faculty.Pan) </td>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.Aadhaar)
-                                        ? "-"
-                                        : faculty.Aadhaar)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.Aadhaar) ? "-" : faculty.Aadhaar)</td>
 
-                                <td>
-                                    @(faculty.From?.ToString("dd-MM-yyyy") ?? "-")
-                                </td>
+                                <td>@(faculty.From?.ToString("dd-MM-yyyy") ?? "-")</td>
 
-                                <td>
-                                    @(faculty.To?.ToString("dd-MM-yyyy") ?? "-")
-                                </td>
+                                <td>@(faculty.To?.ToString("dd-MM-yyyy") ?? "-")</td>
 
 
 
@@ -364,11 +246,7 @@
 
 
                                 @* Remarks *@
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(faculty.RemoveRemarks)
-                                        ? "-"
-                                        : faculty.RemoveRemarks)
-                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(faculty.RemoveRemarks) ? "-" : faculty.RemoveRemarks)</td>
 
                             </tr>
 
@@ -397,6 +275,5 @@
 
 
 @section Scripts {
-    <script src="~/js/verification-dashboard.js"
-            asp-append-version="true"></script>
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
 }

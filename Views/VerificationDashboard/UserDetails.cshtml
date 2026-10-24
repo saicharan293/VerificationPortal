@@ -27,7 +27,7 @@
     ViewData["NextTabLabel"] = page.NextTabLabel;
 
     // Replace 43 with the actual User Details SectionId
-    var userDetailsFeedback = Model.SectionFeedback? .FirstOrDefault(x => x.SectionId == 72);
+    var userDetailsFeedback = Model.SectionFeedback? .FirstOrDefault(x => x.SectionName == "Library User Details");
 }
 
 <div class="verification-page-header">
