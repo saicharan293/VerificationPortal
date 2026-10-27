@@ -53,6 +53,7 @@ namespace VerificationPortal.ViewComponents
                         x.IsActive);
 
             model.HasCollegeAssignment = hasCollegeAssignment;
+            model.IsAdmin = user.IsAdmin.HasValue;
 
             if (!hasCollegeAssignment)
             {

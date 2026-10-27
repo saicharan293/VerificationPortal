@@ -7533,7 +7533,6 @@ namespace VerificationPortal.Controllers
 
             var departmentDictionary =
                 courseMasters
-                    .Where(x => x.CourseCode != null)
                     .GroupBy(x => x.CourseCode.ToString())
                     .ToDictionary(
                         g => g.Key,

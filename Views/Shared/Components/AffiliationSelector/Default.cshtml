@@ -8,7 +8,7 @@
 }
 <link rel="stylesheet" href="~/css/affiliation-selector.css" asp-append-version="true" />
 
-@if (!Model.HasCollegeAssignment)
+@if (!Model.HasCollegeAssignment && !Model.IsAdmin)
 {
     <div class="affiliation-no-college">
 

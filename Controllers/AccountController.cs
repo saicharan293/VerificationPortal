@@ -27,11 +27,24 @@ namespace VerificationPortal.Controllers
             // If already logged in, redirect to dashboard
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Dashboard");
+                var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+                return RedirectByRole(role);
             }
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();
+        }
+
+
+        private IActionResult RedirectByRole(string role)
+        {
+            return role switch
+            {
+                "Admin" => RedirectToAction("Index", "CollegeMapping"),
+                // add more roles here if needed, e.g.
+                // "Section" => RedirectToAction("Index", "SectionDashboard"),
+                _ => RedirectToAction("Index", "Dashboard")
+            };
         }
 
         // POST: /Account/Login
@@ -160,7 +173,7 @@ namespace VerificationPortal.Controllers
                 }
 
                 TempData["SuccessMessage"] = $"Welcome back, {user.DesignationDescription}!";
-                return RedirectToAction("Index", "Dashboard");
+                return RedirectByRole(userRole);
             }
             catch (Exception ex)
             {

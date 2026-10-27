@@ -88,34 +88,36 @@
                 {
                     <partial name="_AdminMenu" />
                 }
+                else
+                { 
+                    <!-- My Colleges -->
+                    <li class="nav-item">
 
-                <!-- My Colleges -->
-                <li class="nav-item">
+                        <a class="nav-link"
+                        asp-controller="MyColleges"
+                        asp-action="Index">
 
-                    <a class="nav-link"
-                       asp-controller="MyColleges"
-                       asp-action="Index">
+                            <i class="bi bi-building me-1"></i>
+                            My Colleges
 
-                        <i class="bi bi-building me-1"></i>
-                        My Colleges
+                        </a>
 
-                    </a>
+                    </li>
 
-                </li>
+                    <!-- Affiliation Selector -->
+                    <li class="nav-item">
 
-                <!-- Affiliation Selector -->
-                <li class="nav-item">
+                        <button type="button"
+                                class="nav-link affiliation-selector-link"
+                                id="openAffiliationSelector">
 
-                    <button type="button"
-                            class="nav-link affiliation-selector-link"
-                            id="openAffiliationSelector">
+                            <i class="bi bi-layers-fill me-1"></i>
+                            Type of Affiliation and Course Level
 
-                        <i class="bi bi-layers-fill me-1"></i>
-                        Type of Affiliation and Course Level
+                        </button>
 
-                    </button>
-
-                </li>
+                    </li>
+                }
 
             </ul>
 

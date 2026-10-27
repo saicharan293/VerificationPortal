@@ -12,6 +12,7 @@
         public string? Message { get; set; }
 
         public bool HasCollegeAssignment { get; set; }
+        public bool IsAdmin {get; set;}
         public bool ShowAffiliationSelector { get; set; }
     }
 
