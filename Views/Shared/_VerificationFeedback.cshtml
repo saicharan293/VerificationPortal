@@ -1,4 +1,63 @@
-﻿<section class="verification-feedback-section" data-aos-duration="600">
+﻿
+<style>
+    .status-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .btn-status {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .65rem 1.4rem;
+        border-radius: 999px;
+        font-weight: 600;
+        border: 2px solid var(--status-color);
+        color: var(--status-color);
+        background: transparent;
+        transition: all .2s ease;
+    }
+
+    .btn-status:hover {
+        background: color-mix(in srgb, var(--status-color) 12%, transparent);
+        transform: translateY(-1px);
+    }
+
+    .btn-check:checked + .btn-status {
+        background: var(--status-color);
+        color: #fff;
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--status-color) 35%, transparent);
+    }
+
+    .btn-check:focus-visible + .btn-status {
+        outline: 3px solid color-mix(in srgb, var(--status-color) 40%, transparent);
+        outline-offset: 2px;
+    }
+
+    .btn-status-accept  { --status-color: #198754; }
+    .btn-status-reject  { --status-color: #bd434f; }
+    .btn-status-pending { --status-color: #f59f00; }
+
+    /* show the validation message when no option is picked */
+    .was-validated .status-options:has(.btn-check:invalid) + .invalid-feedback {
+        display: block;
+    }
+
+    .btn-status .icon-active {
+        display: none;
+    }
+
+    .btn-check:checked + .btn-status .icon-idle {
+        display: none;
+    }
+
+    .btn-check:checked + .btn-status .icon-active {
+        display: inline-block;
+    }
+</style>
+
+<section class="verification-feedback-section" data-aos-duration="600">
     <div class="container-fluid">
         <div class="feedback-card">
             <div class="feedback-header">
@@ -23,29 +82,40 @@
 
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label" for="status">Verification Status <span class="text-danger">*</span></label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="">-- Select Status --</option>
+                                <label class="form-label d-block">Verification Status <span class="text-danger">*</span></label>
 
-                                    <option value="accept"
-                                            selected="@(ViewData["ExistingStatus"]?.ToString() == "Approved")">
+                                <div class="status-options" role="group" aria-label="Verification status">
+                                    <input type="radio" class="btn-check" name="status" id="statusAccept" value="accept"
+                                        autocomplete="off" required
+                                        checked="@(ViewData["ExistingStatus"]?.ToString() == "Approved")" />
+                                    <label class="btn btn-status btn-status-accept" for="statusAccept">
+                                        <i class="bi bi-check-circle-fill icon-idle"></i>
+                                        <i class="bi bi-check-lg icon-active"></i>
                                         Accept
-                                    </option>
+                                    </label>
 
-                                    <option value="reject"
-                                            selected="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")">
+                                    <input type="radio" class="btn-check" name="status" id="statusReject" value="reject"
+                                        autocomplete="off"
+                                        checked="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")" />
+                                    <label class="btn btn-status btn-status-reject" for="statusReject">
+                                        <i class="bi bi-x-circle-fill icon-idle"></i>
+                                        <i class="bi bi-x-lg icon-active"></i>
                                         Reject
-                                    </option>
+                                    </label>
 
-                                    <option value="pending"
-                                            selected="@(ViewData["ExistingStatus"]?.ToString() == "Pending")">
-                                        Pending Review
-                                    </option>
-                                </select>
+                                    @* Pending option commented out
+                                    <input type="radio" class="btn-check" name="status" id="statusPending" value="pending"
+                                        autocomplete="off"
+                                        checked="@(ViewData["ExistingStatus"]?.ToString() == "Pending")" />
+                                    <label class="btn btn-status btn-status-pending" for="statusPending">
+                                        <i class="bi bi-hourglass-split"></i> Pending Review
+                                    </label>
+                                    *@
+                                </div>
                                 <div class="invalid-feedback">Please select a verification status.</div>
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label" for="remarks">Remarks <span class="text-danger">*</span></label>
+                                <label class="form-label" for="remarks">Remarks <span class="remarks-marker"></span></label>
                                 <textarea class="form-control" id="remarks" name="remarks" rows="4"
                                             placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes.">@ViewData["ExistingRemarks"]</textarea>
                                 <div class="form-text">Please provide detailed remarks for your verification decision.</div>
@@ -149,37 +219,42 @@
                             <div class="row g-3">
 
                                 <div class="col-12">
+                                    <label class="form-label d-block">Verification Status <span class="text-danger">*</span></label>
 
-                                    <label class="form-label">
-                                        Verification Status
-                                    </label>
-
-                                    <select class="form-select" name="status">
-
-                                        <option value="accept" selected="@(ViewData["ExistingStatus"]?.ToString() == "Approved")">
+                                    <div class="status-options" role="group" aria-label="Verification status">
+                                        <input type="radio" class="btn-check" name="status" id="editStatusAccept" value="accept"
+                                            autocomplete="off" required
+                                            checked="@(ViewData["ExistingStatus"]?.ToString() == "Approved")" />
+                                        <label class="btn btn-status btn-status-accept" for="editStatusAccept">
+                                            <i class="bi bi-check-circle-fill icon-idle"></i>
+                                            <i class="bi bi-check-lg icon-active"></i>
                                             Accept
-                                        </option>
+                                        </label>
 
-                                        <option value="reject" selected="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")">
+                                        <input type="radio" class="btn-check" name="status" id="editStatusReject" value="reject"
+                                            autocomplete="off"
+                                            checked="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")" />
+                                        <label class="btn btn-status btn-status-reject" for="editStatusReject">
+                                            <i class="bi bi-x-circle-fill icon-idle"></i>
+                                            <i class="bi bi-x-lg icon-active"></i>
                                             Reject
-                                        </option>
+                                        </label>
 
-                                        <option value="pending" selected="@(ViewData["ExistingStatus"]?.ToString() == "Pending")">
-                                            Pending Review
-                                        </option>
-
-                                    </select>
-
+                                        @* Pending option commented out
+                                        <input type="radio" class="btn-check" name="status" id="editStatusPending" value="pending"
+                                            autocomplete="off"
+                                            checked="@(ViewData["ExistingStatus"]?.ToString() == "Pending")" />
+                                        <label class="btn btn-status btn-status-pending" for="editStatusPending">
+                                            <i class="bi bi-hourglass-split"></i> Pending Review
+                                        </label>
+                                        *@
+                                    </div>
                                 </div>
 
                                 <div class="col-12">
 
-                                    <label class="form-label">
-                                        Remarks
-                                    </label>
-
-                                    <textarea class="form-control" rows="4" name="remarks">@ViewData["ExistingRemarks"]</textarea>
-
+                                    <label class="form-label" for="editRemarks">Remarks <span class="remarks-marker"></span></label>
+                                    <textarea class="form-control" id="editRemarks" rows="4" name="remarks">@ViewData["ExistingRemarks"]</textarea>
                                 </div>
 
                             </div>
@@ -205,3 +280,33 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll("form.feedback-form").forEach(function(){
+            const radios = form.querySelectorAll('input[name = "status"]');
+            const remarks = form.querySelector('textarea[name="remarks"]');
+            const marker = form.querySelector('.remarks-marker');
+
+            if(!radios.length || !remarks || !marker) return;
+
+            function updateRemarksMarker(){
+                const selected = from.querySelector('input[name="status"]:checked');
+                const isAccept = selected && selected.value == 'accept';
+                if(isAccept){
+                    marker.className = 'remarks-marker text-muted small';
+                    marker.textContent = '(optional)';
+                    remarks.required = false;
+                }
+                else{
+                    marker.className = 'remarks-marker text-danger';
+                    marker.textContent = "*";
+                    remarks.required = true;
+                }
+            }
+
+            radios.forEach(r => r.addEventListener('change', updateRemarksMarker));
+            updateRemarksMarker();
+        })
+    })
+</script>

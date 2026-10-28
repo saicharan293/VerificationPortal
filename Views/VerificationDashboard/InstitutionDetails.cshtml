@@ -5,42 +5,15 @@
 
     ViewData["Title"] = "Institution Details";
     ViewData["ActiveTab"] = ViewBag.ActiveTab;
-
-    ViewData["InstitutionName"] =
-        ViewBag.InstitutionName ?? "Unknown Institution";
-
-    ViewData["CollegeCode"] =
-        ViewBag.CollegeCode ?? Model?.Institution?.CollegeCode ?? "";
-
-    ViewData["FacultyCode"] =
-        ViewBag.FacultyCode ?? Model?.Institution?.FacultyCode ?? "";
-
+    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? Model?.Institution?.CollegeCode ?? "";
+    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? Model?.Institution?.FacultyCode ?? "";
     ViewData["ShowFeedbackSection"] = true;
-
-    // DON'T set ShowFeedbackForm here.
-    // SetVerificationViewData<AffInstitutionsDetail>()
-    // should populate it.
-
-    ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
-
-    ViewData["PrevTabAction"] =
-        Url.Action(
-            "TrustDetails",
-            "VerificationDashboard",
-            new { collegeCode = ViewBag.CollegeCode });
-
-    ViewData["PrevTabLabel"] =
-        "Previous : Trust Details";
-
-    ViewData["NextTabAction"] =
-        Url.Action(
-            "TrustDetails",
-            "VerificationDashboard",
-            new { collegeCode = ViewBag.CollegeCode });
-
-    ViewData["NextTabLabel"] =
-        "Next : Trust Details";
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["PrevTabAction"] = Url.Action( "TrustDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+    ViewData["PrevTabLabel"] = "Previous : Trust Details";
+    ViewData["NextTabAction"] = Url.Action( "TrustDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
+    ViewData["NextTabLabel"] = "Next : Trust Details";
 }
 
 @{
@@ -49,9 +22,7 @@
     // SECTION FEEDBACK
     //----------------------------------------------
 
-    var sectionFeedback = ViewBag.SectionFeedback
-                as List<VerificationPortal.Models.SectionFeedbackViewModel>
-                ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
 
     var basicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Basic Information");
 
@@ -395,18 +366,25 @@
                 <label class="form-label">Survey No / PID No</label>
                 <input type="text" class="form-control" value="@Model.Institution.SurveyNoPidNo" disabled />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Course Applied</label>
-                <input type="text" class="form-control" value="@Model.Institution.CourseApplied" disabled />
-            </div>
+            @if(Model?.Institution?.FacultyCode == "2")
+            {    
+                <div class="col-md-4">
+                    <label class="form-label">Course Applied</label>
+                    <input type="text" class="form-control" value="@Model.Institution.CourseApplied" disabled />
+                </div>
+            }
+            
             <div class="col-md-4">
                 <label class="form-label">Running Course</label>
                 <input type="text" class="form-control" value="@Model.Institution.RunningCourse" disabled />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Course Level</label>
-                <input type="text" class="form-control" value="@Model.Institution.CourseLevel" disabled />
-            </div>
+            @if(Model?.Institution?.FacultyCode == "2")
+            { 
+                <div class="col-md-4">
+                    <label class="form-label">Course Level</label>
+                    <input type="text" class="form-control" value="@Model.Institution.CourseLevel" disabled />
+                </div>
+            }
             <div class="col-md-4">
                 <label class="form-label">Financing Authority</label>
                 <input type="text" class="form-control" value="@Model.Institution.FinancingAuthority" disabled />
@@ -432,15 +410,15 @@
     </div>
     <div class="verification-card-body">
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label class="form-label">Head of Institution Name</label>
                 <input type="text" class="form-control" value="@Model.Institution.HeadOfInstitution" disabled />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label class="form-label">Mobile Number</label>
                 <input type="text" class="form-control" value="@Model.Institution.HeadOfInstitutionMobNo" disabled />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label class="form-label">Email</label>
                 <input type="email" class="form-control" value="@Model.Institution.HeadOfInstitutionEmail" disabled />
             </div>
@@ -597,132 +575,137 @@
     </div>
 </div>
 
+@if (Model.HasTrustDetails==true)
+{    
+    <!-- Trust Details (Preview) -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-building"></i>
+                Trust Details <small style="font-size: 0.675em;">(Preview - Full details in Trust Details tab)</small>
+            </h3>
+        </div>
+        <div class="verification-card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Trust Name</label>
+                    <input type="text" class="form-control" value="@Model.Institution.TrustName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Trust President</label>
+                    <input type="text" class="form-control" value="@Model.Institution.TrustPresidentName" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">President Contact</label>
+                    <input type="text" class="form-control" value="@Model.Institution.TrustPresidentContactNo" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Trust Address</label>
+                    <input type="text" class="form-control" value="@Model.Institution.TrustAddress" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Trust Establishment Date</label>
+                    <input type="text" class="form-control" value="@(Model.Institution.TrustEstablishmentDate?.ToString("dd MMM yyyy") ?? "")" disabled />
+                </div>
+            </div>
 
-<!-- Trust Details (Preview) -->
-<div class="verification-card">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-building"></i>
-            Trust Details <small style="font-size: 0.675em;">(Preview - Full details in Trust Details tab)</small>
-        </h3>
+            @if (trustFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", trustFeedback)
+            }
+        </div>
     </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Trust Name</label>
-                <input type="text" class="form-control" value="@Model.Institution.TrustName" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Trust President</label>
-                <input type="text" class="form-control" value="@Model.Institution.TrustPresidentName" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">President Contact</label>
-                <input type="text" class="form-control" value="@Model.Institution.TrustPresidentContactNo" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Trust Address</label>
-                <input type="text" class="form-control" value="@Model.Institution.TrustAddress" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Trust Establishment Date</label>
-                <input type="text" class="form-control" value="@(Model.Institution.TrustEstablishmentDate?.ToString("dd MMM yyyy") ?? "")" disabled />
-            </div>
+}
+
+@if(Model.Institution.FacultyCode == "2" && Model.HasAdministrativeAuthority == true)
+{
+    <!-- Administrative Details -->
+    <div class="verification-card">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-bank"></i>
+                Administrative Details
+            </h3>
         </div>
 
-        @if (trustFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", trustFeedback)
-        }
-    </div>
-</div>
+        <div class="verification-card-body">
+            <div class="row g-3">
 
-<!-- Administrative Details -->
-<div class="verification-card">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-bank"></i>
-            Administrative Details
-        </h3>
-    </div>
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Name of Administrative Authority
+                    </label>
 
-    <div class="verification-card-body">
-        <div class="row g-3">
-
-            <div class="col-md-6">
-                <label class="form-label">
-                    Name of Administrative Authority
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(string.IsNullOrWhiteSpace(Model.Institution.NameOfAdministrativeAuthority)
-                           ? "-"
-                           : Model.Institution.NameOfAdministrativeAuthority)"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">
-                    Address of Administrative Authority
-                </label>
-
-                <textarea class="form-control"
-                          rows="2"
-                          disabled>@(string.IsNullOrWhiteSpace(Model.Institution.AddressOfAdministrativeAuthority)
-                              ? "-"
-                              : Model.Institution.AddressOfAdministrativeAuthority)</textarea>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">
-                    Members of Governing Body / Council
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(Model.Institution.MembersOfGoverningBodyOrCouncilFilePath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewGoverningBodyCouncilDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Institution.InstitutionId,
-                                    documentType = "GoverningBodyCouncil"
-                                })!,
-
-                            Title = "Members of Governing Body / Council",
-
-                            FacultyId = Convert.ToInt32( Model.Institution.FacultyCode),
-
-                            DocumentId = Model.MemberOfGovBodyDocumentId,
-
-                            CollegeCode = Model.Institution.CollegeCode,
-                            
-                            CanVerify = true
-                        })
-                }
-                else
-                {
                     <input type="text"
                            class="form-control"
-                           value="-"
+                           value="@(string.IsNullOrWhiteSpace(Model.Institution.NameOfAdministrativeAuthority)
+                               ? "-"
+                               : Model.Institution.NameOfAdministrativeAuthority)"
                            disabled />
-                }
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Address of Administrative Authority
+                    </label>
+
+                    <textarea class="form-control"
+                              rows="2"
+                              disabled>@(string.IsNullOrWhiteSpace(Model.Institution.AddressOfAdministrativeAuthority)
+                                  ? "-"
+                                  : Model.Institution.AddressOfAdministrativeAuthority)</textarea>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">
+                        Members of Governing Body / Council
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Institution.MembersOfGoverningBodyOrCouncilFilePath))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewGoverningBodyCouncilDocument",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        id = Model.Institution.InstitutionId,
+                                        documentType = "GoverningBodyCouncil"
+                                    })!,
+
+                                Title = "Members of Governing Body / Council",
+
+                                FacultyId = Convert.ToInt32( Model.Institution.FacultyCode),
+
+                                DocumentId = Model.MemberOfGovBodyDocumentId,
+
+                                CollegeCode = Model.Institution.CollegeCode,
+                            
+                                CanVerify = true
+                            })
+                    }
+                    else
+                    {
+                        <input type="text"
+                               class="form-control"
+                               value="-"
+                               disabled />
+                    }
+                </div>
+
             </div>
 
+            @if (administrativeFeedback != null)
+            {
+                @await Html.PartialAsync( "_SectionFeedback", administrativeFeedback)
+            }
         </div>
-
-        @if (administrativeFeedback != null)
-        {
-            @await Html.PartialAsync( "_SectionFeedback", administrativeFeedback)
-        }
     </div>
-</div>
 
+}
 
 
 <!-- Managing Other Health Science Colleges -->

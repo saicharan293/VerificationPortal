@@ -164,6 +164,11 @@ namespace VerificationPortal.Controllers
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
+                HttpContext.Session.Clear();
+                HttpContext.Session.SetString("UserId", user.UserId.ToString());
+                HttpContext.Session.SetString("FacultyCode", faculty?.FacultyId.ToString() ?? "0");
+                HttpContext.Session.SetString("FacultyName", faculty?.FacultyName ?? "");
+
                 _logger.LogInformation($"User {user.UserName} logged in successfully with role {userRole}");
 
                 // Redirect based on role or return URL

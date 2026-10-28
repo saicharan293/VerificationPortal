@@ -13,9 +13,12 @@
         public int? AppointmentOrderDocumentId { get; set; }
         public int? GovAutonomousDocumentId { get; set; }
 
+        public bool? HasTrustDetails{get; set;}
+        public bool? HasAdministrativeAuthority { get; set;}
+
         // Managing Other Health Science Colleges
-        public List<OtherHealthScienceCollegeVm> OtherHealthScienceColleges { get; set; }
-            = new();
+        public List<OtherHealthScienceCollegeVm> OtherHealthScienceColleges { get; set; } = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
     }
 
     public class OtherHealthScienceCollegeVm

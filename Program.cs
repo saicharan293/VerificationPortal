@@ -71,7 +71,12 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("SectionOfficer", policy => policy.RequireClaim("IsSection", "True"));
 });
 
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(5);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -91,6 +96,9 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
+
+app.UseMiddleware<SessionValidationMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

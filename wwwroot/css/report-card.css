@@ -19,6 +19,7 @@
 [data-theme="light"] {
     --report-primary: var(--primary, #2563eb);
     --report-primary-light: var(--primary-light, #3b82f6);
+    --report-primary-light-gray: var(--primary-light, #f8fafc);
     --report-primary-dark: var(--primary-dark, #1d4ed8);
     --report-success: #10b981;
     --report-warning: #f59e0b;
@@ -550,7 +551,7 @@
 }
 
 .college-name-link:hover {
-    color: var(--report-primary-dark);
+    color: var(--report-primary-light-gray);
     text-decoration: underline;
 }
 
