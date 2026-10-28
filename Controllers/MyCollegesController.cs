@@ -21,29 +21,26 @@ namespace VerificationPortal.Controllers
         // GET: /MyColleges
         public async Task<IActionResult> Index()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId)) return RedirectToAction("Login", "Account");
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId)) 
+                return RedirectToAction("Login", "Account");
 
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
-            if (string.IsNullOrWhiteSpace(courseLevel)) return RedirectToAction("Login", "Account");
+            if (string.IsNullOrWhiteSpace(courseLevel)) 
+                return RedirectToAction("Login", "Account");
 
             // ========================================================= 
             // USER DETAILS 
             // =========================================================
 
             var user = await _context.TblRguhsFacultyUsers
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
             {
                 return RedirectToAction("Login", "Account");
             }
-
-            // Get user's college mappings (only active ones)
-            var mappings = await _context.TblCollegeMappings
-                .Where(m => m.UserId == user.UserId && m.IsActive)
-                .ToListAsync();
 
             var model = new MyCollegesViewModel
             {
@@ -53,24 +50,107 @@ namespace VerificationPortal.Controllers
 
             };
 
-            if (mappings.Count == 0)
-            {
-                return View(model);
-            }
+            // Get user's college mappings (only active ones)
+            var mappings = await _context.TblCollegeMappings
+                .AsNoTracking()
+                .Where(m => m.UserId == user.UserId && m.IsActive)
+                .ToListAsync();
 
+
+            if (mappings.Count == 0)
+                return View(model);
+
+            //GET FACULTY
+            int facultyCodeInt = user.Faculty.Value;
 
             // Get faculty details
+            var faculties = await GetFacultiesAsync(mappings);
+
+            var eligibleCollegeCodes = await GetEligibleCollegeCodesAsync(courseLevel);
+
+            // Fetch eligible colleges only ONCE
+            var allEligibleColleges = await GetEligibleCollegesAsync(mappings, eligibleCollegeCodes);
+
+            var academicYear = "2026-27";
+            var applicationNumberByCollege = await GetApplicationNumbersAsync(allEligibleColleges, courseLevel, academicYear, facultyCodeInt.ToString());
+
+            // Get eligible course codes for the selected course level
+            var courses = await _context.MstCourses
+                .AsNoTracking()
+                .Where(c => c.CourseLevel == courseLevel)
+                .Select(c => c.CourseCode)
+                .ToListAsync();
+
+            var courseCodes = courses.Select(c => c.ToString()) .ToHashSet();
+
+            model.Mappings = await BuildCollegeMappingsAsync( mappings, allEligibleColleges, faculties, applicationNumberByCollege);
+            return View(model);
+        }
+
+        private Task<List<CollegeMappingWithCollegesViewModel>> BuildCollegeMappingsAsync(List<TblCollegeMapping> mappings, List<AffiliationCollegeMaster> colleges, Dictionary<int, string> faculties, Dictionary<string, string> applicationNumbers)
+        {
+            var collegesByFaculty = colleges
+                .GroupBy(c => c.FacultyCode)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var result = mappings.Select(mapping =>
+            {
+                var facultyCode = mapping.FacultyCode.ToString();
+
+                var fromLetter = char.ToUpperInvariant(mapping.FromLetter?.FirstOrDefault() ?? 'A');
+
+                var toLetter = char.ToUpperInvariant(mapping.ToLetter?.FirstOrDefault() ?? 'Z');
+
+                var facultyColleges = collegesByFaculty.GetValueOrDefault(facultyCode) ?? new();
+
+                var assignedColleges = facultyColleges
+                    .Where(c =>
+                        !string.IsNullOrWhiteSpace(c.CollegeName) &&
+                        char.ToUpperInvariant(c.CollegeName[0]) >= fromLetter &&
+                        char.ToUpperInvariant(c.CollegeName[0]) <= toLetter)
+                    .Select(c => new CollegeDisplayViewModel
+                    {
+                        CollegeCode = c.CollegeCode,
+                        CollegeName = c.CollegeName,
+                        CollegeTown = c.CollegeTown,
+                        ApplicationNumber = applicationNumbers.GetValueOrDefault(c.CollegeCode)
+                    })
+                    .ToList();
+
+                return new CollegeMappingWithCollegesViewModel
+                {
+                    Mapping = mapping,
+                    FacultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty"),
+                    Colleges = assignedColleges,
+                    CollegeCount = assignedColleges.Count,
+                    FromLetter = mapping.FromLetter,
+                    ToLetter = mapping.ToLetter,
+                    CollegeFromCode = mapping.CollegeFrom,
+                    CollegeToCode = mapping.CollegeTo
+                };
+            }).ToList();
+
+            return Task.FromResult(result);
+        }
+
+
+        private async Task<Dictionary<int, string>> GetFacultiesAsync( List<TblCollegeMapping> mappings)
+        {
             var facultyIds = mappings
                 .Select(m => m.FacultyCode)
                 .Distinct()
                 .ToList();
 
-            var faculties = await _context.Faculties
+            return await _context.Faculties
                 .AsNoTracking()
                 .Where(f => facultyIds.Contains(f.FacultyId))
                 .ToDictionaryAsync(f => f.FacultyId, f => f.FacultyName);
+        }
 
-            // Get eligible course codes for the selected course level
+
+        
+        private async Task<HashSet<string>> GetEligibleCollegeCodesAsync(string courseLevel)
+        {
             var courses = await _context.MstCourses
                 .AsNoTracking()
                 .Where(c => c.CourseLevel == courseLevel)
@@ -81,7 +161,6 @@ namespace VerificationPortal.Controllers
                 .Select(c => c.ToString())
                 .ToHashSet();
 
-            // Get college codes with a positive 2026 intake
             var academicIntakes = await _context.AcademicIntakes
                 .AsNoTracking()
                 .Where(a => a.Ay2026TotalIntake > 0)
@@ -92,116 +171,98 @@ namespace VerificationPortal.Controllers
                 })
                 .ToListAsync();
 
-            var eligibleCollegeCodes = academicIntakes
+            return academicIntakes
                 .Where(a =>
                     !string.IsNullOrWhiteSpace(a.Courses) &&
-                    courseCodes.Contains(a.Courses.ToString()))
+                    courseCodes.Contains(a.Courses))
                 .Select(a => a.CollegeCode)
-                .Where(code => code != null)
-                .Distinct()
+                .Where(code => !string.IsNullOrWhiteSpace(code))
+                .Select(code => code!)
                 .ToHashSet();
+        }
 
-            // Prepare faculty codes for the database query
-            var facultyCodeStrings = mappings
+
+        private async Task<List<AffiliationCollegeMaster>> GetEligibleCollegesAsync( List<TblCollegeMapping> mappings, HashSet<string> eligibleCollegeCodes)
+        {
+            var facultyCodes = mappings
                 .Select(m => m.FacultyCode.ToString())
                 .Distinct()
                 .ToList();
 
-            // Fetch eligible colleges only ONCE
-            var allEligibleColleges = await _context.AffiliationCollegeMasters
+            return await _context.AffiliationCollegeMasters
                 .AsNoTracking()
                 .Where(c =>
-                    facultyCodeStrings.Contains(c.FacultyCode) &&
+                    facultyCodes.Contains(c.FacultyCode) &&
                     c.CollegeName != null &&
                     eligibleCollegeCodes.Contains(c.CollegeCode))
                 .OrderBy(c => c.CollegeName)
                 .ToListAsync();
+        }
 
-            // Dictionary for quick faculty-based lookup
-            var collegesByFaculty = allEligibleColleges
-                .GroupBy(c => c.FacultyCode)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.ToList());
+        private async Task<Dictionary<string, string>> GetApplicationNumbersAsync(List<AffiliationCollegeMaster> colleges, string courseLevel, string academicYear, string? facultyCode)
+        {
+            var result = new Dictionary<string, string>();
 
-            var academicYear = "2026-27";
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                return result;
 
-            var applicationNumbers = await _context.FinalDentalSubmissions
-                .AsNoTracking()
-                .Where(e => 
-                    e.IsActive && 
-                    e.AcademicYear == academicYear &&
-                    allEligibleColleges
-                        .Select(c => c.CollegeCode)
-                        .Contains(e.CollegeCode) && 
-                    e.CourseLevel == courseLevel)
-                .Select(e => new
-                {
-                    e.CollegeCode,
-                    e.CourseLevel,
-                    e.ApplicationNumber
-                })
-                .ToListAsync();
+            var collegeCodes = colleges
+                .Where(c => c.FacultyCode == facultyCode)
+                .Select(c => c.CollegeCode)
+                .Distinct()
+                .ToList();
 
-            var applicationNumberByCollege = applicationNumbers
-                .ToDictionary(e => e.CollegeCode, e => e.ApplicationNumber);
+            if (collegeCodes.Count == 0)
+                return result;
 
-            // Process each mapping without additional database queries
-            foreach (var mapping in mappings)
+            // Medical
+            if (facultyCode == "1")
             {
-                var facultyCode = mapping.FacultyCode.ToString();
-
-                var fromLetter =
-                    char.ToUpperInvariant(
-                        mapping.FromLetter?.FirstOrDefault() ?? 'A');
-
-                var toLetter =
-                    char.ToUpperInvariant(
-                        mapping.ToLetter?.FirstOrDefault() ?? 'Z');
-
-                // Dictionary lookup instead of fetching from DB again
-                var facultyColleges = collegesByFaculty
-                    .GetValueOrDefault(facultyCode) ?? new();
-
-                var colleges = facultyColleges
-                    .Where(c =>
+                var applications = await _context.ApplicationSubmissions
+                    .AsNoTracking()
+                    .Where(e =>
+                        e.FacultyCode == facultyCode &&
+                        collegeCodes.Contains(e.CollegeCode) &&
+                        e.CourseLevel == courseLevel)
+                    .Select(e => new
                     {
-                        var firstLetter =
-                            char.ToUpperInvariant(c.CollegeName![0]);
-
-                        return firstLetter >= fromLetter &&
-                               firstLetter <= toLetter;
+                        e.CollegeCode,
+                        e.RegistrationNumber
                     })
-                    .Select(e => new CollegeDisplayViewModel
-                    {
-                        CollegeCode = e.CollegeCode,
-                        CollegeName = e.CollegeName,
-                        CollegeTown = e.CollegeTown,
-                        ApplicationNumber = applicationNumberByCollege.GetValueOrDefault(e.CollegeCode)
-                    })
-                    .ToList();
+                    .ToListAsync();
 
-                model.Mappings.Add(
-                    new CollegeMappingWithCollegesViewModel
-                    {
-                        Mapping = mapping,
-
-                        FacultyName = faculties.GetValueOrDefault(
-                            mapping.FacultyCode,
-                            "Unknown Faculty"),
-
-                        Colleges = colleges,
-                        CollegeCount = colleges.Count,
-
-                        FromLetter = mapping.FromLetter,
-                        ToLetter = mapping.ToLetter,
-
-                        CollegeFromCode = mapping.CollegeFrom,
-                        CollegeToCode = mapping.CollegeTo
-                    });
+                foreach (var application in applications
+                            .GroupBy(e => e.CollegeCode)
+                            .Select(g => g.First()))
+                {
+                    result[application.CollegeCode] = application.RegistrationNumber;
+                }
             }
+            // Dental
+            else if (facultyCode == "2")
+            {
+                var applications = await _context.FinalDentalSubmissions
+                    .AsNoTracking()
+                    .Where(e =>
+                        e.IsActive &&
+                        e.AcademicYear == academicYear &&
+                        collegeCodes.Contains(e.CollegeCode) &&
+                        e.CourseLevel == courseLevel)
+                    .Select(e => new
+                    {
+                        e.CollegeCode,
+                        e.ApplicationNumber
+                    })
+                    .ToListAsync();
 
-            return View(model);
+                foreach (var application in applications
+                            .GroupBy(e => e.CollegeCode)
+                            .Select(g => g.First()))
+                {
+                    result[application.CollegeCode] = application.ApplicationNumber;
+                }
+            }
+            return result;
         }
 
         [HttpGet]

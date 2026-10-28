@@ -193,6 +193,7 @@ namespace VerificationPortal.Controllers
             HttpContext.Session.Remove("AffiliationTypeId");
             HttpContext.Session.Remove("TypeOfAffiliation");
             HttpContext.Session.Remove("SelectedLevel");
+            HttpContext.Session.Remove("CourseLevel");
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
