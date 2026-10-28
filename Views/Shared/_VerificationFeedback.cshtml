@@ -283,7 +283,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function(){
-        document.querySelectorAll("form.feedback-form").forEach(function(){
+        document.querySelectorAll("form.feedback-form").forEach(function(form){
             const radios = form.querySelectorAll('input[name = "status"]');
             const remarks = form.querySelector('textarea[name="remarks"]');
             const marker = form.querySelector('.remarks-marker');
@@ -291,7 +291,7 @@
             if(!radios.length || !remarks || !marker) return;
 
             function updateRemarksMarker(){
-                const selected = from.querySelector('input[name="status"]:checked');
+                const selected = form.querySelector('input[name="status"]:checked');
                 const isAccept = selected && selected.value == 'accept';
                 if(isAccept){
                     marker.className = 'remarks-marker text-muted small';

@@ -5,25 +5,28 @@
 
 .page-loader {
     position: fixed !important;
-    inset: 0;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
     z-index: 2147483647 !important;
-    display: none;
+
+    display: none !important;
+    visibility: hidden !important;
+
     align-items: center;
     justify-content: center;
-    /* Dark overlay */
+
     background: rgba(2, 6, 23, 0.78);
-    /* Blur background content */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    /* Block interaction with underlying content */
-    pointer-events: all;
+    pointer-events: none;
 }
 
-    /* Visible state */
-    .page-loader.is-visible {
-        display: flex !important;
-    }
-
+.page-loader.is-visible {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: all;
+}
 /* =========================================
    LOADER CONTENT CARD
    ========================================= */

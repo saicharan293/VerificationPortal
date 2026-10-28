@@ -180,7 +180,7 @@
         @RenderBody()
     </main>
 
-    <partial name="_PageLoader" />
+    @await Html.PartialAsync("_PageLoader")
 
     <script src="~/js/page-loader.js" asp-append-version="true"></script>
 

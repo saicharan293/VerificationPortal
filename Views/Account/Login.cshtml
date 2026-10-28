@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="~/css/page-loader.css" asp-append-version="true" />
 </head>
 <body class="login-page">
-    <partial name="_PageLoader" />
+    @await Html.PartialAsync("_PageLoader")
     <div class="login-wrapper">
         <!-- Theme Toggle for Login Page -->
         <button class="theme-toggle theme-toggle-login" id="themeToggle" aria-label="Toggle theme">
