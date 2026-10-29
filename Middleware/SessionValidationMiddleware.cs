@@ -1,4 +1,5 @@
 
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -25,9 +26,11 @@ public class SessionValidationMiddleware
             var userId = context.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId))
             {
-                await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                context.Response.Redirect("/Account/Login");
-                return;
+                userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    context.Session.SetString("UserId", userId);
+                }
             }
         }
         await _next(context);
