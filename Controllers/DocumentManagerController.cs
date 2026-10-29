@@ -24,9 +24,14 @@ namespace VerificationPortal.Controllers
         // 3. List of already added documents
         // ============================================================
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? facultyId, int? tabId, int? sectionId)
         {
-            var model = new DocumentManagerViewModel();
+            var model = new DocumentManagerViewModel
+            {
+                FacultyId = facultyId ?? 0,
+                TabId = tabId ?? 0,
+                SectionId = sectionId
+            };
 
             // Load all faculties for the Faculty dropdown
             model.Faculties = await _context.Faculties
@@ -183,7 +188,7 @@ namespace VerificationPortal.Controllers
             TempData["SuccessMessage"] =
                 "Document added successfully.";
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { facultyId = model.FacultyId, tabId = model.TabId, sectionId = model.SectionId});
         }
 
 

@@ -7,6 +7,7 @@
         public List<CourseLevelOptionVM> CourseLevels { get; set; }  = new();
 
         public int? SelectedAffiliationTypeId { get; set; }
+        public int? FacultyCode {get; set;}
 
         public string? SelectedCourseLevel { get; set; }
         public string? Message { get; set; }

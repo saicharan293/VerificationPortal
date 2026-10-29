@@ -166,9 +166,12 @@ else
 
                             @foreach (var level in Model.CourseLevels)
                             {
+                                bool isDisabled = Model.FacultyCode == 1 && level.Level != "UG";
+
                                 <button type="button"
-                                        class="course-level-card @(Model.SelectedCourseLevel == level.Level ? "active" : "") "
-                                        data-course-level="@level.Level">
+                                        class="course-level-card @(Model.SelectedCourseLevel == level.Level ? "active" : "")@(isDisabled ? "readonly" : "")"
+                                        data-course-level="@level.Level"
+                                        disabled = "@isDisabled">
 
                                     <div class="course-level-icon">
 
@@ -178,15 +181,8 @@ else
 
 
                                     <div class="course-level-content">
-
-                                        <span class="course-level-code">
-                                            @level.Level
-                                        </span>
-
-                                        <span class="course-level-name">
-                                            @level.DisplayName
-                                        </span>
-
+                                        <span class="course-level-code"> @level.Level</span>
+                                        <span class="course-level-name"> @level.DisplayName </span>
                                     </div>
 
 

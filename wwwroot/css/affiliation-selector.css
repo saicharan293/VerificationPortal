@@ -267,6 +267,12 @@
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35) inset;
     }
 
+    .course-level-card.readonly{
+        opacity: .25;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
 
 .course-level-icon {
     width: 38px;

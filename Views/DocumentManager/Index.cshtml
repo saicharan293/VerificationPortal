@@ -88,37 +88,18 @@
 
         <div class="document-manager-card-body">
 
-            <form asp-controller="DocumentManager"
-                  asp-action="Create"
-                  method="post">
-
+            <form asp-controller="DocumentManager" asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
-
-
                 <div class="document-form-grid">
-
-                    <!-- ====================================================
-                         FACULTY
-                         ==================================================== -->
-
                     <div class="document-form-group">
-
-                        <label asp-for="FacultyId"
-                               class="document-form-label">
-
+                        <label asp-for="FacultyId" class="document-form-label">
                             Faculty
                             <span class="document-required">*</span>
 
                         </label>
 
-                        <select asp-for="FacultyId"
-                                id="facultyId"
-                                class="form-select">
-
-                            <option value="">
-                                -- Select Faculty --
-                            </option>
-
+                        <select asp-for="FacultyId" id="facultyId" class="form-select">
+                            <option value="">  -- Select Faculty -- </option>
                             @foreach (var faculty in Model.Faculties)
                             {
                                 <option value="@faculty.FacultyId">
@@ -127,7 +108,6 @@
                             }
 
                         </select>
-
                     </div>
 
 
@@ -136,26 +116,16 @@
                          ==================================================== -->
 
                     <div class="document-form-group">
-
-                        <label asp-for="TabId"
-                               class="document-form-label">
-
+                        <label asp-for="TabId" class="document-form-label">
                             Tab Name
                             <span class="document-required">*</span>
-
                         </label>
 
-                        <select asp-for="TabId"
-                                id="tabId"
-                                class="form-select"
-                                disabled>
-
+                        <select asp-for="TabId" id="tabId" class="form-select" disabled>
                             <option value="">
                                 -- Select Tab --
                             </option>
-
                         </select>
-
                     </div>
 
 
@@ -165,22 +135,12 @@
 
                     <div class="document-form-group">
 
-                        <label asp-for="SectionId"
-                               class="document-form-label">
-
+                        <label asp-for="SectionId" class="document-form-label">
                             Section Name
-
                         </label>
 
-                        <select asp-for="SectionId"
-                                id="sectionId"
-                                class="form-select"
-                                disabled>
-
-                            <option value="">
-                                -- Select Section --
-                            </option>
-
+                        <select asp-for="SectionId" id="sectionId" class="form-select" disabled>
+                            <option value=""> -- Select Section -- </option>
                         </select>
 
                     </div>
@@ -192,17 +152,11 @@
 
                     <div class="document-form-group full-width">
 
-                        <label asp-for="DocumentName"
-                               class="document-form-label">
-
+                        <label asp-for="DocumentName" class="document-form-label">
                             Document Name
                             <span class="document-required">*</span>
-
                         </label>
-
-                        <input asp-for="DocumentName"
-                               class="form-control"
-                               placeholder="Enter document name" />
+                        <input asp-for="DocumentName"  class="form-control" placeholder="Enter document name" />
 
                     </div>
 
@@ -214,22 +168,13 @@
                      ======================================================== -->
 
                 <div class="document-form-footer">
-
                     <!-- Mandatory Checkbox -->
 
                     <div class="document-mandatory-wrapper">
-
-                        <input asp-for="IsMandatory"
-                               class="document-mandatory-checkbox"
-                               id="isMandatory" />
-
-                        <label for="isMandatory"
-                               class="document-mandatory-label">
-
+                        <input asp-for="IsMandatory" class="document-mandatory-checkbox" id="isMandatory" />
+                        <label for="isMandatory" class="document-mandatory-label">
                             This is a mandatory document
-
                         </label>
-
                     </div>
 
 
@@ -237,21 +182,14 @@
 
                     <div class="document-form-actions">
 
-                        <button type="reset"
-                                class="btn btn-outline-secondary document-reset-btn">
-
+                        <button type="reset" class="btn btn-outline-secondary document-reset-btn">
                             <i class="bi bi-arrow-counterclockwise"></i>
                             Reset
-
                         </button>
 
-
-                        <button type="submit"
-                                class="btn btn-primary document-save-btn">
-
+                        <button type="submit" class="btn btn-primary document-save-btn">
                             <i class="bi bi-save"></i>
                             Save Document
-
                         </button>
 
                     </div>
@@ -339,39 +277,15 @@
             @if (Model.Documents.Any())
             {
                 <table class="document-table" id="documentTable">
-
                     <thead>
-
                         <tr>
-
-                            <th class="document-sl-no">
-                                #
-                            </th>
-
-                            <th>
-                                Faculty
-                            </th>
-
-                            <th>
-                                Tab
-                            </th>
-
-                            <th>
-                                Section
-                            </th>
-
-                            <th>
-                                Document Name
-                            </th>
-
-                            <th>
-                                Type
-                            </th>
-
-                            <th>
-                                Actions
-                            </th>
-
+                            <th class="document-sl-no"> # </th>
+                            <th> Faculty </th>
+                            <th> Tab </th>
+                            <th> Section </th>
+                            <th> Document Name </th>
+                            <th> Type </th>
+                            <th> Actions </th>
                         </tr>
 
                     </thead>
@@ -386,102 +300,43 @@
                         @foreach (var document in Model.Documents)
                         {
                             <tr class="document-row">
-
-                                <!-- Serial Number -->
-
-                                <td class="document-sl-no">
-
-                                    @serialNumber
-
-                                </td>
-
-
-                                <!-- Faculty -->
-
+                                <td class="document-sl-no"> @serialNumber </td>
+                                <td> @document.FacultyName </td>
+                                <td> @document.TabName </td>
+                                <td> @(string.IsNullOrWhiteSpace(document.SectionName) ? "-" : document.SectionName)</td>
                                 <td>
-
-                                    @document.FacultyName
-
-                                </td>
-
-
-                                <!-- Tab -->
-
-                                <td>
-
-                                    @document.TabName
-
-                                </td>
-
-
-                                <!-- Section -->
-
-                                <td>
-
-                                    @(string.IsNullOrWhiteSpace(document.SectionName)
-                                                                    ? "-"
-                                                                    : document.SectionName)
-
-                                </td>
-
-
-                                <!-- Document Name -->
-
-                                <td>
-
                                     <div class="document-name-wrapper">
-
                                         <div class="document-name-icon">
                                             <i class="bi bi-file-earmark-text"></i>
                                         </div>
-
                                         <span class="document-name-text">
-
                                             @document.DocumentName
-
                                         </span>
-
                                     </div>
-
                                 </td>
-
-
-                                <!-- Mandatory / Optional -->
 
                                 <td>
 
                                     @if (document.IsMandatory)
                                     {
                                         <span class="document-status-badge mandatory">
-
                                             <i class="bi bi-check-circle"></i>
-
                                             Mandatory
-
                                         </span>
                                     }
                                     else
                                     {
                                         <span class="document-status-badge optional">
-
                                             <i class="bi bi-info-circle"></i>
-
                                             Optional
-
                                         </span>
                                     }
 
                                 </td>
 
-
-                                <!-- Actions -->
-
                                 <td>
 
                                     <div class="document-actions">
-
-                                        <!-- Edit -->
-
                                         <button 
                                             type="button"
                                             data-bs-toggle="modal"
@@ -500,16 +355,11 @@
 
                                         </button>
 
-
-                                        <!-- Delete -->
-
                                         <form asp-controller="DocumentManager"
                                               asp-action="Delete"
                                               asp-route-id="@document.DocumentId"
                                               method="post">
-
                                             @Html.AntiForgeryToken()
-
                                             <button type="button"
                                                     class="document-action-btn delete"
                                                     title="Delete Document"
@@ -556,10 +406,6 @@
             }
             else
             {
-                <!-- ====================================================
-                     EMPTY STATE
-                     ==================================================== -->
-
                 <div class="document-empty-state">
 
                     <div class="document-empty-icon">
@@ -795,11 +641,76 @@
 
     <script>
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", async function () {
 
             const facultyDropdown = document.getElementById("facultyId");
             const tabDropdown = document.getElementById("tabId");
             const sectionDropdown = document.getElementById("sectionId");
+
+            const selectedFacultyId = @Model.FacultyId;
+            const selectedTabId = @Model.TabId;
+            const selectedSectionId = @(Model.SectionId ?? 0);
+
+            async function loadTabs(facultyId, tabToSelect = 0){
+                tabDropdown.innerHTML = '<option value=""> -- Select Tab -- </option>';
+                sectionDropdown.innerHTML = '<option value=""> -- Select Section -- </option>';
+
+                tabDropdown.disabled = true;
+                sectionDropdown.disabled = true;
+
+                if(!facultyId) return;
+
+                try{
+                    const response = await fetch('@Url.Action("GetTabs", "DocumentManager")'+'?facultyId='+encodeURIComponent(facultyId));
+
+                    if(!response.ok) throw new Error ("Failed to load tabs.");
+
+                    const tabs = await response.json();
+
+                    tabs.forEach(tab => {
+                        const option = document.createElement("option");
+                        option.value = tab.tabId;
+                        option.textContent = tab.tabName;
+                        tabDropdown.appendChild(option);
+                    });
+
+                    tabDropdown.disabled = false;
+
+                    if(tabToSelect) tabDropdown.value = String(tabToSelect);
+                }
+                catch(error){
+                    console.error("Error loading tabs: ", error);
+                }
+            }
+
+            async function loadSections(tabId, sectionToSelect = 0){
+                sectionDropdown.innerHTML= '<option value=""> -- Select Section -- </option>';
+                sectionDropdown.disabled = true;
+
+                if(!tabId) return;
+
+                try{
+                    const response = await fetch('@Url.Action("GetSections", "DocumentManager")'+'?tabId='+encodeURIComponent(tabId));
+                    if(!response.ok) throw new Error("Failed to load sections.");
+                    const sections = await response.json();
+
+                    sections.forEach(section => {
+                        const option = document.createElement("option");
+                        option.value = section.sectionId;
+                        option.text= section.sectionName;
+                        sectionDropdown.appendChild(option);
+                    });
+
+                    sectionDropdown.disabled = false;
+
+                    if(sectionToSelect) sectionDropdown.value = String(sectionToSelect);
+                }
+                catch(error){
+                    console.error("Error loading sections: ", error);
+                }
+            }
+
+
 
 
             // ============================================================
@@ -808,69 +719,7 @@
             // ============================================================
 
             facultyDropdown.addEventListener("change", async function () {
-
-                const facultyId = this.value;
-
-
-                // Reset Tab dropdown
-                tabDropdown.innerHTML =
-                    '<option value="">-- Select Tab --</option>';
-
-
-                // Reset Section dropdown
-                sectionDropdown.innerHTML =
-                    '<option value="">-- Select Section --</option>';
-
-
-                // Disable both dropdowns initially
-                tabDropdown.disabled = true;
-                sectionDropdown.disabled = true;
-
-
-                // Stop if no Faculty is selected
-                if (!facultyId) {
-                    return;
-                }
-
-
-                try {
-
-                    const response = await fetch(
-                        '@Url.Action("GetTabs", "DocumentManager")'
-                        + '?facultyId='
-                        + facultyId
-                    );
-
-
-                    const tabs = await response.json();
-
-
-                    tabs.forEach(tab => {
-
-                        const option = document.createElement("option");
-
-                        option.value = tab.tabId;
-
-                        option.textContent = tab.tabName;
-
-                        tabDropdown.appendChild(option);
-
-                    });
-
-
-                    // Enable Tab dropdown after loading data
-                    tabDropdown.disabled = false;
-
-                }
-                catch (error) {
-
-                    console.error(
-                        "Error loading tabs:",
-                        error
-                    );
-
-                }
-
+                await loadTabs(this.value);
             });
 
 
@@ -880,73 +729,24 @@
             // ============================================================
 
             tabDropdown.addEventListener("change", async function () {
-
-                const tabId = this.value;
-
-
-                // Reset Section dropdown
-                sectionDropdown.innerHTML =
-                    '<option value="">-- Select Section --</option>';
-
-
-                // Disable Section dropdown initially
-                sectionDropdown.disabled = true;
-
-
-                // Stop if no Tab is selected
-                if (!tabId) {
-                    return;
-                }
-
-
-                try {
-
-                    const response = await fetch(
-                        '@Url.Action("GetSections", "DocumentManager")'
-                        + '?tabId='
-                        + tabId
-                    );
-
-
-                    const sections = await response.json();
-
-
-                    sections.forEach(section => {
-
-                        const option = document.createElement("option");
-
-                        option.value = section.sectionId;
-
-                        option.textContent = section.sectionName;
-
-                        sectionDropdown.appendChild(option);
-
-                    });
-
-
-                    // Enable Section dropdown
-                    sectionDropdown.disabled = false;
-
-                }
-                catch (error) {
-
-                    console.error(
-                        "Error loading sections:",
-                        error
-                    );
-
-                }
-
+                await loadSections(this.value);
             });
 
+            if(selectedFacultyId){
+                facultyDropdown.value = String(selectedFacultyId);
+                await loadTabs (selectedFacultyId, selectedTabId);
+                if(selectedTabId){
+                    await loadSections(selectedTabId, selectedSectionId);
+                }
+            }
 
             // ============================================================
             // RESET BUTTON
             // Reset cascading dropdown states
             // ============================================================
 
-            document.querySelector("form")
-                .addEventListener("reset", function () {
+            const createForm = document.querySelector("form")
+            createForm.addEventListener("reset", function () {
 
                     setTimeout(function () {
 

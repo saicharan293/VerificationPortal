@@ -59,6 +59,7 @@ namespace VerificationPortal.Controllers
                 "DeanDirectorDetails" => "Dean / Director Details",
                 "PrincipalDetails" => "Principal Details",
                 "UGCourseDetails" => "UG Course Details",
+                "UgCourseDetails" => "UG Course Details",
                 "CollegeDesignation" => "Faculty Repository",
                 "ClinicalFacilities" => "Clinical Facilities",
                 "LandAndBuildingDetails" => "Land & Building Details",
