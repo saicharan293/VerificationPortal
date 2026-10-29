@@ -549,6 +549,8 @@ namespace VerificationPortal.Models
         // Child: Administrative
         public List<AdministrativeExperienceRow>? AdministrativeExperiences { get; set; }
 
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
         public DeanDetailsViewModel()
         {
             TeachingExperiences = new List<TeachingExperienceRow>();

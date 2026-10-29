@@ -53,9 +53,9 @@
                                        autocomplete="off"
                                        required>
 
-                                <label class="verification-status-btn status-accepted"
-                                       for="newStatusAccepted_@Model.SectionId">
-                                    <i class="bi bi-check-circle"></i>
+                                <label class="verification-status-btn status-accepted" for="newStatusAccepted_@Model.SectionId">
+                                    <i class="bi bi-check-circle icon-idle"></i>
+                                    <i class="bi bi-check-lg icon-active"></i>
                                     <span>Accept</span>
                                 </label>
 
@@ -67,14 +67,14 @@
                                        value="Rejected"
                                        autocomplete="off">
 
-                                <label class="verification-status-btn status-rejected"
-                                       for="newStatusRejected_@Model.SectionId">
-                                    <i class="bi bi-x-circle"></i>
+                                <label class="verification-status-btn status-rejected" for="newStatusRejected_@Model.SectionId">
+                                    <i class="bi bi-x-circle icon-idle"></i>
+                                    <i class="bi bi-x-lg icon-active"></i>
                                     <span>Reject</span>
                                 </label>
 
 
-                                <input type="radio"
+                                @* <input type="radio"
                                        class="btn-check"
                                        name="VerificationStatus"
                                        id="newStatusPending_@Model.SectionId"
@@ -85,7 +85,7 @@
                                        for="newStatusPending_@Model.SectionId">
                                     <i class="bi bi-hourglass-split"></i>
                                     <span>Pending</span>
-                                </label>
+                                </label> *@
 
                             </div>
 
@@ -100,8 +100,7 @@
                         <div class="col-lg-7">
 
                             <label class="form-label">
-                                Remarks
-                                <span class="text-danger">*</span>
+                                Remarks <span class="remarks-marker"></span>
                             </label>
 
                             <textarea class="form-control section-verification-remarks"
@@ -202,8 +201,8 @@
 
                         <div class="feedback-item">
 
-                            <label class="feedback-label">
-                                Remarks
+                            <label class="form-label">
+                                Remarks <span class="remarks-marker"></span>
                             </label>
 
                             <div class="feedback-value feedback-remarks">
@@ -346,9 +345,9 @@
                                        checked="@(Model.VerificationStatus == "Accepted")"
                                        required>
 
-                                <label class="verification-status-btn status-accepted"
-                                       for="editStatusAccepted_@Model.SectionId">
-                                    <i class="bi bi-check-circle"></i>
+                                <label class="verification-status-btn status-accepted" for="newStatusAccepted_@Model.SectionId">
+                                    <i class="bi bi-check-circle icon-idle"></i>
+                                    <i class="bi bi-check-lg icon-active"></i>
                                     <span>Accept</span>
                                 </label>
 
@@ -361,12 +360,11 @@
                                        autocomplete="off"
                                        checked="@(Model.VerificationStatus == "Rejected")">
 
-                                <label class="verification-status-btn status-rejected"
-                                       for="editStatusRejected_@Model.SectionId">
-                                    <i class="bi bi-x-circle"></i>
+                                <label class="verification-status-btn status-rejected" for="newStatusRejected_@Model.SectionId">
+                                    <i class="bi bi-x-circle icon-idle"></i>
+                                    <i class="bi bi-x-lg icon-active"></i>
                                     <span>Reject</span>
                                 </label>
-
 
                                 <input type="radio"
                                        class="btn-check"
@@ -395,7 +393,7 @@
                         <div class="col-lg-7">
 
                             <label class="form-label">
-                                Remarks
+                                Remarks <span class="remarks-marker"></span>
                             </label>
 
                             <textarea class="form-control section-verification-remarks"
@@ -440,66 +438,52 @@
 
 
 <script>
+(function () {
 
-    // ============================================================
-    // Section Verification - Edit / Cancel
-    // ============================================================
+    // Runs for every form currently on the page. Safe to call repeatedly.
+    function updateRemarks(form) {
+        const marker  = form.querySelector(".remarks-marker");
+        const remarks = form.querySelector("textarea[name='Remarks']");
+        if (!marker || !remarks) return;
 
-    document.addEventListener("click", function(event) {
+        const selected = form.querySelector("input[name='VerificationStatus']:checked");
+        const isAccept = selected && selected.value === "Accepted";
 
-        // --------------------------------------------------------
-        // Edit Verification
-        // --------------------------------------------------------
+        marker.textContent = isAccept ? "(optional)" : "*";
+        marker.className   = "remarks-marker " + (isAccept ? "is-optional" : "is-required");
+        remarks.required   = !isAccept;
+    }
 
-        const editButton =
-            event.target.closest(".btn-edit-section-verification");
+    function initAll() {
+        document.querySelectorAll("form.section-feedback-form").forEach(updateRemarks);
+    }
 
-        if (editButton) {
+    // This partial renders once per section, so register the listeners only once.
+    if (!window.__sectionVerificationInit) {
+        window.__sectionVerificationInit = true;
 
-            const sectionId = editButton.dataset.sectionId;
-
-            const display =
-                document.getElementById(`verificationDisplay_${sectionId}`);
-
-            const editForm =
-                document.getElementById(`verificationEditForm_${sectionId}`);
-
-            if (display && editForm) {
-
-                display.style.display = "none";
-                editForm.style.display = "block";
-
+        document.addEventListener("change", function (e) {
+            if (e.target.matches("input[name='VerificationStatus']")) {
+                updateRemarks(e.target.closest("form"));
             }
+        });
 
-            return;
-        }
+        document.addEventListener("click", function (event) {
+            const editButton   = event.target.closest(".btn-edit-section-verification");
+            const cancelButton = event.target.closest(".btn-cancel-section-verification");
+            const btn = editButton || cancelButton;
+            if (!btn) return;
 
+            const id      = btn.dataset.sectionId;
+            const display = document.getElementById("verificationDisplay_" + id);
+            const form    = document.getElementById("verificationEditForm_" + id);
+            if (!display || !form) return;
 
-        // --------------------------------------------------------
-        // Cancel Edit
-        // --------------------------------------------------------
+            display.style.display = editButton ? "none"  : "block";
+            form.style.display    = editButton ? "block" : "none";
+        });
+    }
 
-        const cancelButton =
-            event.target.closest(".btn-cancel-section-verification");
-
-        if (cancelButton) {
-
-            const sectionId = cancelButton.dataset.sectionId;
-
-            const display =
-                document.getElementById(`verificationDisplay_${sectionId}`);
-
-            const editForm =
-                document.getElementById(`verificationEditForm_${sectionId}`);
-
-            if (display && editForm) {
-
-                editForm.style.display = "none";
-                display.style.display = "block";
-
-            }
-        }
-
-    });
-
+    initAll(); // set the correct state for forms rendered on load
+})();
 </script>

@@ -2252,113 +2252,138 @@ body {
     margin-bottom: 0.65rem;
 }
 
-
 /* ============================================================
-   VERIFICATION STATUS SELECTOR
+   STATUS SELECTOR
    ============================================================ */
 
 .verification-status-selector {
-    display: flex;
+    position: relative;
+    display: flex !important;
+    flex-wrap: wrap !important;
     width: 100%;
-    gap: 0.5rem;
+    gap: .5rem !important;
 }
 
-    .verification-status-selector .btn-check {
-        position: absolute;
-        clip: rect(0, 0, 0, 0);
-        pointer-events: none;
-    }
+.verification-status-selector .btn-check {
+    position: absolute !important;
+    clip: rect(0, 0, 0, 0) !important;
+    pointer-events: none !important;
+}
 
-
-/* Individual status button */
+/* ============================================================
+   STATUS BUTTON
+   --c   = main color (border, tint, selected background)
+   --ink = text color when idle
+   --on  = text color when selected
+   ============================================================ */
 
 .verification-status-btn {
-    flex: 1;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    font-weight: 600;
-    font-size: 0.9rem;
+    --c: #6c757d;
+    --ink: var(--c);
+    --on: #fff;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .5rem !important;
+    padding: .6rem 1.1rem !important;
+    border-radius: .6rem !important;
+    font-weight: 600 !important;
+    font-size: .95rem !important;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    user-select: none;
+    color: var(--ink) !important;
+    background: color-mix(in srgb, var(--c) 10%, #fff) !important;
+    border: 1px solid color-mix(in srgb, var(--c) 30%, transparent) !important;
+    transition: background .2s, color .2s, border-color .2s, box-shadow .2s, transform .15s;
 }
 
-    .verification-status-btn:hover {
-        transform: translateY(-1px);
-    }
-
-
-    /* ============================================================
-   ACCEPT
-   ============================================================ */
-
-    .verification-status-btn.status-accepted:hover {
-        border-color: #198754;
-        color: #198754;
-        background: rgba(25, 135, 84, 0.08);
-    }
-
-.btn-check:checked + .status-accepted {
-    background: #198754;
-    border-color: #198754;
-    color: #fff;
-    box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.15);
+.verification-status-btn:hover {
+    background: color-mix(in srgb, var(--c) 18%, #fff) !important;
+    border-color: var(--c) !important;
 }
 
-
-/* ============================================================
-   REJECT
-   ============================================================ */
-
-.verification-status-btn.status-rejected:hover {
-    border-color: #dc3545;
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.08);
+.verification-status-btn:active {
+    transform: scale(.97);
 }
 
-.btn-check:checked + .status-rejected {
-    background: #dc3545;
-    border-color: #dc3545;
-    color: #fff;
-    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15);
+.status-accepted { --c: #198754; }
+.status-rejected { --c: #dc3545; }
+.status-pending  { --c: #ffc107; --ink: #856404; --on: #212529; }
+
+/* selected (higher specificity than hover, so it wins even when hovered) */
+.btn-check:checked + .verification-status-btn {
+    background: var(--c) !important;
+    border-color: var(--c) !important;
+    color: var(--on) !important;
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--c) 30%, transparent) !important;
 }
 
-
-/* ============================================================
-   PENDING
-   ============================================================ */
-
-.verification-status-btn.status-pending:hover {
-    border-color: #ffc107;
-    color: #856404;
-    background: rgba(255, 193, 7, 0.1);
-}
-
-.btn-check:checked + .status-pending {
-    background: #ffc107;
-    border-color: #ffc107;
-    color: #212529;
-    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.15);
-}
-
-
-/* ============================================================
-   FOCUS ACCESSIBILITY
-   ============================================================ */
-
-.verification-status-selector .btn-check:focus-visible + label {
-    outline: 2px solid var(--primary);
+/* focus */
+.btn-check:focus-visible + .verification-status-btn {
+    outline: 3px solid color-mix(in srgb, var(--c) 40%, transparent) !important;
     outline-offset: 2px;
 }
 
+/* icon swap: circle icon -> plain icon */
+.verification-status-btn .icon-active { display: none !important; }
+.btn-check:checked + .verification-status-btn .icon-idle   { display: none !important; }
+.btn-check:checked + .verification-status-btn .icon-active { display: inline-block !important; }
 
+/* ============================================================
+   REMARKS MARKER
+   ============================================================ */
+
+.remarks-marker.is-optional {
+    color: #6c757d !important;
+    font-size: .8rem !important;
+    font-weight: 400 !important;
+}
+
+.remarks-marker.is-required {
+    color: #dc3545 !important;
+}
+
+/* ============================================================
+   DARK THEME OVERRIDES: status buttons and remarks marker
+   ============================================================ */
+
+/* idle button + its text */
+[data-theme="dark"] .verification-status-btn {
+    color: var(--ink) !important;
+    background: color-mix(in srgb, var(--c) 14%, transparent) !important;
+    border-color: color-mix(in srgb, var(--c) 40%, transparent) !important;
+}
+
+[data-theme="dark"] .verification-status-btn:hover {
+    background: color-mix(in srgb, var(--c) 24%, transparent) !important;
+    border-color: var(--c) !important;
+}
+
+/* the span inside must follow the label's color, not the global span rule */
+[data-theme="dark"] .verification-status-btn span {
+    color: inherit !important;
+}
+
+/* selected */
+[data-theme="dark"] .btn-check:checked + .verification-status-btn {
+    background: var(--c) !important;
+    border-color: var(--c) !important;
+    color: var(--on) !important;
+}
+
+/* pending needs a lighter idle text color on dark backgrounds */
+[data-theme="dark"] .status-pending {
+    --ink: #ffc107;
+}
+
+/* remarks marker */
+[data-theme="dark"] .remarks-marker.is-optional {
+    color: var(--text-tertiary) !important;
+}
+
+[data-theme="dark"] .remarks-marker.is-required, [data-theme="dark"] .text-danger {
+    color: #ff6b6b !important;
+}
 /* ============================================================
    REMARKS
    ============================================================ */

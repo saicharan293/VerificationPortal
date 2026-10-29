@@ -12,15 +12,19 @@ using VerificationPortal.Services.Verification.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
-builder.Services.AddControllersWithViews()
-    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-    .AddDataAnnotationsLocalization();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.AddService<InstitutionTypeFilter>();
+})
+.AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+.AddDataAnnotationsLocalization();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IVerificationService, VerificationService>();
 builder.Services.AddScoped<IClinicalFacilitiesCompositeService, ClinicalFacilitiesCompositeService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IVerificationPageService, VerificationPageService>();
+builder.Services.AddScoped<InstitutionTypeFilter>();
 
 builder.Services.AddScoped(typeof(IVerificationHandler<>), typeof(GenericVerificationHandler<>));
 
@@ -73,7 +77,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(5);
+    options.IdleTimeout = TimeSpan.FromHours(2);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
