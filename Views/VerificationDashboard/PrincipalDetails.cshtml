@@ -1,76 +1,27 @@
-@model VerificationPortal.Models.AffInstitutionsDetail
+@model VerificationPortal.Models.PrincipalDetailsViewModel
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
     ViewData["Title"] = "Principal Details - Verification Dashboard";
     ViewData["ActiveTab"] = "PrincipalDetails";
-
-    ViewData["InstitutionName"] =
-        Model?.NameOfInstitution ?? "Unknown Institution";
-
-    ViewData["CollegeCode"] =
-        Model?.CollegeCode ?? "";
-
-    ViewData["FacultyName"] =
-        Model?.FacultyCode ?? "";
-
-    ViewData["VerificationStatus"] =
-        Model?.IsDeoVerified == true
-            ? "Verified"
-            : Model?.IsDeoVerified == false
-                ? "Rejected"
-                : "Pending";
-
-    ViewData["StatusBadgeClass"] =
-        Model?.IsDeoVerified == true
-            ? "verified"
-            : Model?.IsDeoVerified == false
-                ? "rejected"
-                : "pending";
-
+    ViewData["InstitutionName"] = Model.Institution?.NameOfInstitution ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model.Institution?.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model.Institution?.FacultyCode ?? "";
+    ViewData["VerificationStatus"] = Model.Institution?.IsDeoVerified == true ? "Verified" : Model.Institution?.IsDeoVerified == false ? "Rejected" : "Pending";
+    ViewData["StatusBadgeClass"] = Model.Institution?.IsDeoVerified == true ? "verified" : Model.Institution?.IsDeoVerified == false ? "rejected" : "pending";
     ViewData["ShowFeedbackSection"] = true;
-
-    ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
-
-    ViewData["NextTabAction"] =
-        Url.Action(
-            "Courses",
-            "VerificationDashboard",
-            new
-            {
-                collegeCode = Model?.CollegeCode
-            });
-
-    ViewData["NextTabLabel"] =
-        "Next: Courses & Intake";
-
-    ViewData["PrevTabAction"] =
-        Url.Action(
-            "DeanDirectorDetails",
-            "VerificationDashboard",
-            new
-            {
-                collegeCode = Model?.CollegeCode
-            });
-
-    ViewData["PrevTabLabel"] =
-        "Previous: Dean / Director Details";
-
-
-    // Experience college lookup
-    var experienceColleges =
-        ViewBag.ExperienceColleges
-        as List<SelectListItem>
-        ?? new List<SelectListItem>();
-}
-
-@{
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["NextTabAction"] = Url.Action( "Courses", "VerificationDashboard", new { collegeCode = Model.Institution?.CollegeCode });
+    ViewData["NextTabLabel"] = "Next: Courses & Intake";
+    ViewData["PrevTabAction"] = Url.Action( "DeanDirectorDetails", "VerificationDashboard", new { collegeCode = Model.Institution?.CollegeCode });
+    ViewData["PrevTabLabel"] = "Previous: Dean / Director Details";
+    var experienceColleges = Model.ExperienceColleges?? new List<SelectListItem>();
     ViewBag.ActiveTab = "PrincipalDetails";
+    var principalInfoFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Principal Information");
+    var principalTeachFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Teaching Experience");
+    var principalAdminFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
 }
-
-
 <!-- ========================================================= -->
 <!-- PAGE HEADER -->
 <!-- ========================================================= -->
@@ -113,24 +64,12 @@
 
 </div>
 
-
-<!-- ========================================================= -->
-<!-- PRINCIPAL INFORMATION -->
-<!-- ========================================================= -->
-@{
-    var principalInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Principal Information");
-}
-
 <div class="verification-card mb-4">
-
     <div class="verification-card-header">
-
         <h3 class="verification-card-title">
             <i class="bi bi-person-badge"></i>
             Principal Information
         </h3>
-
     </div>
 
     <div class="verification-card-body">
@@ -140,31 +79,16 @@
             <!-- Principal Name -->
 
             <div class="col-md-6">
-
-                <label class="form-label">
-                    Principal Name
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(ViewBag.PrincipalName ?? "-")"
-                       disabled />
-
+                <label class="form-label"> Principal Name </label>
+                <input type="text" class="form-control" value="@(Model.Institution.PrincipalName ?? "-")" disabled />
             </div>
 
 
             <!-- Qualification -->
 
             <div class="col-md-6">
-
-                <label class="form-label">
-                    Qualification
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(ViewBag.PrincipalQualification ?? "-")"
-                       disabled />
+                <label class="form-label"> Qualification </label>
+                <input type="text" class="form-control" value="@(Model.PrincipalQualification ?? "-")" disabled />
 
             </div>
 
@@ -172,64 +96,32 @@
             <!-- Qualification Date -->
 
             <div class="col-md-6">
-
-                <label class="form-label">
-                    Qualification Date
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(ViewBag.PrincipalQualificationDate ?? "-")"
-                       disabled />
-
+                <label class="form-label"> Qualification Date </label>
+                <input type="text" class="form-control" value="@(Model.PrincipalQualificationDate ?? "-")" disabled />
             </div>
 
 
             <!-- University -->
 
             <div class="col-md-6">
-
-                <label class="form-label">
-                    University
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(ViewBag.PrincipalUniversity ?? "-")"
-                       disabled />
-
+                <label class="form-label"> University </label>
+                <input type="text" class="form-control" value="@(Model.PrincipalUniversity ?? "-")" disabled />
             </div>
 
 
             <!-- State Council Number -->
 
             <div class="col-md-6">
-
-                <label class="form-label">
-                    State Council Number
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(ViewBag.PrincipalStateCouncilNumber ?? "-")"
-                       disabled />
-
+                <label class="form-label"> State Council Number </label>
+                <input type="text" class="form-control" value="@(Model.PrincipalStateCouncilNumber ?? "-")" disabled />
             </div>
 
 
             <!-- Recognition -->
 
             <div class="col-md-6">
-
-                <label class="form-label">
-                    @ViewBag.RecognitionLabel
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(ViewBag.RecognitionStatus ?? "-")"
-                       disabled />
-
+                <label class="form-label"> @Model.RecognitionLabel </label>
+                <input type="text" class="form-control" value="@(Model.RecognitionStatus ?? "-")" disabled />
             </div>
 
         </div>
@@ -245,13 +137,6 @@
 </div>
 
 
-<!-- ========================================================= -->
-<!-- TEACHING EXPERIENCE -->
-<!-- ========================================================= -->
-@{
-    var principalTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Teaching Experience");
-}
 
 <div class="verification-card mb-4">
 
@@ -266,43 +151,19 @@
 
     <div class="verification-card-body">
 
-        @if (ViewBag.TeachingExperiences != null &&
-             ((IEnumerable<dynamic>)ViewBag.TeachingExperiences).Any())
+        @if (Model.TeachingExperiences.Any())
         {
             <div class="table-responsive">
-
                 <table class="table table-bordered table-hover align-middle">
-
                     <thead class="table-light">
-
                         <tr>
-                            <th style="width:70px;">
-                                Sl. No
-                            </th>
-
-                            <th>
-                                Designation
-                            </th>
-
-                            <th>
-                                College
-                            </th>
-
-                            <th>
-                                Other College
-                            </th>
-
-                            <th>
-                                From Date
-                            </th>
-
-                            <th>
-                                To Date
-                            </th>
-
-                            <th>
-                                Total Experience
-                            </th>
+                            <th style="width:70px;"> Sl. No </th>
+                            <th> Designation </th>
+                            <th> College </th>
+                            <th> Other College </th>
+                            <th> From Date </th>
+                            <th> To Date </th>
+                            <th> Total Experience </th>
                         </tr>
 
                     </thead>
@@ -313,67 +174,31 @@
                             var serialNo = 1;
                         }
 
-                        @foreach (var experience
-                            in (IEnumerable<dynamic>)ViewBag.TeachingExperiences)
+                        @foreach (var experience in Model.TeachingExperiences)
                         {
                             var collegeName = "-";
 
                             if (!string.IsNullOrWhiteSpace(experience.ExpCollegeCode))
                             {
                                 collegeName = experienceColleges
-                                    .FirstOrDefault(x =>
-                                        x.Value == experience.ExpCollegeCode)
+                                    .FirstOrDefault(x => x.Value == experience.ExpCollegeCode)
                                     ?.Text
                                     ?? experience.ExpCollegeCode;
                             }
 
                             <tr>
-
-                                <td class="text-center">
-                                    @serialNo
-                                </td>
-
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.Designation)
-                                        ? "-"
-                                        : experience.Designation)
-                                </td>
-
-                                <td>
-                                    @collegeName
-                                </td>
-
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.OtherCollege)
-                                        ? "-"
-                                        : experience.OtherCollege)
-                                </td>
-
-                                <td>
-                                    @(experience.FromDate != null
-                                        ? experience.FromDate.ToString("dd-MM-yyyy")
-                                        : "-")
-                                </td>
-
-                                <td>
-                                    @(experience.ToDate != null
-                                        ? experience.ToDate.ToString("dd-MM-yyyy")
-                                        : "-")
-                                </td>
-
-                                <td>
-                                    @(experience.TotalExperienceYears?.ToString() ?? "-")
-                                </td>
-
+                                <td class="text-center"> @serialNo </td>
+                                <td> @(string.IsNullOrWhiteSpace(experience.Designation) ? "-" : experience.Designation)</td>
+                                <td> @collegeName </td>
+                                <td> @(string.IsNullOrWhiteSpace(  experience.OtherCollege) ? "-" : experience.OtherCollege) </td>
+                                <td> @(experience.FromDate.HasValue != null ? experience.FromDate.Value.ToString("dd-MM-yyyy") : "-") </td>
+                                <td> @(experience.ToDate.HasValue != null ? experience.ToDate.Value.ToString("dd-MM-yyyy") : "-") </td>
+                                <td> @(experience.TotalExperienceYears?.ToString() ?? "-") </td>
                             </tr>
 
                             serialNo++;
                         }
-
                     </tbody>
-
                 </table>
 
             </div>
@@ -381,16 +206,12 @@
         else
         {
             <div class="text-center text-muted py-4">
-
                 <i class="bi bi-info-circle me-2"></i>
-
                 No teaching experience details available.
 
             </div>
         }
 
-
-        
         @if (principalTeachFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", principalTeachFeedback)
@@ -399,16 +220,6 @@
 
 </div>
 
-
-
-<!-- ========================================================= -->
-<!-- ADMINISTRATIVE EXPERIENCE -->
-<!-- ========================================================= -->
-
-@{
-    var principalAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
-}
 
 <div class="verification-card mb-4">
 
@@ -423,43 +234,19 @@
 
     <div class="verification-card-body">
 
-        @if (ViewBag.AdministrativeExperiences != null &&
-             ((IEnumerable<dynamic>)ViewBag.AdministrativeExperiences).Any())
+        @if (Model.AdministrativeExperiences.Any())
         {
             <div class="table-responsive">
-
                 <table class="table table-bordered table-hover align-middle">
-
                     <thead class="table-light">
-
                         <tr>
-                            <th style="width:70px;">
-                                Sl. No
-                            </th>
-
-                            <th>
-                                Post Held
-                            </th>
-
-                            <th>
-                                College
-                            </th>
-
-                            <th>
-                                Other College
-                            </th>
-
-                            <th>
-                                From Date
-                            </th>
-
-                            <th>
-                                To Date
-                            </th>
-
-                            <th>
-                                Total Experience
-                            </th>
+                            <th style="width:70px;">Sl. No</th>
+                            <th> Post Held </th>
+                            <th> College </th>
+                            <th> Other College </th>
+                            <th> From Date </th>
+                            <th> To Date </th>
+                            <th> Total Experience </th>
                         </tr>
 
                     </thead>
@@ -470,85 +257,42 @@
                             var serialNo = 1;
                         }
 
-                        @foreach (var experience
-                            in (IEnumerable<dynamic>)ViewBag.AdministrativeExperiences)
+                        @foreach (var experience in Model.AdministrativeExperiences)
                         {
                             var collegeName = "-";
 
-                            if (!string.IsNullOrWhiteSpace(
-                                experience.ExpCollegeCode))
+                            if (!string.IsNullOrWhiteSpace(experience.ExpCollegeCode))
                             {
                                 collegeName = experienceColleges
-                                .FirstOrDefault(x =>
-                                    x.Value == experience.ExpCollegeCode)
+                                .FirstOrDefault(x => x.Value == experience.ExpCollegeCode)
                                 ?.Text
                                 ?? experience.ExpCollegeCode;
                             }
 
                             <tr>
-
-                                <td class="text-center">
-                                    @serialNo
-                                </td>
-
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.PostHeld)
-                                        ? "-"
-                                        : experience.PostHeld)
-                                </td>
-
-                                <td>
-                                    @collegeName
-                                </td>
-
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.OtherCollege)
-                                        ? "-"
-                                        : experience.OtherCollege)
-                                </td>
-
-                                <td>
-                                    @(experience.FromDate != null
-                                        ? experience.FromDate.ToString("dd-MM-yyyy")
-                                        : "-")
-                                </td>
-
-                                <td>
-                                    @(experience.ToDate != null
-                                        ? experience.ToDate.ToString("dd-MM-yyyy")
-                                        : "-")
-                                </td>
-
-                                <td>
-                                    @(experience.TotalExperienceYears?.ToString() ?? "-")
-                                </td>
-
+                                <td class="text-center"> @serialNo </td>
+                                <td> @(string.IsNullOrWhiteSpace(experience.PostHeld) ? "-" : experience.PostHeld)</td>
+                                <td> @collegeName </td>
+                                <td> @(string.IsNullOrWhiteSpace(experience.OtherCollege) ? "-" : experience.OtherCollege)</td>
+                                <td> @(experience.FromDate.HasValue != null ? experience.FromDate.Value.ToString("dd-MM-yyyy") : "-") </td>
+                                <td> @(experience.ToDate.HasValue != null ? experience.ToDate.Value.ToString("dd-MM-yyyy") : "-") </td>
+                                <td> @(experience.TotalExperienceYears?.ToString() ?? "-") </td>
                             </tr>
 
                             serialNo++;
                         }
-
                     </tbody>
-
                 </table>
-
             </div>
         }
         else
         {
             <div class="text-center text-muted py-4">
-
                 <i class="bi bi-info-circle me-2"></i>
-
                 No administrative experience details available.
-
             </div>
         }
 
-
-        
         @if (principalAdminFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", principalAdminFeedback)

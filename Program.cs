@@ -77,7 +77,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.IdleTimeout = TimeSpan.FromMinutes(90);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

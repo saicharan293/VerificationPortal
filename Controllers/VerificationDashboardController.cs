@@ -1704,8 +1704,8 @@ namespace VerificationPortal.Controllers
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode);
 
-            ViewBag.CollegeName =
-                college?.CollegeName ?? "Unknown College";
+            //ViewBag.CollegeName =
+            //    college?.CollegeName ?? "Unknown College";
 
 
             // ---------------------------------------------------------
@@ -1715,8 +1715,8 @@ namespace VerificationPortal.Controllers
             var experienceColleges =
                 await GetAllExperienceCollegesAsync(facultyCode);
 
-            ViewBag.ExperienceColleges =
-                experienceColleges;
+            //ViewBag.ExperienceColleges =
+            //    experienceColleges;
 
 
             // ---------------------------------------------------------
@@ -1757,30 +1757,33 @@ namespace VerificationPortal.Controllers
             }
             else
             {
-                principalQualification =
-                    principal.DeanQualification ?? "-";
+                principalQualification =  principal.DeanQualification ?? "-";
             }
+
+            // RECOGNITION
+            string recognitionLabel = "Recognized by DCI";
+            string recognitionStatus = "-";
 
 
             // ---------------------------------------------------------
             // PRINCIPAL BASIC INFORMATION
             // ---------------------------------------------------------
 
-            ViewBag.PrincipalName =
-                principal.DeanOrDirectorName ?? "-";
+            //ViewBag.PrincipalName =
+            //    principal.DeanOrDirectorName ?? "-";
 
-            ViewBag.PrincipalQualification =
-                principalQualification;
+            //ViewBag.PrincipalQualification =
+            //    principalQualification;
 
-            ViewBag.PrincipalQualificationDate =
-                principal.DeanQualificationDate?
-                    .ToString("dd-MM-yyyy") ?? "-";
+            //ViewBag.PrincipalQualificationDate =
+            //    principal.DeanQualificationDate?
+            //        .ToString("dd-MM-yyyy") ?? "-";
 
-            ViewBag.PrincipalUniversity =
-                principal.DeanUniversity ?? "-";
+            //ViewBag.PrincipalUniversity =
+            //    principal.DeanUniversity ?? "-";
 
-            ViewBag.PrincipalStateCouncilNumber =
-                principal.DeanStateCouncilNumber ?? "-";
+            //ViewBag.PrincipalStateCouncilNumber =
+            //    principal.DeanStateCouncilNumber ?? "-";
 
 
             // ---------------------------------------------------------
@@ -1789,27 +1792,19 @@ namespace VerificationPortal.Controllers
 
             if (facultyCode == "2")
             {
-                ViewBag.RecognitionLabel =
-                    "Recognized by DCI";
+                recognitionLabel = "Recognized by DCI";
 
-                ViewBag.RecognitionStatus =
-                    principal.RecognizedByDci == true
-                        ? "Yes"
-                        : principal.RecognizedByDci == false
-                            ? "No"
-                            : "-";
+                recognitionStatus = principal.RecognizedByDci == true
+                    ? "Yes"
+                    : principal.RecognizedByDci == false ? "No" : "-";
             }
-            else
+            else if(facultyCode == "1")
             {
-                ViewBag.RecognitionLabel =
-                    "Recognized by MCI";
+                recognitionLabel = "Recognized by MCI";
 
-                ViewBag.RecognitionStatus =
-                    principal.RecognizedByMci == true
-                        ? "Yes"
-                        : principal.RecognizedByMci == false
-                            ? "No"
-                            : "-";
+                recognitionStatus = principal.RecognizedByMci == true
+                    ? "Yes"
+                    : principal.RecognizedByMci == false ? "No" : "-";
             }
 
 
@@ -1820,14 +1815,13 @@ namespace VerificationPortal.Controllers
             var teachingExperiences =
                 await _context.AffPrincipalTeachingExperiences
                     .AsNoTracking()
-                    .Where(t =>
-                        t.DeanId == principal.Id)
+                    .Where(t => t.DeanId == principal.Id)
                     .OrderBy(t => t.Id)
                     .ToListAsync();
 
 
-            ViewBag.TeachingExperiences =
-                teachingExperiences;
+            //ViewBag.TeachingExperiences =
+            //    teachingExperiences;
 
 
             // ---------------------------------------------------------
@@ -1837,14 +1831,13 @@ namespace VerificationPortal.Controllers
             var administrativeExperiences =
                 await _context.AffPrincipalAdministrativeExperiences
                     .AsNoTracking()
-                    .Where(a =>
-                        a.DeanId == principal.Id)
+                    .Where(a =>  a.DeanId == principal.Id)
                     .OrderBy(a => a.Id)
                     .ToListAsync();
 
 
-            ViewBag.AdministrativeExperiences =
-                administrativeExperiences;
+            //ViewBag.AdministrativeExperiences =
+            //    administrativeExperiences;
 
 
             // ---------------------------------------------------------
@@ -1858,9 +1851,26 @@ namespace VerificationPortal.Controllers
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Principal Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Principal Details", context.FacultyCodeInt);
 
-            return View(institution);
+            var model = new PrincipalDetailsViewModel
+            {
+                Institution = institution,
+                CollegeName = college?.CollegeName ?? "Unknown College",
+                PrincipalName = principal.DeanOrDirectorName ?? "-",
+                PrincipalQualification = principalQualification,
+                PrincipalQualificationDate = principal.DeanQualificationDate?.ToString("dd-MM-yyyy") ?? "-",
+                PrincipalUniversity = principal.DeanUniversity ?? "-",
+                PrincipalStateCouncilNumber = principal.DeanStateCouncilNumber ?? "-",
+                RecognitionLabel = recognitionLabel,
+                RecognitionStatus = recognitionStatus,
+                TeachingExperiences = teachingExperiences,
+                AdministrativeExperiences = administrativeExperiences,
+                ExperienceColleges = experienceColleges,
+                SectionFeedback = sectionFeedback
+            };
+
+            return View(model);
         }
 
         // Placeholder actions for remaining tabs (to be implemented later)
