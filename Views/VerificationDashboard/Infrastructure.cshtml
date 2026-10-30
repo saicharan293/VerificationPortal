@@ -1,7 +1,7 @@
 @model List<VerificationPortal.Models.DentalInfrastructure>
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
-    ViewData["Title"] = "Classroom & Laboratory - Verification Dashboard";
+    ViewData["Title"] = "Classroom And Laboratory - Verification Dashboard";
     ViewData["ActiveTab"] = "ClassroomAndLaboratory";
     ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
     ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
@@ -32,7 +32,7 @@
 <div class="page-header mb-4">
     <h1 class="page-title">
         <i class="bi bi-houses"></i>
-        Classroom & Laboratory
+        Classroom And Laboratory
     </h1>
     <p class="text-muted mb-0">Review and verify classroom and laboratory infrastructure for this institution</p>
 </div>
@@ -42,7 +42,7 @@
     <i class="bi bi-info-circle"></i>
     <div class="note-box-content">
         <h6>Verification Instructions</h6>
-        <p>Review the Classroom & Laboratory infrastructure details below. Verify that the Required Area (sq.ft) matches the Available Area (sq.ft) for each requirement. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, proceed to the next tab: <strong>Faculty Details</strong>.</p>
+        <p>Review the Classroom And Laboratory infrastructure details below. Verify that the Required Area (sq.ft) matches the Available Area (sq.ft) for each requirement. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, proceed to the next tab: <strong>Faculty Details</strong>.</p>
     </div>
 </div>
 
@@ -82,7 +82,7 @@
     </div>
 </div>
 
-<!-- Land & Building Details Section -->
+<!-- Land And Building Details Section -->
 @if (ViewBag.LandBuildingDetail != null)
 {
     var landBuilding = ViewBag.LandBuildingDetail as VerificationPortal.Models.DentalCollegeLandBuildingDetail;
@@ -90,7 +90,7 @@
         <div class="verification-card-header">
             <h3 class="verification-card-title">
                 <i class="bi bi-building"></i>
-                Land & Building Details
+                Land And Building Details
             </h3>
         </div>
         <div class="verification-card-body">

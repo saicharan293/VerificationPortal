@@ -1,0 +1,292 @@
+ @model VerificationPortal.Models.ClassroomAndLaboratoryViewModel
+
+@{
+    var infrastructure = Model.InfrastructureDetails;
+    var landBuilding = Model.LandBuildingDetails;
+    var dental = Model.MedicalClassroomAndLaboratory;
+
+    var classroomFeedback = Model.SectionFeedback?
+        .FirstOrDefault(x => x.SectionName == "Facility Requirements");
+}
+
+<div class="verification-card mb-4">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-hospital"></i>
+            Classroom and Laboratory
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (dental != null)
+        {
+            @* Area & Capacity Summary *@
+
+            <div class="row g-3 skills-summary">
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Annual BDS Intake</div>
+                        <div class="summary-value">
+                            @(dental.AnnualBdsIntake?.ToString() ?? "Not Available")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Required Area</div>
+                        <div class="summary-value">
+                            @dental.TotalAreaRequiredSqm.ToString("0.##")
+                            <span>Sq.m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Available Area</div>
+                        <div class="summary-value">
+                            @dental.TotalAreaAvailableSqm
+                            <span>Sq.m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Area Deficiency</div>
+                        <div class="summary-value">
+                            @dental.TotalAreaDeficiencySqm
+                            <span>Sq.m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Skill Stations</div>
+                        <div class="summary-value">
+                            @dental.NumberOfSkillStations
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Examination Rooms</div>
+                        <div class="summary-value">
+                            @dental.NumberOfExaminationRooms
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            @* Facility Requirements *@
+
+            <h5 class="form-section-title mb-3">
+                <i class="bi bi-check2-square me-2"></i>
+                Facility Requirements
+            </h5>
+
+            <div class="row g-3">
+
+                @* Left Column *@
+
+                <div class="col-lg-6">
+                    <div class="border rounded">
+                        <div class="p-3 border-bottom fw-semibold">
+                            Infrastructure & Training
+                        </div>
+
+                        <div class="p-3">
+                            <div class="row g-3">
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Six Weeks Training Before Clinical Posting</span>
+                                        <span class="badge @(dental.SixWeeksTrainingCompletedBeforeClinical == true ? "bg-success" : dental.SixWeeksTrainingCompletedBeforeClinical == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.SixWeeksTrainingCompletedBeforeClinical == true ? "Yes" : dental.SixWeeksTrainingCompletedBeforeClinical == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Minimum 4 Examination Rooms Available</span>
+                                        <span class="badge @(dental.HasMinFourExamRooms == true ? "bg-success" : dental.HasMinFourExamRooms == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasMinFourExamRooms == true ? "Yes" : dental.HasMinFourExamRooms == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Demonstration Room for Small Groups</span>
+                                        <span class="badge @(dental.HasDemoRoomSmallGroups == true ? "bg-success" : dental.HasDemoRoomSmallGroups == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasDemoRoomSmallGroups == true ? "Yes" : dental.HasDemoRoomSmallGroups == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Review or Debriefing Area</span>
+                                        <span class="badge @(dental.HasDebriefArea == true ? "bg-success" : dental.HasDebriefArea == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasDebriefArea == true ? "Yes" : dental.HasDebriefArea == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Room for Skills Lab Faculty Coordinator</span>
+                                        <span class="badge @(dental.HasFacultyCoordinatorRoom == true ? "bg-success" : dental.HasFacultyCoordinatorRoom == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasFacultyCoordinatorRoom == true ? "Yes" : dental.HasFacultyCoordinatorRoom == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Rooms for Support Staff</span>
+                                        <span class="badge @(dental.HasSupportStaffRoom == true ? "bg-success" : dental.HasSupportStaffRoom == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasSupportStaffRoom == true ? "Yes" : dental.HasSupportStaffRoom == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Storage for Mannequins or Equipment</span>
+                                        <span class="badge @(dental.HasStorageForMannequins == true ? "bg-success" : dental.HasStorageForMannequins == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasStorageForMannequins == true ? "Yes" : dental.HasStorageForMannequins == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Right Column *@
+
+                <div class="col-lg-6">
+                    <div class="border rounded">
+
+                        <div class="p-3 border-bottom fw-semibold">
+                            Facilities & Support
+                        </div>
+
+                        <div class="p-3">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Video Recording and Review Facility</span>
+                                        <span class="badge @(dental.HasVideoRecordingFacility == true ? "bg-success" : dental.HasVideoRecordingFacility == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasVideoRecordingFacility == true ? "Yes" : dental.HasVideoRecordingFacility == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Stations for Individual & Group Practice</span>
+                                        <span class="badge @(dental.HasGroupAndIndividualStations == true ? "bg-success" : dental.HasGroupAndIndividualStations == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasGroupAndIndividualStations == true ? "Yes" : dental.HasGroupAndIndividualStations == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Trainers or Mannequins as per CBM</span>
+                                        <span class="badge @(dental.HasRequiredTrainersAndMannequins == true ? "bg-success" : dental.HasRequiredTrainersAndMannequins == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasRequiredTrainersAndMannequins == true ? "Yes" : dental.HasRequiredTrainersAndMannequins == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Dedicated Technical Officer Posted</span>
+                                        <span class="badge @(dental.HasDedicatedTechnicalOfficer == true ? "bg-success" : dental.HasDedicatedTechnicalOfficer == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasDedicatedTechnicalOfficer == true ? "Yes" : dental.HasDedicatedTechnicalOfficer == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Adequate Support Staff Available</span>
+                                        <span class="badge @(dental.HasAdequateSupportStaff == true ? "bg-success" : dental.HasAdequateSupportStaff == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.HasAdequateSupportStaff == true ? "Yes" : dental.HasAdequateSupportStaff == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Teaching Areas Have Audio-Visual Facilities</span>
+                                        <span class="badge @(dental.TeachingAreasHaveAV == true ? "bg-success" : dental.TeachingAreasHaveAV == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.TeachingAreasHaveAV == true ? "Yes" : dental.TeachingAreasHaveAV == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Teaching Areas Have Internet Facility</span>
+                                        <span class="badge @(dental.TeachingAreasHaveInternet == true ? "bg-success" : dental.TeachingAreasHaveInternet == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.TeachingAreasHaveInternet == true ? "Yes" : dental.TeachingAreasHaveInternet == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Skills Lab Enabled for E-Learning</span>
+                                        <span class="badge @(dental.SkillsLabEnabledForELearning == true ? "bg-success" : dental.SkillsLabEnabledForELearning == false ? "bg-danger" : "bg-secondary")">
+                                            @(dental.SkillsLabEnabledForELearning == true ? "Yes" : dental.SkillsLabEnabledForELearning == false ? "No" : "Not Available")
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            @* Feedback *@
+
+            @if (classroomFeedback != null)
+            {
+                <hr class="my-4" />
+
+                @await Html.PartialAsync( "_SectionFeedback", classroomFeedback)
+            }
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-database-x fs-1 d-block mb-3"></i>
+
+                <h5>No Dental Classroom and Laboratory Details Available</h5>
+
+                <p class="mb-0">
+                    No classroom or laboratory details were found
+                    for this institution.
+                </p>
+            </div>
+        }
+
+    </div>
+</div>

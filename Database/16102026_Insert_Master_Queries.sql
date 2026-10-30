@@ -195,8 +195,8 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VAL
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'UG Course Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'PG Course Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Courses & Intake');
-INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Land & Building Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Classroom & Laboratory');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Land And Building Details');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Classroom And Laboratory');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Chair Distribution');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Bed Distribution');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Hostel Details');
@@ -546,8 +546,8 @@ UNIQUE
 --Form 16 Details Upload 3
 --Form 16 Details Upload 4
 --Form 16 Details Upload 5
---AEBAS – Last Three Months
---AEBAS – Inspection Day
+--AEBAS ï¿½ Last Three Months
+--AEBAS ï¿½ Inspection Day
 --Provident Fund
 --ESI
 --Transaction Receipt

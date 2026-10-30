@@ -1,0 +1,334 @@
+@model VerificationPortal.Models.ClassroomAndLaboratoryViewModel
+
+@{
+    var medical = Model.MedicalClassroomAndLaboratory;
+
+    var classroomFeedback = Model.SectionFeedback? .FirstOrDefault(x => x.SectionName == "Facility Requirements");
+}
+
+@if (medical != null)
+{
+    <!-- ========================================================= -->
+    <!-- MEDICAL SKILLS LABORATORY -->
+    <!-- ========================================================= -->
+
+    <div class="verification-card mb-4">
+
+        <div class="verification-card-header">
+
+            <h3 class="verification-card-title">
+                <i class="bi bi-hospital"></i>
+                Skills Laboratory
+            </h3>
+
+        </div>
+
+        <div class="verification-card-body">
+
+            <!-- ================================================= -->
+            <!-- AREA & CAPACITY SUMMARY -->
+            <!-- ================================================= -->
+
+            <div class="row g-3 skills-summary">
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            Annual MBBS Intake
+                        </div>
+                        <div class="summary-value">
+                            @medical.AnnualMbbsIntake
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Required Area</div>
+                        <div class="summary-value">
+                            @medical.TotalAreaRequiredSqm.ToString("0.##")
+                            <span>Sq.m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Available Area</div>
+                        <div class="summary-value">
+                            @medical.TotalAreaAvailableSqm
+                            <span>Sq.m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Area Deficiency</div>
+                        <div class="summary-value">
+                            @medical.TotalAreaDeficiencySqm
+                            <span>Sq.m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Skill Stations</div>
+                        <div class="summary-value">
+                            @medical.NumberOfSkillStations
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="summary-card">
+                        <div class="summary-label">Examination Rooms</div>
+                        <div class="summary-value">
+                            @medical.NumberOfExaminationRooms
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- ================================================= -->
+            <!-- FACILITY REQUIREMENTS -->
+            <!-- ================================================= -->
+
+            <h5 class="form-section-title mb-3">
+                <i class="bi bi-check2-square me-2"></i>
+                Facility Requirements
+
+            </h5>
+
+
+            <div class="row g-3">
+                <!-- LEFT COLUMN -->
+                <div class="col-lg-6">
+                    <div class="border rounded">
+                        <div class="p-3 border-bottom fw-semibold">
+                            Infrastructure & Training
+                        </div>
+                        <div class="p-3">
+                            <div class="row g-3">
+                
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Six Weeks Training Before Clinical Posting
+                                        </span>
+                                        <span class="badge @(medical?.SixWeeksTrainingCompletedBeforeClinical == true ? "bg-success"  : "bg-danger")">
+                                            @(medical?.SixWeeksTrainingCompletedBeforeClinical == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Minimum 4 Examination Rooms Available
+                                        </span>
+                                        <span class="badge @(medical?.HasMinFourExamRooms == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasMinFourExamRooms == true  ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Demonstration Room for Small Groups
+                                        </span>
+                                        <span class="badge @(medical?.HasDemoRoomSmallGroups == true ? "bg-success": "bg-danger")">
+                                            @(medical?.HasDemoRoomSmallGroups == true ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Review or Debriefing Area
+                                        </span>
+                                        <span class="badge @(medical?.HasDebriefArea == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasDebriefArea == true ? "Yes": "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Room for Skills Lab Faculty Coordinator
+                                        </span>
+                                        <span class="badge @(medical?.HasFacultyCoordinatorRoom == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasFacultyCoordinatorRoom == true ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Rooms for Support Staff
+                                        </span>
+                                        <span class="badge @(medical?.HasSupportStaffRoom == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasSupportStaffRoom == true ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Storage for Mannequins / Equipment
+                                        </span>
+
+                                        <span class="badge @(medical?.HasStorageForMannequins == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasStorageForMannequins == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- RIGHT COLUMN -->
+
+                <div class="col-lg-6">
+                    <div class="border rounded">
+                        <div class="p-3 border-bottom fw-semibold">
+                            Facilities and Support
+                        </div>
+                        <div class="p-3">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Video Recording and Review Facility </span>
+                                        <span class="badge @(medical?.HasVideoRecordingFacility == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasVideoRecordingFacility == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Stations for Individual & Group Practice </span>
+                                        <span class="badge @(medical?.HasGroupAndIndividualStations == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasGroupAndIndividualStations == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Trainers or Mannequins as per CBM </span>
+                                        <span class="badge @(medical?.HasRequiredTrainersAndMannequins == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasRequiredTrainersAndMannequins == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Dedicated Technical Officer Posted </span>
+                                        <span class="badge @(medical?.HasDedicatedTechnicalOfficer == true ? "bg-success" : "bg-danger")">
+                                            @( medical?.HasDedicatedTechnicalOfficer == true ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Adequate Support Staff Available </span>
+                                        <span class="badge @(medical?.HasAdequateSupportStaff == true ? "bg-success" : "bg-danger")">
+                                            @(medical?.HasAdequateSupportStaff == true ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Teaching Areas Have Audio-Visual Facilities </span>
+                                        <span class="badge @(medical?.TeachingAreasHaveAV == true ? "bg-success" : "bg-danger")">
+                                            @(medical? .TeachingAreasHaveAV  == true ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Teaching Areas Have Internet Facility </span>
+                                        <span class="badge @(medical?.TeachingAreasHaveInternet  == true ? "bg-success" : "bg-danger")">
+                                            @(medical? .TeachingAreasHaveInternet == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span> Skills Lab Enabled for E-Learning </span>
+                                        <span class="badge @(medical?.SkillsLabEnabledForELearning  == true ? "bg-success"  : "bg-danger")">
+                                            @(medical?.SkillsLabEnabledForELearning == true ? "Yes" : "No" )
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            @if (classroomFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", classroomFeedback)
+            }
+        </div>
+
+
+
+    </div>
+}
+else
+{
+    <!-- ========================================================= -->
+    <!-- NO DATA -->
+    <!-- ========================================================= -->
+
+    <div class="verification-card">
+
+        <div class="verification-card-body">
+
+            <div class="text-center text-muted py-5">
+
+                <i class="bi bi-database-x fs-1 d-block mb-3 opacity-50"></i>
+
+                <h5>
+                    No Medical Skills Laboratory Details Available
+                </h5>
+
+                <p class="mb-0">
+                    No classroom or laboratory infrastructure
+                    details were found for this institution.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@* 
+@if (classroomFeedback != null)
+{
+    @await Html.PartialAsync("_SectionFeedback", classroomFeedback)
+} *@

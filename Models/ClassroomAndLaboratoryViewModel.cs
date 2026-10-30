@@ -4,6 +4,7 @@ namespace VerificationPortal.Models
 {
     public class ClassroomAndLaboratoryViewModel
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
         public string CollegeCode { get; set; }
 
         public int FacultyCode { get; set; }
@@ -14,6 +15,8 @@ namespace VerificationPortal.Models
 
         public MedicalSkillsLaboratory? MedicalSkillsLaboratory { get; set; }
 
+        public SkillsLabViewModel? MedicalClassroomAndLaboratory { get; set; }
+
         //public List<DentalPreClinicalAndSkillsLabAreaReq> PreClinicalLabRequirements { get; set; }
             = new();
 
@@ -21,5 +24,6 @@ namespace VerificationPortal.Models
             = new();
 
         public DentalCollegeLandBuildingDetail? LandBuildingDetails { get; set; }
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
     }
 }

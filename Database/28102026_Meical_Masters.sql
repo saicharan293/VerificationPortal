@@ -21,6 +21,9 @@ INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive,
 
 ----------------------------------
 
+--update MstTabs
+--set tabname = 'Classroom And Laboratory'
+--where TabName like '%classroom%';
 ----------------------------MST MEDICAL TABS ---------------------------
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Institution Details');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Trust Details');
@@ -28,10 +31,12 @@ INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Trust Member De
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Dean / Director Details');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Principal Details');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'UG Course Details');
---INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'PG Course Details');
+--INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Classroom And Laboratory
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Courses & Intake');
-INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Land & Building Details');
---INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Classroom & Laboratory');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Land And Building Details');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Classroom And Laboratory');
+
+
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Chair Distribution');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Bed Distribution');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Hostel Details');
@@ -99,6 +104,11 @@ INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1,
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 43, 'Laboratory Availability');
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 43, 'Museum Availability');
 
+select * from mstsections
+where FacultyId = 2
+
+select * from MstTabs
+where FacultyId = 1
 
 
 

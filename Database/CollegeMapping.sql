@@ -3032,8 +3032,8 @@ BEGIN TRY
         (2, N'PG Course Details'),
         (2, N'Courses & Intake'),
 
-        (2, N'Land & Building Details'),
-        (2, N'Classroom & Laboratory'),
+        (2, N'Land And Building Details'),
+        (2, N'Classroom And Laboratory'),
         (2, N'Chair Distribution'),
         (2, N'Bed Distribution'),
         (2, N'Hostel Details'),
@@ -3119,12 +3119,12 @@ BEGIN TRY
             /* PG Course Details */
             (N'PG Course Details', N'PG Course Details'),
 
-            /* Land & Building Details */
-            (N'Land & Building Details', N'Land Details'),
-            (N'Land & Building Details', N'Building Details'),
+            /* Land And Building Details */
+            (N'Land And Building Details', N'Land Details'),
+            (N'Land And Building Details', N'Building Details'),
 
-            /* Classroom & Laboratory */
-            (N'Classroom & Laboratory', N'Facility Requirements'),
+            /* Classroom And Laboratory */
+            (N'Classroom And Laboratory', N'Facility Requirements'),
 
             /* Chair Distribution */
             (N'Chair Distribution', N'Chair Distribution Details'),

@@ -78,7 +78,17 @@
                 asp-action="LandAndBuildingDetails"
                 asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-building"></i>
-                <span>Land & Building Details</span>
+                <span>Land And Building Details</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link @(activeTab == "ClassroomAndLaboratory" ? "active" : "")"
+                asp-controller="VerificationDashboard"
+                asp-action="ClassroomAndLaboratory"
+                asp-route-collegeCode="@collegeCode">
+                <i class="bi bi-houses"></i>
+                <span>Classroom And Laboratory</span>
             </a>
         </li>
         <li class="nav-item">
@@ -109,17 +119,6 @@
             </a>
         </li>
         
-
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "ClassroomAndLaboratory" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="ClassroomAndLaboratory"
-                asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-houses"></i>
-                <span>Classroom & Laboratory</span>
-            </a>
-        </li>
-
         <li class="nav-item">
             <a asp-controller="VerificationDashboard"
                 asp-action="ChairDistribution"

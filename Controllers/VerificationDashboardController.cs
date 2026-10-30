@@ -62,8 +62,8 @@ namespace VerificationPortal.Controllers
                 "UgCourseDetails" => "UG Course Details",
                 "CollegeDesignation" => "Faculty Repository",
                 "ClinicalFacilities" => "Clinical Facilities",
-                "LandAndBuildingDetails" => "Land & Building Details",
-                "ClassroomAndLaboratory" => "Classroom & Laboratory",
+                "LandAndBuildingDetails" => "Land And Building Details",
+                "ClassroomAndLaboratory" => "Classroom And Laboratory",
                 "ChairDistribution" => "Chair Distribution",
                 "BedDistribution" => "Bed Distribution",
                 "HostelDetails" => "Hostel Details",
@@ -2202,7 +2202,7 @@ namespace VerificationPortal.Controllers
                 };
             }).ToList();
 
-            // Get Dental College Land & Building Details
+            // Get Dental College Land And Building Details
             var landBuildingDetail = await _context.DentalCollegeLandBuildingDetails
                 .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode && x.FacultyCode == facultyCode && x.SeatSlab == seatSlab);
 
@@ -2210,7 +2210,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.TabTitle = "Classroom & Laboratory";
+            ViewBag.TabTitle = "Classroom And Laboratory";
             ViewBag.TabIcon = "bi-houses";
             ViewBag.UserDesignation = GetUserDesignation();
             ViewBag.NextTabAction = Url.Action("Faculty", new { collegeCode });
@@ -2825,7 +2825,7 @@ namespace VerificationPortal.Controllers
             if (landBuilding == null)
             {
                 return NotFound(
-                    $"Land & Building details not found for college code: {collegeCode}");
+                    $"Land And Building Details not found for college code: {collegeCode}");
             }
 
 
@@ -2841,7 +2841,7 @@ namespace VerificationPortal.Controllers
             // SECTION FEEDBACK
             // ---------------------------------------------------------
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land & Building Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land And Building Details", context.FacultyCodeInt);
 
             var landFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionName == "Land Details");
 
@@ -2990,7 +2990,7 @@ namespace VerificationPortal.Controllers
 
             //ViewBag.NextTabAction = Url.Action("ClassroomAndLaboratory", "VerificationDashboard", new { collegeCode });
 
-            //ViewBag.NextTabLabel = "Next: Classroom & Laboratory";
+            //ViewBag.NextTabLabel = "Next: Classroom And Laboratory";
 
             //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
 
@@ -3108,7 +3108,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, nameof(LandAndBuildingDetails), context.FacultyCodeInt);
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land & Building Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land And Building Details", context.FacultyCodeInt);
 
             var landFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Land Details");
             var buildingFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Building Details");
@@ -3171,7 +3171,7 @@ namespace VerificationPortal.Controllers
                     PrevTabAction = prevTabAction,
                     PrevTabLabel = "Previous: PG Course Details",
                     NextTabAction = nextTabAction,
-                    NextTabLabel = "Next: Classroom & Laboratory"
+                    NextTabLabel = "Next: Classroom And Laboratory"
                 },
 
                 // Land details
@@ -3476,19 +3476,20 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
 
+            var context = await GetPageContextAsync(collegeCode);
+
+            var institution = context.Institution;
+            var faculty = context.Faculty;
+            ViewData["CollegeCode"] = context.CollegeCode;
+
             var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
-            var institution = await _context.AffInstitutionsDetails
-                .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+            if (college == null)
+                return NotFound($"College not found for college code: {collegeCode}");
 
-            if (institution == null)
-                return NotFound($"Institution not found for college code: {collegeCode}");
-
-                if (string.IsNullOrWhiteSpace(institution.FacultyCode))
-                return NotFound("Faculty code not found.");
-
-            int facultyCode = Convert.ToInt32(institution.FacultyCode);
+            int facultyCode = faculty.FacultyId;
 
             var academicIntake = await _context.AcademicIntakes
                 .FirstOrDefaultAsync(x =>
@@ -3504,64 +3505,6 @@ namespace VerificationPortal.Controllers
             int seatIntake = academicIntake.Ay2026TotalIntake;
             int seatSlab = GetSeatSlab(seatIntake);
 
-            var infraMasters = await _context.MstDentalInfrastructures
-                .Where(x => x.FacultyCode == facultyCode &&
-                            x.SeatSlab == seatSlab)
-                .OrderBy(x => x.SlNo)
-                .ToListAsync();
-
-            var savedInfrastructure = await _context.DentalInfrastructures
-                .Where(x => x.CollegeCode == collegeCode &&
-                            x.FacultyCode == facultyCode &&
-                            x.SeatSlab == seatSlab)
-                .ToListAsync();
-
-            var skillsLab = await _context.MedicalSkillsLaboratories
-                .Include(x => x.AffiliationType)
-                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
-
-            //var preClinicalLabs = await _context.DentalPreClinicalAndSkillsLabAreaReqs
-            //    .Include(x => x.Lab)
-            //    .Where(x => x.CollegeCode == collegeCode)
-            //    .OrderBy(x => x.Lab.LaboratoryName)
-            //    .ToListAsync();
-
-            // ADD THIS
-            var landBuilding = await _context.DentalCollegeLandBuildingDetails
-                .FirstOrDefaultAsync(x =>
-                    x.CollegeCode == collegeCode &&
-                    x.FacultyCode == facultyCode);
-
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = institution.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
-
-            VerificationDisplayModel? verification = null;
-
-            bool hasSectionData = savedInfrastructure.Any();
-
-            try
-            {
-                verification = await _verificationService
-                        .GetVerificationAsync<DentalInfrastructure>(
-                            x => x.CollegeCode == collegeCode,
-                            GetUserDesignation());
-            }
-            catch (Exception ex) when (
-                ex.Message.Contains("record not found"))
-            {
-                verification = null;
-            }
-
-            //SetVerificationViewData( verification, hasSectionData, "Classroom and Laboratory details have not been submitted for this college.");
-
-            var context = await GetPageContextAsync(collegeCode);
-            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
-
-
-            ViewBag.ActiveTab = "ClassroomAndLaboratory";
             var model = new ClassroomAndLaboratoryViewModel
             {
                 CollegeCode = collegeCode,
@@ -3569,33 +3512,121 @@ namespace VerificationPortal.Controllers
                 SeatIntake = seatIntake,
                 SeatSlab = seatSlab,
 
-                MedicalSkillsLaboratory = skillsLab,
-
-                //PreClinicalLabRequirements = preClinicalLabs,
-                LandBuildingDetails = landBuilding,
-
-                InfrastructureDetails = infraMasters.Select(m =>
+                PageContext = new VerificationPageContextVm
                 {
-                    var saved = savedInfrastructure
-                        .FirstOrDefault(x => x.RequirementId == m.Id);
-
-                    return new DentalInfrastructureVM
-                    {
-                        Id = saved?.Id ?? 0,
-                        RequirementId = m.Id,
-                        SlNo = m.SlNo,
-                        RequirementName = m.RequirementName,
-                        RequirementDescription = m.RequirementDescription,
-                        SeatSlab = m.SeatSlab,
-                        RequiredAreaSqFt = m.RequiredAreaSqFt,
-                        AvailableAreaSqFt = saved?.AvailableAreaSqFt ?? 0
-                    };
-                }).ToList()
+                    FacultyId = faculty.FacultyId,
+                    CollegeCode = collegeCode,
+                    CollegeName = college.CollegeName ?? "Unknown College",
+                    InstitutionName = institution.NameOfInstitution ?? "Unknown Institution",
+                    FacultyName = faculty.FacultyName,
+                    CurrentVerifier = GetUserDesignation()
+                }
             };
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Classroom & Laboratory", context.FacultyCodeInt);
+            // Faculty-wise data loading
+
+            if (facultyCode == 1)
+            {
+                await LoadMedicalClassroomAndLaboratoryAsync( model, collegeCode, seatIntake);
+            }
+            else if (facultyCode == 2)
+            {
+                await LoadDentalClassroomAndLaboratoryAsync( model, collegeCode, facultyCode, seatSlab);
+            }
+
+            // Verification context
+
+            await SetTabWiseVerificationViewData( collegeCode, ControllerContext.ActionDescriptor.ActionName, facultyCode);
+
+            // Populate strongly typed page context
+
+
+            model.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Classroom And Laboratory", facultyCode);
 
             return View(model);
+        }
+        private async Task LoadMedicalClassroomAndLaboratoryAsync(ClassroomAndLaboratoryViewModel model, string collegeCode, int seatIntake)
+        {
+            var medicalSkillsLab = await _context.MedicalSkillsLaboratories
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == "1");
+
+            if (medicalSkillsLab == null)
+                return;
+
+            model.MedicalClassroomAndLaboratory = new SkillsLabViewModel
+            {
+                AnnualMbbsIntake = medicalSkillsLab.AnnualMbbsIntake ?? seatIntake,
+
+                TotalAreaAvailableSqm = medicalSkillsLab.TotalAreaAvailableSqm,
+                TotalAreaRequiredSqm = medicalSkillsLab.TotalAreaRequiredSqm,
+                TotalAreaDeficiencySqm = medicalSkillsLab.TotalAreaDeficiencySqm,
+                SixWeeksTrainingCompletedBeforeClinical = medicalSkillsLab.SixWeeksTrainingCompletedBeforeClinical,
+                NumberOfExaminationRooms = medicalSkillsLab.NumberOfExaminationRooms,
+                HasMinFourExamRooms = medicalSkillsLab.HasMinFourExamRooms,
+                HasDemoRoomSmallGroups = medicalSkillsLab.HasDemoRoomSmallGroups,
+                HasDebriefArea = medicalSkillsLab.HasDebriefArea,
+
+                HasFacultyCoordinatorRoom = medicalSkillsLab.HasFacultyCoordinatorRoom,
+                HasSupportStaffRoom = medicalSkillsLab.HasSupportStaffRoom,
+
+                HasStorageForMannequins = medicalSkillsLab.HasStorageForMannequins,
+                HasVideoRecordingFacility = medicalSkillsLab.HasVideoRecordingFacility,
+
+                NumberOfSkillStations = medicalSkillsLab.NumberOfSkillStations,
+                HasGroupAndIndividualStations = medicalSkillsLab.HasGroupAndIndividualStations,
+
+                HasRequiredTrainersAndMannequins = medicalSkillsLab.HasRequiredTrainersAndMannequins,
+
+                HasDedicatedTechnicalOfficer = medicalSkillsLab.HasDedicatedTechnicalOfficer,
+                HasAdequateSupportStaff = medicalSkillsLab.HasAdequateSupportStaff,
+
+                TeachingAreasHaveAV = medicalSkillsLab.TeachingAreasHaveAv,
+                TeachingAreasHaveInternet = medicalSkillsLab.TeachingAreasHaveInternet,
+
+                SkillsLabEnabledForELearning = medicalSkillsLab.SkillsLabEnabledForElearning
+            };
+        }
+
+        private async Task LoadDentalClassroomAndLaboratoryAsync(ClassroomAndLaboratoryViewModel model, string collegeCode, int facultyCode, int seatSlab)
+        {
+            var infraMasters = await _context.MstDentalInfrastructures
+                .Where(x =>
+                    x.FacultyCode == facultyCode &&
+                    x.SeatSlab == seatSlab)
+                .OrderBy(x => x.SlNo)
+                .ToListAsync();
+
+            var savedInfrastructure = await _context.DentalInfrastructures
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.SeatSlab == seatSlab)
+                .ToListAsync();
+
+            model.InfrastructureDetails = infraMasters.Select(m =>
+            {
+                var saved = savedInfrastructure
+                    .FirstOrDefault(x => x.RequirementId == m.Id);
+
+                return new DentalInfrastructureVM
+                {
+                    Id = saved?.Id ?? 0,
+                    RequirementId = m.Id,
+                    SlNo = m.SlNo,
+                    RequirementName = m.RequirementName,
+                    RequirementDescription = m.RequirementDescription,
+                    SeatSlab = m.SeatSlab,
+                    RequiredAreaSqFt = m.RequiredAreaSqFt,
+                    AvailableAreaSqFt = saved?.AvailableAreaSqFt ?? 0
+                };
+            }).ToList();
+
+            model.LandBuildingDetails = await _context.DentalCollegeLandBuildingDetails
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode);
         }
 
         [HttpGet]
@@ -3726,11 +3757,31 @@ namespace VerificationPortal.Controllers
                 throw new Exception("Faculty code not found.");
 
             var faculty = await _context.Faculties.AsNoTracking().FirstOrDefaultAsync(x => x.FacultyId.ToString() == institution.FacultyCode);
+
+            if(faculty == null)
+                throw new Exception("Faculty Not found.");
+
+            var userId = HttpContext.Session.GetString("UserId");
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new Exception("User session expired. Please login again.");
+            }
+
+             var user = await _context.TblRguhsFacultyUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId.ToString() == userId);
+
+            if (user == null)
+                throw new Exception("Logged-in user not found.");
+
             HttpContext.Session.SetString("FacultyCode", faculty.FacultyId.ToString());
+
             return new VerificationPageContext
             {
                 Institution = institution,
-                Faculty = faculty
+                Faculty = faculty,
+                User = user
             };
         }
 

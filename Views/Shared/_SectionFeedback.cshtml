@@ -362,13 +362,13 @@
                                        autocomplete="off"
                                        checked="@(Model.VerificationStatus == "Rejected")">
 
-                                <label class="verification-status-btn status-rejected" for="newStatusRejected_@Model.SectionId">
+                                <label class="verification-status-btn status-rejected" for="editStatusRejected_@Model.SectionId">
                                     <i class="bi bi-x-circle icon-idle"></i>
                                     <i class="bi bi-x-lg icon-active"></i>
                                     <span>Reject</span>
                                 </label>
 
-                                <input type="radio"
+                                @* <input type="radio"
                                        class="btn-check"
                                        name="VerificationStatus"
                                        id="editStatusPending_@Model.SectionId"
@@ -380,7 +380,7 @@
                                        for="editStatusPending_@Model.SectionId">
                                     <i class="bi bi-hourglass-split"></i>
                                     <span>Pending</span>
-                                </label>
+                                </label> *@
 
                             </div>
 

@@ -7,6 +7,7 @@
         public string CollegeCode => Institution.CollegeCode;
 
         public string FacultyCode => Institution.FacultyCode;
+        public TblRguhsFacultyUser User { get; set; }
 
         public int FacultyCodeInt => int.Parse(Institution.FacultyCode);
 
