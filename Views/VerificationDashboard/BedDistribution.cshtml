@@ -30,7 +30,175 @@
     ViewData["NextTabLabel"] = "Next : Hospital Details";
 }
 
+<style>/* Bed Distribution */
 
+    .bed-section-card {
+        @* background: #fff; *@
+        border: 1px solid #e5eaf1;
+        border-radius: 12px;
+        margin-bottom: 22px;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .bed-section-card:hover {
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .bed-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 17px 22px;
+        @* background: #f8fafc; *@
+        border-bottom: 1px solid #e9edf3;
+        gap: 12px;
+    }
+
+    .bed-section-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        @* background: #e8efff; *@
+        color: #3159a5;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 10px;
+    }
+
+    .bed-section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #263449;
+    }
+
+    .bed-section-subtitle {
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+        @* background: #edf1f6; *@
+        padding: 5px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    .bed-details-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        padding: 22px;
+    }
+
+    .bed-detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        padding: 15px;
+        @* background: #fafbfd; *@
+        border: 1px solid #edf0f4;
+        border-radius: 9px;
+        min-width: 0;
+    }
+
+    .bed-label {
+        color: #64748b;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .bed-value {
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .bed-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 22px;
+        @* background: #f8fafc; *@
+        border-top: 1px solid #e9edf3;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .bed-total-row strong {
+        font-size: 1rem;
+        color: #c1c8d2;
+    }
+
+    .bed-grand-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 25px;
+        margin-bottom: 25px;
+        border-radius: 12px;
+        @* background: #edf4ff; *@
+        border: 1px solid #d8e6ff;
+    }
+
+    .bed-grand-label {
+        display: block;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e3a68;
+    }
+
+    .bed-grand-total small {
+        display: block;
+        margin-top: 5px;
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .bed-grand-total strong {
+        font-size: 30px;
+        color: #2457a7;
+    }
+
+    .bed-reported-total {
+        padding: 12px 22px;
+        border-top: 1px dashed #e2e8f0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .bed-reported-total strong {
+        color: #334155;
+        margin-left: 5px;
+    }
+
+    @@media (max-width: 768px) {
+        .bed-details-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            padding: 15px;
+        }
+
+        .bed-section-header {
+            padding: 14px;
+        }
+
+        .bed-section-title {
+            font-size: 13px;
+        }
+
+        .bed-grand-total {
+            padding: 17px;
+        }
+    }
+
+    @@media (max-width: 420px) {
+        .bed-details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
 }
@@ -61,10 +229,10 @@
 
 
 @{
-    var bedDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+    var bedDistributionFeedback = Model.SectionFeedback
                                 ?.FirstOrDefault(x => x.SectionName == "Beds Distribution");
 }
-<div class="verification-card">
+<div class="verification-card" id="section_@bedDistributionFeedback?.SectionId">
 
     <div class="verification-card-header">
         <h3 class="verification-card-title">
@@ -75,216 +243,300 @@
 
     <div class="verification-card-body">
 
-        @if ((ViewBag.FacultyCode?.ToString() ?? "") == "2")
+        @if (Model.PageContext.FacultyId == 2)
         {
-            <!-- ================= DENTAL ================= -->
+            <!-- DENTAL -->
 
-            <div class="section">
+            <div class="bed-section-card">
 
-                <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 mb-4">
-                    Oral &amp; Maxillofacial Surgery
-                </h5>
-
-                <div class="d-flex justify-content-between align-items-center py-3">
-
-                    <div class="fw-semibold fs-6">
-                        Oral Maxillofacial Surgery Beds
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">01</span>
+                        <span class="bed-section-title">
+                            Oral and Maxillofacial Surgery
+                        </span>
                     </div>
+                    <span class="bed-section-subtitle">Dental</span>
+                </div>
 
-                    <div style="width:180px;">
-                        <input class="form-control text-center fw-bold"
-                               value="@Model.OralMaxillofacialSurgery"
-                               disabled />
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">
+                            Oral and Maxillofacial Surgery Beds
+                        </span>
+                        <span class="bed-value">
+                            @(Model.OralMaxillofacialSurgery?.ToString() ?? "—")
+                        </span>
                     </div>
 
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center border-top py-3 px-3 mt-2">
-
-                    <strong>Total Beds</strong>
-
-                    <strong class="text-primary fs-5">
-                        @(Model.OralMaxillofacialSurgery ?? 0)
-                    </strong>
-
+                <div class="bed-total-row">
+                    <span>Total Beds</span>
+                    <strong>@Model.DentalTotal</strong>
                 </div>
 
             </div>
         }
         else
         {
-            <!-- ================= MEDICAL ================= -->
-            <!-- A. Medicine & Allied -->
+            <!-- MEDICAL -->
 
-            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 mb-4">
-                A. Medicine &amp; Allied
-            </h5>
+            <!-- 01. MEDICINE AND ALLIED -->
 
-            <div class="row g-3 mb-3">
+            <div class="bed-section-card">
 
-                <div class="col-md-3">
-                    <label class="form-label">General Medicine</label>
-                    <input class="form-control" value="@Model.GenMedicine" disabled />
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">01</span>
+                        <span class="bed-section-title">Medicine and Allied</span>
+                    </div>
+                    <span class="bed-section-subtitle">Clinical Beds</span>
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">Paediatrics</label>
-                    <input class="form-control" value="@Model.Paediatrics" disabled />
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">General Medicine</span>
+                        <span class="bed-value">@(Model.GenMedicine?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Paediatrics</span>
+                        <span class="bed-value">@(Model.Paediatrics?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Skin and VD</span>
+                        <span class="bed-value">@(Model.SkinVD?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Psychiatry</span>
+                        <span class="bed-value">@(Model.Psychiatry?.ToString() ?? "—")</span>
+                    </div>
+
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">Skin &amp; VD</label>
-                    <input class="form-control" value="@Model.SkinVD" disabled />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Psychiatry</label>
-                    <input class="form-control" value="@Model.Psychiatry" disabled />
-                </div>
-
-            </div>
-
-            <!-- B. Surgery -->
-
-            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
-                B. Surgery &amp; Allied
-            </h5>
-
-            <div class="row g-3 mb-3">
-
-                <div class="col-md-3">
-                    <label class="form-label">General Surgery</label>
-                    <input class="form-control" value="@Model.GenSurgery" disabled />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Orthopaedics</label>
-                    <input class="form-control" value="@Model.Orthopaedics" disabled />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Ophthalmology</label>
-                    <input class="form-control" value="@Model.Ophthalmology" disabled />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">ENT</label>
-                    <input class="form-control" value="@Model.ENT" disabled />
+                <div class="bed-total-row">
+                    <span>Total Beds</span>
+                    <strong>@Model.MedicineTotal</strong>
                 </div>
 
             </div>
 
-            <!-- C. OBG -->
 
-            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
-                C. Obstetrics &amp; Gynaecology
-            </h5>
+            <!-- 02. SURGERY AND ALLIED -->
 
-            <div class="row g-3 mb-4">
+            <div class="bed-section-card">
 
-                <div class="col-md-4">
-                    <label class="form-label">Obstetrics &amp; ANC</label>
-                    <input class="form-control" value="@Model.ObstetricsANC" disabled />
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">02</span>
+                        <span class="bed-section-title">Surgery and Allied</span>
+                    </div>
+                    <span class="bed-section-subtitle">Clinical Beds</span>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Gynaecology</label>
-                    <input class="form-control" value="@Model.Gynaecology" disabled />
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">General Surgery</span>
+                        <span class="bed-value">@(Model.GenSurgery?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Orthopaedics</span>
+                        <span class="bed-value">@(Model.Orthopaedics?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Ophthalmology</span>
+                        <span class="bed-value">@(Model.Ophthalmology?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">ENT</span>
+                        <span class="bed-value">@(Model.ENT?.ToString() ?? "—")</span>
+                    </div>
+
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Postpartum</label>
-                    <input class="form-control" value="@Model.Postpartum" disabled />
-                </div>
-
-            </div>
-
-            <!-- Grand Total -->
-
-            <div class="alert alert-light border d-flex justify-content-between align-items-center mb-5">
-
-                <strong>GRAND TOTAL BEDS (Clinical)</strong>
-
-                <strong class="text-primary fs-5">
-                    @(
-                        (Model.GenMedicine ?? 0) +
-                        (Model.Paediatrics ?? 0) +
-                        (Model.SkinVD ?? 0) +
-                        (Model.Psychiatry ?? 0) +
-                        (Model.GenSurgery ?? 0) +
-                        (Model.Orthopaedics ?? 0) +
-                        (Model.Ophthalmology ?? 0) +
-                        (Model.ENT ?? 0) +
-                        (Model.ObstetricsANC ?? 0) +
-                        (Model.Gynaecology ?? 0) +
-                        (Model.Postpartum ?? 0)
-                    )
-                </strong>
-
-            </div>
-
-            <!-- Operation Theatre -->
-
-            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
-                II. Operation Theatres
-            </h5>
-
-            <div class="row g-3 mb-4">
-
-                <div class="col-md-6">
-                    <label class="form-label">Major OT</label>
-                    <input class="form-control" value="@Model.MajorOT" disabled />
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Minor OT</label>
-                    <input class="form-control" value="@Model.MinorOT" disabled />
+                <div class="bed-total-row">
+                    <span>Total Beds</span>
+                    <strong>@Model.SurgeryTotal</strong>
                 </div>
 
             </div>
 
-            <!-- ICU -->
 
-            <h5 class="section-title fw-bold text-primary border-start border-4 ps-3 my-4">
-                III. Intensive Care Facilities
-            </h5>
+            <!-- 03. OBSTETRICS AND GYNAECOLOGY -->
 
-            <div class="row g-3 mb-4">
+            <div class="bed-section-card">
 
-                <div class="col-md-2">
-                    <label class="form-label">ICCU</label>
-                    <input class="form-control" value="@Model.ICCU" disabled />
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">03</span>
+                        <span class="bed-section-title">
+                            Obstetrics and Gynaecology
+                        </span>
+                    </div>
+                    <span class="bed-section-subtitle">Clinical Beds</span>
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">ICU</label>
-                    <input class="form-control" value="@Model.ICU" disabled />
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Obstetrics and ANC</span>
+                        <span class="bed-value">@(Model.ObstetricsANC?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Gynaecology</span>
+                        <span class="bed-value">@(Model.Gynaecology?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Postpartum</span>
+                        <span class="bed-value">@(Model.Postpartum?.ToString() ?? "—")</span>
+                    </div>
+
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">PICU / NICU</label>
-                    <input class="form-control" value="@Model.PICU_NICU" disabled />
+                <div class="bed-total-row">
+                    <span>Total</span>
+                    <strong>@Model.ObstetricsGynaecologyTotal</strong>
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">SICU</label>
-                    <input class="form-control" value="@Model.SICU" disabled />
+            </div>
+
+
+            <!-- CLINICAL GRAND TOTAL -->
+
+            @* <div class="bed-grand-total">
+
+                <div>
+                    <span class="bed-grand-label">Total Clinical Beds</span>
+                    <small>Medicine + Surgery + Obstetrics and Gynaecology</small>
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Total ICU Beds</label>
-                    <input class="form-control" value="@Model.TotalICUBeds" disabled />
+                <strong>@Model.ClinicalTotal</strong>
+
+            </div> *@
+
+
+            <!-- 04. OPERATION THEATRES -->
+
+            <div class="bed-section-card">
+
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">04</span>
+                        <span class="bed-section-title">Operation Theatres</span>
+                    </div>
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Casualty Beds</label>
-                    <input class="form-control" value="@Model.CasualtyBeds" disabled />
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Major OT</span>
+                        <span class="bed-value">@(Model.MajorOT?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Minor OT</span>
+                        <span class="bed-value">@(Model.MinorOT?.ToString() ?? "—")</span>
+                    </div>
+
+                </div>
+
+                <div class="bed-total-row">
+                    <span>Total Beds</span>
+                    <strong>@Model.OperationTheatreTotal</strong>
+                </div>
+
+            </div>
+
+
+            <!-- 05. INTENSIVE CARE -->
+
+            <div class="bed-section-card">
+
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">05</span>
+                        <span class="bed-section-title">
+                            Intensive Care Facilities
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">ICCU</span>
+                        <span class="bed-value">@(Model.ICCU?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">ICU</span>
+                        <span class="bed-value">@(Model.ICU?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">PICU / NICU</span>
+                        <span class="bed-value">@(Model.PICU_NICU?.ToString() ?? "—")</span>
+                    </div>
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">SICU</span>
+                        <span class="bed-value">@(Model.SICU?.ToString() ?? "—")</span>
+                    </div>
+
+                </div>
+
+                <div class="bed-total-row">
+                    <span>Total Beds</span>
+                    <strong>@(Model.TotalICUBeds?.ToString() ?? "—")</strong>
+                </div>
+@* 
+                <div class="bed-reported-total">
+                    Reported Total ICU Beds:
+                    <strong>@(Model.TotalICUBeds?.ToString() ?? "—")</strong>
+                </div> *@
+
+            </div>
+
+
+            <!-- 06. CASUALTY -->
+
+            <div class="bed-section-card">
+
+                <div class="bed-section-header">
+                    <div>
+                        <span class="bed-section-number">06</span>
+                        <span class="bed-section-title">Casualty</span>
+                    </div>
+                </div>
+
+                <div class="bed-details-grid">
+
+                    <div class="bed-detail-item">
+                        <span class="bed-label">Casualty Beds</span>
+                        <span class="bed-value">@(Model.CasualtyBeds?.ToString() ?? "—")</span>
+                    </div>
+
+                </div>
+
+                <div class="bed-total-row">
+                    <span>Total Beds</span>
+                    <strong>@(Model.CasualtyBeds ?? 0)</strong>
                 </div>
 
             </div>
         }
 
-        
         @if (bedDistributionFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", bedDistributionFeedback)

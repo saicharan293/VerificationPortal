@@ -3800,21 +3800,31 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
 
+            var context = await GetPageContextAsync(collegeCode);
+            int facultyCode = context.FacultyCodeInt;
+
             var college = await _context.AffiliationCollegeMasters
                 .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
-            var context = await GetPageContextAsync(collegeCode);
-
             PopulateCommonViewBags(context);
 
-            int facultyCode = context.FacultyCodeInt;
 
             var existing = await _context.MedicalUgbedDistributions
                 .FirstOrDefaultAsync(x =>
                     x.CollegeCode == collegeCode &&
                     x.FacultyCode == facultyCode.ToString());
 
-            var vm = new MedicalUGBedDistributionVm();
+            var vm = new MedicalUGBedDistributionVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyCode,
+                    CollegeCode = context.CollegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = context.InstitutionName,
+                    FacultyName = context.FacultyName
+                }
+            };
 
             // =========================================
             // MEDICAL DATA
@@ -3824,31 +3834,37 @@ namespace VerificationPortal.Controllers
             {
                 vm.Id = existing.Id;
 
-                vm.GenMedicine = existing.GenMedicine;
-                vm.Paediatrics = existing.Paediatrics;
-                vm.SkinVD = existing.SkinVd;
-                vm.Psychiatry = existing.Psychiatry;
+                if(facultyCode == 2)
+                {
+                    vm.OralMaxillofacialSurgery = existing.OralMaxillofacialSurgery;
+                }
+                else if(facultyCode == 1)
+                {
+                    
+                    vm.GenMedicine = existing.GenMedicine;
+                    vm.Paediatrics = existing.Paediatrics;
+                    vm.SkinVD = existing.SkinVd;
+                    vm.Psychiatry = existing.Psychiatry;
 
-                vm.GenSurgery = existing.GenSurgery;
-                vm.Orthopaedics = existing.Orthopaedics;
-                vm.Ophthalmology = existing.Ophthalmology;
-                vm.ENT = existing.Ent;
+                    vm.GenSurgery = existing.GenSurgery;
+                    vm.Orthopaedics = existing.Orthopaedics;
+                    vm.Ophthalmology = existing.Ophthalmology;
+                    vm.ENT = existing.Ent;
 
-                vm.ObstetricsANC = existing.ObstetricsAnc;
-                vm.Gynaecology = existing.Gynaecology;
-                vm.Postpartum = existing.Postpartum;
+                    vm.ObstetricsANC = existing.ObstetricsAnc;
+                    vm.Gynaecology = existing.Gynaecology;
+                    vm.Postpartum = existing.Postpartum;
 
-                vm.MajorOT = existing.MajorOt;
-                vm.MinorOT = existing.MinorOt;
+                    vm.MajorOT = existing.MajorOt;
+                    vm.MinorOT = existing.MinorOt;
 
-                vm.ICCU = existing.Iccu;
-                vm.ICU = existing.Icu;
-                vm.PICU_NICU = existing.PicuNicu;
-                vm.SICU = existing.Sicu;
-                vm.TotalICUBeds = existing.TotalIcubeds;
-                vm.CasualtyBeds = existing.CasualtyBeds;
-
-                vm.OralMaxillofacialSurgery = existing.OralMaxillofacialSurgery;
+                    vm.ICCU = existing.Iccu;
+                    vm.ICU = existing.Icu;
+                    vm.PICU_NICU = existing.PicuNicu;
+                    vm.SICU = existing.Sicu;
+                    vm.TotalICUBeds = existing.TotalIcubeds;
+                    vm.CasualtyBeds = existing.CasualtyBeds;
+                }
             }
 
 
@@ -3857,17 +3873,13 @@ namespace VerificationPortal.Controllers
             // =========================================
 
             ViewBag.FacultyCode = facultyCode;
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = context.InstitutionName ?? "Unknown Institution";
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
+            ViewBag.CollegeCode = collegeCode;            
 
             //await SetVerificationViewData<MedicalUgbedDistribution>(collegeCode);
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Bed Distribution", context.FacultyCodeInt);
+            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Bed Distribution", context.FacultyCodeInt);
 
             return View(vm);
         }

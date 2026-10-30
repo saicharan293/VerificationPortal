@@ -62,27 +62,13 @@
     <div class="verification-card-body">
 
         <!-- Land Details -->
-
         @await Html.PartialAsync("~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_LandDetails.cshtml", Model)
-
-
-        @if (Model.LandFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", Model.LandFeedback)
-        }
-
         <!-- Documents -->
 
         @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_LandDocuments.cshtml", Model)
 
         <!-- Building -->
-
         @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_BuildingDetails.cshtml", Model)
-
-        @if (Model.BuildingFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", Model.BuildingFeedback)
-        }
 
         @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_BuildingDocuments.cshtml", Model)
     </div>

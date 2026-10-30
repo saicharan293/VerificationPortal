@@ -659,6 +659,10 @@ html {
     margin-bottom: 15px;
 }
 
+.section-title-mini{
+    font-size: 1.2rem;
+}
+
 .section-description {
     color: var(--gray-500);
     font-size: 1.05rem;

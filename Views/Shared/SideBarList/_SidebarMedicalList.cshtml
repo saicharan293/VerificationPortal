@@ -91,6 +91,19 @@
                 <span>Classroom And Laboratory</span>
             </a>
         </li>
+
+        <li class="nav-item">
+            <a asp-controller="VerificationDashboard"
+                asp-action="BedDistribution"
+                asp-route-collegeCode="@collegeCode"
+                class="nav-link @(activeTab == "BedDistribution" ? "active" : "")">
+
+                <i class="bi bi-hospital"></i>
+
+                <span>Bed Distribution</span>
+            </a>
+        </li>
+
         <li class="nav-item">
             <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
@@ -119,27 +132,6 @@
             </a>
         </li>
         
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="ChairDistribution"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "ChairDistribution" ? "active" : "")">
-
-                <i class="bi bi-grid-3x3-gap"></i>
-                <span>Chair Distribution</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="BedDistribution"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "BedDistribution" ? "active" : "")">
-
-                <i class="bi bi-hospital"></i>
-
-                <span>Bed Distribution</span>
-            </a>
-        </li>
         <li class="nav-item">
             <a asp-controller="VerificationDashboard"
                 asp-action="HostelDetails"
