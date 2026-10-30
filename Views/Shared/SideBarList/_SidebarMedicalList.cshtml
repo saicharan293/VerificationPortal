@@ -91,7 +91,17 @@
                 <span>Classroom And Laboratory</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a asp-controller="VerificationDashboard"
+                asp-action="EquipmentList"
+                asp-route-collegeCode="@collegeCode"
+                class="nav-link @(activeTab == "EquipmentList" ? "active" : "")">
 
+                <i class="bi bi-tools"></i>
+                <span>Equipment List</span>
+
+            </a>
+        </li>
         <li class="nav-item">
             <a asp-controller="VerificationDashboard"
                 asp-action="BedDistribution"
@@ -150,17 +160,7 @@
                 <span>Department Offices And Educational Unit</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="EquipmentList"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "EquipmentList" ? "active" : "")">
-
-                <i class="bi bi-tools"></i>
-                <span>Equipment List</span>
-
-            </a>
-        </li>
+        
         
         <li class="nav-item">
             <a asp-controller="VerificationDashboard"

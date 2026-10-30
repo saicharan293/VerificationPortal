@@ -4,9 +4,14 @@ namespace VerificationPortal.Models
 {
     public class EquipmentPageVM
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
         public string CollegeCode { get; set; } = null!;
         public int FacultyCode { get; set; }
+        public string? SelectedDepartmentCode { get; set; }
         public List<EquipmentRowVM> Equipments { get; set; } = new();
+        public List<SectionFeedbackViewModel>? SectionFeedback { get; set; }
+        public string? AcademicYear { get; set; }
+        public List<SelectListItem> Departments { get; set; } = new();
     }
 
     public class AddEquipmentVM
@@ -51,5 +56,7 @@ namespace VerificationPortal.Models
         public int? OneUnitExisting { get; set; }
 
         public int? TwoUnitExisting { get; set; }
+        public bool IsAvailable { get; set; }
+        public int? AvailableQuantity { get; set; }
     }
 }

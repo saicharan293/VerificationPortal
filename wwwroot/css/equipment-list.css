@@ -1,0 +1,216 @@
+
+/* ================================
+    Equipment Table Container
+    ================================ */
+
+.equipment-table-wrapper {
+    width: 100%;
+    max-height: 440px;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+
+    /* Better touch scrolling */
+    -webkit-overflow-scrolling: touch;
+
+    /* Prevent the table from affecting page width */
+    max-width: 100%;
+
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+}
+
+
+/* ================================
+    Table
+    ================================ */
+
+.equipment-table-wrapper table {
+    width: 100%;
+    min-width: 950px;
+    margin-bottom: 0;
+
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+
+/* ================================
+    Header
+    ================================ */
+
+.equipment-table-wrapper thead th {
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+
+    background: #f8f9fa;
+
+    white-space: nowrap;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    padding: 12px 10px;
+
+    vertical-align: middle;
+
+    border-bottom: 2px solid #dee2e6;
+}
+
+
+/* ================================
+    Table Body
+    ================================ */
+
+.equipment-table-wrapper tbody td {
+    vertical-align: middle;
+
+    padding: 10px;
+
+    font-size: 0.82rem;
+
+    word-break: normal;
+    overflow-wrap: anywhere;
+}
+
+
+/* ================================
+    Department
+    ================================ */
+
+.equipment-table-wrapper td:first-child {
+    min-width: 180px;
+
+    font-weight: 500;
+}
+
+
+/* ================================
+    Equipment Name
+    ================================ */
+
+/* .equipment-table-wrapper td:nth-child(2) {
+    min-width: 220px;
+} */
+
+
+/* ================================
+    Specification
+    ================================ */
+
+/* .equipment-table-wrapper td:nth-child(3) {
+    min-width: 240px;
+
+    white-space: normal;
+
+    line-height: 1.45;
+} */
+
+
+/* ================================
+    Numeric Columns
+    ================================ */
+
+/* .equipment-table-wrapper th:nth-child(n+4),
+.equipment-table-wrapper td:nth-child(n+4) {
+    min-width: 130px;
+
+    text-align: center;
+
+    white-space: nowrap;
+} */
+
+
+/* ================================
+    Hover
+    ================================ */
+
+.equipment-table-wrapper tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+
+/* ================================
+    Mobile / Tablet
+    ================================ */
+
+@media (max-width: 992px) {
+
+    .equipment-table-wrapper {
+        max-height: 420px;
+
+        border-radius: 6px;
+    }
+
+    .equipment-table-wrapper table {
+        min-width: 900px;
+    }
+
+    .equipment-table-wrapper thead th {
+        font-size: 0.76rem;
+        padding: 9px 8px;
+    }
+
+    .equipment-table-wrapper tbody td {
+        font-size: 0.76rem;
+        padding: 8px;
+    }
+}
+
+
+/* ================================
+    Small Mobile
+    ================================ */
+
+@media (max-width: 576px) {
+
+    .equipment-table-wrapper {
+        max-height: 380px;
+
+        border-radius: 5px;
+
+        /*
+            * Prevent horizontal scroll from
+            * affecting the complete page.
+            */
+        overscroll-behavior-x: contain;
+    }
+
+    .equipment-table-wrapper table {
+        min-width: 850px;
+    }
+
+    .equipment-table-wrapper thead th {
+        font-size: 0.72rem;
+
+        padding: 8px 7px;
+    }
+
+    .equipment-table-wrapper tbody td {
+        font-size: 0.72rem;
+
+        padding: 7px;
+    }
+
+    .equipment-table-wrapper td:first-child {
+        min-width: 150px;
+    }
+
+    .equipment-table-wrapper td:nth-child(2) {
+        min-width: 190px;
+    }
+
+    .equipment-table-wrapper td:nth-child(3) {
+        min-width: 210px;
+    }
+
+    .equipment-table-wrapper th:nth-child(n+4),
+    .equipment-table-wrapper td:nth-child(n+4) {
+        min-width: 115px;
+    }
+}

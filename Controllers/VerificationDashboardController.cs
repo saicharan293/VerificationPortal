@@ -3641,16 +3641,139 @@ namespace VerificationPortal.Controllers
             if (institution == null)
                 return NotFound($"Institution not found for college code: {collegeCode}");
 
-            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
+            if (!int.TryParse(institution.FacultyCode, out var facultyCode))
                 return NotFound("Faculty code not found.");
 
-            var facultyCode = Convert.ToInt32(institution.FacultyCode);
+            var context = await GetPageContextAsync(collegeCode);
 
-            // Department master
+            var vm = new EquipmentPageVM
+            {
+                CollegeCode = collegeCode,
+                FacultyCode = facultyCode,
+                PageContext = new VerificationPageContextVm
+                {
+                    CollegeCode = collegeCode,
+                    FacultyId = context.FacultyCodeInt,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = GetUserDesignation(),
+                    CollegeName = context.InstitutionName,
+                    InstitutionName = context.InstitutionName
+                }
+            };
+
+            // Medical
+            if (facultyCode == 1)
+            {
+                vm.Departments = await GetMedicalDepartmentsAsync(facultyCode);
+                vm.Equipments = await GetAllMedicalEquipmentAsync(collegeCode, facultyCode);
+                vm.AcademicYear = await _context.TblMedicalEquipmentAvailabilities
+                    .AsNoTracking()
+                    .Where(a => a.FacultyId == facultyCode && a.CollegeCode == collegeCode)
+                    .Select(a => a.AcademicYear)
+                    .FirstOrDefaultAsync(a => !string.IsNullOrWhiteSpace(a));
+            }
+            // Dental
+            else if (facultyCode == 2)
+            {
+                vm.Equipments = await GetDentalEquipmentAsync(collegeCode, facultyCode);
+            }
+            else
+            {
+                return NotFound("Equipment list is not configured for this faculty.");
+            }
+
+            // Verification information
+
+            ViewBag.FacultyCode = context.FacultyCode;
+            ViewBag.CollegeCode = context.CollegeCode;
+
+            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
+            ViewBag.UserDesignation = GetUserDesignation();
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
+            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Equipment List", context.FacultyCodeInt);
+            // vm.SectionFeedback = feedbackList?.FirstOrDefault(e => e.SectionName == "Equipment Details");
+
+            return View(vm);
+        }
+
+        private async Task<List<EquipmentRowVM>> GetAllMedicalEquipmentAsync(
+            string collegeCode,
+            int facultyCode)
+        {
+            var departments = await _context.DepartmentMasters
+                .AsNoTracking()
+                .Where(d =>
+                    d.FacultyCode == facultyCode &&
+                    d.DepartmentFilter == "Y")
+                .ToListAsync();
+
+            var departmentLookup = departments
+                .GroupBy(d => d.DepartmentCode)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First().DepartmentName
+                );
+
+            var equipments = await _context.MstLaboratoryEquipmentDetails
+                .AsNoTracking()
+                .Where(e => e.FacultyId == facultyCode)
+                .OrderBy(e => e.CourseCode)
+                .ThenBy(e => e.EquipmentId)
+                .ToListAsync();
+
+            var availabilityList = await _context.TblMedicalEquipmentAvailabilities
+                .AsNoTracking()
+                .Where(a =>
+                    a.FacultyId == facultyCode &&
+                    a.CollegeCode == collegeCode)
+                .ToListAsync();
+
+            var availabilityLookup = availabilityList
+                .GroupBy(a => new { a.CourseCode, a.EquipmentId })
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First()
+                );
+
+            return equipments.Select(e =>
+            {
+                availabilityLookup.TryGetValue(
+                    new
+                    {
+                        CourseCode = e.CourseCode,
+                        EquipmentId = e.EquipmentId
+                    },
+                    out var existing);
+
+                departmentLookup.TryGetValue(
+                    e.CourseCode,
+                    out var departmentName);
+
+                return new EquipmentRowVM
+                {
+                    EquipmentId = e.EquipmentId,
+
+                    DepartmentCode = e.CourseCode,
+
+                    DepartmentName = departmentName ?? e.CourseCode,
+
+                    EquipmentName = e.EquipmentName,
+
+                    IsAvailable = existing != null,
+
+                    AvailableQuantity = existing?.AvailableQuantity
+                };
+
+            }).ToList();
+        }
+
+        private async Task<List<EquipmentRowVM>> GetDentalEquipmentAsync( string collegeCode, int facultyCode)
+        {
             var departments = await _context.MstEquipmentDepartments
-                .Where(x =>
-                    x.FacultyCode == facultyCode &&
-                    x.IsActive)
+                .AsNoTracking()
+                .Where(x => x.FacultyCode == facultyCode && x.IsActive)
                 .ToListAsync();
 
             var departmentLookup = departments
@@ -3660,17 +3783,15 @@ namespace VerificationPortal.Controllers
                     x => x.First().DepartmentName
                 );
 
-            // Master equipment
             var masterEquipment = await _context.MstEquipmentDeptWises
-                .Where(x =>
-                    x.FacultyCode == facultyCode &&
-                    x.IsActive)
+                .AsNoTracking()
+                .Where(x => x.FacultyCode == facultyCode && x.IsActive)
                 .OrderBy(x => x.DepartmentCode)
                 .ThenBy(x => x.EquipmentName)
                 .ToListAsync();
 
-            // Existing college equipment
             var savedEquipment = await _context.DentalCollegeEquipmentDetails
+                .AsNoTracking()
                 .Where(x =>
                     x.CollegeCode == collegeCode &&
                     x.FacultyCode == facultyCode &&
@@ -3679,71 +3800,114 @@ namespace VerificationPortal.Controllers
 
             var savedLookup = savedEquipment
                 .GroupBy(x => x.EquipmentId)
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.First()
-                );
+                .ToDictionary(x => x.Key, x => x.First());
 
-            var equipments = masterEquipment
-                .Select(item =>
-                {
-                    savedLookup.TryGetValue(item.Id, out var saved);
-
-                    departmentLookup.TryGetValue(
-                        item.DepartmentCode,
-                        out var departmentName);
-
-                    return new EquipmentRowVM
-                    {
-                        EquipmentId = item.Id,
-
-                        DepartmentCode = item.DepartmentCode,
-
-                        DepartmentName =
-                            departmentName ?? item.DepartmentCode,
-
-                        EquipmentName = item.EquipmentName,
-
-                        Specification = item.Specification,
-
-                        OneUnitReq = item.OneUnitRequirement,
-
-                        TwoUnitReq = item.TwoUnitRequirement,
-
-                        OneUnitExisting = saved?.OneUnitExisting,
-
-                        TwoUnitExisting = saved?.TwoUnitExisting
-                    };
-                })
-                .ToList();
-
-            var vm = new EquipmentPageVM
+            return masterEquipment.Select(item =>
             {
-                CollegeCode = collegeCode,
-                FacultyCode = facultyCode,
-                Equipments = equipments
-            };
+                savedLookup.TryGetValue(item.Id, out var saved);
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.FacultyCode = facultyCode;
-            ViewBag.InstitutionName =
-                institution.NameOfInstitution ?? "Unknown Institution";
+                departmentLookup.TryGetValue(
+                    item.DepartmentCode,
+                    out var departmentName);
 
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
+                return new EquipmentRowVM
+                {
+                    EquipmentId = item.Id,
 
-            //await SetVerificationViewData<DentalCollegeEquipmentDetail>(
-            //    collegeCode);
+                    DepartmentCode = item.DepartmentCode,
 
-            var context = await GetPageContextAsync(collegeCode);
+                    DepartmentName = departmentName ?? item.DepartmentCode,
 
-            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+                    EquipmentName = item.EquipmentName,
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Equipment List", context.FacultyCodeInt);
+                    Specification = item.Specification,
 
-            return View(vm);
+                    OneUnitReq = item.OneUnitRequirement,
+
+                    TwoUnitReq = item.TwoUnitRequirement,
+
+                    OneUnitExisting = saved?.OneUnitExisting,
+
+                    TwoUnitExisting = saved?.TwoUnitExisting
+                };
+
+            }).ToList();
         }
 
+        private async Task<List<SelectListItem>> GetMedicalDepartmentsAsync(int facultyCode)
+        {
+            return await _context.DepartmentMasters
+                .AsNoTracking()
+                .Where(d =>
+                    d.FacultyCode == facultyCode &&
+                    d.DepartmentFilter == "Y")
+                .OrderBy(d => d.DepartmentName)
+                .Select(d => new SelectListItem
+                {
+                    Value = d.DepartmentCode,
+                    Text = d.DepartmentName
+                })
+                .ToListAsync();
+        }
+
+        private async Task GetMedicalEquipmentAsync(EquipmentPageVM vm, string departmentCode)
+        {
+            var facultyCode = vm.FacultyCode;
+            var collegeCode = vm.CollegeCode;
+
+            var equipments = await _context.MstLaboratoryEquipmentDetails
+                .AsNoTracking()
+                .Where(e =>
+                    e.CourseCode == departmentCode &&
+                    e.FacultyId == facultyCode)
+                .OrderBy(e => e.EquipmentId)
+                .ToListAsync();
+
+            var availabilityList = await _context.TblMedicalEquipmentAvailabilities
+                .AsNoTracking()
+                .Where(a =>
+                    a.FacultyId == facultyCode &&
+                    a.CourseCode == departmentCode &&
+                    a.CollegeCode == collegeCode)
+                .ToListAsync();
+
+            vm.AcademicYear = availabilityList
+                .Select(a => a.AcademicYear)
+                .FirstOrDefault(a => !string.IsNullOrWhiteSpace(a));
+
+            var departmentName = vm.Departments
+                .FirstOrDefault(d => d.Value == departmentCode)?.Text
+                ?? departmentCode;
+
+            var availabilityLookup = availabilityList
+                .GroupBy(a => a.EquipmentId)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            vm.Equipments = equipments.Select(e =>
+            {
+                availabilityLookup.TryGetValue(
+                    e.EquipmentId,
+                    out var existing);
+
+                return new EquipmentRowVM
+                {
+                    EquipmentId = e.EquipmentId,
+
+                    DepartmentCode = departmentCode,
+
+                    DepartmentName = departmentName,
+
+                    EquipmentName = e.EquipmentName,
+
+                    Specification = null,
+
+                    IsAvailable = existing != null,
+
+                    AvailableQuantity = existing?.AvailableQuantity
+                };
+
+            }).ToList();
+        }
         private async Task<VerificationPageContext> GetPageContextAsync(string collegeCode)
         {
             var institution = await _context.AffInstitutionsDetails

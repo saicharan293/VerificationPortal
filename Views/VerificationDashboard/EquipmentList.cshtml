@@ -1,4 +1,4 @@
-﻿@model VerificationPortal.Models.EquipmentPageVM
+﻿ @model VerificationPortal.Models.EquipmentPageVM
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
@@ -7,259 +7,37 @@
     ViewData["ActiveTab"] = "EquipmentList";
 
     ViewData["InstitutionName"] =
-        ViewBag.InstitutionName ?? "Unknown Institution";
+        Model.PageContext.InstitutionName ?? "Unknown Institution";
 
     ViewData["CollegeCode"] =
-        ViewBag.CollegeCode ?? "";
+        Model.PageContext.CollegeCode ?? Model.CollegeCode;
 
-    ViewData["FacultyCode"] =
-        ViewBag.FacultyCode ?? "";
+    ViewData["FacultyCode"] = Model.PageContext.FacultyId;
 
     ViewData["ShowFeedbackSection"] = true;
 
     ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+        Model.PageContext.CurrentVerifier ?? "";
 
-    // Update these according to your actual sidebar order
-    ViewData["PrevTabAction"] = Url.Action(
-        "DepartmentOfficesAndEducationalUnit",
-        "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+    ViewData["PrevTabAction"] = Model.PageContext.PrevTabAction;
 
     ViewData["PrevTabLabel"] =
-        "Previous : Department Offices";
+        Model.PageContext.PrevTabLabel ?? "Previous";
 
-    ViewData["NextTabAction"] = Url.Action(
-        "NextActionName",
-        "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+    ViewData["NextTabAction"] = Model.PageContext.NextTabAction;
 
     ViewData["NextTabLabel"] =
-        "Next";
+        Model.PageContext.NextTabLabel ?? "Next";
+
+    bool isMedical = Model.FacultyCode == 1;
+    bool isDental = Model.FacultyCode == 2;
+
+    var equipmentListFeedback = Model.SectionFeedback?.FirstOrDefault(e=>e.SectionName == "Equipment Details");
 }
 
-<style>
-    /* ================================
-       Equipment Table Container
-       ================================ */
-
-    .equipment-table-wrapper {
-        width: 100%;
-        max-height: 440px;
-
-        overflow-x: auto;
-        overflow-y: auto;
-
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-
-        /* Better touch scrolling */
-        -webkit-overflow-scrolling: touch;
-
-        /* Prevent the table from affecting page width */
-        max-width: 100%;
-
-        /* Smooth scrolling */
-        scroll-behavior: smooth;
-    }
-
-
-    /* ================================
-       Table
-       ================================ */
-
-    .equipment-table-wrapper table {
-        width: 100%;
-        min-width: 950px;
-        margin-bottom: 0;
-
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-
-    /* ================================
-       Header
-       ================================ */
-
-    .equipment-table-wrapper thead th {
-        position: sticky;
-        top: 0;
-
-        z-index: 10;
-
-        background: #f8f9fa;
-
-        white-space: nowrap;
-
-        font-size: 0.82rem;
-        font-weight: 600;
-
-        padding: 12px 10px;
-
-        vertical-align: middle;
-
-        border-bottom: 2px solid #dee2e6;
-    }
-
-
-    /* ================================
-       Table Body
-       ================================ */
-
-    .equipment-table-wrapper tbody td {
-        vertical-align: middle;
-
-        padding: 10px;
-
-        font-size: 0.82rem;
-
-        word-break: normal;
-        overflow-wrap: anywhere;
-    }
-
-
-    /* ================================
-       Department
-       ================================ */
-
-    .equipment-table-wrapper td:first-child {
-        min-width: 180px;
-
-        font-weight: 500;
-    }
-
-
-    /* ================================
-       Equipment Name
-       ================================ */
-
-    /* .equipment-table-wrapper td:nth-child(2) {
-        min-width: 220px;
-    } */
-
-
-    /* ================================
-       Specification
-       ================================ */
-
-    /* .equipment-table-wrapper td:nth-child(3) {
-        min-width: 240px;
-
-        white-space: normal;
-
-        line-height: 1.45;
-    } */
-
-
-    /* ================================
-       Numeric Columns
-       ================================ */
-
-    /* .equipment-table-wrapper th:nth-child(n+4),
-    .equipment-table-wrapper td:nth-child(n+4) {
-        min-width: 130px;
-
-        text-align: center;
-
-        white-space: nowrap;
-    } */
-
-
-    /* ================================
-       Hover
-       ================================ */
-
-    .equipment-table-wrapper tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-
-    /* ================================
-       Mobile / Tablet
-       ================================ */
-
-    @@media (max-width: 992px) {
-
-        .equipment-table-wrapper {
-            max-height: 420px;
-
-            border-radius: 6px;
-        }
-
-        .equipment-table-wrapper table {
-            min-width: 900px;
-        }
-
-        .equipment-table-wrapper thead th {
-            font-size: 0.76rem;
-            padding: 9px 8px;
-        }
-
-        .equipment-table-wrapper tbody td {
-            font-size: 0.76rem;
-            padding: 8px;
-        }
-    }
-
-
-    /* ================================
-       Small Mobile
-       ================================ */
-
-    @@media (max-width: 576px) {
-
-        .equipment-table-wrapper {
-            max-height: 380px;
-
-            border-radius: 5px;
-
-            /*
-             * Prevent horizontal scroll from
-             * affecting the complete page.
-             */
-            overscroll-behavior-x: contain;
-        }
-
-        .equipment-table-wrapper table {
-            min-width: 850px;
-        }
-
-        .equipment-table-wrapper thead th {
-            font-size: 0.72rem;
-
-            padding: 8px 7px;
-        }
-
-        .equipment-table-wrapper tbody td {
-            font-size: 0.72rem;
-
-            padding: 7px;
-        }
-
-        .equipment-table-wrapper td:first-child {
-            min-width: 150px;
-        }
-
-        .equipment-table-wrapper td:nth-child(2) {
-            min-width: 190px;
-        }
-
-        .equipment-table-wrapper td:nth-child(3) {
-            min-width: 210px;
-        }
-
-        .equipment-table-wrapper th:nth-child(n+4),
-        .equipment-table-wrapper td:nth-child(n+4) {
-            min-width: 115px;
-        }
-    }
-</style>
-
-@section Scripts {
-    <script src="~/js/verification-dashboard.js"
-            asp-append-version="true"></script>
-}
+<link rel="stylesheet"
+      href="~/css/equipment-list.css"
+      asp-append-version="true" />
 
 <div class="page-header mb-4">
 
@@ -269,8 +47,7 @@
     </h1>
 
     <p class="text-muted mb-0">
-        Review the equipment requirements and equipment available
-        in the institution.
+        Review the equipment requirements and equipment available in the institution.
     </p>
 
 </div>
@@ -286,19 +63,13 @@
         <p>
             Review the prescribed equipment requirements against the
             equipment available in the institution. Verify the
-            quantities reported by the college before approving
-            this section.
+            quantities and availability reported by the college
+            before approving this section.
         </p>
 
     </div>
 
 </div>
-
-@{
-    var equipmentListFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Equipment Details");
-}
-
 
 <div class="verification-card">
 
@@ -309,6 +80,13 @@
             Equipment Details
         </h3>
 
+        @if (isMedical && !string.IsNullOrWhiteSpace(Model.AcademicYear))
+        {
+            <span class="badge bg-primary">
+                Academic Year: @Model.AcademicYear
+            </span>
+        }
+
     </div>
 
     <div class="verification-card-body">
@@ -316,52 +94,43 @@
         @if (Model.Equipments != null && Model.Equipments.Any())
         {
             <div class="table-responsive equipment-table-wrapper">
-
                 <table class="table table-bordered table-hover align-middle mb-0">
-
                     <thead class="table-light">
-
                         <tr>
+                            <th style="width:60px;">Sl No.</th>
+                            <th>Department</th>
+                            <th>Equipment</th>
+                            @if (isDental)
+                            {
+                                <th>Specification</th>
 
-                            <th style="width:60px;">
-                                Sl No.
-                            </th>
+                                <th class="text-center" style="min-width:120px;">
+                                    1 Unit<br />Requirement
+                                </th>
 
-                            <th>
-                                Department
-                            </th>
+                                <th class="text-center" style="min-width:120px;">
+                                    2 Unit<br />Requirement
+                                </th>
 
-                            <th>
-                                Equipment
-                            </th>
+                                <th class="text-center" style="min-width:120px;">
+                                    1 Unit<br />Existing
+                                </th>
 
-                            <th>
-                                Specification
-                            </th>
+                                <th class="text-center" style="min-width:120px;">
+                                    2 Unit<br />Existing
+                                </th>
+                            }
 
-                            <th class="text-center"
-                                style="min-width:130px;">
-                                1 Unit<br />
-                                Requirement
-                            </th>
+                            @if (isMedical)
+                            {
+                                <th class="text-center" style="min-width:140px;">
+                                    Availability
+                                </th>
 
-                            <th class="text-center"
-                                style="min-width:130px;">
-                                2 Unit<br />
-                                Requirement
-                            </th>
-
-                            <th class="text-center"
-                                style="min-width:130px;">
-                                1 Unit<br />
-                                Existing
-                            </th>
-
-                            <th class="text-center"
-                                style="min-width:130px;">
-                                2 Unit<br />
-                                Existing
-                            </th>
+                                <th class="text-center" style="min-width:120px;">
+                                    Available Quantity
+                                </th>
+                            }
 
                         </tr>
 
@@ -371,56 +140,90 @@
 
                         @{
                             int serialNo = 1;
-                            string? previousDepartment = null;
                         }
 
-                        @foreach (var item in Model.Equipments)
+                        @if (isMedical)
                         {
-                            <tr>
+                            var departmentGroups = Model.Equipments
+                                .GroupBy(x => new
+                                {
+                                    x.DepartmentCode,
+                                    x.DepartmentName
+                                })
+                                .OrderBy(g => g.Key.DepartmentName);
 
-                                <td class="text-center">
-                                    @serialNo
-                                </td>
+                            foreach (var department in departmentGroups)
+                            {
+                                var items = department.ToList();
+                                var firstItem = true;
 
-                                <td>
-                                    @item.DepartmentName
-                                </td>
+                                foreach (var item in department)
+                                {
+                                    <tr>
+                                        <td class="text-center"> @serialNo </td>
 
-                                <td class="fw-semibold">
-                                    @item.EquipmentName
-                                </td>
+                                        @if (firstItem)
+                                        {
+                                            <td rowspan="@items.Count()" class="align-top"> @item.DepartmentName </td>
+                                            firstItem = false;
+                                        }
+                                        <td class="fw-semibold"> @item.EquipmentName </td>
+                                        <td class="text-center">
+                                            @if (item.IsAvailable)
+                                            {
+                                                <span class="badge bg-success"> Available </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger"> Not Available </span>
+                                            }
+                                        </td>
+                                        <td class="text-center"> @(item.AvailableQuantity?.ToString() ?? "-") </td>
+                                    </tr>
 
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(item.Specification)
-                                        ? "N/A"
-                                        : item.Specification)
-                                </td>
-
-                                <td class="text-center">
-                                    @(item.OneUnitReq?.ToString() ?? "-")
-                                </td>
-
-                                <td class="text-center">
-                                    @(item.TwoUnitReq?.ToString() ?? "-")
-                                </td>
-
-                                <td class="text-center">
-                                    @(item.OneUnitExisting?.ToString() ?? "-")
-                                </td>
-
-                                <td class="text-center">
-                                    @(item.TwoUnitExisting?.ToString() ?? "-")
-                                </td>
-
-                            </tr>
-
-                            serialNo++;
+                                    serialNo++;
+                                }
+                            }
                         }
 
+                        @if (isDental)
+                        {
+
+                            var departmentGroups = Model.Equipments
+                                .GroupBy(e => new 
+                                {
+                                    e.DepartmentCode, 
+                                    e.DepartmentName
+                                })
+                                .OrderBy(e => e.Key.DepartmentName);
+
+                            foreach(var department in departmentGroups)
+                            {
+                                var items = department.ToList();
+                                var firstItem = true;
+
+                                foreach (var item in items)
+                                {
+                                    <tr>
+                                        <td class="text-center"> @serialNo </td>
+                                        @if (firstItem)
+                                        {
+                                            <td rowspan="@items.Count()" class="align-top"> @item.DepartmentName </td>
+                                            firstItem = false;
+                                        }
+                                        <td class="fw-semibold"> @item.EquipmentName </td>
+                                        <td> @(string.IsNullOrWhiteSpace(item.Specification) ? "N/A" : item.Specification) </td>
+                                        <td class="text-center"> @(item.OneUnitReq?.ToString() ?? "-") </td>
+                                        <td class="text-center"> @(item.TwoUnitReq?.ToString() ?? "-") </td>
+                                        <td class="text-center"> @(item.OneUnitExisting?.ToString() ?? "-") </td>
+                                        <td class="text-center"> @(item.TwoUnitExisting?.ToString() ?? "-") </td>
+                                    </tr>
+                                    serialNo++;
+                                }
+                            }
+                        }
                     </tbody>
-
                 </table>
-
             </div>
         }
         else
@@ -431,12 +234,15 @@
             </div>
         }
 
-
-        
         @if (equipmentListFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", equipmentListFeedback)
+            @await Html.PartialAsync(  "_SectionFeedback", equipmentListFeedback)
         }
+
     </div>
 
 </div>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}

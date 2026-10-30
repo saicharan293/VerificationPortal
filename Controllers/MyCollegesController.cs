@@ -87,23 +87,31 @@ namespace VerificationPortal.Controllers
             return View(model);
         }
 
-        private Task<List<CollegeMappingWithCollegesViewModel>> BuildCollegeMappingsAsync(List<TblCollegeMapping> mappings, List<AffiliationCollegeMaster> colleges, Dictionary<int, string> faculties, Dictionary<string, string> applicationNumbers)
+        
+        private Task<List<CollegeMappingWithCollegesViewModel>> BuildCollegeMappingsAsync( List<TblCollegeMapping> mappings, List<AffiliationCollegeMaster> colleges, Dictionary<int, string> faculties, Dictionary<string, string> applicationNumbers)
         {
-            var collegesByFaculty = colleges
-                .GroupBy(c => c.FacultyCode)
-                .ToDictionary(g => g.Key, g => g.ToList());
-
             var result = mappings.Select(mapping =>
             {
                 var facultyCode = mapping.FacultyCode.ToString();
 
-                var fromLetter = char.ToUpperInvariant(mapping.FromLetter?.FirstOrDefault() ?? 'A');
+                var fromLetter = char.ToUpperInvariant(
+                    mapping.FromLetter?.FirstOrDefault() ?? 'A');
 
-                var toLetter = char.ToUpperInvariant(mapping.ToLetter?.FirstOrDefault() ?? 'Z');
+                var toLetter = char.ToUpperInvariant(
+                    mapping.ToLetter?.FirstOrDefault() ?? 'Z');
 
-                var facultyColleges = collegesByFaculty.GetValueOrDefault(facultyCode) ?? new();
+                // Step 1: Get only assigned colleges
+                var assignedColleges = colleges
+                    .Where(c =>
+                        c.FacultyCode == facultyCode &&
+                        (
+                            c.CollegeCode == mapping.CollegeFrom ||
+                            c.CollegeCode == mapping.CollegeTo
+                        ))
+                    .ToList();
 
-                var assignedColleges = facultyColleges
+                // Step 2 & 3: Apply FromLetter and ToLetter filters
+                var filteredColleges = assignedColleges
                     .Where(c =>
                         !string.IsNullOrWhiteSpace(c.CollegeName) &&
                         char.ToUpperInvariant(c.CollegeName[0]) >= fromLetter &&
@@ -120,9 +128,10 @@ namespace VerificationPortal.Controllers
                 return new CollegeMappingWithCollegesViewModel
                 {
                     Mapping = mapping,
-                    FacultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty"),
-                    Colleges = assignedColleges,
-                    CollegeCount = assignedColleges.Count,
+                    FacultyName = faculties.GetValueOrDefault(
+                        mapping.FacultyCode, "Unknown Faculty"),
+                    Colleges = filteredColleges,
+                    CollegeCount = filteredColleges.Count,
                     FromLetter = mapping.FromLetter,
                     ToLetter = mapping.ToLetter,
                     CollegeFromCode = mapping.CollegeFrom,
@@ -132,8 +141,6 @@ namespace VerificationPortal.Controllers
 
             return Task.FromResult(result);
         }
-
-
         private async Task<Dictionary<int, string>> GetFacultiesAsync( List<TblCollegeMapping> mappings)
         {
             var facultyIds = mappings
