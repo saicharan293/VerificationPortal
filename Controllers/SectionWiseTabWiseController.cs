@@ -153,6 +153,15 @@ namespace VerificationPortal.Controllers
                 return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
             }
 
+            int savedSectionId  = 0;
+            var redirectUrl = Url.IsLocalUrl(model.ReturnUrl)
+                ? model.ReturnUrl
+                : Url.Action(
+                    "InstitutionDetail",
+                    "VerificationDashboard",
+                    new { collegeCode = model.CollegeCode }
+                  );
+
             try
             {
                 var connection = _context.Database.GetDbConnection();
@@ -194,6 +203,8 @@ namespace VerificationPortal.Controllers
                         SectionId = Convert.ToInt32(reader["SectionId"])
                     };
 
+                    savedSectionId = result.SectionId;
+
                     TempData["SuccessMessage"] = result.SaveStatus == "Accepted" 
                         ? "Section verification saved successfully."
                         : "Section verification updated successfully.";
@@ -216,11 +227,13 @@ namespace VerificationPortal.Controllers
                 );
                 TempData["ErrorMessage"] = "Unable to save section verification";
 
-                return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+                return Redirect($"{redirectUrl}#section_{savedSectionId}");
             }
            
+           
+
             // Fallback
-            return RedirectToReturnUrl(model.ReturnUrl, "InstitutionDetails", new { collegeCode = model.CollegeCode });
+            return Redirect($"{redirectUrl}#section_{savedSectionId}");
         }
 
     }

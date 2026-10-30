@@ -1,0 +1,34 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2" id="section_@Model.WorkshopFeedback?.SectionId">
+    <i class="bi bi-tools me-2"></i>
+    Workshop Details
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Workshop Staff Count </label>
+        <input class="form-control" value="@(Model.WorkshopStaffCount?.ToString() ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-12">
+        <label class="form-label fw-semibold"> Workshop Equipment Details </label>
+        <textarea class="form-control" rows="3" disabled>
+            @(string.IsNullOrWhiteSpace(Model.WorkshopEquipmentDetails) ? "Not Available" : Model.WorkshopEquipmentDetails)
+        </textarea>
+    </div>
+
+    <div class="col-md-12">
+        <label class="form-label fw-semibold"> Workshop Scope of Work </label>
+        <textarea class="form-control" rows="3" disabled>
+            @(string.IsNullOrWhiteSpace(Model.WorkshopScopeOfWork) ? "Not Available" : Model.WorkshopScopeOfWork)
+        </textarea>
+    </div>
+
+</div>
+
+@if (Model.WorkshopFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.WorkshopFeedback)
+}

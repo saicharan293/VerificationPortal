@@ -1,0 +1,140 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="section_@Model.LaboratoryFeedback?.SectionId">
+    <i class="bi bi-flask me-2"></i>
+    Laboratory Availability
+</h5>
+
+<div class="table-responsive mb-4">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Laboratory</th>
+                <th class="text-center">Available</th>
+                <th class="text-center">Shared</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>Histology</td>
+                <td class="text-center">
+                    @(Model.HistologyAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.HistologyShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Clinical Physiology</td>
+                <td class="text-center">
+                    @(Model.ClinicalPhysiologyAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.ClinicalPhysiologyShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Biochemistry</td>
+                <td class="text-center">
+                    @(Model.BiochemistryAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.BiochemistryShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Histopathology / Cytopathology</td>
+                <td class="text-center">
+                    @(Model.HistopathCytopathAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.HistopathCytopathShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Clinical Pathology / Haematology</td>
+                <td class="text-center">
+                    @(Model.ClinPathHemeAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.ClinPathHemeShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Microbiology</td>
+                <td class="text-center">
+                    @(Model.MicrobiologyAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.MicrobiologyShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Clinical Pharmacology</td>
+                <td class="text-center">
+                    @(Model.ClinicalPharmAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.ClinicalPharmShared ? "Yes" : "No")
+                </td>
+            </tr>
+
+            <tr>
+                <td>Calculus / Pharmacology</td>
+                <td class="text-center">
+                    @(Model.CalPharmAvailable ? "Yes" : "No")
+                </td>
+                <td class="text-center">
+                    @(Model.CalPharmShared ? "Yes" : "No")
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h6 class="fw-bold mb-3">Common Laboratory Facilities</h6>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Audio-Visual Facilities in All Laboratories
+        </label>
+        <input class="form-control"
+               value="@(Model.AllLabsHaveAv ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Internet Available in All Laboratories
+        </label>
+        <input class="form-control"
+               value="@(Model.AllLabsHaveInternet ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Technical Staff Facilities Ensured
+        </label>
+        <input class="form-control"
+               value="@(Model.TechnicalStaffFacilitiesEnsured ? "Yes" : "No")"
+               disabled />
+    </div>
+
+</div>
+
+@if (Model.LaboratoryFeedback != null)
+{
+    @await Html.PartialAsync(
+        "~/Views/Shared/_SectionFeedback.cshtml",
+        Model.LaboratoryFeedback)
+}

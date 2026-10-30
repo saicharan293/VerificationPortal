@@ -1,0 +1,92 @@
+﻿@model VerificationPortal.Models.DentalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2">
+    <i class="bi bi-house"></i>
+    Building Details
+</h5>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Total Built-up Area (Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area Per Lecture Hall (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.LectureHallAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Number of Students / One Lecture Hall</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.LectureHallSeatingCapacity?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Number of Lecture Halls</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.LectureHallCount?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area of Museum & Demonstration Rooms (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area of Departmental Areas (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area of Preclinical Labs & Skill Labs (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.PreclinicalSkillLabAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area of Examination Hall (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area of Library Including Reading Room (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.LibraryAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Area of Dental Hospital (in Sq.m)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.HospitalAreaSqm?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.LandBuilding.Remarks))
+{
+    <hr />
+
+    <h5 class="fw-bold">
+        <i class="bi bi-chat-left-text"></i>
+        Remarks
+    </h5>
+
+    <div class="alert alert-secondary">
+        @Model.LandBuilding.Remarks
+    </div>
+}

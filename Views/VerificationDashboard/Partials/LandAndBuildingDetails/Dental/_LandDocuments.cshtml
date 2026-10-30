@@ -1,0 +1,44 @@
+﻿@model VerificationPortal.Models.DentalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2">
+    <i class="bi bi-file-earmark-text"></i>
+    Land Documents
+</h5>
+
+<div class="row g-3 mb-4">
+    @foreach (var document in Model.LandDocuments)
+    {
+        <div class="col-md-4">
+            <label class="form-label fw-bold">
+                @document.Label
+            </label>
+
+            @if (!string.IsNullOrWhiteSpace(document.Path))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            document.Action,
+                            "VerificationDashboard",
+                            new
+                            {
+                                id = Model.LandBuilding.Id,
+                                documentType = document.DocumentType
+                            })!,
+                        Title = document.Label,
+                        DocumentId = document.DocumentId,
+                        FacultyId = Model.FacultyId,
+                        CollegeCode = Model.CollegeCode
+                    })
+            }
+            else
+            {
+                <div class="form-control text-muted">
+                    Not Uploaded
+                </div>
+            }
+        </div>
+    }
+</div>

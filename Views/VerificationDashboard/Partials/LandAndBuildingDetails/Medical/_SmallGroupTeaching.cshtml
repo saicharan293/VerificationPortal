@@ -1,0 +1,85 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="@Model.SmallGroupFeedback?.SectionId">
+    <i class="bi bi-people me-2"></i>
+    Small Group Teaching — General
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Annual MBBS Intake
+        </label>
+
+        <input class="form-control"
+               value="@(Model.AnnualMbbsIntake.ToString() ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Small Group Batch Size
+        </label>
+
+        <input class="form-control"
+               value="@(Model.SmallGroupBatchSize.ToString() ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Teaching Areas Shared by All Departments
+        </label>
+
+        <input class="form-control"
+               value="@(Model.TeachingAreasSharedAllDepts
+                   ? (Model.TeachingAreasSharedAllDepts ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Audio-Visual Facilities in All Teaching Areas
+        </label>
+
+        <input class="form-control"
+               value="@(Model.AvInAllTeachingAreas
+                   ? (Model.AvInAllTeachingAreas ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Internet Available in All Teaching Areas
+        </label>
+
+        <input class="form-control"
+               value="@(Model.InternetInAllTeachingAreas
+                   ? (Model.InternetInAllTeachingAreas ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Digital Link Available in All Teaching Areas
+        </label>
+
+        <input class="form-control"
+               value="@(Model.DigitalLinkAllTeachingAreas
+                   ? (Model.DigitalLinkAllTeachingAreas ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+</div>
+
+@if (Model.SmallGroupFeedback != null)
+{
+    @await Html.PartialAsync(
+        "~/Views/Shared/_SectionFeedback.cshtml",
+        Model.SmallGroupFeedback)
+}

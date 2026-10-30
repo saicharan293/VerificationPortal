@@ -2,6 +2,7 @@
 {
     public class DentalLandBuildingVerificationVm
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
         public DentalCollegeLandBuildingDetail LandBuilding { get; set; } = null!;
 
         public List<VerificationDocumentVm> LandDocuments { get; set; } = new();

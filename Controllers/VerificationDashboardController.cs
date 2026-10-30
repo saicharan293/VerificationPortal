@@ -2773,6 +2773,18 @@ namespace VerificationPortal.Controllers
             ViewBag.UserDesignation = GetUserDesignation();
 
 
+            return context.FacultyCodeInt switch
+            {
+                1 => await MedicalLandBuildingDetailsInternal(collegeCode, context),
+                2 => await DentalLandBuildingDetailsInternal(collegeCode, context),
+                _ => BadRequest("Unsupported faculty for Land & Building verification.")
+            };
+
+        }
+
+
+        private async Task<IActionResult> DentalLandBuildingDetailsInternal(string collegeCode, VerificationPageContext context)
+        {
             // ---------------------------------------------------------
             // COLLEGE
             // ---------------------------------------------------------
@@ -2838,7 +2850,7 @@ namespace VerificationPortal.Controllers
             var documentMasterMap = await _context.MstDocuments
                 .AsNoTracking()
                 .Where(x => x.FacultyId == 2 && x.IsActive)
-                .ToDictionaryAsync( x => x.DocumentName, x => x.DocumentId);
+                .ToDictionaryAsync(x => x.DocumentName, x => x.DocumentId);
 
             // ---------------------------------------------------------
             // DOCUMENTS
@@ -2972,15 +2984,15 @@ namespace VerificationPortal.Controllers
             // NAVIGATION
             // ---------------------------------------------------------
 
-            ViewBag.PrevTabAction = Url.Action("PgCourseDetails", "VerificationDashboard", new { collegeCode });
+            //ViewBag.PrevTabAction = Url.Action("PgCourseDetails", "VerificationDashboard", new { collegeCode });
 
-            ViewBag.PrevTabLabel = "Previous: PG Course Details";
+            //ViewBag.PrevTabLabel = "Previous: PG Course Details";
 
-            ViewBag.NextTabAction = Url.Action( "ClassroomAndLaboratory", "VerificationDashboard", new { collegeCode });
+            //ViewBag.NextTabAction = Url.Action("ClassroomAndLaboratory", "VerificationDashboard", new { collegeCode });
 
-            ViewBag.NextTabLabel = "Next: Classroom & Laboratory";
+            //ViewBag.NextTabLabel = "Next: Classroom & Laboratory";
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
+            //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9);
 
             // ---------------------------------------------------------
             // VIEW MODEL
@@ -2988,6 +3000,20 @@ namespace VerificationPortal.Controllers
 
             var vm = new DentalLandBuildingVerificationVm
             {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = context.FacultyCodeInt,
+                    CollegeCode = collegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution",
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = GetUserDesignation(),
+                    PrevTabAction = Url.Action("UgCourseDetails", "VerificationDashboard", new { collegeCode }),
+                    PrevTabLabel = "Previous: UG Course Details",
+                    NextTabAction = Url.Action("ClassroomAndLaboratory", "VerificationDashboard", new { collegeCode }),
+                    NextTabLabel = "Previous: Classroom And Laboratory",
+
+                },
                 LandBuilding = landBuilding,
 
                 LandDocuments = landDocuments,
@@ -3002,11 +3028,277 @@ namespace VerificationPortal.Controllers
 
                 CollegeCode = collegeCode
             };
-
-
-            return View(vm);
+            return View(nameof(LandAndBuildingDetails), vm);
         }
 
+
+        private async Task<IActionResult> MedicalLandBuildingDetailsInternal(string collegeCode, VerificationPageContext context)
+        {
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College Code is required");
+
+            if (context.Faculty == null)
+                return BadRequest("Faculty Details could not found.");
+
+            string? courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            var college = await _context.AffiliationCollegeMasters.AsNoTracking().FirstOrDefaultAsync(e => e.CollegeCode == collegeCode);
+
+            var teachingQuery = _context.SmallGroupTeachings
+                .AsNoTracking()
+                .Where(e => e.CollegeCode == collegeCode && e.FacultyCode == context.FacultyCode);
+
+
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                teachingQuery = teachingQuery.Where(x =>
+                    x.CourseLevel == courseLevel ||
+                    x.CourseLevel == null ||
+                    x.CourseLevel == "");
+            }
+
+            var teaching = !string.IsNullOrWhiteSpace(courseLevel)
+                ? await teachingQuery
+                    .OrderBy(x => x.CourseLevel == courseLevel ? 0 : 1)
+                    .ThenByDescending(x => x.Id)
+                    .FirstOrDefaultAsync()
+                : await teachingQuery
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefaultAsync();
+
+            if (teaching == null)
+            {
+                return NotFound($"Medical Land and Building Details not found for the college: {context.InstitutionName}");
+            }
+
+            var adminQuery = _context.MedicalAdministrativePhysicalFacilities
+               .AsNoTracking().Where(x => x.CollegeCode == collegeCode &&x.FacultyCode == context.FacultyCode);
+
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                adminQuery = adminQuery.Where(x => x.CourseLevel == courseLevel || x.CourseLevel == null || x.CourseLevel == "");
+            }
+
+            var admin = !string.IsNullOrWhiteSpace(courseLevel)
+                ? await adminQuery.OrderBy(x => x.CourseLevel == courseLevel ? 0 : 1).ThenByDescending(x => x.Id).FirstOrDefaultAsync()
+                : await adminQuery.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+
+            var labsQuery = _context.MedicalStudentPracticalLabs.AsNoTracking().Where(x => x.CollegeCode == collegeCode && x.FacultyCode == context.FacultyCode);
+
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                labsQuery = labsQuery.Where(x => x.CourseLevel == courseLevel || x.CourseLevel == null || x.CourseLevel == "");
+            }
+
+            var labs = !string.IsNullOrWhiteSpace(courseLevel)
+                ? await labsQuery.OrderBy(x => x.CourseLevel == courseLevel ? 0 : 1).ThenByDescending(x => x.Id).FirstOrDefaultAsync()
+                : await labsQuery.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+
+            var museumQuery = _context.MedicalMuseums.AsNoTracking().Where(x => x.CollegeCode == collegeCode && x.FacultyCode == context.FacultyCode);
+
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                museumQuery = museumQuery.Where(x => x.CourseLevel == courseLevel || x.CourseLevel == null || x.CourseLevel == "");
+            }
+
+            var museum = !string.IsNullOrWhiteSpace(courseLevel)
+                ? await museumQuery.OrderBy(x => x.CourseLevel == courseLevel ? 0 : 1).ThenByDescending(x => x.Id).FirstOrDefaultAsync()
+                : await museumQuery.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+
+            await SetTabWiseVerificationViewData(collegeCode, nameof(LandAndBuildingDetails), context.FacultyCodeInt);
+
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land & Building Details", context.FacultyCodeInt);
+
+            var landFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Land Details");
+            var buildingFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Building Details");
+            var areaFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Area Details");
+            var facilitiesFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Facilities Availability");
+            var staffQuartersFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Staff Quarters");
+            var workshopFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Workshop Details");
+            var animalHouseFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Animal House Details");
+            var smallGroupFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Small Group Teaching General");
+            var teachingRoomsFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Teaching Rooms");
+            var laboratoryFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Laboratory Availability");
+            var museumFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Museum Availability");
+
+            var documentMasterMap = await _context.MstDocuments.AsNoTracking().Where(e => e.FacultyId == context.FacultyCodeInt && e.IsActive).ToDictionaryAsync(e => e.DocumentName, e => e.DocumentId);
+
+            var landRecordsPath = !string.IsNullOrWhiteSpace(teaching.LandRecordsFilePath) ? teaching.LandRecordsFilePath : teaching.LandRecordsPath;
+
+            var approvedBuildingPlanPath = !string.IsNullOrWhiteSpace(teaching.ApprovedBuildingPlanFilePath) ? teaching.ApprovedBuildingPlanFilePath : teaching.ApprovedBuildingPlanPath;
+
+            var landDocuments = new List<VerificationDocumentVm>
+            {
+                new()
+                {
+                    Label = "Land Records",
+                    Path = landRecordsPath,
+                    DocumentType = "LandRecords",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Land Records")
+                }
+            };
+
+            var buildingDocuments = new List<VerificationDocumentVm>
+            {
+                new()
+                {
+                    Label = "Approved Building Plan",
+                    Path = approvedBuildingPlanPath,
+                    DocumentType = "ApprovedBuildingPlan",
+                    Action = "ViewLandBuildingDocument",
+                    DocumentId = documentMasterMap.GetValueOrDefault("Approved Building Plan")
+                }
+            };
+
+
+            var prevTabAction = Url.Action( nameof(UGCourseDetails), "VerificationDashboard", new { collegeCode });
+
+            var nextTabAction = Url.Action( nameof(ClassroomAndLaboratory), "VerificationDashboard", new { collegeCode });
+
+            var vm = new MedicalLandBuildingVerificationVm
+            {
+                Id = teaching.Id,
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = context.FacultyCodeInt,
+                    CollegeCode = collegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = context.Institution.NameOfInstitution ?? "Unknown Institution",
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = GetUserDesignation(),
+                    PrevTabAction = prevTabAction,
+                    PrevTabLabel = "Previous: PG Course Details",
+                    NextTabAction = nextTabAction,
+                    NextTabLabel = "Next: Classroom & Laboratory"
+                },
+
+                // Land details
+                IsMinimumLandAvailable = teaching.IsMinimumLandAvailable,
+                LandDetailsIfYes = teaching.LandDetailsIfYes,
+                HasPurchasePlanIfNo = teaching.HasPurchasePlanIfNo,
+                HasBudgetProvisionIfNo = teaching.HasBudgetProvisionIfNo,
+                HasFutureExpansionSpace = teaching.HasFutureExpansionSpace,
+                LandRecordsFilePath = teaching.LandRecordsFilePath,
+
+                // Building details
+                IsBuildingAsPerCouncilNorms = teaching.IsBuildingAsPerCouncilNorms,
+                LandOwnershipType = teaching.LandOwnershipType,
+                BuildingOwnershipType = teaching.BuildingOwnershipType,
+                FloorAreaSqFt = teaching.FloorAreaSqFt ?? 0,
+                NumberOfBlocks = teaching.NumberOfBlocks ?? 0,
+                NumberOfFloors = teaching.NumberOfFloors ?? 0,
+                YearOfConstruction = teaching.YearOfConstruction ?? 0,
+                ApprovedBuildingPlanFilePath = teaching.ApprovedBuildingPlanFilePath,
+
+                // General small group teaching
+                AnnualMbbsIntake = teaching.AnnualMbbsIntake,
+                SmallGroupBatchSize = teaching.SmallGroupBatchSize,
+                TeachingAreasSharedAllDepts = teaching.TeachingAreasSharedAllDepts,
+                AvInAllTeachingAreas = teaching.AvInAllTeachingAreas,
+                InternetInAllTeachingAreas = teaching.InternetInAllTeachingAreas,
+                DigitalLinkAllTeachingAreas = teaching.DigitalLinkAllTeachingAreas,
+
+                // Teaching rooms
+                SmallGroupStudents = teaching.SmallGroupStudents,
+                RequiredAreaSqm = teaching.RequiredAreaSqm,
+                AvailableAreaSqm = teaching.AvailableAreaSqm,
+                AreaDeficiencySqm = teaching.AreaDeficiencySqm,
+                RoomsSharedByAllDepts = teaching.RoomsSharedByAllDepts,
+                AppropriateAreaEachSpecialty = teaching.AppropriateAreaEachSpecialty,
+                ConnectedToLectureHalls = teaching.ConnectedToLectureHalls,
+                InternetInTeachingRooms = teaching.InternetInTeachingRooms,
+
+                // Administrative physical facilities
+                PrincipalChamberAreaSqFt = admin?.PrincipalChamberAreaSqFt,
+                OfficeRoomAreaSqFt = admin?.OfficeRoomAreaSqFt,
+                StaffRoomsAreaSqFt = admin?.StaffRoomsAreaSqFt,
+                LectureHallsAreaSqFt = admin?.LectureHallsAreaSqFt,
+                LaboratoriesAreaSqFt = admin?.LaboratoriesAreaSqFt,
+                SeminarHallAreaSqFt = admin?.SeminarHallAreaSqFt,
+                AuditoriumAreaSqFt = admin?.AuditoriumAreaSqFt,
+                MuseumAreaSqFt = admin?.MuseumAreaSqFt,
+                ExaminationHallAvailable = admin?.ExaminationHallAvailable,
+                WorkshopStaffCount = admin?.WorkshopStaffCount,
+                WorkshopEquipmentDetails = admin?.WorkshopEquipmentDetails,
+                WorkshopScopeOfWork = admin?.WorkshopScopeOfWork,
+                AnimalHouseAreaSqFt = admin?.AnimalHouseAreaSqFt,
+                AnimalHouseStaffCount = admin?.AnimalHouseStaffCount,
+                AnimalTypes = admin?.AnimalTypes,
+                CommitteeRoomsAreaSqFt = admin?.CommitteeRoomsAreaSqFt,
+                CommonRoomMenAvailable = admin?.CommonRoomMenAvailable,
+                CommonRoomWomenAvailable = admin?.CommonRoomWomenAvailable,
+                StudentHostelAvailable = admin?.StudentHostelAvailable,
+                StaffQuartersPrincipal = admin?.StaffQuartersPrincipal,
+                StaffQuartersOtherStaff = admin?.StaffQuartersOtherStaff,
+                StaffQuartersTeachingAncillary = admin?.StaffQuartersTeachingAncillary,
+                RegisteredUnderAnatomyAct = admin?.RegisteredUnderAnatomyAct,
+                AnimalHouseAvailable = admin?.AnimalHouseAvailable,
+
+                // Student practical laboratories
+                HistologyAvailable = labs?.HistologyAvailable ?? false,
+                HistologyShared = labs?.HistologyShared ?? false,
+                ClinicalPhysiologyAvailable = labs?.ClinicalPhysiologyAvailable ?? false,
+                ClinicalPhysiologyShared = labs?.ClinicalPhysiologyShared ?? false,
+                BiochemistryAvailable = labs?.BiochemistryAvailable ?? false,
+                BiochemistryShared = labs?.BiochemistryShared ?? false,
+                HistopathCytopathAvailable = labs?.HistopathCytopathAvailable ?? false,
+                HistopathCytopathShared = labs?.HistopathCytopathShared ?? false,
+                ClinPathHemeAvailable = labs?.ClinPathHemeAvailable ?? false,
+                ClinPathHemeShared = labs?.ClinPathHemeShared ?? false,
+                MicrobiologyAvailable = labs?.MicrobiologyAvailable ?? false,
+                MicrobiologyShared = labs?.MicrobiologyShared ?? false,
+                ClinicalPharmAvailable = labs?.ClinicalPharmAvailable ?? false,
+                ClinicalPharmShared = labs?.ClinicalPharmShared ?? false,
+                CalPharmAvailable = labs?.CalPharmAvailable ?? false,
+                CalPharmShared = labs?.CalPharmShared ?? false,
+                AllLabsHaveAv = labs?.AllLabsHaveAv ?? false,
+                AllLabsHaveInternet = labs?.AllLabsHaveInternet ?? false,
+                TechnicalStaffFacilitiesEnsured = labs?.TechnicalStaffFacilitiesEnsured ?? false,
+
+                // Museum details
+                SeparateAnatomyMuseumAvailable = museum?.SeparateAnatomyMuseumAvailable ?? false,
+                PathologyForensicSharedMuseum = museum?.PathologyForensicSharedMuseum ?? false,
+                PharmMicroCommSharedMuseum = museum?.PharmMicroCommSharedMuseum ?? false,
+                SeatingCapacityPerMuseum = museum?.SeatingCapacityPerMuseum ?? 0,
+                SeatingAreaAvailableSqm = museum?.SeatingAreaAvailableSqm ?? 0,
+                SeatingAreaRequiredSqm = museum?.SeatingAreaRequiredSqm ?? 0,
+                SeatingAreaDeficiencySqm = museum?.SeatingAreaDeficiencySqm ?? 0,
+                MuseumsHaveAv = museum?.MuseumsHaveAv ?? false,
+                MuseumsHaveInternet = museum?.MuseumsHaveInternet ?? false,
+                MuseumsDigitallyLinked = museum?.MuseumsDigitallyLinked ?? false,
+                MuseumsHaveRacksShelves = museum?.MuseumsHaveRacksShelves ?? false,
+                MuseumsHaveRadiologyDisplay = museum?.MuseumsHaveRadiologyDisplay ?? false,
+                TeachingTimeSharingProgrammed = museum?.TeachingTimeSharingProgrammed ?? false,
+
+                // College/course identification
+                FacultyCode = context.FacultyCode,
+                CourseLevel = teaching.CourseLevel ?? courseLevel,
+
+                // Documents
+                LandDocuments = landDocuments,
+                BuildingDocuments = buildingDocuments,
+
+                // Feedback
+                LandFeedback = landFeedback,
+                BuildingFeedback = buildingFeedback,
+                AreaFeedback = areaFeedback,
+                FacilitiesFeedback = facilitiesFeedback,
+                StaffQuartersFeedback = staffQuartersFeedback,
+                WorkshopFeedback = workshopFeedback,
+                AnimalHouseFeedback = animalHouseFeedback,
+                SmallGroupFeedback = smallGroupFeedback,
+                TeachingRoomsFeedback = teachingRoomsFeedback,
+                LaboratoryFeedback = laboratoryFeedback,
+                MuseumFeedback = museumFeedback,
+
+                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 9)
+            };
+
+            return View("MedicalLandBuildingDetails", vm);
+
+        }
 
         [HttpGet]
         public async Task<IActionResult> ViewLandBuildingDocument( int id, string documentType)
@@ -3434,7 +3726,7 @@ namespace VerificationPortal.Controllers
                 throw new Exception("Faculty code not found.");
 
             var faculty = await _context.Faculties.AsNoTracking().FirstOrDefaultAsync(x => x.FacultyId.ToString() == institution.FacultyCode);
-
+            HttpContext.Session.SetString("FacultyCode", faculty.FacultyId.ToString());
             return new VerificationPageContext
             {
                 Institution = institution,

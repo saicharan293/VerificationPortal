@@ -1,0 +1,134 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="section_@Model.MuseumFeedback?.SectionId">
+    <i class="bi bi-bank me-2"></i>
+    Museum Availability
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Separate Anatomy Museum Available
+        </label>
+        <input class="form-control"
+               value="@(Model.SeparateAnatomyMuseumAvailable ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Pathology / Forensic Museum Shared
+        </label>
+        <input class="form-control"
+               value="@(Model.PathologyForensicSharedMuseum ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Pharmacology / Microbiology / Community Medicine Museum Shared
+        </label>
+        <input class="form-control"
+               value="@(Model.PharmMicroCommSharedMuseum ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Seating Capacity per Museum
+        </label>
+        <input class="form-control"
+               value="@Model.SeatingCapacityPerMuseum"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Available Seating Area (Sq. M.)
+        </label>
+        <input class="form-control"
+               value="@Model.SeatingAreaAvailableSqm.ToString("N2")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Required Seating Area (Sq. M.)
+        </label>
+        <input class="form-control"
+               value="@Model.SeatingAreaRequiredSqm.ToString("N2")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Seating Area Deficiency (Sq. M.)
+        </label>
+        <input class="form-control"
+               value="@Model.SeatingAreaDeficiencySqm.ToString("N2")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Audio-Visual Facilities Available
+        </label>
+        <input class="form-control"
+               value="@(Model.MuseumsHaveAv ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Internet Available
+        </label>
+        <input class="form-control"
+               value="@(Model.MuseumsHaveInternet ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Museums Digitally Linked
+        </label>
+        <input class="form-control"
+               value="@(Model.MuseumsDigitallyLinked ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Racks / Shelves Available
+        </label>
+        <input class="form-control"
+               value="@(Model.MuseumsHaveRacksShelves ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Radiology Displays Available
+        </label>
+        <input class="form-control"
+               value="@(Model.MuseumsHaveRadiologyDisplay ? "Yes" : "No")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Teaching Time Sharing Programmed
+        </label>
+        <input class="form-control"
+               value="@(Model.TeachingTimeSharingProgrammed ? "Yes" : "No")"
+               disabled />
+    </div>
+
+</div>
+
+@if (Model.MuseumFeedback != null)
+{
+    @await Html.PartialAsync(
+        "~/Views/Shared/_SectionFeedback.cshtml",
+        Model.MuseumFeedback)
+}

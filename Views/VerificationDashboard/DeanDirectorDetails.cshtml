@@ -58,10 +58,6 @@
     ViewData["PrevTabLabel"] =
         "Previous: Trust Member Details";
 
-}
-
-
-@{
     ViewBag.ActiveTab = "DeanDirectorDetails";
 }
 
@@ -110,7 +106,7 @@
     var deanInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
                                 ?.FirstOrDefault(x => x.SectionName == "Dean / Director Information");
 }
-<div class="verification-card mb-4">
+<div class="verification-card mb-4" id="section_@deanInfoFeedback?.SectionId">
 
     <div class="verification-card-header">
 
@@ -246,7 +242,7 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Teaching Experience");
 }
 
-<div class="verification-card mb-4">
+<div class="verification-card mb-4" id="section_@deanTeachFeedback?.SectionId">
 
     <div class="verification-card-header">
 
@@ -406,7 +402,7 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
 }
 
-<div class="verification-card mb-4">
+<div class="verification-card mb-4" id="section_@deanAdminFeedback?.SectionId">
 
     <div class="verification-card-header">
 

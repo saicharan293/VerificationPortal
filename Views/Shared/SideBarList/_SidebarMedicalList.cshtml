@@ -73,6 +73,15 @@
             </li>
         }
         <li class="nav-item">
+            <a class="nav-link @(activeTab == "LandAndBuildingDetails" ? "active" : "")"
+                asp-controller="VerificationDashboard"
+                asp-action="LandAndBuildingDetails"
+                asp-route-collegeCode="@collegeCode">
+                <i class="bi bi-building"></i>
+                <span>Land & Building Details</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
 
@@ -99,15 +108,7 @@
                 <span>Clinical Facilities</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "LandAndBuildingDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="LandAndBuildingDetails"
-                asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-building"></i>
-                <span>Land & Building Details</span>
-            </a>
-        </li>
+        
 
         <li class="nav-item">
             <a class="nav-link @(activeTab == "ClassroomAndLaboratory" ? "active" : "")"

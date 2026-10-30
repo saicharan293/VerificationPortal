@@ -32,6 +32,7 @@
                     <input type="hidden" name="SectionName" value="@Model.SectionName" />
                     <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
                     <input type="hidden" name="CourseLevel" value="@Model.CourseLevel" />
+                    <input type="hidden" name="SectionId" value="@Model.SectionId" />
 
                     <div class="row g-4">
 
@@ -101,6 +102,9 @@
 
                             <label class="form-label">
                                 Remarks <span class="remarks-marker"></span>
+                                <div class="form-text">
+                                    Please provide remarks for your verification decision.
+                                </div>
                             </label>
 
                             <textarea class="form-control section-verification-remarks"
@@ -109,9 +113,7 @@
                                       placeholder="Enter your verification remarks here..."
                                       required></textarea>
 
-                            <div class="form-text">
-                                Please provide remarks for your verification decision.
-                            </div>
+                            
 
                             <div class="invalid-feedback">
                                 Remarks are required.
@@ -125,7 +127,7 @@
                     <div class="verification-form-actions mt-4">
 
                         <button type="submit"
-                                class="btn btn-primary section-feedback-save">
+                                class="btn btn-primary section-feedback-save w-100 d-inline-flex justify-content-center align-items-center">
 
                             <i class="bi bi-save me-1"></i>
                             Save Verification

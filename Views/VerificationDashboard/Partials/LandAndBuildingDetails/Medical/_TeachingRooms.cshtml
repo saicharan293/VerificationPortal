@@ -1,0 +1,95 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2" id="section_@Model.TeachingRoomsFeedback?.SectionId">
+    <i class="bi bi-easel2 me-2"></i>
+    Teaching Rooms
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Number of Small Group Students
+        </label>
+        <input class="form-control"
+               value="@(Model.SmallGroupStudents.ToString() ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Required Area (Sq. M.)
+        </label>
+        <input class="form-control"
+               value="@(Model.RequiredAreaSqm.ToString("N2") ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Available Area (Sq. M.)
+        </label>
+        <input class="form-control"
+               value="@(Model.AvailableAreaSqm.ToString("N2") ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Area Deficiency (Sq. M.)
+        </label>
+        <input class="form-control"
+               value="@(Model.AreaDeficiencySqm.ToString("N2") ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Rooms Shared by All Departments
+        </label>
+        <input class="form-control"
+               value="@(Model.RoomsSharedByAllDepts
+                   ? (Model.RoomsSharedByAllDepts ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Appropriate Area for Each Specialty
+        </label>
+        <input class="form-control"
+               value="@(Model.AppropriateAreaEachSpecialty
+                   ? (Model.AppropriateAreaEachSpecialty ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Connected to Lecture Halls
+        </label>
+        <input class="form-control"
+               value="@(Model.ConnectedToLectureHalls
+                   ? (Model.ConnectedToLectureHalls ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Internet Available in Teaching Rooms
+        </label>
+        <input class="form-control"
+               value="@(Model.InternetInTeachingRooms
+                   ? (Model.InternetInTeachingRooms ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+</div>
+
+@if (Model.TeachingRoomsFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.TeachingRoomsFeedback)
+}

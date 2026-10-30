@@ -1,0 +1,40 @@
+﻿@model VerificationPortal.Models.DentalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2">
+    <i class="bi bi-geo-alt"></i>
+    Land Details
+</h5>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Total Land Area (Acres)</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.TotalLandAreaAcres?.ToString("N2") ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Land Ownership Type</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.LandOwnershipType ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Land Category</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.LandCategory ?? "N/A")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">Future Expansion Space</label>
+        <input class="form-control"
+               value="@(Model.LandBuilding.HasFutureExpansionSpace == true
+                    ? "Yes"
+                    : Model.LandBuilding.HasFutureExpansionSpace == false
+                        ? "No"
+                        : "N/A")"
+               disabled />
+    </div>
+</div>

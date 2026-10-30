@@ -8,7 +8,7 @@
     var verificationStatus = ViewData["VerificationStatus"]?.ToString();
     var statusBadgeClass = ViewData["StatusBadgeClass"]?.ToString();
     var existingCourseLevel = Context.Session.GetString("CourseLevel");
-    var facultyCode = HttpContextAccessor.HttpContext?.Session.GetString("FacultyCode");
+    var facultyCode = Context?.Session.GetString("FacultyCode");
 }
 
 <aside class="verification-sidebar" id="verificationSidebar" role="navigation" aria-label="Verification sections">

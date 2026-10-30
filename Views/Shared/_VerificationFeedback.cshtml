@@ -15,18 +15,19 @@
         font-weight: 600;
         border: 2px solid var(--status-color);
         color: var(--status-color);
-        background: transparent;
+        background-color: transparent;
+        cursor: pointer;
         transition: all .2s ease;
     }
 
-    .btn-status:hover {
-        background: color-mix(in srgb, var(--status-color) 12%, transparent);
+    .btn-status:hover,
+    .btn-check:checked + .btn-status {
+        background-color: var(--status-color) !important;
+        color: #fff !important;
         transform: translateY(-1px);
     }
 
     .btn-check:checked + .btn-status {
-        background: var(--status-color);
-        color: #fff;
         box-shadow: 0 4px 12px color-mix(in srgb, var(--status-color) 35%, transparent);
     }
 
@@ -38,7 +39,6 @@
     .btn-status-accept  { --status-color: #198754; }
     .btn-status-reject  { --status-color: #bd434f; }
     .btn-status-pending { --status-color: #f59f00; }
-
     /* show the validation message when no option is picked */
     .was-validated .status-options:has(.btn-check:invalid) + .invalid-feedback {
         display: block;
@@ -116,14 +116,14 @@
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label" for="remarks">Remarks <span class="remarks-marker"></span></label>
+                                <div class="form-text">Please provide detailed remarks for your verification decision.</div>
                                 <textarea class="form-control" id="remarks" name="remarks" rows="4"
                                             placeholder="Enter your verification remarks here... Describe any discrepancies, observations, or approval notes.">@ViewData["ExistingRemarks"]</textarea>
-                                <div class="form-text">Please provide detailed remarks for your verification decision.</div>
                                 <div class="invalid-feedback">Remarks are required for verification.</div>
                             </div>
                         </div>
 
-                        <div class="feedback-actions">
+                        <div class="feedback-actions mt-3">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-save"></i> Save Verification
                             </button>

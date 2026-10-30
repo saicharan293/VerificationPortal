@@ -1,0 +1,50 @@
+﻿@model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2" id="section_@Model.BuildingFeedback?.SectionId">
+    <i class="bi bi-house me-2"></i>
+    Building Details
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Building as per Council Norms </label>
+        <input class="form-control" value="@(Model.IsBuildingAsPerCouncilNorms.HasValue ? (Model.IsBuildingAsPerCouncilNorms.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Land Ownership Type </label>
+        <input class="form-control" value="@(Model.LandOwnershipType ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Building Ownership Type </label>
+        <input class="form-control" value="@(Model.BuildingOwnershipType ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Total Floor Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.FloorAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Number of Blocks </label>
+        <input class="form-control" value="@(Model.NumberOfBlocks?.ToString() ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Number of Floors </label>
+        <input class="form-control" value="@(Model.NumberOfFloors?.ToString() ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Year of Construction </label>
+        <input class="form-control" value="@(Model.YearOfConstruction?.ToString() ?? "Not Available")" disabled />
+    </div>
+
+</div>
+
+@if (Model.BuildingFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.BuildingFeedback)
+}

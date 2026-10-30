@@ -1,0 +1,45 @@
+﻿ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="section_@Model.FacilitiesFeedback?.SectionId">
+    <i class="bi bi-building-check me-2"></i>
+    Facilities Availability
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Examination Hall </label>
+        <input class="form-control" value="@(Model.ExaminationHallAvailable.HasValue ? (Model.ExaminationHallAvailable.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Animal House </label>
+        <input class="form-control" value="@(Model.AnimalHouseAvailable.HasValue ? (Model.AnimalHouseAvailable.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Common Room for Men Available </label>
+        <input class="form-control" value="@(Model.CommonRoomMenAvailable.HasValue ? (Model.CommonRoomMenAvailable.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Common Room for Women Available </label>
+        <input class="form-control" value="@(Model.CommonRoomWomenAvailable.HasValue ? (Model.CommonRoomWomenAvailable.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Student Hostel Available </label>
+        <input class="form-control" value="@(Model.StudentHostelAvailable.HasValue ? (Model.StudentHostelAvailable.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Registered under Anatomy Act 1969 </label>
+        <input class="form-control" value="@(Model.RegisteredUnderAnatomyAct.HasValue ? (Model.RegisteredUnderAnatomyAct.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+</div>
+
+@if (Model.FacilitiesFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.FacilitiesFeedback)
+}

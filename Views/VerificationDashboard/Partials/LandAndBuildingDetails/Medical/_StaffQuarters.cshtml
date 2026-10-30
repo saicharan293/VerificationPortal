@@ -1,0 +1,26 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="section_@Model.StaffQuartersFeedback?.SectionId">
+    <i class="bi bi-houses me-2"></i>
+    Staff Quarters
+</h5>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Quarters Available for Principal </label>
+        <input class="form-control" value="@(Model.StaffQuartersPrincipal.HasValue ? (Model.StaffQuartersPrincipal.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Quarters Available for Other Staff </label>
+        <input class="form-control" value="@(Model.StaffQuartersOtherStaff.HasValue ? (Model.StaffQuartersOtherStaff.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Quarters Available for Teaching and Ancillary Staff</label>
+        <input class="form-control" value="@(Model.StaffQuartersTeachingAncillary.HasValue ? (Model.StaffQuartersTeachingAncillary.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+</div>
+
+@if (Model.StaffQuartersFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.StaffQuartersFeedback)
+}

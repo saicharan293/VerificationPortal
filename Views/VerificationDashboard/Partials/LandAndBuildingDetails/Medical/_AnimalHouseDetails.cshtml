@@ -1,0 +1,73 @@
+ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="section_@Model.AnimalHouseFeedback?.SectionId">
+    <i class="bi bi-heart-pulse me-2"></i>
+    Animal House Details
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Animal House Available
+        </label>
+
+        <input class="form-control"
+               value="@(Model.AnimalHouseAvailable.HasValue
+                   ? (Model.AnimalHouseAvailable.Value ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Animal House Area (Sq. Ft.)
+        </label>
+
+        <input class="form-control"
+               value="@(Model.AnimalHouseAreaSqFt?.ToString("N2") ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Animal House Staff Count
+        </label>
+
+        <input class="form-control"
+               value="@(Model.AnimalHouseStaffCount?.ToString() ?? "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Registered Under Anatomy Act
+        </label>
+
+        <input class="form-control"
+               value="@(Model.RegisteredUnderAnatomyAct.HasValue
+                   ? (Model.RegisteredUnderAnatomyAct.Value ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-12">
+        <label class="form-label fw-semibold">
+            Animal Types
+        </label>
+
+        <textarea class="form-control"
+                  rows="3"
+                  disabled>@(string.IsNullOrWhiteSpace(Model.AnimalTypes)
+                      ? "Not Available"
+                      : Model.AnimalTypes)</textarea>
+    </div>
+
+</div>
+
+@if (Model.AnimalHouseFeedback != null)
+{
+    @await Html.PartialAsync(
+        "~/Views/Shared/_SectionFeedback.cshtml",
+        Model.AnimalHouseFeedback)
+}

@@ -1,0 +1,60 @@
+﻿ @model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2"  id="section_@Model.AreaFeedback?.SectionId">
+    <i class="bi bi-rulers me-2"></i>
+    Area Details
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Principal Chamber Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.PrincipalChamberAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Office Room Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.OfficeRoomAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Staff Rooms Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.StaffRoomsAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Lecture Halls Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.LectureHallsAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Laboratories Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.LaboratoriesAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Seminar Hall Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.SeminarHallAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Auditorium Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.AuditoriumAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Museum Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.MuseumAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold"> Committee Rooms Area (Sq. Ft.) </label>
+        <input class="form-control" value="@(Model.CommitteeRoomsAreaSqFt?.ToString("N2") ?? "Not Available")" disabled />
+    </div>
+
+</div>
+
+@if (Model.AreaFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.AreaFeedback)
+}

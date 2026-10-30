@@ -1,31 +1,23 @@
 ﻿@model VerificationPortal.Models.DentalLandBuildingVerificationVm
 
-
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
     ViewData["Title"] = "Land & Building Details - Verification Dashboard";
     ViewData["ActiveTab"] = "LandAndBuildingDetails";
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
-    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
+
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model.PageContext.FacultyName ?? "";
 
     ViewData["ShowFeedbackSection"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["CurrentVerifier"] = Model.PageContext.CurrentVerifier ?? User.Identity?.Name;
 
-    ViewData["PrevTabAction"] = Url.Action(
-        "PgCourseDetails",
-        "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+    ViewData["PrevTabAction"] = Model.PageContext.PrevTabAction;
+    ViewData["PrevTabLabel"] = Model.PageContext.PrevTabLabel ?? "Previous: PG Course Details";
 
-    ViewData["PrevTabLabel"] = "Previous: PG Course Details";
-
-    ViewData["NextTabAction"] = Url.Action(
-        "ClassroomAndLaboratory",
-        "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
-
-    ViewData["NextTabLabel"] = "Next: Classroom & Laboratory";
+    ViewData["NextTabAction"] = Model.PageContext.NextTabAction;
+    ViewData["NextTabLabel"] = Model.PageContext.NextTabLabel ?? "Next: Classroom & Laboratory";
 
     var landBuilding = Model.LandBuilding;
 }
@@ -71,276 +63,28 @@
 
         <!-- Land Details -->
 
-        <h5 class="fw-bold mb-3 border-bottom pb-2">
-            <i class="bi bi-geo-alt"></i>
-            Land Details
-        </h5>
-
-        <div class="row g-3 mb-4">
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Total Land Area (Acres)</label>
-                <input class="form-control"
-                       value="@(Model.LandBuilding.TotalLandAreaAcres?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Land Ownership Type</label>
-                <input class="form-control"
-                       value="@(Model.LandBuilding.LandOwnershipType ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Land Category</label>
-                <input class="form-control"
-                       value="@(Model.LandBuilding.LandCategory ?? "N/A")"
-                       disabled />
-            </div>
+        @await Html.PartialAsync("~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_LandDetails.cshtml", Model)
 
 
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Future Expansion Space</label>
-                <input class="form-control"
-                       value="@(Model.LandBuilding.HasFutureExpansionSpace == true ? "Yes" : (Model.LandBuilding.HasFutureExpansionSpace == false ? "No" : "N/A"))"
-                       disabled />
-            </div>
-
-        </div>
-
-        <!-- Documents -->
-
-        <h5 class="fw-bold mb-3 border-bottom pb-2">
-            <i class="bi bi-file-earmark-text"></i>
-            Land Documents
-        </h5>
-
-        <div class="row g-3 mb-4">
-            @foreach (var document in Model.LandDocuments)
-            {
-                <div class="col-md-4">
-
-                    <label class="form-label fw-bold">
-                        @document.Label
-                    </label>
-
-                    @if (!string.IsNullOrWhiteSpace(document.Path))
-                    {
-                        @await Html.PartialAsync(
-                            "_DocumentViewerButton",
-                            new DocumentViewerVm
-                            {
-                                Url = Url.Action(
-                                    document.Action,
-                                    "VerificationDashboard",
-                                    new
-                                    {
-                                        id = Model.LandBuilding.Id,
-                                        documentType = document.DocumentType
-                                    })!,
-
-                                Title = document.Label,
-                                DocumentId = document.DocumentId,
-                                FacultyId = Model.FacultyId,
-                                CollegeCode = Model.CollegeCode
-                            })
-                    }
-                    else
-                    {
-                        <div class="form-control text-muted">
-                            Not Uploaded
-                        </div>
-                    }
-
-                </div>
-            }
-
-        </div>
-
-        
         @if (Model.LandFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", Model.LandFeedback)
         }
 
+        <!-- Documents -->
+
+        @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_LandDocuments.cshtml", Model)
 
         <!-- Building -->
 
-        <h5 class="fw-bold mb-3 border-bottom pb-2">
-            <i class="bi bi-house"></i>
-            Building Details
-        </h5>
-
-        <div class="row g-3 mb-4">
-
-            <!-- Total Built-up Area -->
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Total Built-up Area (Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.TotalBuiltupAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area Per Lecture Hall (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.LectureHallAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Number of students / one lecture hall
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.LectureHallSeatingCapacity?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Number of lecture halls
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.LectureHallCount?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area of Museum & Demonstration Rooms (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.MuseumDemoRoomsAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area of Departmental Areas (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.DepartmentWiseAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area of Preclinical Labs & Skill Labs (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.PreclinicalSkillLabAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area of Examination Hall (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.ExaminationHallAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area of Library Including Reading Room (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.LibraryAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">
-                    Area of Dental Hospital (in Sq.m)
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.LandBuilding.HospitalAreaSqm?.ToString("N2") ?? "N/A")"
-                       disabled />
-            </div>
-
-
-            <div class="row g-3 mb-4">
-
-                @foreach (var document in Model.BuildingDocuments)
-                {
-                    <div class="col-md-4">
-
-                        <label class="form-label fw-bold">
-                            @document.Label
-                        </label>
-
-                        @if (!string.IsNullOrWhiteSpace(document.Path))
-                        {
-                            @await Html.PartialAsync(
-                                "_DocumentViewerButton",
-                                new DocumentViewerVm
-                                {
-                                    Url = Url.Action(
-                                        "ViewLandBuildingDocument",
-                                        "VerificationDashboard",
-                                        new
-                                        {
-                                            id = Model.LandBuilding.Id,
-                                            documentType = document.DocumentType
-                                        })!,
-
-                                    Title = document.Label, 
-                                    DocumentId = document.DocumentId,
-                                    FacultyId = Model.FacultyId,
-                                    CollegeCode = Model.CollegeCode
-                                })
-                        }
-                        else
-                        {
-                            <div class="form-control text-muted">
-                                Not Uploaded
-                            </div>
-                        }
-
-                    </div>
-                }
-
-            </div>
-
-        </div>
-
-        @if (!string.IsNullOrWhiteSpace(Model.LandBuilding.Remarks))
-        {
-            <hr />
-
-            <h5 class="fw-bold">
-                <i class="bi bi-chat-left-text"></i>
-                Remarks
-            </h5>
-
-            <div class="alert alert-secondary">
-                @Model.LandBuilding.Remarks
-            </div>
-        }
-
+        @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_BuildingDetails.cshtml", Model)
 
         @if (Model.BuildingFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", Model.BuildingFeedback)
         }
 
+        @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/LandAndBuildingDetails/Dental/_BuildingDocuments.cshtml", Model)
     </div>
 
     

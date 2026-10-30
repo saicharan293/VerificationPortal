@@ -1,0 +1,56 @@
+﻿@model VerificationPortal.Models.MedicalLandBuildingVerificationVm
+
+<h5 class="fw-bold mb-3 border-bottom pb-2" id="section_@Model.LandFeedback?.SectionId">
+    <i class="bi bi-geo-alt me-2"></i>
+    Land Details
+</h5>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Minimum Land Available </label>
+        <input class="form-control" value="@(Model.IsMinimumLandAvailable.HasValue ? (Model.IsMinimumLandAvailable.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold"> Future Expansion Space Available </label>
+        <input class="form-control" value="@(Model.HasFutureExpansionSpace.HasValue ? (Model.HasFutureExpansionSpace.Value ? "Yes" : "No") : "Not Available")" disabled />
+    </div>
+
+    <div class="col-md-12">
+        <label class="form-label fw-semibold"> Land Details </label>
+        <textarea class="form-control"
+                  rows="3"
+                  disabled>@(string.IsNullOrWhiteSpace(Model.LandDetailsIfYes) ? "Not Available"  : Model.LandDetailsIfYes)</textarea>
+    </div>
+
+    @* <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Purchase Plan if Land is Not Available
+        </label>
+
+        <input class="form-control"
+               value="@(Model.HasPurchasePlanIfNo.HasValue
+                   ? (Model.HasPurchasePlanIfNo.Value ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">
+            Budget Provision for Purchase
+        </label>
+
+        <input class="form-control"
+               value="@(Model.HasBudgetProvisionIfNo.HasValue
+                   ? (Model.HasBudgetProvisionIfNo.Value ? "Yes" : "No")
+                   : "Not Available")"
+               disabled />
+    </div> *@
+
+</div>
+
+@if (Model.LandFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.LandFeedback)
+}
