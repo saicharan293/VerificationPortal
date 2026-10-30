@@ -4171,6 +4171,14 @@ namespace VerificationPortal.Controllers
 
             var vm = new DepartmentOfficesMeuViewModel
             {
+                PageContext = new VerificationPageContextVm
+                {
+                  CollegeCode = context.CollegeCode,
+                  CollegeName = context.InstitutionName,
+                  FacultyId = context.FacultyCodeInt,
+                  FacultyName = context.FacultyName,
+                  CurrentVerifier = GetUserDesignation()  
+                },
                 CourseLevel = entity.CourseLevel,
                 CollegeCode = context.CollegeCode,
                 FacultyCode = Convert.ToInt32(facultyCode),
@@ -4272,7 +4280,7 @@ namespace VerificationPortal.Controllers
             //await SetVerificationViewData<AffInstitutionsDetail>( collegeCode);
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Department Offices And Educational Unit", context.FacultyCodeInt);
+            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Department Offices And Educational Unit", context.FacultyCodeInt);
 
             return View(vm);
         }

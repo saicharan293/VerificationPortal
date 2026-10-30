@@ -62,6 +62,9 @@ namespace VerificationPortal.Models
         public string? DeuMembersListFilePath { get; set; }
         public int? DeuMembersListDocumentId { get; set; }
 
+        public VerificationPageContextVm PageContext { get; set; } = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (HasMedicalEducationUnit == true)

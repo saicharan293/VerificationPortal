@@ -1,0 +1,71 @@
+@model VerificationPortal.Models.DepartmentOfficesMeuViewModel
+
+@{
+    var deptInfraFeedback = Model.SectionFeedback
+                                ?.FirstOrDefault(x => x.SectionName == "Department Office Infrastructure");
+}
+
+<div class="verification-card">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-building"></i>
+            Department Office Infrastructure
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Room for Head of Department with space for Department Office, office staff and storage of records
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.HasHodRoomWithOfficeAndRecords == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                     Rooms with adequate space for teaching faculty and Tutors / Demonstrators / Residents (Junior & Senior)
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.HasRoomsForFacultyAndResidents == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Rooms for faculty provided with communication, computer and internet facilities
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.FacultyRoomsHaveCommunicationComputerInternet == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Rooms for Non-Teaching Staff
+                </label>
+
+                <input class="form-control"
+                       value="@(Model.HasRoomsForNonTeachingStaff == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+        </div>
+
+
+        @if (deptInfraFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deptInfraFeedback)
+        }
+
+    </div>
+
+</div>

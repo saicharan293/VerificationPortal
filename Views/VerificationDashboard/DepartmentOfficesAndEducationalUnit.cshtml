@@ -60,340 +60,24 @@
 </div>
 
 
-@{
-    var deptInfraFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Department Office Infrastructure");
-}
+@await Html.PartialAsync(
+    "~/Views/VerificationDashboard/Partials/DepartmentOfficeEducationalUnit/_DepartmentOfficeInfrastructure.cshtml",
+    Model
+)
 
-<div class="verification-card">
-
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-building"></i>
-            Department Office Infrastructure
-        </h3>
-    </div>
-
-    <div class="verification-card-body">
-
-        <div class="row g-4">
-
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">
-                    HOD Room with Office & Records
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.HasHodRoomWithOfficeAndRecords == true ? "Yes" : "No")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">
-                    Rooms for Faculty & Residents
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.HasRoomsForFacultyAndResidents == true ? "Yes" : "No")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">
-                    Faculty Rooms have Communication, Computer & Internet
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.FacultyRoomsHaveCommunicationComputerInternet == true ? "Yes" : "No")"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">
-                    Rooms for Non-Teaching Staff
-                </label>
-
-                <input class="form-control"
-                       value="@(Model.HasRoomsForNonTeachingStaff == true ? "Yes" : "No")"
-                       disabled />
-            </div>
-
-        </div>
-
-
-        @if (deptInfraFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", deptInfraFeedback)
-        }
-
-    </div>
-
-</div>
-
-
-
-
-@{
-    var deuFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                        ?.FirstOrDefault(x => x.SectionName == "Dental Education Unit");
-}
-
-@if ((ViewBag.FacultyCode?.ToString() ?? "") == "2")
+@if (Model.PageContext.FacultyId == 2)
 {
     <!-- ================= DENTAL EDUCATION UNIT ================= -->
-
-    <div class="verification-card mt-4">
-
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-mortarboard"></i>
-                Dental Education Unit (DEU)
-            </h3>
-        </div>
-
-        <div class="verification-card-body">
-
-            <div class="row g-4">
-
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                        Dental Education Unit Available
-                    </label>
-
-                    <input class="form-control"
-                           value="@(Model.HasDentalEducationUnit == true ? "Yes" : "No")"
-                           disabled />
-                </div>
-
-                @if (Model.HasDentalEducationUnit == true)
-                {
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Area (Sq. m.)
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.DentalEducationUnitAreaSqm"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Audio Visual Facilities
-                        </label>
-
-                        <input class="form-control"
-                               value="@(Model.DentalEducationUnitHasAudioVisual == true ? "Yes" : "No")"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Internet Facility
-                        </label>
-
-                        <input class="form-control"
-                               value="@(Model.DentalEducationUnitHasInternet == true ? "Yes" : "No")"
-                               disabled />
-                    </div>
-
-                    <!-- DEU Year of Starting -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            DEU Year of Starting
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.DEUYearOfStarting"
-                               disabled />
-                    </div>
-
-                    <!-- DEU Nature of Activities -->
-                    <div class="col-md-12">
-                        <label class="form-label fw-semibold">
-                            Nature of Activities
-                        </label>
-
-                        <textarea class="form-control"
-                                  rows="4"
-                                  disabled>@Model.NatureOfActivities</textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Coordinator Name
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.DeuCoordinatorName"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Designation & Department
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.DeuCoordinatorDesignationDepartment"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Phone
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.DeuCoordinatorPhone"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Email
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.DeuCoordinatorEmail"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-12">
-                        <label class="form-label fw-semibold">
-                            Activities During Last Academic Year
-                        </label>
-
-                        <textarea class="form-control"
-                                  rows="4"
-                                  disabled>@Model.DeuActivitiesLastAcademicYear</textarea>
-                    </div>
-                }
-
-            </div>
-            @if (deuFeedback != null)
-            {
-                @await Html.PartialAsync("_SectionFeedback", deuFeedback)
-            }
-        </div>
-
-    </div>
+    @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/DepartmentOfficesEducationalUnit/_DEU.cshtml",  Model)
 
 }
 else
 {
     <!-- ================= MEDICAL EDUCATION UNIT ================= -->
-
-    <div class="verification-card mt-4">
-
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-mortarboard"></i>
-                Medical Education Unit (MEU)
-            </h3>
-        </div>
-
-        <div class="verification-card-body">
-
-            <div class="row g-4">
-
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                        Medical Education Unit Available
-                    </label>
-
-                    <input class="form-control"
-                           value="@(Model.HasMedicalEducationUnit == true ? "Yes" : "No")"
-                           disabled />
-                </div>
-
-                @if (Model.HasMedicalEducationUnit == true)
-                {
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Area (Sq. m.)
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.MedicalEducationUnitAreaSqm"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Audio Visual Facilities
-                        </label>
-
-                        <input class="form-control"
-                               value="@(Model.MedicalEducationUnitHasAudioVisual == true ? "Yes" : "No")"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Internet Facility
-                        </label>
-
-                        <input class="form-control"
-                               value="@(Model.MedicalEducationUnitHasInternet == true ? "Yes" : "No")"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Coordinator Name
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.MeuCoordinatorName"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Designation & Department
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.MeuCoordinatorDesignationDepartment"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Phone
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.MeuCoordinatorPhone"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            Email
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.MeuCoordinatorEmail"
-                               disabled />
-                    </div>
-
-                    <div class="col-md-12">
-                        <label class="form-label fw-semibold">
-                            Activities During Last Academic Year
-                        </label>
-
-                        <textarea class="form-control"
-                                  rows="4"
-                                  disabled>@Model.MeuActivitiesLastAcademicYear</textarea>
-                    </div>
-                }
-
-            </div>
-
-        </div>
-
-    </div>
+    @await Html.PartialAsync(
+    "~/Views/VerificationDashboard/Partials/DepartmentOfficeEducationalUnit/_MEU.cshtml",
+    Model
+)
 }
 
 <div class="verification-card mt-4">
@@ -407,7 +91,7 @@ else
 
     <div class="verification-card-body">
 
-        @if ((ViewBag.FacultyCode?.ToString() ?? "") == "2")
+        @if (Model.PageContext.FacultyId == 2)
         {
             <!-- DEU -->
             <div class="row">
@@ -470,7 +154,7 @@ else
 
                     @if (Model.HasMeuMembersListFile)
                     {
-                        <div class="d-flex align-items-center justify-content-between border rounded p-3 bg-light">
+                        <div class="d-flex align-items-center justify-content-between border rounded p-3">
 
                             <div>
                                 <i class="bi bi-file-earmark-pdf text-danger me-2"></i>

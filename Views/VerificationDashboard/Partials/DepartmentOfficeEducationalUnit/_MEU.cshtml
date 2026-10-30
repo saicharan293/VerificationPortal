@@ -1,0 +1,121 @@
+@model VerificationPortal.Models.DepartmentOfficesMeuViewModel
+
+@{
+    var meuFeedback = Model.SectionFeedback
+                        ?.FirstOrDefault(x => x.SectionName == "Medical Education Unit");
+}
+
+<div class="verification-card mt-4" id="section_@meuFeedback?.SectionId">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-mortarboard"></i>
+            Medical Education Unit (MEU)
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Medical Education Unit Available
+                </label>
+
+                <input class="form-control"
+                        value="@(Model.HasMedicalEducationUnit == true ? "Yes" : "No")"
+                        disabled />
+            </div>
+
+            @if (Model.HasMedicalEducationUnit == true)
+            {
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Medical Education Unit Area (Sq. m.)
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.MedicalEducationUnitAreaSqm"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        MEU has Audio-Visual Facilities
+                    </label>
+
+                    <input class="form-control"
+                            value="@(Model.MedicalEducationUnitHasAudioVisual == true ? "Yes" : "No")"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        MEU has Internet Facilities
+                    </label>
+
+                    <input class="form-control"
+                            value="@(Model.MedicalEducationUnitHasInternet == true ? "Yes" : "No")"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        MEU Coordinator Name
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.MeuCoordinatorName"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Designation and Department
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.MeuCoordinatorDesignationDepartment"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Phone
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.MeuCoordinatorPhone"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Email Id
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.MeuCoordinatorEmail"
+                            disabled />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">
+                        List of MEU Activities During Last Academic Year
+                    </label>
+
+                    <textarea class="form-control"
+                                rows="4"
+                                disabled>@Model.MeuActivitiesLastAcademicYear</textarea>
+                </div>
+            }
+
+        </div>
+        @if (meuFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", meuFeedback)
+        }
+    </div>
+
+</div>

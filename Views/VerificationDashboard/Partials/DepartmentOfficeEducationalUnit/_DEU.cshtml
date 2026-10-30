@@ -1,0 +1,143 @@
+@model VerificationPortal.Models.DepartmentOfficesMeuViewModel
+
+@{
+    var deuFeedback = Model.SectionFeedback
+                        ?.FirstOrDefault(x => x.SectionName == "Dental Education Unit");
+}
+
+
+<div class="verification-card mt-4" id="section_@deuFeedback?.SectionId">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-mortarboard"></i>
+            Dental Education Unit (DEU)
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Dental Education Unit Available
+                </label>
+
+                <input class="form-control"
+                        value="@(Model.HasDentalEducationUnit == true ? "Yes" : "No")"
+                        disabled />
+            </div>
+
+            @if (Model.HasDentalEducationUnit == true)
+            {
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Area (Sq. m.)
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.DentalEducationUnitAreaSqm"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Audio Visual Facilities
+                    </label>
+
+                    <input class="form-control"
+                            value="@(Model.DentalEducationUnitHasAudioVisual == true ? "Yes" : "No")"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Internet Facility
+                    </label>
+
+                    <input class="form-control"
+                            value="@(Model.DentalEducationUnitHasInternet == true ? "Yes" : "No")"
+                            disabled />
+                </div>
+
+                <!-- DEU Year of Starting -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        DEU Year of Starting
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.DEUYearOfStarting"
+                            disabled />
+                </div>
+
+                <!-- DEU Nature of Activities -->
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">
+                        Nature of Activities
+                    </label>
+
+                    <textarea class="form-control"
+                                rows="4"
+                                disabled>@Model.NatureOfActivities</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Coordinator Name
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.DeuCoordinatorName"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Designation & Department
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.DeuCoordinatorDesignationDepartment"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Phone
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.DeuCoordinatorPhone"
+                            disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Email
+                    </label>
+
+                    <input class="form-control"
+                            value="@Model.DeuCoordinatorEmail"
+                            disabled />
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">
+                        Activities During Last Academic Year
+                    </label>
+
+                    <textarea class="form-control"
+                                rows="4"
+                                disabled>@Model.DeuActivitiesLastAcademicYear</textarea>
+                </div>
+            }
+
+        </div>
+        @if (deuFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deuFeedback)
+        }
+    </div>
+
+</div>
