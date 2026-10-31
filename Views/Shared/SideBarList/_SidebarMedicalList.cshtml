@@ -135,6 +135,17 @@
         </li>
 
         <li class="nav-item">
+            <a asp-controller="VerificationDashboard"
+                asp-action="CA_VehicleDetails"
+                asp-route-collegeCode="@collegeCode"
+                class="nav-link @(activeTab == "CAVehicleDetails" ? "active" : "")">
+
+                <i class="bi bi-car-front"></i>
+                <span>Vehicle Details</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
             <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
 
@@ -162,16 +173,6 @@
             </a>
         </li>
         
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="CA_VehicleDetails"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "CAVehicleDetails" ? "active" : "")">
-
-                <i class="bi bi-car-front"></i>
-                <span>Vehicle Details</span>
-            </a>
-        </li>
         <li class="nav-item">
             <a asp-controller="VerificationDashboard"
                 asp-action="WorkShopDetails"
