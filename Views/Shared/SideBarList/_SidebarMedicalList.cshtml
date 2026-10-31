@@ -144,7 +144,35 @@
                 <span>Vehicle Details</span>
             </a>
         </li>
-        
+
+        @if (existingCourseLevel == "UG")
+        {
+            <li class="nav-item">
+                <a asp-controller="VerificationDashboard"
+                asp-action="UgAcademicMatters"
+                asp-route-collegeCode="@collegeCode"
+                class="nav-link @(activeTab == "UgAcademicMatters" ? "active" : "")">
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    <span>UG Academic Matters</span>
+                </a>
+            </li>
+        }
+
+        @if (existingCourseLevel == "PG")
+        {
+            <li class="nav-item">
+                <a asp-controller="VerificationDashboard"
+                asp-action="PgAcademicMatters"
+                asp-route-collegeCode="@collegeCode"
+                class="nav-link @(activeTab == "PgAcademicMatters" ? "active" : "")">
+
+                    <i class="bi bi-mortarboard"></i>
+                    <span>PG Academic Matters</span>
+                </a>
+            </li>
+        }
         <li class="nav-item">
             <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
@@ -206,34 +234,7 @@
             </a>
         </li>
 
-        @if (existingCourseLevel == "UG")
-        {
-            <li class="nav-item">
-                <a asp-controller="VerificationDashboard"
-                asp-action="UgAcademicMatters"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "UgAcademicMatters" ? "active" : "")">
-
-                    <i class="bi bi-mortarboard"></i>
-
-                    <span>UG Academic Matters</span>
-                </a>
-            </li>
-        }
-
-        @if (existingCourseLevel == "PG")
-        {
-            <li class="nav-item">
-                <a asp-controller="VerificationDashboard"
-                asp-action="PgAcademicMatters"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "PgAcademicMatters" ? "active" : "")">
-
-                    <i class="bi bi-mortarboard"></i>
-                    <span>PG Academic Matters</span>
-                </a>
-            </li>
-        }
+        
         
         <li class="nav-item">
             <a href="@Url.Action("StaffPayScale", "VerificationDashboard", new { collegeCode = collegeCode })"
