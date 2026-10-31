@@ -24,6 +24,10 @@ INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive,
 --update MstTabs
 --set tabname = 'Classroom And Laboratory'
 --where TabName like '%classroom%';
+
+
+SELECT * FROM MstTabs
+WHERE FacultyId = 1
 ----------------------------MST MEDICAL TABS ---------------------------
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Institution Details');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Trust Details');
@@ -39,9 +43,9 @@ INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Classroom And L
 
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Chair Distribution');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Bed Distribution');
---INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Hostel Details');
---INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Department Offices And Educational Unit');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Equipment List');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Department Offices And Educational Unit');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Hostel Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Vehicle Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'UG Academic Matters');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'PG Academic Matters');
@@ -118,13 +122,15 @@ where t.FacultyId = 2
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 44, 'Facility Requirements');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 11, 'Chair Distribution Details');
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 45, 'Beds Distribution');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 13, 'Hostel Information');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 13, 'Student Accommodation');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 13, 'Common Room Facilities');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 13, 'Hostel Facilities');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 14, 'Department Office Infrastructure');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 14, 'Dental Education Unit');
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 46, 'Equipment Details');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 47, 'Department Office Infrastructure');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 47, 'Medical Education Unit');
+
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 48, 'Hostel Information');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 48, 'Student Accommodation');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 48, 'Common Room Facilities');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 48, 'Hostel Facilities');
+
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 16, 'Vehicle Information');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 17, 'UG Academic Performance');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 18, 'PG Academic Performance');

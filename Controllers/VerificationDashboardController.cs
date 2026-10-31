@@ -4060,16 +4060,6 @@ namespace VerificationPortal.Controllers
 
             PopulateCommonViewBags(context);
 
-            //ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            //ViewBag.UserDesignation = GetUserDesignation();
-
-            var college = await _context.AffiliationCollegeMasters
-                .AsNoTracking()
-                .Where(c => c.CollegeCode == collegeCode)
-                .FirstOrDefaultAsync();
-
-            //ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-
             var hostel = await _context.AffHostelDetails
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x =>
@@ -4089,21 +4079,29 @@ namespace VerificationPortal.Controllers
 
             var vm = new AffHostelDetailsCreateVm
             {
+                PageContext = new VerificationPageContextVm
+                {
+                  CollegeCode = collegeCode,
+                  FacultyId = context.FacultyCodeInt,
+                  FacultyName = context.FacultyName,
+                  CurrentVerifier = GetUserDesignation(),
+                //   NextTabAction =   
+                },
                 Hostel = hostel ?? new AffHostelDetail
                 {
                     CollegeCode = collegeCode,
                     FacultyCode = context.FacultyCode
                 }, 
                 CourseLevel = courseLevel,
-                CollegeName = college.CollegeName,
-                CollegeCode = college.CollegeCode,
+                CollegeName = context.InstitutionName,
+                CollegeCode = context.CollegeCode,
                 UserDesignation = GetUserDesignation(),
                 ActiveTab = nameof(HostelDetails),
                 SectionFeedback = sectionFeedback
             };
 
             vm.PossessionProofDocumentId = await GetDocumentIdAsync("Possession Proof");
-            vm.FacultyName = await GetFacultyName(Convert.ToInt32(college.FacultyCode));
+            vm.FacultyName = await GetFacultyName(Convert.ToInt32(context.FacultyCode));
 
           
 

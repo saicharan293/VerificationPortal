@@ -6,9 +6,9 @@
     ViewData["Title"] = "Hostel Details";
     ViewData["ActiveTab"] = "HostelDetails";
 
-    ViewData["InstitutionName"] = Model.CollegeName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = Model.CollegeCode ?? "";
-    ViewData["FacultyName"] = Model.FacultyName ?? "";
+    ViewData["InstitutionName"] = Model.PageContext.CollegeName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? Model.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model.PageContext.FacultyName ?? "";
 
     ViewData["ShowFeedbackSection"] = true;
 
@@ -65,7 +65,7 @@
     </div>
 </div>
 
-<div class="verification-card">
+<div class="verification-card" id="section_@hostelInfoFeedback?.SectionId">
     
 
     <div class="verification-card-header">
@@ -89,15 +89,6 @@
                        disabled />
             </div>
 
-            @* <div class="col-md-6">
-                <label class="form-label fw-semibold">
-                    Ownership
-                </label>
-
-                <input class="form-control"
-                       value="@Model.Hostel.OwnOrRented"
-                       disabled />
-            </div> *@
 
             <div class="col-md-6">
                 <label class="form-label fw-semibold">
@@ -106,16 +97,6 @@
 
                 <input class="form-control"
                        value="@Model.Hostel.BuiltUpAreaSqFt"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">
-                    Space per Student
-                </label>
-
-                <input class="form-control"
-                       value="@Model.Hostel.SpacePerStudent"
                        disabled />
             </div>
 
@@ -215,7 +196,7 @@
 
 
 
-<div class="verification-card mt-4">
+<div class="verification-card mt-4"  id="section_@studentAccomodationFeedback?.SectionId">
 
     <div class="verification-card-header">
         <h3 class="verification-card-title">
@@ -228,28 +209,28 @@
 
         <div class="row g-4">
 
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <label>Total Male Students</label>
                 <input class="form-control"
                        value="@Model.Hostel.TotalMaleStudents"
                        disabled />
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <label>Total Male Rooms</label>
                 <input class="form-control"
                        value="@Model.Hostel.TotalMaleRooms"
                        disabled />
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <label>Total Female Students</label>
                 <input class="form-control"
                        value="@Model.Hostel.TotalFemaleStudents"
                        disabled />
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <label>Total Female Rooms</label>
                 <input class="form-control"
                        value="@Model.Hostel.TotalFemaleRooms"
@@ -266,7 +247,7 @@
     </div>
 </div>
 
-<div class="verification-card mt-4">
+<div class="verification-card mt-4" id="section_@commonRoomFacilitiesFeedback?.SectionId">
 
     <div class="verification-card-header">
         <h3 class="verification-card-title">
@@ -288,10 +269,26 @@
             </div>
 
             <div class="col-md-6">
+                <label>Common Room Area for Men (Sq. Ft.)</label>
+
+                <input class="form-control"
+                       value="@(Model.Hostel.CommonRoomForMenArea)"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
                 <label>Common Room for Women</label>
 
                 <input class="form-control"
                        value="@(Model.Hostel.CommonRoomWomen == true ? "Yes" : "No")"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label>Common Room Area for Women (Sq. Ft.)</label>
+
+                <input class="form-control"
+                       value="@(Model.Hostel.CommonRoomForWomenArea)"
                        disabled />
             </div>
 
@@ -304,36 +301,6 @@
             </div>
 
         </div>
-
-        <div class="row g-4">
-
-            <div class="col-md-12">
-                <label>Hostel Facility Details</label>
-
-                <textarea class="form-control"
-                          rows="3"
-                          disabled>@Model.Hostel.HostelFacilityDetails</textarea>
-            </div>
-
-            <div class="col-md-6">
-                <label>Hostel Capacity (Men)</label>
-
-                <input class="form-control"
-                       value="@Model.Hostel.HostelMenCount"
-                       disabled />
-            </div>
-
-            <div class="col-md-6">
-                <label>Hostel Capacity (Women)</label>
-
-                <input class="form-control"
-                       value="@Model.Hostel.HostelWomenCount"
-                       disabled />
-            </div>
-
-        </div>
-
-
         
         @if (commonRoomFacilitiesFeedback != null)
         {
@@ -343,7 +310,7 @@
 
 </div>
 
-<div class="verification-card mt-4">
+<div class="verification-card mt-4" id="section_@hostelFacilitiesFeedback?.SectionId">
 
     <div class="verification-card-header">
         <h3 class="verification-card-title">
@@ -355,74 +322,117 @@
     <div class="verification-card-body">
 
         <div class="row g-3">
+            <div class="col-md-12">
+                <label>Give details of facilities</label>
+
+                <textarea class="form-control"
+                        rows="3"
+                        disabled>@Model.Hostel.HostelFacilityDetails</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label>For men students</label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.HostelMenCount"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label>For lady students</label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.HostelWomenCount"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Whether own or rented
+                </label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.OwnOrRented"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Space given to each student (sq.ft)
+                </label>
+
+                <input class="form-control"
+                       value="@Model.Hostel.SpacePerStudent"
+                       disabled />
+            </div>
 
             <div class="col-md-6">
                 <strong>Sleeping Furniture</strong><br />
-                <span class="badge @(Model.Hostel.SleepingFurniture == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.SleepingFurniture == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.SleepingFurniture == true ? "bg-success" : Model.Hostel.SleepingFurniture == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.SleepingFurniture == true ? "Available" : Model.Hostel.SleepingFurniture == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Sanitary & Bathing Facilities</strong><br />
-                <span class="badge @(Model.Hostel.SanitaryBathing == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.SanitaryBathing == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.SanitaryBathing == true ? "bg-success" : Model.Hostel.SanitaryBathing == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.SanitaryBathing == true ? "Available" : Model.Hostel.SanitaryBathing == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Dining Hall</strong><br />
-                <span class="badge @(Model.Hostel.DiningHall == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.DiningHall == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.DiningHall == true ? "bg-success" : Model.Hostel.DiningHall == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.DiningHall == true ? "Available" : Model.Hostel.DiningHall == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Common Room</strong><br />
-                <span class="badge @(Model.Hostel.HostelCommonRoom == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.HostelCommonRoom == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.HostelCommonRoom == true ? "bg-success" : Model.Hostel.HostelCommonRoom == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.HostelCommonRoom == true ? "Available" : Model.Hostel.HostelCommonRoom == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Visitors Room</strong><br />
-                <span class="badge @(Model.Hostel.VisitorsRoom == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.VisitorsRoom == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.VisitorsRoom == true ? "bg-success" : Model.Hostel.VisitorsRoom == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.VisitorsRoom == true ? "Available" : Model.Hostel.VisitorsRoom == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Kitchen & Pantry</strong><br />
-                <span class="badge @(Model.Hostel.KitchenPantry == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.KitchenPantry == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.KitchenPantry == true ? "bg-success" : Model.Hostel.KitchenPantry == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.KitchenPantry == true ? "Available" : Model.Hostel.KitchenPantry == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Warden Office</strong><br />
-                <span class="badge @(Model.Hostel.WardenOffice == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.WardenOffice == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.WardenOffice == true ? "bg-success" : Model.Hostel.WardenOffice == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.WardenOffice == true ? "Available" : Model.Hostel.WardenOffice == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Reception Counter</strong><br />
-                <span class="badge @(Model.Hostel.ReceptionCounter == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.ReceptionCounter == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.ReceptionCounter == true ? "bg-success" : Model.Hostel.ReceptionCounter == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.ReceptionCounter == true ? "Available" : Model.Hostel.ReceptionCounter == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Games & Recreation</strong><br />
-                <span class="badge @(Model.Hostel.GamesRecreation == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.GamesRecreation == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.GamesRecreation == true ? "bg-success" : Model.Hostel.GamesRecreation == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.GamesRecreation == true ? "Available" : Model.Hostel.GamesRecreation == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 
             <div class="col-md-6">
                 <strong>Medical Facilities</strong><br />
-                <span class="badge @(Model.Hostel.MedicalFacilities == true ? "bg-success" : "bg-danger")">
-                    @(Model.Hostel.MedicalFacilities == true ? "Available" : "Not Available")
+                <span class="badge @(Model.Hostel.MedicalFacilities == true ? "bg-success" : Model.Hostel.MedicalFacilities == false ? "bg-danger" : "bg-secondary")">
+                    @(Model.Hostel.MedicalFacilities == true ? "Available" : Model.Hostel.MedicalFacilities == false ? "Not Available" : "Not Provided")
                 </span>
             </div>
 

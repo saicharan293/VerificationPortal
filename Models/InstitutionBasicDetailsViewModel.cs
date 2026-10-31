@@ -253,6 +253,7 @@ namespace VerificationPortal.Models
     public class AffHostelDetailsCreateVm
     {
         public AffHostelDetail Hostel { get; set; } = new();
+        public VerificationPageContextVm PageContext { get; set; } = new();
         public IEnumerable<SelectListItem> HostelTypes { get; set; } = new List<SelectListItem>();
 
         public string? CourseLevel {  get; set; }
