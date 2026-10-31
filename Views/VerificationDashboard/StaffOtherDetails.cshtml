@@ -30,21 +30,47 @@
 
     var staffOtherDetailsFeedback = staffOther?.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Staff Other Details");
 
-    var documents = new List<(string Label, string? FileName, int? Id,string FileType, string Title)>
+    var documents = new List<(string Label, string? FileName, int? Id, string FileType, string Title)>
     {
-        ("Examiners List", staffOther?.TeachersUpdatedPdfName, staffOther?.TeachersUpdatedPdfId,"EmsList", "Examiners List"),
-        ("Form 16 Details", staffOther?.ExaminerDetailsPdfName, staffOther?.ExaminerDetailsPdfId, "Examiner", "Examiner Details"),
-        ("Form 16 Details Upload 2", staffOther?.ExaminerDetailsPdfName2, staffOther?.ExaminerDetailsPdf2Id, "Examiner2", "Examiner Details"),
-        ("Form 16 Details Upload 3", staffOther?.ExaminerDetailsPdfName3, staffOther?.ExaminerDetailsPdf3Id, "Examiner3", "Examiner Details"),
-        ("Form 16 Details Upload 4", staffOther?.ExaminerDetailsPdfName4, staffOther?.ExaminerDetailsPdf4Id, "Examiner4", "Examiner Details Upload 4"),
-        ("Form 16 Details Upload 5", staffOther?.ExaminerDetailsPdfName5, staffOther?.ExaminerDetailsPdf5Id, "Examiner5", "Examiner Details Upload 5"),
-        ("AEBAS – Last Three Months", staffOther?.AEBASLastThreeMonthsPdfName, staffOther?.AEBASLastThreeMonthsPdfId, "AEBAS3Months", "AEBAS – Last Three Months"),
-        ("AEBAS – Inspection Day", staffOther?.AEBASInspectionDayPdfName, staffOther?.AEBASInspectionDayPdfId, "AEBASInspection", "AEBAS – Inspection Day"),
+        ("Examiners List", staffOther?.TeachersUpdatedPdfName, staffOther?.TeachersUpdatedPdfId, "EmsList", "Examiners List"),
+
+        ("Form 16 Details", staffOther?.ExaminerDetailsPdfName, staffOther?.ExaminerDetailsPdfId, "Examiner", "Examiner Details")
+    };
+
+    // Show additional Form 16 documents only for Dental (Faculty Code 2)
+    if (Model.PageContext.FacultyId == 2)
+    {
+        documents.AddRange(new[]
+        {
+            ("Form 16 Details Upload 2", staffOther?.ExaminerDetailsPdfName2, staffOther?.ExaminerDetailsPdf2Id, "Examiner2", "Examiner Details"),
+            ("Form 16 Details Upload 3", staffOther?.ExaminerDetailsPdfName3, staffOther?.ExaminerDetailsPdf3Id, "Examiner3", "Examiner Details"),
+            ("Form 16 Details Upload 4", staffOther?.ExaminerDetailsPdfName4, staffOther?.ExaminerDetailsPdf4Id, "Examiner4", "Examiner Details Upload 4"),
+            ("Form 16 Details Upload 5", staffOther?.ExaminerDetailsPdfName5, staffOther?.ExaminerDetailsPdf5Id, "Examiner5", "Examiner Details Upload 5")
+        });
+    }
+
+    documents.AddRange(new[]
+    {
+        ("AEBAS - Last Three Months", staffOther?.AEBASLastThreeMonthsPdfName, staffOther?.AEBASLastThreeMonthsPdfId, "AEBAS3Months", "AEBAS – Last Three Months"),
+        ("AEBAS - Inspection Day", staffOther?.AEBASInspectionDayPdfName, staffOther?.AEBASInspectionDayPdfId, "AEBASInspection", "AEBAS – Inspection Day"),
         ("Provident Fund", staffOther?.ProvidentFundPdfName, staffOther?.ProvidentFundPdfId, "PF", "Provident Fund"),
         ("ESI", staffOther?.ESIPdfName, staffOther?.ESIPdfId, "ESI", "ESI")
-    };
+    });
+}
+<style>
+    .min-width-0 {
+    min-width: 0;
 }
 
+.verification-document-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.verification-document-card:hover {
+    border-color: #b8c7d9 !important;
+    background-color: #fff !important;
+}
+</style>
 <div class="verification-page-header">
 
     <h2 class="verification-page-title">
@@ -58,101 +84,63 @@
 </div>
 
 <div class="verification-card mt-4">
-
     <div class="verification-card-header">
-
         <h3 class="verification-card-title">
             <i class="bi bi-people me-2"></i>
             Staff Other Details
         </h3>
-
-        <span class="badge bg-primary">
-            Staff Details
-        </span>
-
+        <span class="badge bg-primary"> Staff Details </span>
     </div>
 
     <div class="verification-card-body">
-
         <div class="row g-4">
-
             <div class="col-md-6">
-
                 <div class="verification-field">
-
                     <label class="verification-label">
                         Teachers Updated in EMS
                     </label>
 
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(
-                            staffOther?.TeachersUpdatedInEMS)
-                            ? "-"
-                            : staffOther.TeachersUpdatedInEMS)
+                        @(string.IsNullOrWhiteSpace( staffOther?.TeachersUpdatedInEMS) ? "-" : staffOther.TeachersUpdatedInEMS)
                     </div>
-
                 </div>
-
             </div>
 
 
             <div class="col-md-6">
-
                 <div class="verification-field">
 
                     <label class="verification-label">
                         Examiner Details Attached
                     </label>
-
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(
-                            staffOther?.ExaminerDetailsAttached)
-                            ? "-"
-                            : staffOther.ExaminerDetailsAttached)
+                        @(string.IsNullOrWhiteSpace( staffOther?.ExaminerDetailsAttached) ? "-" : staffOther.ExaminerDetailsAttached)
                     </div>
-
                 </div>
-
             </div>
 
 
             <div class="col-md-6">
-
                 <div class="verification-field">
-
                     <label class="verification-label">
                         Service Register Maintained
                     </label>
 
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(
-                            staffOther?.ServiceRegisterMaintained)
-                            ? "-"
-                            : staffOther.ServiceRegisterMaintained)
+                        @(string.IsNullOrWhiteSpace(staffOther?.ServiceRegisterMaintained) ? "-" : staffOther.ServiceRegisterMaintained)
                     </div>
-
                 </div>
-
             </div>
 
-
             <div class="col-md-6">
-
                 <div class="verification-field">
-
                     <label class="verification-label">
                         Acquittance Register Maintained
                     </label>
-
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(
-                            staffOther?.AcquittanceRegisterMaintained)
-                            ? "-"
-                            : staffOther.AcquittanceRegisterMaintained)
+                        @(string.IsNullOrWhiteSpace( staffOther?.AcquittanceRegisterMaintained) ? "-" : staffOther.AcquittanceRegisterMaintained)
                     </div>
-
                 </div>
-
             </div>
 
         </div>
@@ -175,54 +163,60 @@
             @foreach (var document in documents)
             {
                 <div class="col-md-6" key="@document.FileType">
-                    <div class="verification-field">
-                        <label class="verification-label">
-                            @document.Label
-                        </label>
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Document Icon -->
+                            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i>
+                            </div>
 
-                        <div class="verification-value">
-                            @if (!string.IsNullOrWhiteSpace(document.FileName))
-                            {
-                                <div class="d-flex align-items-center justify-content-between gap-2">
-                                    <span class="text-break">
-                                        @document.FileName
-                                    </span>
-
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewStaffOtherPdf",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = Model.CollegeCode,
-                                                    fileType = document.FileType
-                                                })!,
-
-                                            Title = document.Title,
-
-                                            FacultyId = Convert.ToInt32(
-                                                staffOther?.FacultyCode),
-
-                                            DocumentId = document.Id, // Replace with the actual document ID property
-
-                                            CollegeCode = Model.CollegeCode,
-
-                                            CanVerify = true
-                                        })
+                            <!-- Document Details -->
+                            <div class="flex-grow-1 min-width-0">
+                                <div class="fw-semibold mb-1">
+                                    @document.Label
                                 </div>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+
+                                @if (!string.IsNullOrWhiteSpace(document.FileName))
+                                {
+                                    <div class="text-muted small text-break mb-2">
+                                        <i class="bi bi-paperclip me-1"></i>
+                                        @document.FileName
+                                    </div>
+
+                                    <div>
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewStaffOtherPdf",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        collegeCode = Model.CollegeCode,
+                                                        fileType = document.FileType
+                                                    })!,
+                                                Title = document.Title,
+                                                FacultyId = Convert.ToInt32( Model.PageContext.FacultyId),
+                                                DocumentId = document.Id,
+                                                CollegeCode = Model.CollegeCode,
+                                                CanVerify = true
+                                            })
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="badge text-secondary">
+                                        <i class="bi bi-file-earmark-x me-1"></i>
+                                        Not Uploaded
+                                    </span>
+                                }
+
+                            </div>
                         </div>
                     </div>
                 </div>
             }
-
         </div>
     </div>
 

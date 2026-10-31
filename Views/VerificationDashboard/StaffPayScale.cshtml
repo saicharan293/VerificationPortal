@@ -7,11 +7,11 @@
     ViewData["Title"] = "Staff Pay Scale";
     ViewData["ActiveTab"] = "StaffPayScale";
 
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
 
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
 
-    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? "";
+    ViewData["FacultyCode"] = Model.PageContext.FacultyId;
 
     ViewData["ShowFeedbackSection"] = true;
 
@@ -51,60 +51,32 @@
 
     <div class="verification-card-body">
         @{
-            var staffPayFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                                    ?.FirstOrDefault(x => x.SectionName == "Staff Pay Scale");
+            var staffPayFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Staff Pay Scale");
         }
 
-        @if (Model.StaffPayScaleList != null &&
-             Model.StaffPayScaleList.Any())
+        @if (Model.StaffPayScaleList != null && Model.StaffPayScaleList.Any())
         {
             <div class="table-responsive">
-
                 <table class="table table-bordered table-hover align-middle">
-
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 100px;">
-                                Sl. No.
-                            </th>
-
-                            <th>
-                                Designation
-                            </th>
-
-                            <th>
-                                Pay Scale
-                            </th>
+                            <th style="width: 100px;"> Sl. No. </th>
+                            <th> Designation </th>
+                            <th> Pay Scale </th>
                         </tr>
                     </thead>
 
                     <tbody>
-
                         @foreach (var item in Model.StaffPayScaleList)
                         {
                             <tr>
-
-                                <td class="fw-semibold">
-                                    @item.DesignationSlNo
-                                </td>
-
-                                <td>
-                                    @item.Designation
-                                </td>
-
-                                <td>
-                                    @(item.PayScale.HasValue
-                                        ? item.PayScale.Value.ToString("0.00")
-                                        : "-")
-                                </td>
-
+                                <td class="fw-semibold"> @item.DesignationSlNo </td>
+                                <td> @item.Designation </td>
+                                <td> @(item.PayScale.HasValue ? item.PayScale.Value.ToString("0.00") : "-") </td>
                             </tr>
                         }
-
                     </tbody>
-
                 </table>
-
             </div>
         }
         else

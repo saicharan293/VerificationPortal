@@ -6,6 +6,7 @@ namespace VerificationPortal.Models
     // Combined view model for the page
     public class StaffDetailsCombinedViewModel
     {
+        public VerificationPageContextVm PageContext {get; set;} = new();
         public string? CourseLevel { get; set; }
         public string? CollegeCode { get; set; }
         public string? FacultyCode { get; set; }
@@ -16,8 +17,7 @@ namespace VerificationPortal.Models
         public CA_Med_StaffParticularsOtherVM StaffOther { get; set; }
             = new();
 
-        public List<string> ExistingCourseLevels { get; set; }
-            = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
 
         // Separate verification for each section
         public VerificationFeedbackViewModel? StaffPayScaleVerification { get; set; }
