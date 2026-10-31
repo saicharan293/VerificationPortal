@@ -173,6 +173,15 @@
                 </a>
             </li>
         }
+
+        <li class="nav-item">
+            <a href="@Url.Action( "FinanceDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                class="nav-link @(activeTab == "FinanceDetails" ? "active" : "")">
+
+                <i class="bi bi-cash-stack"></i>
+                <span>Finance Details</span>
+            </a>
+        </li>
         <li class="nav-item">
             <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
@@ -255,14 +264,7 @@
             </a>
 
         </li>
-        <li class="nav-item">
-            <a href="@Url.Action( "FinanceDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "FinanceDetails" ? "active" : "")">
-
-                <i class="bi bi-cash-stack"></i>
-                <span>Finance Details</span>
-            </a>
-        </li>
+        
         <li class="nav-item">
             <a href="@Url.Action("LibraryServices", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "LibraryServices" ? "active" : "")">

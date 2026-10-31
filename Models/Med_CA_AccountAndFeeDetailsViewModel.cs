@@ -5,6 +5,7 @@ namespace VerificationPortal.Models
 {
     public class Med_CA_AccountAndFeeDetailsViewModel
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
         public string CollegeCode { get; set; } = null!;
 
         public string CourseLevel { get; set; } = null!;
@@ -17,30 +18,6 @@ namespace VerificationPortal.Models
 
         [Required(ErrorMessage = "Authority Contact is required")]
         public string AuthorityContact { get; set; } = "";
-
-        //[Required(ErrorMessage = "Recurrent Annual is required")]
-        //public decimal RecurrentAnnual { get; set; }
-
-        //[Required(ErrorMessage = "Non-Recurrent Annual is required")]
-        //public decimal NonRecurrentAnnual { get; set; }
-
-        //[Required(ErrorMessage = "Deposits is required")]
-        //public decimal Deposits { get; set; }
-
-        //[Required(ErrorMessage = "Tuition Fee is required")]
-        //public decimal TuitionFee { get; set; }
-
-        //[Required(ErrorMessage = "Sports Fee is required")]
-        //public decimal SportsFee { get; set; }
-
-        //[Required(ErrorMessage = "Union Fee is required")]
-        //public decimal UnionFee { get; set; }
-
-        //[Required(ErrorMessage = "Library Fee is required")]
-        //public decimal LibraryFee { get; set; }
-
-        //[Required(ErrorMessage = "Other Fee is required")]
-        //public decimal OtherFee { get; set; }
 
         [Required(ErrorMessage = "Recurrent Annual is required")]
         public decimal? RecurrentAnnual { get; set; }
@@ -69,13 +46,6 @@ namespace VerificationPortal.Models
 
         public decimal TotalFee { get; set; } // Can be calculated if needed
 
-        //[Required(ErrorMessage = "Account Books Maintained is required")]
-        //public string AccountBooksMaintained { get; set; } = "N"; // Y/N
-
-        //[Required(ErrorMessage = "Accounts Audited is required")]
-        //public string AccountsAudited { get; set; } = "N"; // Y/N
-
-
         [Required(ErrorMessage = "Account Books Maintained is required")]
         public string AccountBooksMaintained { get; set; } = string.Empty; // ← FIXED: no default "N"
 
@@ -100,6 +70,8 @@ namespace VerificationPortal.Models
 
         // Helper property to easily check in View
         public bool IsPG => CourseLevel?.Trim().ToUpper() == "PG";
+
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
@@ -116,9 +88,5 @@ namespace VerificationPortal.Models
 
             return ValidationResult.Success;
         }
-    }
-    public class Med_CA_AccountAndFeeDetailsPageVM
-    {
-        public List<Med_CA_AccountAndFeeDetailsViewModel> Sections { get; set; } = new();
     }
 }

@@ -1,4 +1,4 @@
-﻿@model VerificationPortal.Models.Med_CA_AccountAndFeeDetailsPageVM
+﻿@model VerificationPortal.Models.Med_CA_AccountAndFeeDetailsViewModel
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
@@ -6,9 +6,9 @@
     ViewData["Title"] = "Finance Details";
     ViewData["ActiveTab"] = "FinanceDetails";
 
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
-    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? "";
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
+    ViewData["FacultyCode"] = Model.PageContext.FacultyId;
 
     ViewData["ShowFeedbackSection"] = true;
 
@@ -20,7 +20,7 @@
         "VerificationDashboard",
         new
         {
-            collegeCode = ViewBag.CollegeCode
+            collegeCode = Model.PageContext.CollegeCode
         });
 
     ViewData["PrevTabLabel"] = "Previous : PG Academic Matters";
@@ -30,10 +30,39 @@
         "VerificationDashboard",
         new
         {
-            collegeCode = ViewBag.CollegeCode
+            collegeCode = Model.PageContext.CollegeCode
         });
 
     ViewData["NextTabLabel"] = "Next : Next Section";
+
+    var courseLevel = Model.CourseLevel?.ToLower();
+
+    var authoritySectionName = courseLevel switch
+    {
+        "ug" => "Authority & Account Details - UG",
+        "pg" => "Authority & Account Details - PG",
+        _ => null
+    };
+
+    var annualSectionName = courseLevel switch
+    {
+        "ug" => "Annual Financial Details - UG",
+        "pg" => "Annual Financial Details - PG",
+        _ => null
+    };
+
+    var accountSectionName = courseLevel switch
+    {
+        "ug" => "Account & Audit Details - UG",
+        "pg" => "Account & Audit Details - PG",
+        _ => null
+    };
+
+    var authorityFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == authoritySectionName);
+
+    var annualFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == annualSectionName);
+
+    var accountFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == accountSectionName);
 }
 
 
@@ -54,325 +83,153 @@
 </div>
 
 
-@if (Model.Sections != null && Model.Sections.Any())
+@if (Model != null )
 {
-    foreach (var section in Model.Sections)
-    {
-        <!-- =========================================================
-             AUTHORITY & ACCOUNT DETAILS
-        ========================================================== -->
+    <!-- =========================================================
+            AUTHORITY & ACCOUNT DETAILS
+    ========================================================== -->
 
-        <div class="verification-card mt-4">
+    <div class="verification-card mt-4">
 
-            <div class="verification-card-header" style="justify-content: start;">
+        <div class="verification-card-header" style="justify-content: start;">
 
-                <h3 class="verification-card-title">
-                    <i class="bi bi-building"></i>
-                    Authority & Account Details
-                </h3>
+            <h3 class="verification-card-title">
+                <i class="bi bi-building"></i>
+                Authority & Account Details
+            </h3>
+        </div>
 
-                <span class="badge bg-primary">
-                    @(section.CourseLevel)
-                </span>
+        <div class="verification-card-body" id="section_@authorityFeedback?.SectionId">
+            <div class="row g-4">
+                <!-- Authority Name & Address -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Authority Name & Address
+                        </label>
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(Model.AuthorityNameAddress) ? "-" : Model.AuthorityNameAddress)
+                        </div>
+                    </div>
+                </div>
 
+
+                <!-- Authority Contact -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Authority Contact
+                        </label>
+
+                        <div class="verification-value">
+                            @(string.IsNullOrWhiteSpace(Model.AuthorityContact)
+                                ? "-"
+                                : Model.AuthorityContact)
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            
-            @{
-                var courseLevel = section.CourseLevel?.ToLower();
-
-                var authoritySectionName = courseLevel switch
-                {
-                    "ug" => "Authority & Account Details - UG",
-                    "pg" => "Authority & Account Details - PG",
-                    _ => null
-                };
-
-                var annualSectionName = courseLevel switch
-                {
-                    "ug" => "Annual Financial Details - UG",
-                    "pg" => "Annual Financial Details - PG",
-                    _ => null
-                };
-
-                var accountSectionName = courseLevel switch
-                {
-                    "ug" => "Account & Audit Details - UG",
-                    "pg" => "Account & Audit Details - PG",
-                    _ => null
-                };
-
-                var authorityFeedback =
-                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                    ?.FirstOrDefault(x =>
-                        x.SectionName == authoritySectionName);
-
-                var annualFeedback =
-                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                    ?.FirstOrDefault(x =>
-                        x.SectionName == annualSectionName);
-
-                var accountFeedback =
-                    (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                    ?.FirstOrDefault(x =>
-                        x.SectionName == accountSectionName);
+            @if (authorityFeedback != null)
+            {
+                @await Html.PartialAsync( "_SectionFeedback", authorityFeedback )
             }
 
-
-            <div class="verification-card-body">
-
-                <div class="row g-4">
-
-                    <!-- Authority Name & Address -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Authority Name & Address
-                            </label>
-
-                            <div class="verification-value">
-                                @(string.IsNullOrWhiteSpace(section.AuthorityNameAddress)
-                                    ? "-"
-                                    : section.AuthorityNameAddress)
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Authority Contact -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Authority Contact
-                            </label>
-
-                            <div class="verification-value">
-                                @(string.IsNullOrWhiteSpace(section.AuthorityContact)
-                                    ? "-"
-                                    : section.AuthorityContact)
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                @if (authorityFeedback != null)
-                {
-                    @await Html.PartialAsync( "_SectionFeedback", authorityFeedback )
-                }
-
-            </div>
-
-            
         </div>
 
         
+    </div>
 
-        <!-- =========================================================
-             ANNUAL FINANCIAL DETAILS
-        ========================================================== -->
+    
 
-        <div class="verification-card mt-4">
+    <!-- =========================================================
+            ANNUAL FINANCIAL DETAILS
+    ========================================================== -->
 
-            <div class="verification-card-header">
+    <div class="verification-card mt-4">
+        <div class="verification-card-header"  id="section_@annualFeedback?.SectionId">
+            <h3 class="verification-card-title">
+                <i class="bi bi-currency-rupee"></i>
+                Annual Financial Details
+            </h3>
+        </div>
 
-                <h3 class="verification-card-title">
-                    <i class="bi bi-currency-rupee"></i>
-                    Annual Financial Details
-                </h3>
-
-                <span class="badge bg-secondary">
-                    @(section.CourseLevel)
-                </span>
-
-            </div>
-
-
-            <div class="verification-card-body">
-
-                <div class="row g-4">
-
-                    <!-- Recurrent Annual -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Recurrent Annual
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.RecurrentAnnual.HasValue
-                                    ? $"₹ {section.RecurrentAnnual.Value:N2}"
-                                    : "-")
-                            </div>
-
+        <div class="verification-card-body">
+            <div class="row g-4">
+                <!-- Recurrent Annual -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Recurrent Annual
+                        </label>
+                        <div class="verification-value">
+                            @(Model.RecurrentAnnual.HasValue ? $"₹ {Model.RecurrentAnnual.Value:N2}" : "-")
                         </div>
-
                     </div>
+                </div>
 
 
-                    <!-- Non-Recurrent Annual -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Non-Recurrent Annual
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.NonRecurrentAnnual.HasValue
-                                    ? $"₹ {section.NonRecurrentAnnual.Value:N2}"
-                                    : "-")
-                            </div>
-
+                <!-- Non-Recurrent Annual -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Non-Recurrent Annual
+                        </label>
+                        <div class="verification-value">
+                            @(Model.NonRecurrentAnnual.HasValue ? $"₹ {Model.NonRecurrentAnnual.Value:N2}" : "-")
                         </div>
-
                     </div>
+                </div>
 
 
-                    <!-- Deposits -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Deposits
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.Deposits.HasValue
-                                    ? $"₹ {section.Deposits.Value:N2}"
-                                    : "-")
-                            </div>
-
+                <!-- Deposits -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Deposits
+                        </label>
+                        <div class="verification-value">
+                            @(Model.Deposits.HasValue ? $"₹ {Model.Deposits.Value:N2}" : "-")
                         </div>
-
                     </div>
+                </div>
 
 
-                    <!-- Tuition Fee -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Tuition Fee
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.TuitionFee.HasValue
-                                    ? $"₹ {section.TuitionFee.Value:N2}"
-                                    : "-")
-                            </div>
-
+                <!-- Tuition Fee -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Tuition Fee
+                        </label>
+                        <div class="verification-value">
+                            @(Model.TuitionFee.HasValue ? $"₹ {Model.TuitionFee.Value:N2}" : "-")
                         </div>
-
                     </div>
+                </div>
 
 
-                    <!-- Sports Fee -->
-                    <div class="col-12 col-sm-6 col-lg-4">
+                <!-- Sports Fee -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Sports Fee
+                        </label>
 
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Sports Fee
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.SportsFee.HasValue
-                                    ? $"₹ {section.SportsFee.Value:N2}"
-                                    : "-")
-                            </div>
-
+                        <div class="verification-value">
+                            @(Model.SportsFee.HasValue ? $"₹ {Model.SportsFee.Value:N2}" : "-")
                         </div>
-
                     </div>
+                </div>
 
 
-                    <!-- Union Fee -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Union Fee
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.UnionFee.HasValue
-                                    ? $"₹ {section.UnionFee.Value:N2}"
-                                    : "-")
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Library Fee -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Library Fee
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.LibraryFee.HasValue
-                                    ? $"₹ {section.LibraryFee.Value:N2}"
-                                    : "-")
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Other Fee -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Other Fee
-                            </label>
-
-                            <div class="verification-value">
-                                @(section.OtherFee.HasValue
-                                    ? $"₹ {section.OtherFee.Value:N2}"
-                                    : "-")
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Total Fee -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Total Fee
-                            </label>
-
-                            <div class="verification-value fw-bold">
-                                ₹ @(section.TotalFee.ToString("N2"))
-                            </div>
-
+                <!-- Union Fee -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Union Fee
+                        </label>
+                        <div class="verification-value">
+                            @(Model.UnionFee.HasValue ? $"₹ {Model.UnionFee.Value:N2}"  : "-")
                         </div>
 
                     </div>
@@ -380,359 +237,331 @@
                 </div>
 
 
-                @if (annualFeedback != null)
-                {
-                    @await Html.PartialAsync( "_SectionFeedback", annualFeedback )
-                }
+                <!-- Library Fee -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Library Fee
+                        </label>
+                        <div class="verification-value">
+                            @(Model.LibraryFee.HasValue ? $"₹ {Model.LibraryFee.Value:N2}" : "-")
+                        </div>
+                    </div>
+                </div>
 
+
+                <!-- Other Fee -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Other Fee
+                        </label>
+                        <div class="verification-value">
+                            @(Model.OtherFee.HasValue ? $"₹ {Model.OtherFee.Value:N2}" : "-")
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Total Fee -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Total Fee
+                        </label>
+                        <div class="verification-value fw-bold">
+                            ₹ @(Model.TotalFee.ToString("N2"))
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
+
+            @if (annualFeedback != null)
+            {
+                @await Html.PartialAsync( "_SectionFeedback", annualFeedback )
+            }
 
         </div>
 
-        
-        <!-- =========================================================
-             ACCOUNT & AUDIT DETAILS
-        ========================================================== -->
+    </div>
 
-        <div class="verification-card mt-4">
+    
+    <!-- =========================================================
+            ACCOUNT & AUDIT DETAILS
+    ========================================================== -->
 
-            <div class="verification-card-header">
+    <div class="verification-card mt-4">
+        <div class="verification-card-header" id="section_@accountFeedback?.SectionId">
+            <h3 class="verification-card-title">
+                <i class="bi bi-journal-check"></i>
+                Account & Audit Details
+            </h3>
+        </div>
 
-                <h3 class="verification-card-title">
-                    <i class="bi bi-journal-check"></i>
-                    Account & Audit Details
-                </h3>
+        <div class="verification-card-body">
+            <div class="row g-4">
+                <!-- Account Books -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Account Books Maintained
+                        </label>
 
-            </div>
+                        <div class="verification-value">
+
+                            @if (string.Equals(Model.AccountBooksMaintained?.Trim(), "Y", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-success"> Yes </span>
+                            }
+                            else if (string.Equals( Model.AccountBooksMaintained?.Trim(), "N", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-danger"> No </span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+
+                        </div>
+                    </div>
+                </div>
 
 
-            <div class="verification-card-body">
+                <!-- Accounts Audited -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Accounts Audited
+                        </label>
+                        <div class="verification-value">
+                            @if (string.Equals( Model.AccountsAudited?.Trim(), "Y", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-success"> Yes </span>
+                            }
+                            else if (string.Equals( Model.AccountsAudited?.Trim(), "N", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-danger"> No </span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
 
-                <div class="row g-4">
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Account Books -->
+
+                <!-- Donation - PG only -->
+                @if (Model.IsPG)
+                {
                     <div class="col-12 col-md-6">
-
                         <div class="verification-field">
-
                             <label class="verification-label">
-                                Account Books Maintained
+                                Donation Levied
                             </label>
-
                             <div class="verification-value">
 
-                                @if (string.Equals(
-                                    section.AccountBooksMaintained?.Trim(),
-                                    "Y",
-                                    StringComparison.OrdinalIgnoreCase))
+                                @if (string.Equals( Model.DonationLevied?.Trim(),"Y", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    <span class="badge bg-success">
-                                        Yes
-                                    </span>
+                                    <span class="badge bg-success"> Yes </span>
                                 }
-                                else if (string.Equals(
-                                    section.AccountBooksMaintained?.Trim(),
-                                    "N",
-                                    StringComparison.OrdinalIgnoreCase))
+                                else if (string.Equals( Model.DonationLevied?.Trim(), "N", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    <span class="badge bg-danger">
-                                        No
-                                    </span>
+                                    <span class="badge bg-danger"> No </span>
                                 }
                                 else
                                 {
                                     <span>-</span>
                                 }
-
                             </div>
-
                         </div>
-
                     </div>
+                }
+            </div>
 
 
-                    <!-- Accounts Audited -->
-                    <div class="col-12 col-md-6">
+            <div class="row g-4 mt-1">
+                <!-- Governing Council -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Governing Council Document
+                        </label>
 
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Accounts Audited
-                            </label>
-
-                            <div class="verification-value">
-
-                                @if (string.Equals(
-                                    section.AccountsAudited?.Trim(),
-                                    "Y",
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="badge bg-success">
-                                        Yes
-                                    </span>
-                                }
-                                else if (string.Equals(
-                                    section.AccountsAudited?.Trim(),
-                                    "N",
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="badge bg-danger">
-                                        No
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span>-</span>
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Donation - PG only -->
-                    @if (section.IsPG)
-                    {
-                        <div class="col-12 col-md-6">
-
-                            <div class="verification-field">
-
-                                <label class="verification-label">
-                                    Donation Levied
-                                </label>
-
-                                <div class="verification-value">
-
-                                    @if (string.Equals(
-                                        section.DonationLevied?.Trim(),
-                                        "Y",
-                                        StringComparison.OrdinalIgnoreCase))
+                        <div class="verification-value">
+                            @if (!string.IsNullOrWhiteSpace(Model.GoverningCouncilPdfName))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
                                     {
-                                        <span class="badge bg-success">
-                                            Yes
-                                        </span>
-                                    }
-                                    else if (string.Equals(
-                                        section.DonationLevied?.Trim(),
-                                        "N",
-                                        StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <span class="badge bg-danger">
-                                            No
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span>-</span>
-                                    }
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                    }
-
-                </div>
-
-
-                <div class="row g-4 mt-1">
-
-                    <!-- Governing Council -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Governing Council Document
-                            </label>
-
-                            <div class="verification-value">
-
-                                @if (!string.IsNullOrWhiteSpace(section.GoverningCouncilPdfName))
-                                {
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewGoverningCouncilDocument",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = section.CollegeCode,
-                                                    courseLevel = section.CourseLevel,
-                                                    facultyCode = section.FacultyCode
-                                                })!,
-                                            Title = "Governing Council Document"
-                                        })
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        Not Uploaded
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Account Summary -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Account Summary
-                            </label>
-
-                            <div class="verification-value">
-
-                                @if (!string.IsNullOrWhiteSpace(section.AccountSummaryPdfName))
-                                {
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewAccountSummaryPdf",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = section.CollegeCode,
-                                                    courseLevel = section.CourseLevel,
-                                                    facultyCode = section.FacultyCode
-                                                })!,
-                                            Title = "Account Summary"
-                                        })
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        Not Uploaded
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Audited Statement -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="verification-field">
-
-                            <label class="verification-label">
-                                Audited Statement
-                            </label>
-
-                            <div class="verification-value">
-
-                                @if (!string.IsNullOrWhiteSpace(section.AuditedStatementPdfName))
-                                {
-                                    @await Html.PartialAsync(
-                                        "_DocumentViewerButton",
-                                        new DocumentViewerVm
-                                        {
-                                            Url = Url.Action(
-                                                "ViewAuditedStatementPdf",
-                                                "VerificationDashboard",
-                                                new
-                                                {
-                                                    collegeCode = section.CollegeCode,
-                                                    courseLevel = section.CourseLevel,
-                                                    facultyCode = section.FacultyCode
-                                                })!,
-                                            Title = "Audited Statement"
-                                        })
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        Not Uploaded
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Donation - PG Only -->
-                    @if (section.IsPG)
-                    {
-                        <div class="col-12 col-md-6">
-
-                            <div class="verification-field">
-
-                                <label class="verification-label">
-                                    Donation Document
-                                </label>
-
-                                <div class="verification-value">
-
-                                    @if (!string.IsNullOrWhiteSpace(section.DonationPdfName))
-                                    {
-                                        @await Html.PartialAsync(
-                                            "_DocumentViewerButton",
-                                            new DocumentViewerVm
+                                        Url = Url.Action(
+                                            "ViewGoverningCouncilDocument",
+                                            "VerificationDashboard",
+                                            new
                                             {
-                                                Url = Url.Action(
-                                                    "ViewDonationPdf",
-                                                    "VerificationDashboard",
-                                                    new
-                                                    {
-                                                        collegeCode = section.CollegeCode,
-                                                        courseLevel = section.CourseLevel,
-                                                        facultyCode = section.FacultyCode
-                                                    })!,
-                                                Title = "Donation Document"
-                                            })
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">
-                                            Not Uploaded
-                                        </span>
-                                    }
+                                                collegeCode = Model.CollegeCode,
+                                                courseLevel = Model.CourseLevel,
+                                                facultyCode = Model.FacultyCode
+                                            })!,
+                                        Title = "Governing Council Document"
+                                    })
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Not Uploaded
+                                </span>
+                            }
 
-                                </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Account Summary -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Account Summary
+                        </label>
+                        <div class="verification-value">
+                            @if (!string.IsNullOrWhiteSpace(Model.AccountSummaryPdfName))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewAccountSummaryPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                courseLevel = Model.CourseLevel,
+                                                facultyCode = Model.FacultyCode
+                                            })!,
+                                        Title = "Account Summary"
+                                    })
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Not Uploaded
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Audited Statement -->
+                <div class="col-12 col-md-6">
+                    <div class="verification-field">
+                        <label class="verification-label">
+                            Audited Statement
+                        </label>
+
+                        <div class="verification-value">
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AuditedStatementPdfName))
+                            {
+                                @await Html.PartialAsync(
+                                    "_DocumentViewerButton",
+                                    new DocumentViewerVm
+                                    {
+                                        Url = Url.Action(
+                                            "ViewAuditedStatementPdf",
+                                            "VerificationDashboard",
+                                            new
+                                            {
+                                                collegeCode = Model.CollegeCode,
+                                                courseLevel = Model.CourseLevel,
+                                                facultyCode = Model.FacultyCode
+                                            })!,
+                                        Title = "Audited Statement"
+                                    })
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Not Uploaded
+                                </span>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Donation - PG Only -->
+                @if (Model.IsPG)
+                {
+                    <div class="col-12 col-md-6">
+
+                        <div class="verification-field">
+
+                            <label class="verification-label">
+                                Donation Document
+                            </label>
+
+                            <div class="verification-value">
+
+                                @if (!string.IsNullOrWhiteSpace(Model.DonationPdfName))
+                                {
+                                    @await Html.PartialAsync(
+                                        "_DocumentViewerButton",
+                                        new DocumentViewerVm
+                                        {
+                                            Url = Url.Action(
+                                                "ViewDonationPdf",
+                                                "VerificationDashboard",
+                                                new
+                                                {
+                                                    collegeCode = Model.CollegeCode,
+                                                    courseLevel = Model.CourseLevel,
+                                                    facultyCode = Model.FacultyCode
+                                                })!,
+                                            Title = "Donation Document"
+                                        })
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Not Uploaded
+                                    </span>
+                                }
 
                             </div>
 
                         </div>
-                    }
 
-                </div>
-
-                @if (accountFeedback != null)
-                {
-                    @await Html.PartialAsync( "_SectionFeedback", accountFeedback )
+                    </div>
                 }
 
             </div>
 
+            @if (accountFeedback != null)
+            {
+                @await Html.PartialAsync( "_SectionFeedback", accountFeedback )
+            }
+
         </div>
 
-        
+    </div>
 
-        <!-- =========================================================
-             SUPPORTING DOCUMENTS
-        ========================================================== -->
 
-    }
+    <!-- =========================================================
+            SUPPORTING DOCUMENTS
+    ========================================================== -->
+
 }
 else
 {
@@ -741,19 +570,12 @@ else
     ========================================================== -->
 
     <div class="verification-card mt-4">
-
         <div class="verification-card-body">
-
             <div class="alert alert-warning mb-0">
-
                 <i class="bi bi-exclamation-triangle me-2"></i>
-
                 No finance details available for this institution.
-
             </div>
-
         </div>
-
     </div>
 }
 

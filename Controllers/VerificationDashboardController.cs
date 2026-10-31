@@ -5736,93 +5736,76 @@ namespace VerificationPortal.Controllers
                 var institution = pageContext.Institution;
                 var facultyCode = institution.FacultyCode!.Trim();
 
-                // Get available course levels
-                var levels = await (
-                    from cc in _context.CollegeCourseIntakeDetails
-                    join cm in _context.MstCourses
-                        on cc.CourseCode equals cm.CourseCode.ToString()
-                    where cc.CollegeCode == collegeCode
-                    select cm.CourseLevel
-                )
-                .Distinct()
-                .ToListAsync();
+                var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
-                // Fallback if no levels are found
-                if (!levels.Any())
+                if (string.IsNullOrWhiteSpace(courseLevel))
                 {
-                    levels = await GetSortedCourseLevels(collegeCode);
+                    TempData["ErrorMessage"] = "Course level not found. Please login again.";
+                    return RedirectToAction(nameof(Index));
                 }
 
-                // Keep the desired order
-                levels = levels
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .Select(x => x.Trim().ToUpper())
-                    .Distinct()
-                    .OrderBy(x => x == "UG" ? 1 :
-                                  x == "PG" ? 2 :
-                                  x == "SS" ? 3 : 99)
-                    .ToList();
+                var data = await _context.MedCaAccountAndFeeDetails
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel);
 
-                // Load all saved finance records
-                var financeRecords = await _context.MedCaAccountAndFeeDetails
-                    .AsNoTracking()
-                    .Where(x =>
-                        x.CollegeCode == collegeCode &&
-                        x.FacultyCode == facultyCode)
-                    .ToListAsync();
+                var actionName =ControllerContext.ActionDescriptor.ActionName;
 
-                var vm = new Med_CA_AccountAndFeeDetailsPageVM();
+                var context = new VerificationPageContextVm
+                {
+                    CollegeCode = collegeCode,
+                    CollegeName = pageContext.InstitutionName,
+                    FacultyId = pageContext.FacultyCodeInt,
+                    FacultyName = pageContext.FacultyName
+                };
 
                 // Build one section for each course level
-                foreach (var level in levels)
+                var vm = new Med_CA_AccountAndFeeDetailsViewModel
                 {
-                    var data = financeRecords.FirstOrDefault(x =>
-                        !string.IsNullOrWhiteSpace(x.CourseLevel) &&
-                        x.CourseLevel.Trim().Equals(level, StringComparison.OrdinalIgnoreCase));
 
-                    vm.Sections.Add(new Med_CA_AccountAndFeeDetailsViewModel
-                    {
-                        CollegeCode = collegeCode,
-                        FacultyCode = facultyCode,
-                        CourseLevel = level,
+                    PageContext = context,
+                    CollegeCode = collegeCode,
+                    FacultyCode = facultyCode,
+                    CourseLevel = courseLevel,
 
-                        AuthorityNameAddress = data?.AuthorityNameAddress ?? "",
-                        AuthorityContact = data?.AuthorityContact ?? "",
+                    AuthorityNameAddress = data?.AuthorityNameAddress ?? "",
+                    AuthorityContact = data?.AuthorityContact ?? "",
 
-                        RecurrentAnnual = data?.RecurrentAnnual,
-                        NonRecurrentAnnual = data?.NonRecurrentAnnual,
-                        Deposits = data?.Deposits,
+                    RecurrentAnnual = data?.RecurrentAnnual,
+                    NonRecurrentAnnual = data?.NonRecurrentAnnual,
+                    Deposits = data?.Deposits,
 
-                        TuitionFee = data?.TuitionFee,
-                        SportsFee = data?.SportsFee,
-                        UnionFee = data?.UnionFee,
-                        LibraryFee = data?.LibraryFee,
-                        OtherFee = data?.OtherFee,
+                    TuitionFee = data?.TuitionFee,
+                    SportsFee = data?.SportsFee,
+                    UnionFee = data?.UnionFee,
+                    LibraryFee = data?.LibraryFee,
+                    OtherFee = data?.OtherFee,
 
-                        TotalFee = data?.TotalFee ?? 0,
+                    TotalFee = data?.TotalFee ?? 0,
 
-                        AccountBooksMaintained =
-                            data?.AccountBooksMaintained ?? "",
+                    AccountBooksMaintained =
+                        data?.AccountBooksMaintained ?? "",
 
-                        AccountsAudited =
-                            data?.AccountsAudited ?? "",
+                    AccountsAudited =
+                        data?.AccountsAudited ?? "",
 
-                        DonationLevied =
-                            data?.DonationLevied ?? "",
+                    DonationLevied =
+                        data?.DonationLevied ?? "",
 
-                        GoverningCouncilPdfName =
-                            data?.GoverningCouncilPdfName,
+                    GoverningCouncilPdfName =
+                        data?.GoverningCouncilPdfName,
 
-                        AccountSummaryPdfName =
-                            data?.AccountSummaryPdfName,
+                    AccountSummaryPdfName =
+                        data?.AccountSummaryPdfName,
 
-                        AuditedStatementPdfName =
-                            data?.AuditedStatementPdfName,
+                    AuditedStatementPdfName =
+                        data?.AuditedStatementPdfName,
 
-                        DonationPdfName =
-                            data?.DonationPdfName
-                    });
-                }
+                    DonationPdfName =
+                        data?.DonationPdfName
+                };
 
                 // Common verification page data
                 ViewBag.CollegeCode = collegeCode;
@@ -5837,7 +5820,7 @@ namespace VerificationPortal.Controllers
                 //await SetVerificationViewData<MedCaAccountAndFeeDetail>(collegeCode);
                 await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-                ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Finance Details", pageContext.FacultyCodeInt);
+                vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Finance Details", pageContext.FacultyCodeInt);
 
                 return View("FinanceDetails", vm);
             }
