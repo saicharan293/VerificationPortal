@@ -7,47 +7,63 @@
     ViewData["Title"] = "Library Services";
     ViewData["ActiveTab"] = "LibraryServices";
 
-    ViewData["InstitutionName"] =
-        ViewBag.InstitutionName ?? "Unknown Institution";
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
 
-    ViewData["CollegeCode"] =
-        ViewBag.CollegeCode ?? "";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
 
-    ViewData["FacultyCode"] =
-        ViewBag.FacultyCode ?? "";
+    ViewData["FacultyCode"] = Model.PageContext.FacultyId;
 
     ViewData["ShowFeedbackSection"] = true;
 
-    ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + Model.PageContext.CurrentVerifier;
 
-    ViewData["PrevTabAction"] =
-        Url.Action(
-            "StaffOtherDetails",
-            "VerificationDashboard",
-            new { collegeCode = ViewBag.CollegeCode }
-        );
+    ViewData["PrevTabAction"] = Url.Action( "StaffOtherDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
 
-    ViewData["PrevTabLabel"] =
-        "Previous : Staff Other Details";
+    ViewData["PrevTabLabel"] = "Previous : Staff Other Details";
 
-    ViewData["NextTabAction"] =
-        Url.Action(
-            "NextTab",
-            "VerificationDashboard",
-            new { collegeCode = ViewBag.CollegeCode }
-        );
+    ViewData["NextTabAction"] = Url.Action( "NextTab", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode } );
 
-    ViewData["NextTabLabel"] =
-        "Next : Next Section";
+    ViewData["NextTabLabel"] = "Next : Next Section";
 
     bool isDentalFaculty = ViewBag.IsDentalFaculty == true;
+    bool isMedicalFaculty = ViewBag.IsMedicalFaculty == true;
 
     var departmentMasters =
         ViewBag.DepartmentMasters
         as List<VerificationPortal.Models.DepartmentMaster>
         ?? new List<VerificationPortal.Models.DepartmentMaster>();
 }
+<style>
+    .department-library-scroll {
+        max-height: 450px;
+        overflow-y: auto;
+        overflow-x: auto;
+        position: relative;
+    }
+
+    /* Keep table headers visible while scrolling */
+    .department-library-scroll thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #f8f9fa;
+    }
+
+    /* Optional scrollbar styling */
+    .department-library-scroll::-webkit-scrollbar {
+        width: 7px;
+        height: 7px;
+    }
+
+    .department-library-scroll::-webkit-scrollbar-thumb {
+        background-color: #b8c1cc;
+        border-radius: 10px;
+    }
+
+    .department-library-scroll::-webkit-scrollbar-track {
+        background-color: #f1f3f5;
+    }
+</style>
 
 
 <div class="verification-page-header">
@@ -63,16 +79,336 @@
 </div>
 
 
+@{
+    var libraryServicesFeedback = Model.SectionFeedback?
+        .FirstOrDefault(x => x.SectionName == "Library Services");
+}
+
+@if (isMedicalFaculty)
+{    
+    <div class="verification-card mt-4" id="section_@libraryServicesFeedback?.SectionId">
+
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-journal-bookmark me-2"></i>
+                Library Services
+            </h3>
+
+            <span class="badge bg-primary">
+                Common
+            </span>
+        </div>
+
+        <div class="verification-card-body">
+
+            @if (Model.LibraryServices.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead>
+                            <tr>
+                                <th style="width:70px">Sl. No</th>
+                                <th>Library Service</th>
+                                <th style="width:150px">Availability</th>
+                                <th>Uploaded Document</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (int i = 0; i < Model.LibraryServices.Count; i++)
+                            {
+                                var service = Model.LibraryServices[i];
+
+                                <tr>
+                                    <td>@(i + 1)</td>
+
+                                    <td>
+                                        <strong>@service.ServiceName</strong>
+                                    </td>
+
+                                    <td>
+                                        @if (service.IsAvailable == "Yes")
+                                        {
+                                            <span class="badge bg-success">Available</span>
+                                        }
+                                        else if (service.IsAvailable == "No")
+                                        {
+                                            <span class="badge bg-danger">Not Available</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not Specified</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(service.UploadedFileName))
+                                        {
+                                            @await Html.PartialAsync(
+                                                "_DocumentViewerButton",
+                                                new DocumentViewerVm
+                                                {
+                                                    Url = Url.Action(
+                                                        "ViewLibraryServiceDocument",
+                                                        "VerificationDashboard",
+                                                        new
+                                                        {
+                                                            collegeCode = Model.CollegeCode,
+                                                            serviceId = service.ServiceId
+                                                        })!,
+                                                    Title = service.ServiceName
+                                                })
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No document uploaded</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center text-muted py-4">
+                    No library services available.
+                </div>
+            }
+
+            @if (libraryServicesFeedback != null)
+            {
+                @await Html.PartialAsync( "_SectionFeedback", libraryServicesFeedback)
+            }
+
+        </div>
+    </div>
+}
+
+@{
+    var usageReportFeedback = Model.SectionFeedback?
+        .FirstOrDefault(x => x.SectionName == "Usage Report");
+}
+@if (isMedicalFaculty)
+{
+    <div class="verification-card mt-4" id="section_@usageReportFeedback?.SectionId">
+
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+                Library Usage Report
+            </h3>
+        </div>
+
+        <div class="verification-card-body">
+
+            @if (!string.IsNullOrWhiteSpace(Model.UsageReportFileName))
+            {
+                @await Html.PartialAsync(
+                    "_DocumentViewerButton",
+                    new DocumentViewerVm
+                    {
+                        Url = Url.Action(
+                            "ViewLibraryUsageReport",
+                            "VerificationDashboard",
+                            new
+                            {
+                                collegeCode = Model.CollegeCode
+                            })!,
+                        Title = "Library Usage Report"
+                    })
+            }
+            else
+            {
+                <div class="text-center text-muted py-3">
+                    No usage report uploaded.
+                </div>
+            }
+        </div>
+    </div>
+}
+@{
+    var libraryStaffFeedback = Model.SectionFeedback?
+        .FirstOrDefault(x => x.SectionName == "Library Staff Details");
+}
+@if (isMedicalFaculty)
+{
+<div class="verification-card mt-4" id="section_@libraryStaffFeedback?.SectionId">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-people me-2"></i>
+            Library Staff Details
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.LibraryStaff.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Sl. No</th>
+                            <th>Staff Name</th>
+                            <th>Designation</th>
+                            <th>Qualification</th>
+                            <th>Experience</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < Model.LibraryStaff.Count; i++)
+                        {
+                            var staff = Model.LibraryStaff[i];
+
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td><strong>@staff.StaffName</strong></td>
+                                <td>@staff.Designation</td>
+                                <td>@staff.Qualification</td>
+                                <td>@staff.Experience Years</td>
+                                <td>@staff.Category</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+                No library staff details available.
+            </div>
+        }
+
+        @if (libraryStaffFeedback != null)
+        {
+            @await Html.PartialAsync( "_SectionFeedback", libraryStaffFeedback)
+        }
+
+    </div>
+</div>
+}
+@if (isMedicalFaculty && Model.OtherDetails != null)
+{
+    var other = Model.OtherDetails;
+
+    var otherDetailsFeedback = Model.SectionFeedback?
+        .FirstOrDefault(x => x.SectionName == "Digital Valuation Centre");
+
+    <div class="verification-card mt-4" id="section_@otherDetailsFeedback.SectionId">
+
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-pc-display me-2"></i>
+                Digital Valuation Centre
+            </h3>
+        </div>
+
+        <div class="verification-card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle">
+
+                    <tbody>
+
+                        <tr>
+                            <th style="width:50%">
+                                Digital Valuation Centre
+                            </th>
+                            <td>
+                                @if (other.HasDigitalValuationCentre == "Yes")
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @(other.HasDigitalValuationCentre ?? "Not Specified")
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+
+                        @if (other.HasDigitalValuationCentre == "Yes")
+                        {
+                            <tr>
+                                <th>Number of Systems</th>
+                                <td>@(other.NoOfSystems?.ToString() ?? "-")</td>
+                            </tr>
+
+                            <tr>
+                                <th>Stable Internet Connection</th>
+                                <td>@(other.HasStableInternet ?? "-")</td>
+                            </tr>
+
+                            <tr>
+                                <th>CCTV Camera System</th>
+                                <td>@(other.HasCccameraSystem ?? "-")</td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <th>Special Features / Achievements</th>
+                            <td>
+                                @if (other.SpecialFeaturesQuestion == "Yes")
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                        </tr>
+
+                        @if (!string.IsNullOrWhiteSpace(other.UploadedFileName))
+                        {
+                            <tr>
+                                <th>Uploaded Document</th>
+                                <td>
+                                    <i class="bi bi-file-pdf text-danger me-2"></i>
+                                    @other.UploadedFileName
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            @if (otherDetailsFeedback != null)
+            {
+                @await Html.PartialAsync(
+                    "_SectionFeedback",
+                    otherDetailsFeedback)
+            }
+
+        </div>
+    </div>
+}
+
 @* ============================================================
    DEPARTMENT LIBRARY DETAILS
    ============================================================ *@
 
 @{
-    var deptLibraryDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+    var deptLibraryDetailsFeedback = Model.SectionFeedback
                                 ?.FirstOrDefault(x => x.SectionName == "Department Library Details");
 }
 
-<div class="verification-card mt-4">
+<div class="verification-card mt-4" id="section_@deptLibraryDetailsFeedback?.SectionId">
 
     <div class="verification-card-header">
 
@@ -90,58 +426,30 @@
 
     <div class="verification-card-body">
 
-        @if (Model.DepartmentLibraries != null &&
-             Model.DepartmentLibraries.Any())
+        @if (Model.DepartmentLibraries != null && Model.DepartmentLibraries.Any())
         {
-            <div class="table-responsive">
+            <div class="table-responsive department-library-scroll">
 
                 <table class="table table-bordered table-hover align-middle">
 
                     <thead>
                         <tr>
 
-                            <th>
-                                Sl. No
-                            </th>
-
-                            <th>
-                                Department
-                            </th>
-
-                            <th>
-                                Total Books
-                            </th>
-
-                            <th>
-                                Books Added This Year
-                            </th>
-
-                            <th>
-                                Current Journals
-                            </th>
+                            <th> Sl. No </th>
+                            <th> Department </th>
+                            <th> Total Books </th>
+                            <th> Books Added This Year </th>
+                            <th> Current Journals </th>
 
                             @if (isDentalFaculty)
                             {
-                                <th>
-                                    Titles
-                                </th>
-
-                                <th>
-                                    International Journals
-                                </th>
-
-                                <th>
-                                    Back Volumes
-                                </th>
-
-                                <th>
-                                    Print Journal %
-                                </th>
+                                <th> Titles </th>
+                                <th> International Journals </th>
+                                <th> Back Volumes </th>
+                                <th> Print Journal % </th>
                             }
 
-                            <th>
-                                Library Staff
-                            </th>
+                            <th> Library Staff </th>
 
                         </tr>
                     </thead>
@@ -149,9 +457,7 @@
 
                     <tbody>
 
-                        @for (int i = 0;
-                             i < Model.DepartmentLibraries.Count;
-                             i++)
+                        @for (int i = 0;  i < Model.DepartmentLibraries.Count; i++)
                         {
                             var row = Model.DepartmentLibraries[i];
 
@@ -177,8 +483,7 @@
                                         @departmentName
                                     </strong>
 
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        row.DepartmentCode))
+                                    @if (!string.IsNullOrWhiteSpace( row.DepartmentCode))
                                     {
                                         <div class="small text-muted">
                                             @row.DepartmentCode
@@ -187,45 +492,27 @@
                                 </td>
 
 
-                                <td>
-                                    @row.TotalBooks
-                                </td>
+                                <td> @row.TotalBooks </td>
 
 
-                                <td>
-                                    @row.BooksAddedInYear
-                                </td>
+                                <td> @row.BooksAddedInYear </td>
 
 
-                                <td>
-                                    @row.CurrentJournals
-                                </td>
+                                <td> @row.CurrentJournals </td>
 
 
                                 @if (isDentalFaculty)
                                 {
-                                    <td>
-                                        @(row.Titles?.ToString() ?? "-")
-                                    </td>
-
-                                    <td>
-                                        @(row.InternationalJournals?.ToString() ?? "-")
-                                    </td>
-
-                                    <td>
-                                        @(row.BackVolumes?.ToString() ?? "-")
-                                    </td>
-
-                                    <td>
-                                        @(row.PrintJournalPercentage?.ToString() ?? "-")
-                                    </td>
+                                    <td> @(row.Titles?.ToString() ?? "-")</td>
+                                    <td> @(row.InternationalJournals?.ToString() ?? "-")</td>
+                                    <td> @(row.BackVolumes?.ToString() ?? "-") </td>
+                                    <td> @(row.PrintJournalPercentage?.ToString() ?? "-") </td>
                                 }
 
 
                                 <td>
 
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        row.LibraryStaff1))
+                                    @if (!string.IsNullOrWhiteSpace( row.LibraryStaff1))
                                     {
                                         <div>
                                             <strong>Staff 1:</strong>
@@ -233,8 +520,7 @@
                                         </div>
                                     }
 
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        row.LibraryStaff2))
+                                    @if (!string.IsNullOrWhiteSpace(row.LibraryStaff2))
                                     {
                                         <div class="mt-1">
                                             <strong>Staff 2:</strong>
@@ -242,10 +528,8 @@
                                         </div>
                                     }
 
-                                    @if (string.IsNullOrWhiteSpace(
-                                            row.LibraryStaff1) &&
-                                        string.IsNullOrWhiteSpace(
-                                            row.LibraryStaff2))
+                                    @if (string.IsNullOrWhiteSpace(row.LibraryStaff1) &&
+                                        string.IsNullOrWhiteSpace(row.LibraryStaff2))
                                     {
                                         <span>-</span>
                                     }
@@ -292,7 +576,7 @@
 
 @if (isDentalFaculty)
 {
-    <div class="verification-card mt-4">
+    <div class="verification-card mt-4"  id="section_@deptLibraryDetailsFeedback?.SectionId">
 
         <div class="verification-card-header">
 
@@ -310,8 +594,7 @@
 
         <div class="verification-card-body">
 
-            @if (Model.DentalLibraryRecords != null &&
-                 Model.DentalLibraryRecords.Any())
+            @if (Model.DentalLibraryRecords != null && Model.DentalLibraryRecords.Any())
             {
                 <div class="table-responsive">
 
@@ -328,36 +611,26 @@
 
                         <tbody>
 
-                            @for (int i = 0;
-                                  i < Model.DentalLibraryRecords.Count;
-                                  i++)
+                            @for (int i = 0; i < Model.DentalLibraryRecords.Count; i++)
                             {
                                 var record = Model.DentalLibraryRecords[i];
 
                                 <tr>
 
-                                    <td>
-                                        @(i + 1)
-                                    </td>
+                                    <td> @(i + 1) </td>
 
                                     <td>
-                                        <strong>
-                                            @record.RecordName
-                                        </strong>
+                                        <strong> @record.RecordName </strong>
                                     </td>
 
                                     <td>
                                         @if (!string.IsNullOrWhiteSpace(record.ExistingFileName))
                                         {
-                                            <span>
-                                                @record.ExistingFileName
-                                            </span>
+                                            <span> @record.ExistingFileName </span>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">
-                                                No file uploaded
-                                            </span>
+                                            <span class="text-muted"> No file uploaded </span>
                                         }
                                     </td>
 
@@ -414,6 +687,69 @@
     </div>
 }
 
+@{
+    var specialFeaturesFeedback = Model.SectionFeedback
+                                ?.FirstOrDefault(x => x.SectionName == "Special Features");
+}
+
+@if (ViewBag.IsMedicalFaculty && Model.OtherDetails != null)
+{
+    
+    <div class="verification-card mb-4" id="section_@specialFeaturesFeedback?.SectionId">
+
+        <div class="verification-card-header">
+            <h5>Special Features</h5>
+        </div>
+
+        <div class="verification-card-body">
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Special Features / Achievements
+                    </label>
+
+                    <div>
+                        @(Model.OtherDetails.SpecialFeaturesQuestion ?? "Not Available")
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Supporting Document
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.OtherDetails.UploadedFileName))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewLibrarySpecialFeaturesDocument",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode = Model.CollegeCode
+                                    })!,
+                                Title = "Special Features / Achievements"
+                            })
+                    }
+                    else
+                    {
+                        <span class="text-muted">No document uploaded</span>
+                    }
+                </div>
+
+            </div>
+
+            @if (specialFeaturesFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", specialFeaturesFeedback)
+            }
+        </div>
+    </div>
+}
 
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>

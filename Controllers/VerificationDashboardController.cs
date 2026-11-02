@@ -5119,47 +5119,16 @@ namespace VerificationPortal.Controllers
 
 
             // ---------------------------------------------------------
-            // COURSE LEVELS
-            // ---------------------------------------------------------
-
-            var levels = await GetSortedCourseLevels(collegeCode);
-
-            if (!levels.Any())
-            {
-                levels = new List<string> { "UG" };
-            }
-
-            levels = levels
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(x => x.Trim().ToUpper())
-                .Distinct()
-                .ToList();
-
-
-            // ---------------------------------------------------------
-            // SELECT COURSE LEVEL
+            // COURSE LEVEL
             // ---------------------------------------------------------
 
             if (string.IsNullOrWhiteSpace(courseLevel))
             {
-                courseLevel =
-                    levels.FirstOrDefault(x =>
-                        x.Equals(
-                            "UG",
-                            StringComparison.OrdinalIgnoreCase))
-                    ?? levels.First();
-            }
-
-            courseLevel = courseLevel.Trim().ToUpper();
-
-
-            // Make sure requested level actually exists
-            if (!levels.Contains(
-                    courseLevel,
-                    StringComparer.OrdinalIgnoreCase))
-            {
-                return BadRequest(
-                    $"Course level '{courseLevel}' is not available.");
+                courseLevel = HttpContext.Session.GetString("CourseLevel");
+                if (string.IsNullOrWhiteSpace(courseLevel))
+                {
+                    return BadRequest("Course level not found in session.");
+                }
             }
 
 
@@ -5172,10 +5141,33 @@ namespace VerificationPortal.Controllers
                 CollegeCode = collegeCode,
                 FacultyCode = facultyCode,
                 AffiliationType = affiliationType,
-                CourseLevel = courseLevel
+                CourseLevel = courseLevel,
+                PageContext = new VerificationPageContextVm
+                {
+                    CollegeCode = collegeCode,
+                    FacultyId = pageContext.FacultyCodeInt,
+                    FacultyName = pageContext.FacultyName,
+                    CollegeName = pageContext.InstitutionName,
+                    InstitutionName = pageContext.InstitutionName,
+                    CurrentVerifier = GetUserDesignation()
+                }
             };
 
 
+            await LoadCommonLibraryDataAsync( model, collegeCode, facultyCode, affiliationType, courseLevel);
+
+            // =============================================
+            // 7. FACULTY-SPECIFIC DATA
+            // =============================================
+
+            if (facultyCode == 1)
+            {
+                await LoadMedicalLibraryVerificationAsync( model, collegeCode, facultyCode, affiliationType, courseLevel);
+            }
+            else if (facultyCode == 2)
+            {
+                await LoadDentalLibraryVerificationAsync( model, collegeCode, facultyCode, affiliationType, courseLevel);
+            }
             // =========================================================
             // 1. DEPARTMENT MASTER
             // =========================================================
@@ -5292,18 +5284,12 @@ namespace VerificationPortal.Controllers
                     masterRecords
                         .Select(master =>
                         {
-                            var uploaded =
-                                uploadedRecords.FirstOrDefault(x =>
-                                    x.RecordId == master.RecordId);
-
+                            var uploaded = uploadedRecords.FirstOrDefault(x => x.RecordId == master.RecordId);
                             return new DentalLibraryVerificationRow
                             {
                                 RecordId = master.RecordId,
-
                                 RecordName = master.RecordName,
-
-                                ExistingFileName =
-                                    uploaded?.FileName
+                                ExistingFileName = uploaded?.FileName
                             };
                         })
                         .ToList();
@@ -5315,12 +5301,10 @@ namespace VerificationPortal.Controllers
             // =========================================================
 
             ViewBag.InstitutionName = pageContext.Institution.NameOfInstitution;
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.FacultyCode = facultyCode;
             ViewBag.AffiliationType = affiliationType;
             ViewBag.CourseLevel = courseLevel;
-            ViewBag.CourseLevels = levels;
             ViewBag.IsDentalFaculty = facultyCode == 2;
+            ViewBag.IsMedicalFaculty = facultyCode == 1;
             ViewBag.DepartmentMasters = departmentMasters;
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
 
@@ -5334,9 +5318,258 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library Services", pageContext.FacultyCodeInt);
+            model.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library Services", pageContext.FacultyCodeInt);
 
             return View("LibraryServices", model);
+        }
+
+                
+        private async Task LoadCommonLibraryDataAsync(MedicalLibraryVerificationViewModel model, string collegeCode, int facultyCode, int affiliationType, string courseLevel)
+        {
+            // =============================================
+            // 1. LIBRARY SERVICES
+            // =============================================
+
+            var savedServices = await _context.CaMedicalLibraryServices
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.AffiliationType == affiliationType &&
+                    (string.IsNullOrEmpty(x.CourseLevel) ||
+                    x.CourseLevel.Trim().ToUpper() == courseLevel))
+                .OrderByDescending(x =>
+                    x.CourseLevel != null &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel)
+                .ThenByDescending(x => x.LibraryServiceId)
+                .ToListAsync();
+
+            var masterServices = await _context.CaMstMediLibraryServices
+                .AsNoTracking()
+                .OrderBy(x => x.ServiceId)
+                .ToListAsync();
+
+            model.LibraryServices = masterServices.Select(master =>
+            {
+                var saved = savedServices.FirstOrDefault( x => x.ServiceId == master.ServiceId);
+
+                return new LibraryServiceVerificationRow
+                {
+                    ServiceId = master.ServiceId,
+                    ServiceName = master.ServiceName,
+                    IsAvailable = saved?.IsAvailable,
+                    UploadedFileName = saved?.UploadedFileName
+                };
+            }).ToList();
+
+
+            // =============================================
+            // 2. USAGE REPORT
+            // =============================================
+
+            var usageReports = await _context.CaMedicalLibraryUsageReports
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.AffiliationType == affiliationType &&
+                    (string.IsNullOrEmpty(x.CourseLevel) ||
+                    x.CourseLevel.Trim().ToUpper() == courseLevel))
+                .OrderByDescending(x =>
+                    x.CourseLevel != null &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel)
+                .ThenByDescending(x => x.UsageReportId)
+                .ToListAsync();
+
+            model.UsageReportFileName =
+                usageReports.FirstOrDefault()?.UploadedFileName;
+
+
+            // =============================================
+            // 3. LIBRARY STAFF
+            // =============================================
+
+            var staffCandidates = await _context.CaMedicalLibraryStaffs
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.AffiliationType == affiliationType &&
+                    (string.IsNullOrEmpty(x.CourseLevel) ||
+                    x.CourseLevel.Trim().ToUpper() == courseLevel))
+                .OrderByDescending(x =>
+                    x.CourseLevel != null &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel)
+                .ThenBy(x => x.Id)
+                .ToListAsync();
+
+            var exactStaff = staffCandidates
+                .Where(x =>
+                    !string.IsNullOrWhiteSpace(x.CourseLevel) &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel)
+                .ToList();
+
+            var savedStaff = exactStaff.Any()
+                ? exactStaff
+                : staffCandidates
+                    .Where(x => string.IsNullOrWhiteSpace(x.CourseLevel))
+                    .ToList();
+
+            model.LibraryStaff = savedStaff.Select(x =>
+                new LibraryStaffVerificationRow
+                {
+                    StaffName = x.StaffName,
+                    Designation = x.Designation,
+                    Qualification = x.Qualification,
+                    Experience = x.Experience,
+                    Category = x.Category
+                }).ToList();
+
+
+            // =============================================
+            // 4. DEPARTMENTAL LIBRARY
+            // =============================================
+
+            var departmentCandidates =
+                await _context.CaMedicalDepartmentLibraries
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCode &&
+                        x.AffiliationType == affiliationType &&
+                        (string.IsNullOrEmpty(x.CourseLevel) ||
+                        x.CourseLevel.Trim().ToUpper() == courseLevel))
+                    .OrderByDescending(x =>
+                        x.CourseLevel != null &&
+                        x.CourseLevel.Trim().ToUpper() == courseLevel)
+                    .ThenBy(x => x.DepartmentCode)
+                    .ThenByDescending(x => x.DepartmentalLibraryId)
+                    .ToListAsync();
+
+            var exactDepartments = departmentCandidates
+                .Where(x =>
+                    !string.IsNullOrWhiteSpace(x.CourseLevel) &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel)
+                .ToList();
+
+            var savedDepartments = exactDepartments.Any()
+                ? exactDepartments
+                : departmentCandidates
+                    .Where(x => string.IsNullOrWhiteSpace(x.CourseLevel))
+                    .ToList();
+
+            model.DepartmentLibraries = savedDepartments.Select(x =>
+            {
+                var staff1 = "";
+                var staff2 = "";
+
+                if (!string.IsNullOrWhiteSpace(x.LibraryStaff))
+                {
+                    var parts = x.LibraryStaff.Split(
+                        '|',
+                        StringSplitOptions.RemoveEmptyEntries);
+
+                    if (parts.Length > 0)
+                        staff1 = parts[0].Trim();
+
+                    if (parts.Length > 1)
+                        staff2 = parts[1].Trim();
+                }
+
+                return new DepartmentLibraryVerificationRow
+                {
+                    DepartmentCode = x.DepartmentCode,
+                    TotalBooks = x.TotalBooks,
+                    BooksAddedInYear = x.BooksAddedInYear,
+                    CurrentJournals = x.CurrentJournals,
+                    LibraryStaff1 = staff1,
+                    LibraryStaff2 = staff2,
+                    Titles = x.Titles,
+                    InternationalJournals = x.InternationalJournals,
+                    BackVolumes = x.BackVolumes,
+                    PrintJournalPercentage = x.PrintJournalPercentage
+                };
+            }).ToList();
+        }
+
+        private async Task LoadMedicalLibraryVerificationAsync( MedicalLibraryVerificationViewModel model, string collegeCode, int facultyCode, int affiliationType, string courseLevel)
+        {
+            var otherDetailsCandidates =
+                await _context.CaMedicalLibraryOtherDetails
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCode &&
+                        x.AffiliationType == affiliationType &&
+                        (string.IsNullOrEmpty(x.CourseLevel) ||
+                        x.CourseLevel.Trim().ToUpper() == courseLevel))
+                    .ToListAsync();
+
+            var otherDetails = otherDetailsCandidates.FirstOrDefault(x =>
+                    !string.IsNullOrWhiteSpace(x.CourseLevel) &&
+                    x.CourseLevel.Trim().ToUpper() == courseLevel)
+                ?? otherDetailsCandidates.FirstOrDefault(x =>
+                    string.IsNullOrWhiteSpace(x.CourseLevel));
+
+            if (otherDetails == null)
+                return;
+
+            model.OtherDetails = new MedicalLibraryOtherVerification
+            {
+                HasDigitalValuationCentre = otherDetails.HasDigitalValuationCentre,
+                NoOfSystems = otherDetails.NoOfSystems,
+                HasStableInternet = otherDetails.HasStableInternet,
+                HasCccameraSystem = otherDetails.HasCccameraSystem,
+                SpecialFeaturesQuestion =!string.IsNullOrWhiteSpace( otherDetails.SpecialFeaturesAchievementsPdfPath)  ? "Yes" : "No",
+                UploadedFileName = otherDetails.UploadedFileName
+            };
+        }
+
+
+                
+        private async Task LoadDentalLibraryVerificationAsync( MedicalLibraryVerificationViewModel model, string collegeCode, int facultyCode, int affiliationType, string courseLevel)
+        {
+            // =============================================
+            // 1. DENTAL LIBRARY MASTER
+            // =============================================
+
+            var masterRecords =
+                await _context.CaMstDentalLibraryRecords
+                    .AsNoTracking()
+                    .OrderBy(x => x.DisplayOrder)
+                    .ToListAsync();
+
+
+            // =============================================
+            // 2. UPLOADED DENTAL RECORDS
+            // =============================================
+
+            var uploadedRecords =
+                await _context.CaDentalLibraryRecords
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyCode &&
+                        x.AffiliationType == affiliationType)
+                    .ToListAsync();
+
+
+            // =============================================
+            // 3. MAP MASTER AND UPLOADED RECORDS
+            // =============================================
+
+            model.DentalLibraryRecords = masterRecords.Select(master =>
+            {
+                var uploaded = uploadedRecords.FirstOrDefault( x => x.RecordId == master.RecordId);
+
+                return new DentalLibraryVerificationRow
+                {
+                    RecordId = master.RecordId,
+                    RecordName = master.RecordName,
+                    ExistingFileName = uploaded?.FileName
+                };
+
+            }).ToList();
         }
 
 

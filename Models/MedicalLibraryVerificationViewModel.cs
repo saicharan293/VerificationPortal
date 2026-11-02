@@ -25,6 +25,9 @@
 
         public List<DentalLibraryVerificationRow> DentalLibraryRecords { get; set; }
             = new();
+
+        public VerificationPageContextVm PageContext { get; set; } = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
     }
 
     public class LibraryServiceVerificationRow
