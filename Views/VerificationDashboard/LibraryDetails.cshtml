@@ -27,11 +27,11 @@
             new { collegeCode = ViewBag.CollegeCode });
 
     ViewData["PrevTabLabel"] =
-        "Previous : Research & Publications";
+        "Previous : Research and Publications";
 
     ViewData["NextTabAction"] =
         Url.Action(
-            "NextTab",
+            "ResearchPublications",
             "VerificationDashboard",
             new { collegeCode = ViewBag.CollegeCode });
 

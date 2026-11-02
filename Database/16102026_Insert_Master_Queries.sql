@@ -209,7 +209,7 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VAL
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Staff Other Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Finance Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Library Services');
-INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Research & Publications');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Research and Publications');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Library Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Faculty Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Teaching Experience');
@@ -274,7 +274,7 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 21, 'Annual Financial Details - PG');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 21, 'Account & Audit Details - PG');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 22, 'Department Library Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 23, 'Research & Publication Details');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 23, 'Research and Publication Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 24, 'General Library Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 24, 'Library Items');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 24, 'Library Building');

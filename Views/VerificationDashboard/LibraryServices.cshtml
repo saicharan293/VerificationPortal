@@ -304,7 +304,7 @@
     var otherDetailsFeedback = Model.SectionFeedback?
         .FirstOrDefault(x => x.SectionName == "Digital Valuation Centre");
 
-    <div class="verification-card mt-4" id="section_@otherDetailsFeedback.SectionId">
+    <div class="verification-card mt-4" id="section_@otherDetailsFeedback?.SectionId">
 
         <div class="verification-card-header">
             <h3 class="verification-card-title">
@@ -650,7 +650,7 @@
                                                             collegeCode = Model.CollegeCode,
                                                             recordId = record.RecordId
                                                         })!,
-                                                    Title = record.RecordName
+                                                    Title = record.RecordName ?? "-"
                                                 })
                                         }
                                         else
@@ -710,7 +710,7 @@
                     </label>
 
                     <div>
-                        @(Model.OtherDetails.SpecialFeaturesQuestion ?? "Not Available")
+                        @(Model.OtherDetails?.SpecialFeaturesQuestion ?? "Not Available")
                     </div>
                 </div>
 
@@ -719,7 +719,7 @@
                         Supporting Document
                     </label>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.OtherDetails.UploadedFileName))
+                    @if (!string.IsNullOrWhiteSpace(Model.OtherDetails?.UploadedFileName))
                     {
                         @await Html.PartialAsync(
                             "_DocumentViewerButton",

@@ -3050,7 +3050,7 @@ BEGIN TRY
         (2, N'Finance Details'),
         (2, N'Addition Information'),
         (2, N'Library Services'),
-        (2, N'Research & Publications'),
+        (2, N'Research and Publications'),
         (2, N'Library Details'),
         (2, N'Library Expenditure and Services'),
         (2, N'Library Staff Details'),
@@ -3171,8 +3171,8 @@ BEGIN TRY
             /* Library Services */
             (N'Library Services', N'Department Library Details'),
 
-            /* Research & Publications */
-            (N'Research & Publications', N'Research & Publication Details'),
+            /* Research and Publications */
+            (N'Research and Publications', N'Research and Publication Details'),
 
             /* Library Details */
             (N'Library Details', N'General Library Details'),

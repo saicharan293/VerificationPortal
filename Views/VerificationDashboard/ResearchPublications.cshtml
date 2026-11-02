@@ -2,28 +2,26 @@
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
-    ViewData["Title"] = "Research & Publications";
+    ViewData["Title"] = "Research and Publications";
     ViewData["ActiveTab"] = "ResearchPublications";
 
     ViewData["InstitutionName"] =
-        ViewBag.InstitutionName ?? "Unknown Institution";
+        Model.PageContext.InstitutionName ?? "Unknown Institution";
 
-    ViewData["CollegeCode"] =
-        ViewBag.CollegeCode ?? "";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
 
-    ViewData["FacultyCode"] =
-        ViewBag.FacultyCode ?? "";
+    ViewData["FacultyCode"] = Model.PageContext.FacultyId;
 
     ViewData["ShowFeedbackSection"] = true;
 
     ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
+        User.Identity?.Name + " - " + Model.PageContext.CurrentVerifier;
 
     ViewData["PrevTabAction"] =
         Url.Action(
             "LibraryServices",
             "VerificationDashboard",
-            new { collegeCode = ViewBag.CollegeCode }
+            new { collegeCode = Model.PageContext.CollegeCode }
         );
 
     ViewData["PrevTabLabel"] =
@@ -33,7 +31,7 @@
         Url.Action(
             "NextTab",
             "VerificationDashboard",
-            new { collegeCode = ViewBag.CollegeCode }
+            new { collegeCode = Model.PageContext.CollegeCode }
         );
 
     ViewData["NextTabLabel"] = "Next : Next Section";
@@ -46,7 +44,7 @@
 <div class="verification-page-header">
 
     <h2 class="verification-page-title">
-        Research & Publications
+        Research and Publications
     </h2>
 
     <p class="verification-page-subtitle">
@@ -55,7 +53,7 @@
 </div>
 
 <!-- ========================================================= -->
-<!-- RESEARCH & PUBLICATION DETAILS -->
+<!-- Research and Publication DETAILS -->
 <!-- ========================================================= -->
 
 <div class="verification-card mt-4">
@@ -64,7 +62,7 @@
 
         <h3 class="verification-card-title">
             <i class="bi bi-journal-richtext me-2"></i>
-            Research & Publication Details
+            Research and Publication Details
         </h3>
 
         <span class="badge bg-primary">
@@ -99,117 +97,7 @@
 
             </div>
 
-
-            <!-- Students RGUHS Funding -->
-
-            <div class="col-md-6">
-
-                <div class="verification-field">
-
-                    <label class="verification-label">
-                        Students – RGUHS Funded
-                    </label>
-
-                    <div class="verification-value">
-
-                        @(Model.StudentsRGUHSFunded?.ToString() ?? "-")
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Students External Funding -->
-
-            <div class="col-md-6">
-
-                <div class="verification-field">
-
-                    <label class="verification-label">
-                        Students – External Body Funding
-                    </label>
-
-                    <div class="verification-value">
-
-                        @(Model.StudentsExternalBodyFunding?.ToString() ?? "-")
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Faculty RGUHS Funding -->
-
-            <div class="col-md-6">
-
-                <div class="verification-field">
-
-                    <label class="verification-label">
-                        Faculty – RGUHS Funded
-                    </label>
-
-                    <div class="verification-value">
-
-                        @(Model.FacultyRGUHSFunded?.ToString() ?? "-")
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Faculty External Funding -->
-
-            <div class="col-md-6">
-
-                <div class="verification-field">
-
-                    <label class="verification-label">
-                        Faculty – External Body Funding
-                    </label>
-
-                    <div class="verification-value">
-
-                        @(Model.FacultyExternalBodyFunding?.ToString() ?? "-")
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        @{
-            var researchDetailsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionName == "Research & Publication Details");
-        }
-
-        @if (researchDetailsFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", researchDetailsFeedback)
-        }
-
-        <!-- ================================================= -->
-        <!-- UPLOADED DOCUMENTS -->
-        <!-- ================================================= -->
-
-        <hr class="my-4" />
-
-        <h5 class="fw-semibold mb-3">
-            Uploaded Documents
-        </h5>
-
-
-        <div class="row g-3">
-
-
+            
             <!-- Publications Document -->
 
             <div class="col-md-6">
@@ -249,6 +137,115 @@
 
             </div>
 
+
+            <!-- Students RGUHS Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Students Research Project - RGUHS Funded
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.StudentsRGUHSFunded?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Students External Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Students Research Project - External Body Funding
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.StudentsExternalBodyFunding?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Faculty RGUHS Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Faculty Research Project - RGUHS Funded
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.FacultyRGUHSFunded?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Faculty External Funding -->
+
+            <div class="col-md-6">
+
+                <div class="verification-field">
+
+                    <label class="verification-label">
+                        Faculty Research Project - External Body Funding
+                    </label>
+
+                    <div class="verification-value">
+
+                        @(Model.FacultyExternalBodyFunding?.ToString() ?? "-")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @{
+            var researchDetailsFeedback = Model.SectionFeedback
+                                        ?.FirstOrDefault(x => x.SectionName == "Research and Publication Details");
+        }
+
+        @if (researchDetailsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", researchDetailsFeedback)
+        }
+
+        <!-- ================================================= -->
+        <!-- UPLOADED DOCUMENTS -->
+        <!-- ================================================= -->
+
+        <hr class="my-4" />
+
+        <h5 class="fw-semibold mb-3">
+            Uploaded Documents
+        </h5>
+
+
+        <div class="row g-3">
 
             <!-- Clinical Trials Document -->
 
@@ -379,6 +376,11 @@
 <!-- ========================================================= -->
 <!-- DEPARTMENT-WISE PUBLICATIONS -->
 <!-- ========================================================= -->
+
+@{
+    var departmentWisePublicationsFeedback = Model.SectionFeedback
+                                ?.FirstOrDefault(x => x.SectionName == "Department wise Publications");
+}
 
 <div class="verification-card mt-4">
 
@@ -526,6 +528,10 @@
 
     </div>
 
+    @if (departmentWisePublicationsFeedback != null)
+    {
+        @await Html.PartialAsync("_SectionFeedback", departmentWisePublicationsFeedback)
+    }
 </div>
 
 @section Scripts {

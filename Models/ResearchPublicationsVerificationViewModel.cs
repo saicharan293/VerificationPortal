@@ -2,6 +2,8 @@
 {
     public class ResearchPublicationsVerificationViewModel
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
         public string? CollegeCode { get; set; }
 
         public int FacultyCode { get; set; }
