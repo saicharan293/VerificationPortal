@@ -54,7 +54,7 @@ INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Staff Pay Scale
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Staff Other Details');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Library Services');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Research and Publications');
---INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Library Details');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Library Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Faculty Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Teaching Experience');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Clinical Facilities');
@@ -147,15 +147,16 @@ INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1,
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 55, 'Research and Publication Details');
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 55, 'Department wise Publications');
 
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 56, 'General Library Details');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 56, 'Library Items');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 56, 'Library Building');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 56, 'Technical Processes');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 56, 'Library Equipment');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 56, 'Library Finance');
+
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 21, 'Authority & Account Details - PG');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 21, 'Annual Financial Details - PG');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 21, 'Account & Audit Details - PG');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 24, 'General Library Details');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 24, 'Library Items');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 24, 'Library Building');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 24, 'Technical Processes');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 24, 'Library Equipment');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 24, 'Library Finance');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 25, 'Faculty Details');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Clinical Hospital Details');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Clinical Statistics');

@@ -1,0 +1,367 @@
+
+/* =========================================
+   GENERAL LIBRARY DETAILS
+========================================= */
+
+.library-overview-card {
+    overflow: hidden;
+}
+
+/* Header */
+
+.library-overview-card .verification-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.library-header-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.library-header-subtitle {
+    color: var(--text-muted, #94a3b8);
+    font-size: 12px;
+}
+
+.library-section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+/* Information Items */
+
+.library-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    height: 100%;
+    min-height: 100px;
+    padding: 18px;
+    background: var(--card-inner-bg, rgba(148, 163, 184, 0.05));
+    border: 1px solid var(--border-color, #334155);
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.library-info-item:hover {
+    border-color: rgba(96, 165, 250, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Icons */
+
+.library-info-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 19px;
+}
+
+.library-info-icon.email {
+    background: rgba(59, 130, 246, 0.13);
+    color: #60a5fa;
+}
+
+.library-info-icon.digital {
+    background: rgba(16, 185, 129, 0.13);
+    color: #34d399;
+}
+
+.library-info-icon.helinet {
+    background: rgba(168, 85, 247, 0.13);
+    color: #c084fc;
+}
+
+.library-info-icon.department {
+    background: rgba(245, 158, 11, 0.13);
+    color: #fbbf24;
+}
+
+/* Content */
+
+.library-info-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.library-info-content .verification-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-muted, #94a3b8);
+}
+
+.library-info-value {
+    color: var(--text-primary, #e2e8f0);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* Mobile */
+
+@media (max-width: 576px) {
+
+    .library-overview-card .verification-card-header {
+        align-items: flex-start;
+    }
+
+    .library-info-item {
+        padding: 14px;
+        min-height: 85px;
+        gap: 12px;
+    }
+
+    .library-info-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        font-size: 17px;
+    }
+
+}
+
+
+/* =========================================
+   LIBRARY BUILDING - INFRASTRUCTURE
+========================================= */
+
+.building-icon {
+    background: rgba(16, 185, 129, 0.13);
+    color: #34d399;
+}
+
+.infrastructure-badge {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.22);
+}
+
+/* Independent Building */
+
+.library-info-icon.building {
+    background: rgba(59, 130, 246, 0.13);
+    color: #60a5fa;
+}
+
+/* Building Area */
+
+.library-info-icon.area {
+    background: rgba(245, 158, 11, 0.13);
+    color: #fbbf24;
+}
+
+.building-area-value {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.area-unit {
+    color: var(--text-muted, #94a3b8);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: normal;
+}
+
+@media (max-width: 576px) {
+
+    .building-area-value {
+        font-size: 17px;
+    }
+
+}
+
+/* =========================================
+   TECHNICAL PROCESSES
+========================================= */
+
+.technical-header-icon {
+    background: rgba(168, 85, 247, 0.13);
+    color: #c084fc;
+}
+
+.technical-badge {
+    background: rgba(168, 85, 247, 0.12);
+    color: #c084fc;
+    border-color: rgba(168, 85, 247, 0.22);
+}
+
+/* Process Items */
+
+.technical-process-item {
+    min-height: 95px;
+}
+
+.technical-process-icon {
+    background: rgba(99, 102, 241, 0.13);
+    color: #818cf8;
+}
+
+/* Empty State */
+
+.technical-empty-state {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px;
+    background: rgba(148, 163, 184, 0.05);
+    border: 1px dashed #475569;
+    border-radius: 12px;
+}
+
+.technical-empty-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.technical-empty-state h6 {
+    margin: 0 0 5px;
+    color: #e2e8f0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.technical-empty-state p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+@media (max-width: 576px) {
+    .technical-empty-state {
+        padding: 16px;
+        gap: 12px;
+    }
+}
+
+
+/* =========================================
+   LIBRARY EQUIPMENT
+========================================= */
+
+.equipment-header-icon {
+    background: rgba(6, 182, 212, 0.13);
+    color: #22d3ee;
+}
+
+.equipment-badge {
+    background: rgba(6, 182, 212, 0.12);
+    color: #22d3ee;
+    border-color: rgba(6, 182, 212, 0.22);
+}
+
+.equipment-item-icon {
+    background: rgba(59, 130, 246, 0.13);
+    color: #60a5fa;
+}
+
+.equipment-info-item {
+    min-height: 95px;
+}
+
+.equipment-info-item:hover {
+    border-color: rgba(34, 211, 238, 0.4);
+}
+
+/* =========================================
+   LIBRARY FINANCE
+========================================= */
+
+.finance-header-icon {
+    background: rgba(16, 185, 129, 0.13);
+    color: #34d399;
+}
+
+.finance-badge {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.22);
+}
+
+.finance-info-item {
+    min-height: 105px;
+}
+
+.budget-icon {
+    background: rgba(16, 185, 129, 0.13);
+    color: #34d399;
+}
+
+.expenditure-icon {
+    background: rgba(59, 130, 246, 0.13);
+    color: #60a5fa;
+}
+
+/* Financial Values */
+
+.finance-value {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    color: #e2e8f0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
+}
+
+.finance-unit {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: normal;
+}
+
+.finance-info-item:hover {
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 576px) {
+    .finance-value {
+        font-size: 19px;
+    }
+}

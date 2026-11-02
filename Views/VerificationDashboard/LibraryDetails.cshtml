@@ -38,6 +38,8 @@
     ViewData["NextTabLabel"] =
         "Next : Next Section";
 }
+<link rel="stylesheet" href="~/css/library-details.css" asp-append-version="true" />
+
 
 <div class="verification-page-header">
 
@@ -61,16 +63,31 @@
                                 ?.FirstOrDefault(x => x.SectionName == "General Library Details");
 }
 
-<div class="verification-card mt-4">
+
+<div class="verification-card library-overview-card mt-4">
 
     <div class="verification-card-header">
 
-        <h3 class="verification-card-title">
-            <i class="bi bi-book me-2"></i>
-            General Library Details
-        </h3>
+        <div class="d-flex align-items-center gap-3">
 
-        <span class="badge bg-primary">
+            <div class="library-header-icon">
+                <i class="bi bi-book-half"></i>
+            </div>
+
+            <div>
+                <h3 class="verification-card-title mb-1">
+                    General Library Details
+                </h3>
+
+                <p class="library-header-subtitle mb-0">
+                    Library facilities and digital access information
+                </p>
+            </div>
+
+        </div>
+
+        <span class="library-section-badge">
+            <i class="bi bi-book me-1"></i>
             Library
         </span>
 
@@ -78,77 +95,110 @@
 
     <div class="verification-card-body">
 
-        <div class="row g-4">
+        <div class="row g-3">
 
+            <!-- Library Email -->
             <div class="col-md-6">
 
-                <div class="verification-field">
+                <div class="library-info-item">
 
-                    <label class="verification-label">
-                        Library Email ID
-                    </label>
+                    <div class="library-info-icon email">
+                        <i class="bi bi-envelope-at"></i>
+                    </div>
 
-                    <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(Model.General?.LibraryEmailId)
-                            ? "-"
-                            : Model.General.LibraryEmailId)
+                    <div class="library-info-content">
+
+                        <label class="verification-label">
+                            Library Email ID
+                        </label>
+
+                        <div class="library-info-value">
+                            @(string.IsNullOrWhiteSpace(Model.General?.LibraryEmailId)
+                                ? "-"
+                                : Model.General.LibraryEmailId)
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
 
-
+            <!-- Digital Library -->
             <div class="col-md-6">
 
-                <div class="verification-field">
+                <div class="library-info-item">
 
-                    <label class="verification-label">
-                        Digital Library
-                    </label>
+                    <div class="library-info-icon digital">
+                        <i class="bi bi-pc-display-horizontal"></i>
+                    </div>
 
-                    <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(Model.General?.DigitalLibrary)
-                            ? "-"
-                            : Model.General.DigitalLibrary)
+                    <div class="library-info-content">
+
+                        <label class="verification-label">
+                            Digital Library
+                        </label>
+
+                        <div class="library-info-value">
+                            @(string.IsNullOrWhiteSpace(Model.General?.DigitalLibrary)
+                                ? "-"
+                                : Model.General.DigitalLibrary == "Y" ? "Available" : "Not Available")
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
 
-
+            <!-- HELINET -->
             <div class="col-md-6">
 
-                <div class="verification-field">
+                <div class="library-info-item">
 
-                    <label class="verification-label">
-                        HELINET Services
-                    </label>
+                    <div class="library-info-icon helinet">
+                        <i class="bi bi-globe2"></i>
+                    </div>
 
-                    <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(Model.General?.HelinetServices)
-                            ? "-"
-                            : Model.General.HelinetServices)
+                    <div class="library-info-content">
+
+                        <label class="verification-label">
+                            HELINET Services
+                        </label>
+
+                        <div class="library-info-value">
+                            @(string.IsNullOrWhiteSpace(Model.General?.HelinetServices)
+                                ? "-"
+                                : Model.General.HelinetServices == "Y" ? "Available" : "Not Available")
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
 
-
+            <!-- Department Library -->
             <div class="col-md-6">
 
-                <div class="verification-field">
+                <div class="library-info-item">
 
-                    <label class="verification-label">
-                        Department-wise Library
-                    </label>
+                    <div class="library-info-icon department">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
 
-                    <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(Model.General?.DepartmentWiseLibrary)
-                            ? "-"
-                            : Model.General.DepartmentWiseLibrary)
+                    <div class="library-info-content">
+
+                        <label class="verification-label">
+                            Department-wise Library
+                        </label>
+
+                        <div class="library-info-value">
+                            @(string.IsNullOrWhiteSpace(Model.General?.DepartmentWiseLibrary)
+                                ? "-"
+                                : Model.General.DepartmentWiseLibrary == "Y" ? "Available" : "Not Available")
+                        </div>
+
                     </div>
 
                 </div>
@@ -159,11 +209,15 @@
 
         @if (generalLibraryDetailsFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", generalLibraryDetailsFeedback)
+            <div class="mt-4">
+                @await Html.PartialAsync("_SectionFeedback", generalLibraryDetailsFeedback)
+            </div>
         }
+
     </div>
 
 </div>
+
 
 
 
@@ -176,7 +230,7 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Library Items");
 }
 
-<div class="verification-card mt-4">
+<div class="verification-card mt-4" id ="section_@libraryItemsFeedback?.SectionId">
 
     <div class="verification-card-header">
 
@@ -283,16 +337,31 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Library Building");
 }
 
-<div class="verification-card mt-4">
+
+<div class="verification-card library-overview-card mt-4" id="section_@libraryBuildingFeedback?.SectionId">
 
     <div class="verification-card-header">
 
-        <h3 class="verification-card-title">
-            <i class="bi bi-building me-2"></i>
-            Library Building
-        </h3>
+        <div class="d-flex align-items-center gap-3">
 
-        <span class="badge bg-primary">
+            <div class="library-header-icon building-icon">
+                <i class="bi bi-building"></i>
+            </div>
+
+            <div>
+                <h3 class="verification-card-title mb-1">
+                    Library Building
+                </h3>
+
+                <p class="library-header-subtitle mb-0">
+                    Physical infrastructure and building information
+                </p>
+            </div>
+
+        </div>
+
+        <span class="library-section-badge infrastructure-badge">
+            <i class="bi bi-buildings me-1"></i>
             Infrastructure
         </span>
 
@@ -300,37 +369,61 @@
 
     <div class="verification-card-body">
 
-        <div class="row g-4">
+        <div class="row g-3">
 
+            <!-- Independent Building -->
             <div class="col-md-6">
 
-                <div class="verification-field">
+                <div class="library-info-item">
 
-                    <label class="verification-label">
-                        Independent Library Building
-                    </label>
+                    <div class="library-info-icon building">
+                        <i class="bi bi-building-check"></i>
+                    </div>
 
-                    <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(Model.Building?.IsIndependent)
-                            ? "-"
-                            : Model.Building.IsIndependent)
+                    <div class="library-info-content">
+
+                        <label class="verification-label">
+                            Independent Library Building
+                        </label>
+
+                        <div class="library-info-value">
+                            @(string.IsNullOrWhiteSpace(Model.Building?.IsIndependent)
+                                ? "-"
+                                : Model.Building.IsIndependent == "Y" ? "Available" : "Not Available")
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
 
-
+            <!-- Building Area -->
             <div class="col-md-6">
 
-                <div class="verification-field">
+                <div class="library-info-item">
 
-                    <label class="verification-label">
-                        Area (Sq. Mtrs.)
-                    </label>
+                    <div class="library-info-icon area">
+                        <i class="bi bi-rulers"></i>
+                    </div>
 
-                    <div class="verification-value">
-                        @(Model.Building?.AreaSqMtrs?.ToString("0.##") ?? "-")
+                    <div class="library-info-content">
+
+                        <label class="verification-label">
+                            Library Building Area
+                        </label>
+
+                        <div class="library-info-value building-area-value">
+
+                            @(Model.Building?.AreaSqMtrs?.ToString("0.##") ?? "-")
+
+                            @if (Model.Building?.AreaSqMtrs != null)
+                            {
+                                <span class="area-unit">Sq. Mtrs.</span>
+                            }
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -339,11 +432,13 @@
 
         </div>
 
-        
         @if (libraryBuildingFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", libraryBuildingFeedback)
+            <div class="mt-4">
+                @await Html.PartialAsync("_SectionFeedback", libraryBuildingFeedback)
+            </div>
         }
+
     </div>
 
 </div>
@@ -360,16 +455,31 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Technical Processes");
 }
 
-<div class="verification-card mt-4">
+
+<div class="verification-card library-overview-card mt-4" id="section_@techProcessFeedback?.SectionId">
 
     <div class="verification-card-header">
 
-        <h3 class="verification-card-title">
-            <i class="bi bi-gear me-2"></i>
-            Technical Processes
-        </h3>
+        <div class="d-flex align-items-center gap-3">
 
-        <span class="badge bg-primary">
+            <div class="library-header-icon technical-header-icon">
+                <i class="bi bi-gear-wide-connected"></i>
+            </div>
+
+            <div>
+                <h3 class="verification-card-title mb-1">
+                    Technical Processes
+                </h3>
+
+                <p class="library-header-subtitle mb-0">
+                    Technical operations and process information
+                </p>
+            </div>
+
+        </div>
+
+        <span class="library-section-badge technical-badge">
+            <i class="bi bi-cpu me-1"></i>
             Technical
         </span>
 
@@ -377,25 +487,32 @@
 
     <div class="verification-card-body">
 
-        @if (Model.TechnicalProcesses != null &&
-             Model.TechnicalProcesses.Any())
+        @if (Model.TechnicalProcesses != null && Model.TechnicalProcesses.Any())
         {
-            <div class="row g-4">
+            <div class="row g-3">
 
                 @foreach (var process in Model.TechnicalProcesses)
                 {
                     <div class="col-md-6">
 
-                        <div class="verification-field">
+                        <div class="library-info-item technical-process-item">
 
-                            <label class="verification-label">
-                                @process.ProcessName
-                            </label>
+                            <div class="library-info-icon technical-process-icon">
+                                <i class="bi bi-gear"></i>
+                            </div>
 
-                            <div class="verification-value">
-                                @(string.IsNullOrWhiteSpace(process.Value)
-                                    ? "-"
-                                    : process.Value)
+                            <div class="library-info-content">
+
+                                <label class="verification-label">
+                                    @process.ProcessName
+                                </label>
+
+                                <div class="library-info-value">
+                                    @(string.IsNullOrWhiteSpace(process.Value)
+                                        ? "-"
+                                        : process.Value)
+                                </div>
+
                             </div>
 
                         </div>
@@ -407,15 +524,27 @@
         }
         else
         {
-            <div class="verification-value">
-                No technical process details available.
+            <div class="technical-empty-state">
+
+                <div class="technical-empty-icon">
+                    <i class="bi bi-clipboard-data"></i>
+                </div>
+
+                <div>
+                    <h6>No Technical Processes Available</h6>
+                    <p>
+                        Technical process information has not been provided.
+                    </p>
+                </div>
+
             </div>
         }
 
-        
         @if (techProcessFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", techProcessFeedback)
+            <div class="mt-4">
+                @await Html.PartialAsync("_SectionFeedback", techProcessFeedback)
+            </div>
         }
 
     </div>
@@ -432,16 +561,31 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Library Equipment");
 }
 
-<div class="verification-card mt-4">
+
+<div class="verification-card library-overview-card mt-4" id="section_@libraryEquipmentFeedback?.SectionId">
 
     <div class="verification-card-header">
 
-        <h3 class="verification-card-title">
-            <i class="bi bi-pc-display me-2"></i>
-            Library Equipment
-        </h3>
+        <div class="d-flex align-items-center gap-3">
 
-        <span class="badge bg-primary">
+            <div class="library-header-icon equipment-header-icon">
+                <i class="bi bi-pc-display-horizontal"></i>
+            </div>
+
+            <div>
+                <h3 class="verification-card-title mb-1">
+                    Library Equipment
+                </h3>
+
+                <p class="library-header-subtitle mb-0">
+                    Equipment availability and library resources
+                </p>
+            </div>
+
+        </div>
+
+        <span class="library-section-badge equipment-badge">
+            <i class="bi bi-cpu me-1"></i>
             Equipment
         </span>
 
@@ -452,22 +596,30 @@
         @if (Model.Equipments != null &&
              Model.Equipments.Any())
         {
-            <div class="row g-4">
+            <div class="row g-3">
 
                 @foreach (var equipment in Model.Equipments)
                 {
                     <div class="col-md-6">
 
-                        <div class="verification-field">
+                        <div class="library-info-item equipment-info-item">
 
-                            <label class="verification-label">
-                                @equipment.EquipmentName
-                            </label>
+                            <div class="library-info-icon equipment-item-icon">
+                                <i class="bi bi-pc-display"></i>
+                            </div>
 
-                            <div class="verification-value">
-                                @(string.IsNullOrWhiteSpace(equipment.HasEquipment)
-                                    ? "-"
-                                    : equipment.HasEquipment)
+                            <div class="library-info-content">
+
+                                <label class="verification-label">
+                                    @equipment.EquipmentName
+                                </label>
+
+                                <div class="library-info-value">
+                                    @(string.IsNullOrWhiteSpace(equipment.HasEquipment)
+                                        ? "-"
+                                        : equipment.HasEquipment == "Y" ? "Available" : "Not Available")
+                                </div>
+
                             </div>
 
                         </div>
@@ -479,21 +631,33 @@
         }
         else
         {
-            <div class="verification-value">
-                No library equipment details available.
+            <div class="technical-empty-state">
+
+                <div class="technical-empty-icon">
+                    <i class="bi bi-pc-display"></i>
+                </div>
+
+                <div>
+                    <h6>No Library Equipment Available</h6>
+                    <p>
+                        Library equipment information has not been provided.
+                    </p>
+                </div>
+
             </div>
         }
 
-
-        
         @if (libraryEquipmentFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", libraryEquipmentFeedback)
+            <div class="mt-4">
+                @await Html.PartialAsync("_SectionFeedback", libraryEquipmentFeedback)
+            </div>
         }
 
     </div>
 
 </div>
+
 
 
 @* =========================================================
@@ -505,16 +669,32 @@
                                 ?.FirstOrDefault(x => x.SectionName == "Library Finance");
 }
 
-<div class="verification-card mt-4">
+
+<div class="verification-card library-overview-card mt-4"
+     id="section_@libraryFinanceFeedback?.SectionId">
 
     <div class="verification-card-header">
 
-        <h3 class="verification-card-title">
-            <i class="bi bi-currency-rupee me-2"></i>
-            Library Finance
-        </h3>
+        <div class="d-flex align-items-center gap-3">
 
-        <span class="badge bg-primary">
+            <div class="library-header-icon finance-header-icon">
+                <i class="bi bi-currency-rupee"></i>
+            </div>
+
+            <div>
+                <h3 class="verification-card-title mb-1">
+                    Library Finance
+                </h3>
+
+                <p class="library-header-subtitle mb-0">
+                    Budget allocation and expenditure details
+                </p>
+            </div>
+
+        </div>
+
+        <span class="library-section-badge finance-badge">
+            <i class="bi bi-wallet2 me-1"></i>
             Finance
         </span>
 
@@ -524,39 +704,68 @@
 
         @if (Model.Finance != null)
         {
-            <div class="row g-4">
+            <div class="row g-3">
 
+                <!-- Total Budget -->
                 <div class="col-md-6">
 
-                    <div class="verification-field">
+                    <div class="library-info-item finance-info-item">
 
-                        <label class="verification-label">
-                            Total Budget
-                        </label>
+                        <div class="library-info-icon budget-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
 
-                        <div class="verification-value">
-                            @(Model.Finance.TotalBudgetLakhs.HasValue
-                                ? $"{Model.Finance.TotalBudgetLakhs:N2} Lakhs"
-                                : "-")
+                        <div class="library-info-content">
+
+                            <label class="verification-label">
+                                Total Budget
+                            </label>
+
+                            <div class="finance-value">
+                                @if (Model.Finance.TotalBudgetLakhs.HasValue)
+                                {
+                                    @Model.Finance.TotalBudgetLakhs.Value.ToString("N2")
+                                    <span class="finance-unit">Lakhs</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </div>
+
                         </div>
 
                     </div>
 
                 </div>
 
-
+                <!-- Expenditure on Books -->
                 <div class="col-md-6">
 
-                    <div class="verification-field">
+                    <div class="library-info-item finance-info-item">
 
-                        <label class="verification-label">
-                            Expenditure on Books
-                        </label>
+                        <div class="library-info-icon expenditure-icon">
+                            <i class="bi bi-journal-bookmark"></i>
+                        </div>
 
-                        <div class="verification-value">
-                            @(Model.Finance.ExpenditureBooksLakhs.HasValue
-                                ? $"{Model.Finance.ExpenditureBooksLakhs:N2} Lakhs"
-                                : "-")
+                        <div class="library-info-content">
+
+                            <label class="verification-label">
+                                Expenditure on Books
+                            </label>
+
+                            <div class="finance-value">
+                                @if (Model.Finance.ExpenditureBooksLakhs.HasValue)
+                                {
+                                    @Model.Finance.ExpenditureBooksLakhs.Value.ToString("N2")
+                                    <span class="finance-unit">Lakhs</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </div>
+
                         </div>
 
                     </div>
@@ -567,25 +776,33 @@
         }
         else
         {
-            <div class="verification-field">
+            <div class="technical-empty-state">
 
-                <div class="verification-value">
-                    No finance details available.
+                <div class="technical-empty-icon">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+
+                <div>
+                    <h6>No Finance Details Available</h6>
+                    <p>
+                        Library budget and expenditure information has not been provided.
+                    </p>
                 </div>
 
             </div>
         }
 
-
-
         @if (libraryFinanceFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", libraryFinanceFeedback)
+            <div class="mt-4">
+                @await Html.PartialAsync("_SectionFeedback", libraryFinanceFeedback)
+            </div>
         }
 
     </div>
 
 </div>
+
 
 
 @section Scripts {
