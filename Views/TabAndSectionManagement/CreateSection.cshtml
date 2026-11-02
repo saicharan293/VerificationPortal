@@ -1,0 +1,191 @@
+﻿
+@model VerificationPortal.Models.TabManagementViewModel.SectionManagementViewModel
+
+@{
+    // Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    bool isEdit = Model.SectionId > 0;
+
+    ViewData["Title"] = isEdit ? "Edit Section" : "Create Section";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tab-section.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/create-section.css" asp-append-version="true" />
+}
+
+<div class="cs-page">
+
+    <!-- PAGE HEADER -->
+    <div class="cs-page-header">
+
+        <div>
+            <div class="cs-breadcrumb">
+                <a asp-controller="TabAndSectionManagement"
+                   asp-action="Index">
+                    Tab & Section Management
+                </a>
+
+                <i class="bi bi-chevron-right"></i>
+
+                <span>@(isEdit ? "Edit Section" : "Create Section")</span>
+            </div>
+
+            <h2>@(isEdit ? "Edit Section" : "Create New Section")</h2>
+
+            <p>
+                @(isEdit
+                    ? "Update the section details and save your changes."
+                    : "Create a new section under the selected faculty and tab.")
+            </p>
+        </div>
+
+        <a asp-controller="TabAndSectionManagement"
+           asp-action="Index"
+           class="cs-back-btn">
+            <i class="bi bi-arrow-left"></i>
+            Back to List
+        </a>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="cs-form-card">
+
+        <div class="cs-form-header">
+
+            <div class="cs-form-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <h5>Section Information</h5>
+                <p>Enter the required details below.</p>
+            </div>
+
+        </div>
+
+        <form asp-controller="TabAndSectionManagement"
+              asp-action="@(isEdit ? "EditSection" : "CreateSection")"
+              method="post"
+              id="sectionForm"
+              data-tabs-url="@Url.Action("GetTabsByFaculty", "TabAndSectionManagement")">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="SectionId" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert">
+            </div>
+
+            <div class="cs-form-body">
+
+                <!-- FACULTY -->
+                <div class="cs-form-group">
+
+                    <label asp-for="FacultyId" class="form-label">
+                        Faculty <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="FacultyId"
+                            asp-items="Model.Faculties"
+                            class="form-select"
+                            id="FacultyId">
+
+                        <option value="">Select Faculty</option>
+
+                    </select>
+
+                    <span asp-validation-for="FacultyId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- TAB -->
+                <div class="cs-form-group">
+
+                    <label asp-for="TabId" class="form-label">
+                        Tab <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="TabId"
+                            asp-items="Model.Tabs"
+                            class="form-select"
+                            id="TabId">
+
+                        <option value="">Select Tab</option>
+
+                    </select>
+
+                    <span asp-validation-for="TabId"
+                          class="text-danger">
+                    </span>
+
+                    <small class="cs-help-text" id="tabHelpText">
+                        Select a faculty first to view its tabs.
+                    </small>
+
+                </div>
+
+                <!-- SECTION NAME -->
+                <div class="cs-form-group">
+
+                    <label asp-for="SectionName" class="form-label">
+                        Section Name <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="SectionName"
+                           class="form-control"
+                           id="SectionName"
+                           placeholder="Enter section name"
+                           maxlength="150"
+                           autocomplete="off" />
+
+                    <div class="cs-input-footer">
+
+                        <span asp-validation-for="SectionName"
+                              class="text-danger">
+                        </span>
+
+                        <small id="sectionNameCounter">
+                            0 / 150
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FORM FOOTER -->
+            <div class="cs-form-footer">
+
+                <a asp-controller="TabAndSectionManagement"
+                   asp-action="Index"
+                   class="btn cs-cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn cs-submit-btn">
+                    <i class="bi bi-check-circle"></i>
+                    @(isEdit ? "Update Section" : "Save Section")
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/create-section.js" asp-append-version="true"></script>
+}

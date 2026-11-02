@@ -13,6 +13,8 @@ namespace VerificationPortal.Models
         public bool ShowAffiliationSelector { get; set; }
         public int TotalVerified { get; set; }
 
+        public bool HasCollegeMapping {get; set;}
+
         public int TotalPending { get; set; }
 
         public DateTime CurrentDate { get; set; }

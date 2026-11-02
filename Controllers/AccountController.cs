@@ -40,7 +40,7 @@ namespace VerificationPortal.Controllers
         {
             return role switch
             {
-                "Admin" => RedirectToAction("Index", "CollegeMapping"),
+                "Admin" => RedirectToAction("Index", "Dashboard"),
                 // add more roles here if needed, e.g.
                 // "Section" => RedirectToAction("Index", "SectionDashboard"),
                 _ => RedirectToAction("Index", "Dashboard")

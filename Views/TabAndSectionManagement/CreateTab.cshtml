@@ -1,0 +1,159 @@
+﻿
+@model VerificationPortal.Models.TabManagementViewModel.TabViewModel
+
+@{
+    ViewData["Title"] = "Tab & Section Management";
+
+    bool isEdit = Model.TabId > 0;
+
+    ViewData["Title"] = isEdit ? "Edit Tab" : "Create Tab";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tab-section.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/create-tab.css" asp-append-version="true" />
+}
+
+<div class="ct-page">
+
+    <!-- PAGE HEADER -->
+    <div class="ct-page-header">
+
+        <div>
+            <div class="ct-breadcrumb">
+                <a asp-controller="TabAndSectionManagement" asp-action="Index">
+                    Tab & Section Management
+                </a>
+                <i class="bi bi-chevron-right"></i>
+                <span>@(isEdit ? "Edit Tab" : "Create Tab")</span>
+            </div>
+
+            <h2>@(isEdit ? "Edit Tab" : "Create New Tab")</h2>
+
+            <p>
+                @(isEdit
+                    ? "Update the tab details and save your changes."
+                    : "Create a new verification tab for the selected faculty.")
+            </p>
+        </div>
+
+        <a asp-controller="TabAndSectionManagement"
+           asp-action="Index"
+           class="ct-back-btn">
+            <i class="bi bi-arrow-left"></i>
+            Back to List
+        </a>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="ct-form-card">
+
+        <div class="ct-form-header">
+            <div class="ct-form-icon">
+                <i class="bi bi-folder-plus"></i>
+            </div>
+
+            <div>
+                <h5>Tab Information</h5>
+                <p>Enter the required details below.</p>
+            </div>
+        </div>
+
+        <form asp-controller="TabAndSectionManagement"
+              asp-action="@(isEdit ? "EditTab" : "CreateTab")"
+              method="post"
+              id="tabForm">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="TabId" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert">
+            </div>
+
+            <div class="ct-form-body">
+
+                <!-- FACULTY -->
+                <div class="ct-form-group">
+
+                    <label asp-for="FacultyId" class="form-label">
+                        Faculty <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="FacultyId"
+                            asp-items="Model.Faculties"
+                            class="form-select"
+                            id="FacultyId">
+
+                        <option value="">Select Faculty</option>
+
+                    </select>
+
+                    <span asp-validation-for="FacultyId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- TAB NAME -->
+                <div class="ct-form-group">
+
+                    <label asp-for="TabName" class="form-label">
+                        Tab Name <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="TabName"
+                           class="form-control"
+                           id="TabName"
+                           placeholder="Enter tab name"
+                           maxlength="150"
+                           autocomplete="off" />
+
+                    <div class="ct-input-footer">
+
+                        <span asp-validation-for="TabName"
+                              class="text-danger">
+                        </span>
+
+                        <small id="tabNameCounter">
+                            0 / 150
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FORM FOOTER -->
+            <div class="ct-form-footer">
+
+                <a asp-controller="TabAndSectionManagement"
+                   asp-action="Index"
+                   class="btn ct-cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn ct-submit-btn">
+                    <i class="bi bi-check-circle"></i>
+                    @(isEdit ? "Update Tab" : "Save Tab")
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/create-tab.js" asp-append-version="true"></script>
+}

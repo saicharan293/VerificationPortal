@@ -56,7 +56,7 @@ namespace VerificationPortal.Controllers
                 "InstitutionDetails" => "Institution Details",
                 "TrustDetails" => "Trust Details",
                 "TrustMemberDetails" => "Trust Member Details",
-                "DeanDirectorDetails" => "Dean / Director Details",
+                "DeanDirectorDetails" => "Dean or Director Details",
                 "PrincipalDetails" => "Principal Details",
                 "UGCourseDetails" => "UG Course Details",
                 "UgCourseDetails" => "UG Course Details",
@@ -77,7 +77,7 @@ namespace VerificationPortal.Controllers
                 "StaffOtherDetails" => "Staff Other Details",
                 "FinanceDetails" => "Finance Details",
                 "LibraryServices" => "Library Services",
-                "ResearchPublications" => "Research & Publications",
+                "ResearchPublications" => "Research and Publications",
                 "LibraryDetails" => "Library Details",
                 "LibraryExpenditure" => "Library Expenditure and Services",
                 "LibraryStaffDetails" => "Library Staff Details",
@@ -1061,7 +1061,7 @@ namespace VerificationPortal.Controllers
             if (dean == null)
             {
                 return NotFound(
-                    "Dean / Director details not found.");
+                    "Dean or Director Details not found.");
             }
 
 
@@ -1230,7 +1230,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Dean / Director Details", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Dean or Director Details", context.FacultyCodeInt);
 
             return View(vm);
         }
@@ -1893,7 +1893,7 @@ namespace VerificationPortal.Controllers
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.ActiveTab = "Courses";
             ViewBag.ComingSoon = true;
-            ViewBag.TabTitle = "Courses & Intake";
+            ViewBag.TabTitle = "Courses and Intake";
             ViewBag.TabIcon = "bi-book";
             ViewBag.UserDesignation = GetUserDesignation();
 
@@ -5614,7 +5614,7 @@ namespace VerificationPortal.Controllers
 
 
             // =========================================================
-            // 1. MAIN RESEARCH & PUBLICATIONS
+            // 1. MAIN Research and Publications
             // =========================================================
 
             var researchRecord =
@@ -5645,8 +5645,18 @@ namespace VerificationPortal.Controllers
             // 3. BUILD VERIFICATION VIEW MODEL
             // =========================================================
 
+            var verficationContext = new VerificationPageContextVm
+            {
+                FacultyId = pageContext.FacultyCodeInt,
+                FacultyName = pageContext.FacultyName,
+                CollegeCode = collegeCode,
+                InstitutionName = pageContext.InstitutionName,
+                CurrentVerifier = GetUserDesignation()
+            };
+
             var model = new ResearchPublicationsVerificationViewModel
             {
+                PageContext = verficationContext,
                 CollegeCode = collegeCode,
 
                 FacultyCode = facultyCode,
@@ -5669,18 +5679,10 @@ namespace VerificationPortal.Controllers
                         .Select(x => new DepartmentWisePublicationVerificationRow
                         {
                             Id = x.Id,
-
-                            DeptCode =
-                                x.DeptCode,
-
-                            DeptName =
-                                x.DeptName,
-
-                            PublicationsCount =
-                                x.PublicationsCount,
-
-                            PublicationPath =
-                                x.PublicationPath
+                            DeptCode = x.DeptCode,
+                            DeptName = x.DeptName,
+                            PublicationsCount = x.PublicationsCount,
+                            PublicationPath = x.PublicationPath
                         })
                         .ToList()
             };
@@ -5703,7 +5705,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Research & Publications", pageContext.FacultyCodeInt);
+            model.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Research and Publications", pageContext.FacultyCodeInt);
             return View("ResearchPublications", model);
 
         }

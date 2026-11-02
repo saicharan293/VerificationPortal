@@ -1,7 +1,7 @@
 @model VerificationPortal.Models.AffInstitutionsDetail
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
-    ViewData["Title"] = "Courses & Intake";
+    ViewData["Title"] = "Courses and Intake";
     ViewData["ActiveTab"] = "Courses";
     ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
     ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
@@ -21,7 +21,7 @@
         <div class="verification-card-header">
             <h2 class="verification-card-title">
                 <i class="bi bi-book"></i>
-                Courses & Intake
+                Courses and Intake
             </h2>
             <div class="verification-card-actions">
                 <span class="badge badge-warning">Planned</span>
@@ -89,7 +89,7 @@
                     <div class="col-12">
                         <label class="form-label">Remarks <span class="text-danger">*</span></label>
                         <textarea class="form-control" name="remarks" rows="4" required
-                                  placeholder="Enter your verification remarks for Courses & Intake..."></textarea>
+                                  placeholder="Enter your verification remarks for Courses and Intake..."></textarea>
                         <div class="form-text">Please provide detailed remarks for your verification decision.</div>
                         <div class="invalid-feedback">Remarks are required for verification.</div>
                     </div>

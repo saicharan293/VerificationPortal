@@ -1,0 +1,525 @@
+﻿@model VerificationPortal.Models.TabManagementViewModel.TabAndSectionManagementViewModel
+
+@{
+    ViewData["Title"] = "Tab & Section Management";
+
+    var faculties = ViewBag.Faculties as IEnumerable<SelectListItem>;
+    var tabs = ViewBag.Tabs as IEnumerable<SelectListItem>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tab-section.css" asp-append-version="true" />
+}
+
+<!-- PAGE HEADER -->
+<div class="admin-page-header ts-page-header">
+    <div class="container-fluid px-4">
+        <div class="ts-header-content">
+            <div>
+                <div class="ts-header-eyebrow">
+                    ADMINISTRATION / MASTER MANAGEMENT
+                </div>
+
+                <h1>
+                    <i class="bi bi-diagram-3-fill"></i>
+                    Tab & Section Management
+                </h1>
+
+                <p>
+                    Configure verification tabs and sections for different faculties.
+                </p>
+            </div>
+
+            <a asp-controller="Dashboard"
+               asp-action="Index"
+               class="btn btn-light ts-back-btn">
+                <i class="bi bi-arrow-left me-2"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 ts-page">
+
+    <!-- ALERTS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show ts-alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show ts-alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- SUMMARY -->
+    <div class="row g-3 ts-summary">
+
+        <div class="col-xl-4 col-md-4">
+            <div class="ts-stat-card">
+                <div class="ts-stat-icon ts-blue">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+
+                <div class="ts-stat-details">
+                    <span>Total Tabs</span>
+                    <h3>@Model.Tabs.Count</h3>
+                </div>
+
+                <div class="ts-stat-decoration">
+                    <i class="bi bi-folder2"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-4">
+            <div class="ts-stat-card">
+                <div class="ts-stat-icon ts-green">
+                    <i class="bi bi-list-nested"></i>
+                </div>
+
+                <div class="ts-stat-details">
+                    <span>Total Sections</span>
+                    <h3>@Model.Sections.Count</h3>
+                </div>
+
+                <div class="ts-stat-decoration">
+                    <i class="bi bi-list-ul"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-4">
+            <div class="ts-stat-card">
+                <div class="ts-stat-icon ts-purple">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+
+                <div class="ts-stat-details">
+                    <span>Faculties Covered</span>
+                    <h3>@Model.Tabs.Select(x => x.FacultyId).Distinct().Count()</h3>
+                </div>
+
+                <div class="ts-stat-decoration">
+                    <i class="bi bi-building"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTER PANEL -->
+    <div class="ts-filter-card">
+
+        <div class="ts-filter-heading">
+            <div class="ts-section-heading">
+                <div class="ts-heading-icon">
+                    <i class="bi bi-funnel"></i>
+                </div>
+
+                <div>
+                    <h5>Filter Records</h5>
+                    <p>Find tabs and sections by faculty and tab.</p>
+                </div>
+            </div>
+
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                Clear Filters
+            </a>
+        </div>
+
+        <form asp-action="Index" method="get" id="tabSectionFilterForm">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-5 col-md-5">
+                    <label class="form-label">Faculty</label>
+
+                    <select name="facultyId"
+                            id="filterFacultyId"
+                            class="form-select">
+                        <option value="">All Faculties</option>
+
+                        @if (faculties != null)
+                        {
+                            foreach (var faculty in faculties)
+                            {
+                                <option value="@faculty.Value"
+                                        selected="@faculty.Selected">
+                                    @faculty.Text
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-5 col-md-5">
+                    <label class="form-label">Tab</label>
+
+                    <select name="tabId"
+                            id="filterTabId"
+                            class="form-select">
+                        <option value="">All Tabs</option>
+
+                        @if (tabs != null)
+                        {
+                            foreach (var tab in tabs)
+                            {
+                                <option value="@tab.Value"
+                                        selected="@tab.Selected">
+                                    @tab.Text
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search me-1"></i>
+                    Search
+                </button>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- TAB MANAGEMENT -->
+    <div class="ts-management-card">
+
+        <div class="ts-card-header">
+            <div class="ts-section-heading">
+                <div class="ts-heading-icon ts-heading-blue">
+                    <i class="bi bi-folder-fill"></i>
+                </div>
+
+                <div>
+                    <h5>Tab Management</h5>
+                    <p>Create and manage faculty-wise verification tabs.</p>
+                </div>
+            </div>
+
+            <a asp-action="CreateTab" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>
+                Add New Tab
+            </a>
+        </div>
+
+        <!-- TAB SEARCH -->
+        <div class="ts-table-toolbar">
+            <div class="ts-search-box">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                    id="tabSearchInput"
+                    class="form-control"
+                    placeholder="Search by faculty or tab name..."
+                    autocomplete="off" />
+                <button type="button"
+                        class="ts-search-clear"
+                        id="clearTabSearch"
+                        title="Clear search">
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive ts-scroll-container" id="tabsScroll">
+            <table class="table ts-table" id="tabsTable">
+                <thead>
+                    <tr>
+                        <th class="ts-col-number">#</th>
+                        <th>
+                            <button type="button" class="ts-sort-button" data-sort-index="1">
+                                Faculty
+                                <i class="bi bi-arrow-down-up"></i>
+                            </button>
+                        </th>
+                        <th>
+                            <button type="button" class="ts-sort-button" data-sort-index="1">
+                                Tab Name
+                                <i class="bi bi-arrow-down-up"></i>
+                            </button>
+                        </th>
+                        <th class="text-center">
+                            <button type="button" class="ts-sort-button" data-sort-index="1">
+                                Sections
+                                <i class="bi bi-arrow-down-up"></i>
+                            </button>
+                        </th>
+                        <th class="text-end ts-col-actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Tabs.Any())
+                    {
+                        var index = 1;
+
+                        foreach (var tab in Model.Tabs)
+                        {
+                            <tr>
+                                <td class="ts-number">@index</td>
+
+                                <td>
+                                    <span class="ts-faculty">
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                        @tab.FacultyName
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="ts-record-name">
+                                        @tab.TabName
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="ts-count">
+                                        @tab.TotalSections
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="ts-actions">
+
+                                        <a asp-action="Index"
+                                           asp-route-facultyId="@tab.FacultyId"
+                                           asp-route-tabId="@tab.TabId"
+                                           class="btn ts-action-view"
+                                           title="View Sections">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <a asp-action="EditTab"
+                                           asp-route-id="@tab.TabId"
+                                           class="btn ts-action-edit"
+                                           title="Edit Tab">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <form asp-action="DeleteTab"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this tab?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@tab.TabId" />
+
+                                            <button type="submit"
+                                                    class="btn ts-action-delete"
+                                                    title="Delete Tab">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="ts-empty-state">
+                                    <div class="ts-empty-icon">
+                                        <i class="bi bi-folder2-open"></i>
+                                    </div>
+                                    <h6>No Tabs Found</h6>
+                                    <p>There are no tabs matching your selected filters.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="ts-table-footer ts-pagination-footer">
+            <div id="tabsPageInfo">
+                Showing 0 records
+            </div>
+
+            <div class="ts-pagination" id="tabsPagination"></div>
+        </div>
+    </div>
+
+    <!-- SECTION MANAGEMENT -->
+    <div class="ts-management-card">
+
+        <div class="ts-card-header">
+            <div class="ts-section-heading">
+                <div class="ts-heading-icon ts-heading-green">
+                    <i class="bi bi-list-ul"></i>
+                </div>
+
+                <div>
+                    <h5>Section Management</h5>
+                    <p>Manage sections associated with verification tabs.</p>
+                </div>
+            </div>
+
+            <a asp-action="CreateSection"
+               asp-route-tabId="@Model.SelectedTabId"
+               class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>
+                Add New Section
+            </a>
+        </div>
+
+        <!-- SECTION SEARCH -->
+        <div class="ts-table-toolbar">
+            <div class="ts-search-box">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                    id="sectionSearchInput"
+                    class="form-control"
+                    placeholder="Search by faculty, tab or section name..."
+                    autocomplete="off" />
+                <button type="button"
+                        class="ts-search-clear"
+                        id="clearSectionSearch"
+                        title="Clear search">
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive ts-scroll-container" id="sectionsScroll">
+            <table class="table ts-table" id="sectionsTable">
+                <thead>
+                    <tr>
+                        <th class="ts-col-number">#</th>
+                        <th>
+                            <button type="button" class="ts-sort-button" data-sort-index="1">
+                                Faculty
+                                <i class="bi bi-arrow-down-up"></i>
+                            </button>
+                        </th>
+                        <th>
+                            <button type="button" class="ts-sort-button" data-sort-index="1">
+                                Tab Name 
+                                <i class="bi bi-arrow-down-up"></i> 
+                            </button>
+                        </th>
+                        <th>
+                            <button type="button" class="ts-sort-button" data-sort-inde="1">
+                                Section Name 
+                                <i class="bi bi-arrow-down-up"></i> 
+                            </button>
+                        </th>
+                        <th class="text-end ts-col-actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Sections.Any())
+                    {
+                        var index = 1;
+
+                        foreach (var item in Model.Sections)
+                        {
+                            <tr>
+                                <td class="ts-number">@index</td>
+
+                                <td>
+                                    <span class="ts-faculty">
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                        @item.FacultyName
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="ts-tab-name">
+                                        <i class="bi bi-folder2"></i>
+                                        @item.TabName
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="ts-record-name">
+                                        @item.SectionName
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="ts-actions">
+
+                                        <a asp-action="EditSection"
+                                           asp-route-id="@item.SectionId"
+                                           class="btn ts-action-edit"
+                                           title="Edit Section">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <form asp-action="DeleteSection"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this section?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@item.SectionId" />
+
+                                            <button type="submit"
+                                                    class="btn ts-action-delete"
+                                                    title="Delete Section">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="ts-empty-state">
+                                    <div class="ts-empty-icon ts-empty-green">
+                                        <i class="bi bi-list-nested"></i>
+                                    </div>
+                                    <h6>No Sections Found</h6>
+                                    <p>There are no sections matching your selected filters.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="ts-table-footer ts-pagination-footer">
+            <div id="sectionsPageInfo">
+                Showing 0 records
+            </div>
+
+            <div class="ts-pagination" id="sectionsPagination"></div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/tab-section.js" asp-append-version="true"></script>
+}

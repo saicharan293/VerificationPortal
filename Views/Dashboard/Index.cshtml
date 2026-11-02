@@ -107,49 +107,115 @@
     <div class="container">
         <div class="row g-4">
 
-            <!-- My Colleges -->
-            <div class="col-lg-6">
-                <a asp-controller="MyColleges"
-                   asp-action="Index"
-                   class="dashboard-action-card">
+            @if (!Model.IsAdmin)
+            {
+                <!-- My Colleges -->
+                @* <div class="col-lg-6">
+                    <a asp-controller="MyColleges"
+                    asp-action="Index"
+                    class="dashboard-action-card">
 
-                    <div class="dashboard-action-icon">
-                        <i class="bi bi-building"></i>
-                    </div>
+                        <div class="dashboard-action-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
 
-                    <div class="dashboard-action-content">
-                        <h5>My Colleges</h5>
-                        <p>View and manage colleges assigned to you.</p>
-                    </div>
+                        <div class="dashboard-action-content">
+                            <h5>My Colleges</h5>
+                            <p>View and manage colleges assigned to you.</p>
+                        </div>
 
-                    <div class="dashboard-action-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </div>
+                        <div class="dashboard-action-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
 
-                </a>
-            </div>
+                    </a>
+                </div> *@
+    
+                <!-- Type of Affiliation -->
+                <div class="col-lg-12">
 
-            <!-- Type of Affiliation -->
-            <div class="col-lg-6">
-                <button type="button"
-                        class="dashboard-action-card affiliation-selector-link w-100 border-0 text-start"
-                        id="openAffiliationSelector">
+                    @if (!Model.HasCollegeMapping)
+                    {
+                        <div class="college-assignment-pending-card">
 
-                    <div class="dashboard-action-icon">
-                        <i class="bi bi-layers-fill"></i>
-                    </div>
+                            <div class="college-pending-icon">
+                                <i class="bi bi-building-exclamation"></i>
+                            </div>
 
-                    <div class="dashboard-action-content">
-                        <h5>Type of Affiliation & Course Level</h5>
-                        <p>Select the affiliation type and course level to continue.</p>
-                    </div>
+                            <div class="college-pending-content">
 
-                    <div class="dashboard-action-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </div>
+                                <div class="college-pending-heading">
+                                    <h5>College Assignment Pending</h5>
+                                    <span class="college-pending-badge">Pending</span>
+                                </div>
 
-                </button>
-            </div>
+                                <p>
+                                    Your account is not yet mapped to any college.
+                                    The administrator needs to assign a college before
+                                    you can proceed with the affiliation process.
+                                </p>
+
+                                <div class="college-pending-footer">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                    <span>Please contact the administrator for assistance.</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <button type="button"
+                                class="affiliation-selector-link dashboard-action-card w-100 border-0 text-start"
+                                id="openAffiliationSelector">
+
+                            <div class="dashboard-action-icon">
+                                <i class="bi bi-layers-fill"></i>
+                            </div>
+
+                            <div class="dashboard-action-content">
+                                <h5>Type of Affiliation & Course Level</h5>
+                                <p>Select the affiliation type and course level to continue.</p>
+                            </div>
+
+                            <div class="dashboard-action-arrow">
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+
+                        </button>
+                    }
+
+                </div>
+            }
+            
+            @if (Model.IsAdmin)
+            { 
+                <!-- Manage Tabs & Sections -->
+                <div class="col-lg-6">
+                    <a asp-controller="TabAndSectionManagement"
+                    asp-action="Index"
+                    class="dashboard-action-card">
+
+                        <div class="dashboard-action-icon">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+
+                        <div class="dashboard-action-content">
+                            <h5>Manage Tabs & Sections</h5>
+                            <p>
+                                Create and manage verification tabs and their
+                                corresponding sections for different faculties.
+                            </p>
+                        </div>
+
+                        <div class="dashboard-action-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+
+                    </a>
+                </div>
+            }
 
         </div>
     </div>

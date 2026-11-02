@@ -13,9 +13,9 @@
     ViewData["ShowFeedbackSection"] = true;
     ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
     ViewData["NextTabAction"] = Url.Action( "Courses", "VerificationDashboard", new { collegeCode = Model.Institution?.CollegeCode });
-    ViewData["NextTabLabel"] = "Next: Courses & Intake";
+    ViewData["NextTabLabel"] = "Next: Courses and Intake";
     ViewData["PrevTabAction"] = Url.Action( "DeanDirectorDetails", "VerificationDashboard", new { collegeCode = Model.Institution?.CollegeCode });
-    ViewData["PrevTabLabel"] = "Previous: Dean / Director Details";
+    ViewData["PrevTabLabel"] = "Previous: Dean or Director Details";
     var experienceColleges = Model.ExperienceColleges?? new List<SelectListItem>();
     ViewBag.ActiveTab = "PrincipalDetails";
     var principalInfoFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Principal Information");

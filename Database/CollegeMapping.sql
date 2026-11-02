@@ -3025,12 +3025,12 @@ BEGIN TRY
         (2, N'Institution Details'),
         (2, N'Trust Details'),
         (2, N'Trust Member Details'),
-        (2, N'Dean / Director Details'),
+        (2, N'Dean or Director Details'),
         (2, N'Principal Details'),
 
         (2, N'UG Course Details'),
         (2, N'PG Course Details'),
-        (2, N'Courses & Intake'),
+        (2, N'Courses and Intake'),
 
         (2, N'Land And Building Details'),
         (2, N'Classroom And Laboratory'),
@@ -3087,7 +3087,7 @@ BEGIN TRY
             (N'Institution Details', N'Head of Institution'),
             (N'Institution Details', N'Nodal Officer Details'),
             (N'Institution Details', N'Principal Details'),
-            (N'Institution Details', N'Dean / Director Details'),
+            (N'Institution Details', N'Dean or Director Details'),
             (N'Institution Details', N'Trust Details'),
             (N'Institution Details', N'Administrative Section'),
             (N'Institution Details', N'Managing Other Health Science Colleges'),
@@ -3098,10 +3098,10 @@ BEGIN TRY
             /* Trust Member Details */
             (N'Trust Member Details', N'Trust Members'),
 
-            /* Dean / Director Details */
-            (N'Dean / Director Details', N'Dean / Director Information'),
-            (N'Dean / Director Details', N'Teaching Experience'),
-            (N'Dean / Director Details', N'Administrative Experience'),
+            /* Dean or Director Details */
+            (N'Dean or Director Details', N'Dean / Director Information'),
+            (N'Dean or Director Details', N'Teaching Experience'),
+            (N'Dean or Director Details', N'Administrative Experience'),
 
             /* Principal Details */
             (N'Principal Details', N'Principal Information'),

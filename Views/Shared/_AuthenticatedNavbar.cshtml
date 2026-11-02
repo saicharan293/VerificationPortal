@@ -2,9 +2,7 @@
 
 <style>
     .affiliation-selector-link {
-        background: none;
-        border: none;
-        padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
+        border: 1px solid var(--border-color) !important;
     }
 
     .auth-navbar .navbar-toggler {
@@ -88,7 +86,7 @@
                 {
                     <partial name="_AdminMenu" />
                 }
-                else
+                else if(ViewBag.HasCollegeMapping == true)
                 { 
                     <!-- My Colleges -->
                     <li class="nav-item">
@@ -116,6 +114,15 @@
 
                         </button>
 
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <span class="nav-link text-warning">
+                            <i class="bi bi-exclamation-circle me-1"></i>
+                            College Assignment Pending
+                        </span>
                     </li>
                 }
 

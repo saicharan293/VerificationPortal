@@ -45,12 +45,16 @@ namespace VerificationPortal.Controllers
 
             // Get faculty details
             var faculty = await _context.Faculties
+                .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.FacultyId == user.Faculty);
 
             // Get college mapping (if exists)
-            var collegeMapping = await _context.TblCollegeMappings
+            var collegeMapping = await _context.TblCollegeMappings.AsNoTracking()
                 .FirstOrDefaultAsync(cm => cm.UserId == user.UserId && cm.IsActive == true);
 
+            bool hasCollegeMapping = await _context.TblCollegeMappings.AsNoTracking().AnyAsync(cm => cm.UserId == user.UserId && cm.IsActive == true);
+
+            ViewBag.HasCollegeMapping = hasCollegeMapping;
             // Count statistics
             int totalColleges = 0;
             if (collegeMapping != null)
@@ -65,6 +69,7 @@ namespace VerificationPortal.Controllers
                 User = user,
                 Faculty = faculty,
                 CollegeMapping = collegeMapping,
+                HasCollegeMapping = hasCollegeMapping,
                 TotalAssignedColleges = totalColleges,
                 Role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User",
                 IsAdmin = user.IsAdmin ?? false,
@@ -91,10 +96,10 @@ namespace VerificationPortal.Controllers
             }
 
             int userDbId = int.Parse(userIdClaim);
-            var user = await _context.TblRguhsFacultyUsers
+            var user = await _context.TblRguhsFacultyUsers.AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userDbId);
 
-            var faculty = await _context.Faculties
+            var faculty = await _context.Faculties.AsNoTracking()
                 .FirstOrDefaultAsync(f => f.FacultyId == user.Faculty);
 
             ViewBag.Faculty = faculty;
