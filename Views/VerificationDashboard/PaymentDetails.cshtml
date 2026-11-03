@@ -1,0 +1,230 @@
+@model VerificationPortal.Models.PaymentDetailsVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Payment Details";
+    ViewData["ActiveTab"] = "PaymentDetails";
+    ViewData["ShowFeedbackSection"] = true;
+
+    var page = Model.PageContext;
+    ViewData["InstitutionName"] = page.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = page.CollegeCode ?? "";
+    ViewData["FacultyCode"] = page.FacultyId;
+    ViewData["CurrentVerifier"] = page.CurrentVerifier;
+    ViewData["PrevTabAction"] = page.PrevTabAction;
+    ViewData["PrevTabLabel"] = page.PrevTabLabel;
+    ViewData["NextTabAction"] = page.NextTabAction;
+    ViewData["NextTabLabel"] = page.NextTabLabel;
+}
+
+<link rel="stylesheet" href="~/css/payment-details.css" asp-append-version="true" />
+
+<div class="container-fluid px-3 px-md-4 py-3">
+
+    
+    <!-- AFFILIATION TYPE (Medical Only) -->
+    @if (Model.FacultyType == "Medical" && !string.IsNullOrEmpty(Model.AffiliationCategory))
+    {
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header border-bottom py-3">
+                <h5 class="fw-bold mb-0 text-primary">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Affiliation Type Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon level">
+                                <i class="bi bi-tag-fill"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Affiliation Category</span>
+                                <div class="payment-info-value">@Model.AffiliationCategory</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon transaction">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Form No.</span>
+                                <div class="payment-info-value">@Model.FormNo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon date">
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Academic Year</span>
+                                <div class="payment-info-value">@Model.AcademicYear</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- PAYMENT INFO CARD -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header border-bottom py-3">
+            <h5 class="fw-bold mb-0 text-primary">
+                <i class="bi bi-receipt-cutoff me-2"></i>
+                Payment Information
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.HasPayment)
+            {
+                <div class="row g-3">
+
+                    @* Course Level *@
+                    <div class="col-md-3">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon level">
+                                <i class="bi bi-mortarboard"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Course Level</span>
+                                <div class="payment-info-value">@(Model.CourseLevel ?? "-")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Transaction ID *@
+                    <div class="col-md-3">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon transaction">
+                                <i class="bi bi-hash"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Transaction ID</span>
+                                <div class="payment-info-value text-break">
+                                    @(string.IsNullOrWhiteSpace(Model.TransactionId) ? "-" : Model.TransactionId)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Payment Date *@
+                    <div class="col-md-3">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon date">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Payment Date</span>
+                                <div class="payment-info-value">
+                                    @(Model.PaymentDate?.ToString("dd MMM yyyy") ?? "-")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Payment Amount *@
+                    <div class="col-md-3">
+                        <div class="payment-info-item">
+                            <div class="payment-info-icon amount">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div class="payment-info-content">
+                                <span class="form-label">Amount Paid</span>
+                                <div class="payment-amount-value">
+                                    @(Model.PaymentAmount.HasValue ? "₹" + Model.PaymentAmount.Value.ToString("N2") : "-")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Medical-specific Screenshot -->
+                @if (Model.FacultyType == "Medical" && !string.IsNullOrWhiteSpace(Model.ScreenshotFileName))
+                {
+                    <div class="mt-4 pt-3 border-top">
+
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-file-earmark-image me-2"></i>
+                            Payment Screenshot
+                        </h6>
+
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewPaymentScreenshot",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        collegeCode = Model.CollegeCode
+                                    })!,
+
+                                Title = "Payment Screenshot",
+
+                                FacultyId = Model.PageContext.FacultyId,
+                                CollegeCode = Model.PageContext.CollegeCode,
+
+                                CanVerify = true
+                            })
+
+                    </div>
+                }
+
+            }
+            else
+            {
+                <div class="payment-empty-state">
+
+                    <span class="payment-empty-icon">
+                        <i class="bi bi-credit-card"></i>
+                    </span>
+
+                    <h6>No payment information available</h6>
+
+                    <p>
+                        Payment information is not available for verification at this time.
+                    </p>
+
+                </div>
+            }
+
+
+            @* SECTION FEEDBACK *@
+
+            @{
+                var paymentFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Payment Details");
+            }
+
+            @if (paymentFeedback != null)
+            {
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="fw-bold mb-1">
+                        <i class="bi bi-chat-left-text me-2"></i>
+                        Verification Feedback
+                    </h6>
+                    <small class="text-muted d-block mb-3">
+                        Submit your verification remarks for the payment details.
+                    </small>
+                    @await Html.PartialAsync("_SectionFeedback", paymentFeedback)
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}

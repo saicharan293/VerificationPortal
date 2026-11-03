@@ -83,6 +83,7 @@ namespace VerificationPortal.Controllers
                 "LibraryStaffDetails" => "Library Staff Details",
                 "UserDetails" => "Library User Details",
                 "DentalFeePaymentVerification" => "Payment Details",
+                "PaymentDetails" => "Payment Details",
                 "FacultyDetails" => "Faculty Details",
                 "NonTeachingStaffDetails" => "Non Teaching Staff Details",
                 "TeachingExperience" => "Teaching Experience",
@@ -2384,6 +2385,7 @@ namespace VerificationPortal.Controllers
                 { "UserDetails", typeof(UserDetail) },
 
                 { "DentalFeePaymentVerification", typeof(TxnDentalFeeStructure) },
+                { "PaymentDetails", typeof(PaymentAffiliationDocument) },
 
                 { "ClinicalFacilities", typeof(HospitalDetailsForAffiliation) },
 
@@ -8925,6 +8927,244 @@ namespace VerificationPortal.Controllers
             // 6. Return View
             // --------------------------------------------------
             return View("NonTeachingStaffDetails", vm);
+        }
+
+        // GET: /VerificationDashboard/PaymentDetails/{collegeCode}
+        // Renders payment data conditionally based on faculty code:
+        //   Medical (1) -> PaymentAffiliationDocument
+        //   Dental  (2) -> TxnDentalPayment
+
+
+        public async Task<IActionResult> PaymentDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+            var facultyId = pageContext.FacultyCodeInt;
+
+            if (facultyId <= 0)
+                return NotFound("Faculty information not found.");
+
+            // AffiliationTypeId represents TypeOfAffiliation.TypeId
+            var affiliationTypeId =
+                HttpContext.Session.GetInt32("AffiliationTypeId");
+
+            // Course level comes from session
+            var courseLevel = HttpContext.Session.GetString("CourseLevel")
+                ?? HttpContext.Session.GetString("SelectedCourseLevel");
+
+            var vm = new PaymentDetailsVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyId,
+                    CollegeCode = collegeCode,
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+                    FacultyName = pageContext.FacultyName,
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+                    VerificationStatus = "Pending",
+                    StatusBadgeClass = "pending",
+                    PrevTabAction = Url.Action("FinanceDetails", "VerificationDashboard", new { collegeCode }),
+                    PrevTabLabel = "Previous : Finance Details",
+                    NextTabAction = Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode }),
+                    NextTabLabel = "Next : Faculty Details"
+                },
+                CollegeCode = collegeCode,
+                CourseLevel = courseLevel
+            };
+
+            // --------------------------------------------------
+            // Resolve course level group from session
+            // --------------------------------------------------
+
+            var courseLevelGroup = courseLevel?.Trim().ToUpperInvariant() switch
+            {
+                "UG" => "UG",
+                "PG" => "PG_BROAD",
+                "PG_BROAD" => "PG_BROAD",
+                "SS" => "PG_SS",
+                "PG_SS" => "PG_SS",
+                _ => null
+            };
+
+            // --------------------------------------------------
+            // Conditional rendering based on faculty
+            // --------------------------------------------------
+
+            if (facultyId == 1) // Medical
+            {
+                vm.FacultyType = "Medical";
+
+                int resolvedMasterAffiliationId = 0;
+
+                // --------------------------------------------------
+                // Resolve TypeOfAffiliation -> MstAffiliationType
+                // --------------------------------------------------
+
+                if (affiliationTypeId.HasValue && affiliationTypeId.Value > 0 && !string.IsNullOrWhiteSpace(courseLevelGroup))
+                {
+                    var typeDescription = await _context.TypeOfAffiliations
+                        .AsNoTracking()
+                        .Where(x => x.TypeId == affiliationTypeId.Value)
+                        .Select(x => x.TypeDescription)
+                        .FirstOrDefaultAsync();
+
+                    if (!string.IsNullOrWhiteSpace(typeDescription))
+                    {
+                        var categoryQuery = _context.MstAffiliationTypes
+                            .AsNoTracking()
+                            .Where(x =>
+                                x.FacultyCode == facultyId.ToString() &&
+                                x.CourseLevelGroup == courseLevelGroup &&
+                                x.IsActive);
+
+                        // Match application type with Medical affiliation category
+                        if (typeDescription.Contains("Fresh", StringComparison.OrdinalIgnoreCase))
+                        {
+                            categoryQuery = categoryQuery.Where(x => x.AffiliationCategory.Contains("Fresh"));
+                        }
+                        else if (typeDescription.Contains("Continuation", StringComparison.OrdinalIgnoreCase))
+                        {
+                            categoryQuery = categoryQuery.Where(x => x.AffiliationCategory.Contains("Continuation"));
+                        }
+                        else if (
+                            typeDescription.Contains("Enhancement", StringComparison.OrdinalIgnoreCase) ||
+                            typeDescription.Contains("Increase", StringComparison.OrdinalIgnoreCase))
+                        {
+                            categoryQuery = categoryQuery.Where(x => x.AffiliationCategory.Contains("Increase"));
+                        }
+                        else if (typeDescription.Contains( "Additional", StringComparison.OrdinalIgnoreCase))
+                        {
+                            categoryQuery = categoryQuery.Where(x => x.AffiliationCategory.Contains("Additional"));
+                        }
+                        else
+                        {
+                            // No matching category configured
+                            categoryQuery = categoryQuery.Where(x => false);
+                        }
+
+                        var affType = await categoryQuery
+                            .OrderByDescending(x => x.AcademicYear)
+                            .FirstOrDefaultAsync();
+
+                        if (affType != null)
+                        {
+                            resolvedMasterAffiliationId = affType.AffiliationTypeId;
+
+                            vm.AffiliationTypeId = affType.AffiliationTypeId;
+                            vm.AffiliationCategory = affType.AffiliationCategory;
+                            vm.FormNo = affType.FormNo;
+                            vm.AcademicYear = affType.AcademicYear;
+                            vm.CourseLevelGroup = affType.CourseLevelGroup;
+                        }
+                    }
+                }
+
+                // --------------------------------------------------
+                // Retrieve Medical payment details
+                // --------------------------------------------------
+
+                if (resolvedMasterAffiliationId > 0)
+                {
+                    var payment = await _context.PaymentAffiliationDocuments
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.CollegeCode == collegeCode &&
+                            x.FacultyCode == facultyId &&
+                            x.CourseLevel == courseLevel &&
+                            x.AffiliationTypeId == resolvedMasterAffiliationId)
+                        .OrderByDescending(x => x.CreatedOn)
+                        .FirstOrDefaultAsync();
+
+                    if (payment != null)
+                    {
+                        vm.HasPayment = true;
+                        vm.CourseLevel = payment.CourseLevel;
+                        vm.TransactionId = payment.TransactionId;
+                        vm.PaymentAmount = payment.PaymentAmount;
+                        vm.PaymentDate = payment.PaymentDate;
+                        vm.ScreenshotFileName = payment.ScreenshotFileName;
+                        vm.ScreenshotFilePath = payment.ScreenshotFilePath;
+                        vm.PublicAccessToken = payment.PublicAccessToken;
+                    }
+                }
+            }
+            else if (facultyId == 2) // Dental
+            {
+                vm.FacultyType = "Dental";
+
+                var payment = await _context.TxnDentalPayments
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CollegeCode == collegeCode &&
+                        x.FacultyCode == facultyId &&
+                        x.AffiliationTypeId == affiliationTypeId &&
+                        x.IsActive &&
+                        x.CourseLevel == courseLevel)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .FirstOrDefaultAsync();
+
+                if (payment != null)
+                {
+                    vm.HasPayment = true;
+                    vm.CourseLevel = payment.CourseLevel;
+                    vm.TransactionId = payment.TransactionId;
+                    vm.PaymentAmount = payment.AmountPaid;
+                    vm.PaymentDate = payment.CreatedDate;
+                    vm.ReceiptPath = payment.TransactionReceiptPath;
+                }
+            }
+            else
+            {
+                vm.FacultyType = "Unknown";
+            }
+
+            // --------------------------------------------------
+            // Section feedback
+            // --------------------------------------------------
+
+            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(
+                collegeCode,
+                "Payment Details",
+                facultyId);
+
+            await SetTabWiseVerificationViewData(
+                collegeCode,
+                ControllerContext.ActionDescriptor.ActionName,
+                facultyId);
+
+            return View("PaymentDetails", vm);
+        }
+
+        // GET: /VerificationDashboard/ViewPaymentScreenshot/{collegeCode}
+        public async Task<IActionResult> ViewPaymentScreenshot(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound();
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+            var facultyId = pageContext.FacultyCodeInt;
+
+            var payment = await _context.PaymentAffiliationDocuments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyId);
+
+            if (payment == null || string.IsNullOrWhiteSpace(payment.ScreenshotFilePath))
+                return NotFound();
+
+            var resolvedPath = ResolveDocumentPath(payment.ScreenshotFilePath);
+
+            if (!System.IO.File.Exists(resolvedPath))
+                return NotFound();
+
+            return PhysicalFile(
+                resolvedPath,
+                GetDocumentContentType(resolvedPath),
+                enableRangeProcessing: true
+            );
         }
     }
 }
