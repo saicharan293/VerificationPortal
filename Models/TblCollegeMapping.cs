@@ -27,5 +27,11 @@ public partial class TblCollegeMapping
 
     public string ToLetter { get; set; } = null!;
 
+    public int VerificationLevel { get; set; }
+
+    public int? VerifiedBy { get; set; }
+
+    public DateTime? VerifiedDate { get; set; }
+
     public virtual Faculty FacultyCodeNavigation { get; set; } = null!;
 }

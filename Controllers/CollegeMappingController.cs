@@ -72,7 +72,8 @@ namespace VerificationPortal.Controllers
                     FacultyName = g.First().FacultyCodeNavigation?.FacultyName,
                     UserDesignation = users.FirstOrDefault(u => u.UserId == g.Key.UserId && u.Faculty == g.Key.FacultyCode)?.DesignationDescription,
                     MappingCount = g.Count(),
-                    MappingIds = g.Select(m => m.Id).ToList()
+                    MappingIds = g.Select(m => m.Id).ToList(),
+                    VerificationLevel = g.First().VerificationLevel
                 })
                 .ToList();
 
@@ -90,7 +91,8 @@ namespace VerificationPortal.Controllers
                     CollegeTo = g.CollegeTo,
                     IsActive = g.IsActive,
                     CreatedDate = g.CreatedDate,
-                    CreatedBy = g.CreatedBy
+                    CreatedBy = g.CreatedBy,
+                    VerificationLevel = g.MappingIds.Count > 0 ? g.VerificationLevel : 0
                 },
                 UserDesignation = g.UserDesignation,
                 FacultyName = g.FacultyName
@@ -338,6 +340,10 @@ namespace VerificationPortal.Controllers
             // ---------------------------------------------------------
             // 5. Create mapping
             // ---------------------------------------------------------
+            var maxLevel = await _context.TblCollegeMappings
+                .Where(m => m.FacultyCode == model.SelectedFacultyId)
+                .MaxAsync(m => (int?)m.VerificationLevel) ?? 0;
+
             var mapping = new TblCollegeMapping
             {
                 UserId = user.UserId,
@@ -352,7 +358,8 @@ namespace VerificationPortal.Controllers
 
                 CreatedDate = DateTime.Now,
                 CreatedBy = User.Identity?.Name ?? "System",
-                IsActive = true
+                IsActive = true,
+                VerificationLevel = maxLevel + 1
             };
 
             _context.TblCollegeMappings.Add(mapping);
@@ -934,6 +941,27 @@ namespace VerificationPortal.Controllers
                 colleges = colleges,
                 totalCount = colleges.Count
             });
+        }
+
+        // POST: /CollegeMapping/UpdateVerificationLevels
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,ViceChancellor,Director")]
+        public async Task<IActionResult> UpdateVerificationLevels([FromBody] List<int> orderedIds)
+        {
+            var mappings = await _context.TblCollegeMappings
+                .Where(m => orderedIds.Contains(m.Id))
+                .ToListAsync();
+
+            for (int i = 0; i < orderedIds.Count; i++)
+            {
+                var mapping = mappings.FirstOrDefault(m => m.Id == orderedIds[i]);
+                if (mapping != null)
+                    mapping.VerificationLevel = i + 1;
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
 
         // ==================== HELPER METHODS ====================

@@ -168,10 +168,12 @@
             <table id="mappingTable" class="table table-sm table-hover w-100">
                 <thead>
                     <tr>
+                        <th>Drag</th>
                         <th>User</th>
                         <th>Designation</th>
                         <th>Faculty</th>
                         <th>Range</th>
+                        <th>Verification Level</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th class="text-end">Actions</th>
@@ -182,7 +184,10 @@
                     {
                         @foreach (var item in Model.Mappings)
                         {
-                            <tr>
+                            <tr data-id="@item.Mapping.Id">
+                                <td class="drag-handle" style="cursor: grab;">
+                                    <i class="bi bi-grip-vertical text-muted"></i>
+                                </td>
                                 <td>
                                     <strong>@item.Mapping.UserName</strong>
                                     <br />
@@ -208,6 +213,9 @@
                                         </small>
                                         <i class="bi bi-eye ms-1 small"></i>
                                     </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@item.Mapping.VerificationLevel</span>
                                 </td>
                                 <td>
                                     @if (item.Mapping.IsActive == true)
@@ -246,7 +254,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <i class="bi bi-inbox display-1 text-muted"></i>
                                 <p class="text-muted mt-3">No college mappings found.</p>
                                 <a asp-action="Create" class="btn btn-primary btn-sm">
@@ -310,6 +318,7 @@
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
@@ -317,6 +326,30 @@
 
 @section Scripts {
     <script>
+        // Drag and Drop for Verification Level
+        const mappingTbody = document.querySelector('#mappingTable tbody');
+        if (mappingTbody) {
+            new Sortable(mappingTbody, {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: async function(evt) {
+                    const orderedIds = Array.from(mappingTbody.querySelectorAll('tr[data-id]'))
+                        .map(row => parseInt(row.dataset.id));
+
+                    await fetch('@Url.Action("UpdateVerificationLevels")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(orderedIds)
+                    });
+
+                    location.reload();
+                }
+            });
+        }
+
         // Toggle Active Status
         document.querySelectorAll('.toggle-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
@@ -408,7 +441,7 @@
                                     [10,25,50,100,"All"]
                                 ],
 
-                                ordering: true,
+                                ordering: false,
 
                                 searching: true,
 

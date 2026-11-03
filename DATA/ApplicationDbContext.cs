@@ -620,6 +620,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<TblRguhsFacultyUserOld> TblRguhsFacultyUserOlds { get; set; }
 
+    public virtual DbSet<TblVerificationLevel> TblVerificationLevels { get; set; }
+
     public virtual DbSet<TeachingStaffDepartmentWiseDetail> TeachingStaffDepartmentWiseDetails { get; set; }
 
     public virtual DbSet<TrustDocumentDetail> TrustDocumentDetails { get; set; }
@@ -9603,6 +9605,10 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.ToTable("Tbl_CollegeMapping");
 
+            entity.HasIndex(e => new { e.VerificationLevel, e.IsActive }, "IX_CollegeMapping_Level_Active");
+
+            entity.HasIndex(e => e.UserId, "IX_CollegeMapping_UserId");
+
             entity.HasIndex(e => e.FacultyCode, "IX_Tbl_CollegeMapping_FacultyCode");
 
             entity.HasIndex(e => e.UserId, "IX_Tbl_CollegeMapping_UserId");
@@ -9627,6 +9633,8 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.VerificationLevel).HasDefaultValue(1, "DF_CollegeMapping_VerificationLevel");
+            entity.Property(e => e.VerifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.FacultyCodeNavigation).WithMany(p => p.TblCollegeMappings)
                 .HasForeignKey(d => d.FacultyCode)
@@ -9766,6 +9774,22 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.LockoutEndTime).HasColumnType("datetime");
             entity.Property(e => e.Password).HasMaxLength(256);
             entity.Property(e => e.UserName).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TblVerificationLevel>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TblVerif__3214EC07AA098EBC");
+
+            entity.ToTable("TblVerificationLevel");
+
+            entity.HasIndex(e => new { e.VerificationLevel, e.IsActive }, "IX_VerificationLevel_Level_Active");
+
+            entity.HasIndex(e => e.UserId, "UX_VerificationLevel_UserId").IsUnique();
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
         });
 
         modelBuilder.Entity<TeachingStaffDepartmentWiseDetail>(entity =>

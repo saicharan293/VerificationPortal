@@ -1,0 +1,158 @@
+@model VerificationPortal.Models.GeoTaggedPhotosViewModel
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+    ViewData["Title"] = "Geo Tagged Photos";
+    ViewData["ActiveTab"] = "GeoTaggedPhotos";
+    ViewData["ShowFeedbackSection"] = true;
+
+    var page = Model.PageContext;
+    ViewData["InstitutionName"] = page.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = page.CollegeCode ?? "";
+    ViewData["FacultyCode"] = page.FacultyId;
+    ViewData["CurrentVerifier"] = page.CurrentVerifier;
+    ViewData["PrevTabAction"] = page.PrevTabAction;
+    ViewData["PrevTabLabel"] = page.PrevTabLabel;
+    ViewData["NextTabAction"] = page.NextTabAction;
+    ViewData["NextTabLabel"] = page.NextTabLabel;
+}
+
+<link rel="stylesheet" href="~/css/geo-tagged-photos.css" asp-append-version="true" />
+
+<div class="container-fluid px-3 px-md-4 py-3">
+
+    <!-- PAGE HEADER -->
+    <div class="geo-page-header">
+        <div class="geo-header-icon">
+            <i class="bi bi-camera-fill"></i>
+        </div>
+        <div class="geo-header-content">
+            <h4 class="geo-page-title">Geo Tagged Photos</h4>
+            <p class="geo-page-subtitle">
+                GPS-tagged photographs uploaded by the college for verification
+            </p>
+        </div>
+        <div class="geo-header-meta">
+            <div class="geo-stat">
+                <span class="geo-stat-value">@Model.Photos.Count</span>
+                <span class="geo-stat-label">Total Photos</span>
+            </div>
+            <div class="geo-stat">
+                <span class="geo-stat-value">@Model.Categories.Count</span>
+                <span class="geo-stat-label">Categories</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHOTOS GRID - Grouped by Category -->
+    @if (Model.Photos.Any())
+    {
+        @foreach (var group in Model.PhotosByCategory)
+        {
+            <div class="geo-category-section">
+                <div class="geo-category-header">
+                    <div class="geo-category-icon">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                    <h5 class="geo-category-title">@group.Key</h5>
+                    <span class="geo-category-count">@group.Value.Count photo(s)</span>
+                </div>
+
+                <div class="geo-photos-grid">
+                    @foreach (var photo in group.Value)
+                    {
+                        <div class="geo-photo-card">
+                            <div class="geo-photo-thumb">
+                                <img src="@photo.ImagePath" alt="@photo.OriginalFileName" class="geo-photo-img" />
+                                <span class="geo-photo-badge">Slot @photo.ImageSlotNo</span>
+                            </div>
+                            <div class="geo-photo-body">
+                                <div class="geo-photo-info">
+                                    <div class="geo-photo-info-row">
+                                        <i class="bi bi-calendar"></i>
+                                        <span>@(photo.CapturedOn?.ToString("dd MMM yyyy") ?? "-")</span>
+                                    </div>
+                                    <div class="geo-photo-info-row">
+                                        <i class="bi bi-geo-alt"></i>
+                                        <span>
+                                            @if (photo.Latitude.HasValue && photo.Longitude.HasValue)
+                                            {
+                                                <span>@photo.Latitude.Value.ToString("F6"), @photo.Longitude.Value.ToString("F6")</span>
+                                                @if (photo.AccuracyMeters.HasValue)
+                                                {
+                                                    <small class="text-muted">±@photo.AccuracyMeters.Value</small>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No GPS data</span>
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="geo-photo-info-row">
+                                        <i class="bi bi-hdd-stack"></i>
+                                        <span>@(photo.FileSizeKb?.ToString() ?? "-") KB</span>
+                                    </div>
+                                    <div class="geo-photo-info-row">
+                                        <i class="bi bi-person"></i>
+                                        <span>@(photo.UploadedBy ?? "-")</span>
+                                    </div>
+                                </div>
+                                <a href="@photo.ImagePath" target="_blank" class="geo-photo-view">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- SECTION FEEDBACK PER CATEGORY -->
+                @if (Model.FeedbackByCategory.TryGetValue(group.Key, out var categoryFeedback) && categoryFeedback != null)
+                {
+                    <div class="geo-feedback-section mt-3">
+                        <h6 class="geo-feedback-title">
+                            <i class="bi bi-chat-left-text me-2"></i>
+                            Verification Feedback - @group.Key
+                        </h6>
+                        <small class="geo-feedback-subtitle">
+                            Submit your verification remarks for this category.
+                        </small>
+                        @await Html.PartialAsync("_SectionFeedback", categoryFeedback)
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="geo-empty-state">
+            <div class="geo-empty-icon">
+                <i class="bi bi-camera"></i>
+            </div>
+            <h6>No geo-tagged photos available</h6>
+            <p>Geo-tagged photographs have not been uploaded for this college.</p>
+        </div>
+    }
+
+    <!-- GLOBAL SECTION FEEDBACK -->
+    @* @if (Model.SectionFeedback?.Any() == true)
+    {
+        <div class="geo-feedback-section mt-3">
+            <h6 class="geo-feedback-title">
+                <i class="bi bi-chat-left-text me-2"></i>
+                General Verification Feedback
+            </h6>
+            <small class="geo-feedback-subtitle">
+                General remarks for the geo-tagged photos section.
+            </small>
+            @foreach (var feedback in Model.SectionFeedback)
+            {
+                @await Html.PartialAsync("_SectionFeedback", feedback)
+            }
+        </div>
+    } *@
+</div>
+
+@section Scripts {
+    <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
+}

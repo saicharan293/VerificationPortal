@@ -88,6 +88,7 @@ namespace VerificationPortal.Controllers
                 "NonTeachingStaffDetails" => "Non Teaching Staff Details",
                 "TeachingExperience" => "Teaching Experience",
                 "ActionTakenDeficiencyReport" => "Action Taken Report",
+                "GeoTaggedPhotos" => "Geo Tagged Photos",
 
 
 
@@ -9165,6 +9166,98 @@ namespace VerificationPortal.Controllers
                 GetDocumentContentType(resolvedPath),
                 enableRangeProcessing: true
             );
+        }
+
+        // GET: /VerificationDashboard/GeoTaggedPhotos/{collegeCode}
+        public async Task<IActionResult> GeoTaggedPhotos(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            var pageContext = await GetPageContextAsync(collegeCode);
+            var facultyId = pageContext.FacultyCodeInt;
+
+            if (facultyId <= 0)
+                return NotFound("Faculty information not found.");
+
+            // Fetch geo-tagged photos for this college
+            var photos = await _context.GeoPhotoUploads
+                .AsNoTracking()
+                .Include(x => x.Category)
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyId.ToString() &&
+                    x.IsActive)
+                .OrderBy(x => x.Category.DisplayOrder)
+                .ThenBy(x => x.ImageSlotNo)
+                .Select(x => new GeoPhotoItemVm
+                {
+                    PhotoId = x.PhotoId,
+                    CollegeCode = x.CollegeCode,
+                    CategoryName = x.Category.CategoryName,
+                    CategoryCode = x.Category.CategoryCode,
+                    ImageSlotNo = x.ImageSlotNo,
+                    ImagePath = x.ImagePath,
+                    OriginalFileName = x.OriginalFileName,
+                    ContentType = x.ContentType,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    AccuracyMeters = x.AccuracyMeters,
+                    CapturedOn = x.CapturedOn,
+                    UploadedOn = x.UploadedOn,
+                    UploadedBy = x.UploadedBy,
+                    FileSizeKb = x.FileSizeKb
+                })
+                .ToListAsync();
+
+            // Fetch all categories for reference
+            var categories = await _context.GeoPhotoCategoryMasters
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.DisplayOrder)
+                .ToListAsync();
+
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(
+                collegeCode, "Geo Tagged Photos", pageContext.FacultyCodeInt);
+
+            // Group photos by category from backend
+            var photosByCategory = photos
+                .GroupBy(p => p.CategoryName ?? "Uncategorized")
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Group section feedback by category name from backend
+            var feedbackByCategory = sectionFeedback
+                .Where(x => x.SectionName != null)
+                .GroupBy(x => x.SectionName)
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+
+            var vm = new GeoTaggedPhotosViewModel
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyId,
+                    CollegeCode = collegeCode,
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+                    FacultyName = pageContext.FacultyName,
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+                    VerificationStatus = "Pending",
+                    StatusBadgeClass = "pending",
+                    PrevTabAction = Url.Action("PaymentDetails", "VerificationDashboard", new { collegeCode }),
+                    PrevTabLabel = "Previous : Payment Details",
+                    NextTabAction = Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode }),
+                    NextTabLabel = "Next : Faculty Details"
+                },
+                Photos = photos,
+                Categories = categories,
+                PhotosByCategory = photosByCategory,
+                FeedbackByCategory = feedbackByCategory,
+                SectionFeedback = sectionFeedback
+            };
+
+            await SetTabWiseVerificationViewData(
+                collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
+
+            return View("GeoTaggedPhotos", vm);
         }
     }
 }
