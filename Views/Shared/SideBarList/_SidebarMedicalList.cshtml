@@ -287,33 +287,7 @@
                 <span>Library Details</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="@Url.Action("LibraryExpenditure", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "LibraryExpenditure" ? "active" : "")">
-
-                <i class="bi bi-cash-coin"></i>
-                <span>Library Expenditure</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="@Url.Action("LibraryStaffDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "LibraryStaffDetails" ? "active" : "")">
-
-                <i class="bi bi-person-badge"></i>
-                <span>Library Staff Details</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="@Url.Action("UserDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "UserDetails" ? "active" : "")">
-
-                <i class="bi bi-people"></i>
-                <span>User Details</span>
-            </a>
-        </li>
-
+        
         <li class="nav-item">
             <a href="@Url.Action("DentalFeePaymentVerification", "VerificationDashboard", new { collegeCode = collegeCode })"
                 class="nav-link @(activeTab == "PaymentDetails" ? "active" : "")">
@@ -333,6 +307,15 @@
             </a>
         </li>
         <li class="nav-item">
+            <a href="@Url.Action("NonTeachingStaffDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                class="nav-link @(activeTab == "NonTeachingStaffDetails" ? "active" : "")">
+
+                <i class="bi bi-people"></i>
+                <span>Non Teaching Staff Details</span>
+
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link @(activeTab == "TeachingExperience" ? "active" : "")"
                 asp-controller="VerificationDashboard"
                 asp-action="TeachingExperience"
@@ -344,15 +327,6 @@
             </a>
         </li>
         
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "ActionTakenDeficiencyReport" ? "active" : "")"
-                href="@Url.Action("ActionTakenDeficiencyReport", "VerificationDashboard", new { collegeCode = collegeCode })">
-
-                <i class="bi bi-file-earmark-check"></i>
-
-                <span>Action Taken Deficiency Report</span>
-            </a>
-        </li>
     </ul>
 </nav>
 

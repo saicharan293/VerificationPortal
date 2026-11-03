@@ -84,6 +84,7 @@ namespace VerificationPortal.Controllers
                 "UserDetails" => "Library User Details",
                 "DentalFeePaymentVerification" => "Payment Details",
                 "FacultyDetails" => "Faculty Details",
+                "NonTeachingStaffDetails" => "Non Teaching Staff Details",
                 "TeachingExperience" => "Teaching Experience",
                 "ActionTakenDeficiencyReport" => "Action Taken Report",
 
@@ -8824,6 +8825,106 @@ namespace VerificationPortal.Controllers
                 status = feedback.Status,
                 feedback = feedback.Feedback ?? ""
             });
+        }
+
+        // GET: /VerificationDashboard/NonTeachingStaffDetails/{collegeCode}
+        public async Task<IActionResult> NonTeachingStaffDetails(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Login", "Account");
+
+            // --------------------------------------------------
+            // 1. Get common verification page context
+            // --------------------------------------------------
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyId = pageContext.FacultyCodeInt;
+
+            if (facultyId <= 0)
+                return NotFound("Faculty information not found.");
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            // --------------------------------------------------
+            // 2. Get Non-Teaching Staff Details
+            // --------------------------------------------------
+            var staff = await _context.NonTeachingStaffDetails
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyId.ToString() &&
+                    (string.IsNullOrEmpty(courseLevel) || x.CourseLevel == courseLevel))
+                .Select(x => new NonTeachingStaffItemVm
+                {
+                    Id = x.Id,
+
+                    CollegeCode = x.CollegeCode,
+
+                    FacultyCode = x.FacultyCode,
+
+                    CourseLevel = x.CourseLevel,
+
+                    StaffName = x.StaffName,
+
+                    Designation = x.Designation,
+
+                    MobileNumber = x.MobileNumber,
+
+                    SalaryPaid = x.SalaryPaid
+                })
+                .OrderBy(x => x.StaffName)
+                .ThenBy(x => x.Designation)
+                .ToListAsync();
+
+            // --------------------------------------------------
+            // 3. Get Section Feedback
+            // --------------------------------------------------
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Non Teaching Staff Details", pageContext.FacultyCodeInt);
+
+            // --------------------------------------------------
+            // 4. Build ViewModel
+            // --------------------------------------------------
+            var vm = new NonTeachingStaffVerificationVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyId,
+
+                    CollegeCode = collegeCode,
+
+                    InstitutionName = pageContext.Institution.NameOfInstitution,
+
+                    FacultyName = pageContext.FacultyName,
+
+                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+
+                    VerificationStatus = "Pending",
+
+                    StatusBadgeClass = "pending",
+
+                    PrevTabAction = Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode }),
+
+                    PrevTabLabel = "Previous : Faculty Details",
+
+                    NextTabAction = Url.Action("TeachingExperience", "VerificationDashboard", new { collegeCode }),
+
+                    NextTabLabel = "Next : Teaching Experience"
+                },
+
+                Staff = staff,
+
+                SectionFeedback = sectionFeedback
+            };
+
+            // --------------------------------------------------
+            // 5. Common verification ViewData
+            // --------------------------------------------------
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
+
+            // --------------------------------------------------
+            // 6. Return View
+            // --------------------------------------------------
+            return View("NonTeachingStaffDetails", vm);
         }
     }
 }

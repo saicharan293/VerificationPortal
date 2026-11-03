@@ -341,6 +341,15 @@
             </a>
         </li>
         <li class="nav-item">
+            <a href="@Url.Action("NonTeachingStaffDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
+                class="nav-link @(activeTab == "NonTeachingStaffDetails" ? "active" : "")">
+
+                <i class="bi bi-people"></i>
+                <span>Non Teaching Staff Details</span>
+
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link @(activeTab == "TeachingExperience" ? "active" : "")"
                 asp-controller="VerificationDashboard"
                 asp-action="TeachingExperience"

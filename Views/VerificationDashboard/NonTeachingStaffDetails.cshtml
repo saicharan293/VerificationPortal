@@ -1,0 +1,193 @@
+@model VerificationPortal.Models.NonTeachingStaffVerificationVm
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Non Teaching Staff Details";
+    ViewData["ActiveTab"] = "NonTeachingStaffDetails";
+    ViewData["ShowFeedbackSection"] = true;
+
+    var page = Model.PageContext;
+
+    ViewData["InstitutionName"] = page.InstitutionName ?? "Unknown Institution";
+
+    ViewData["CollegeCode"] = page.CollegeCode ?? "";
+
+    ViewData["FacultyCode"] = page.FacultyId;
+
+    ViewData["CurrentVerifier"] = page.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = page.PrevTabAction;
+
+    ViewData["PrevTabLabel"] = page.PrevTabLabel;
+
+    ViewData["NextTabAction"] = page.NextTabAction;
+
+    ViewData["NextTabLabel"] = page.NextTabLabel;
+}
+
+<link rel="stylesheet" href="~/css/non-teaching-staff.css" asp-append-version="true" />
+
+<div class="verification-page-header">
+
+    <h2 class="verification-page-title">
+        Non Teaching Staff Details
+    </h2>
+
+    <p class="verification-page-subtitle">
+        Details of non-teaching staff employed by the institution
+    </p>
+
+</div>
+
+<div class="verification-card mt-4 non-teaching-card">
+
+    <div class="verification-card-header">
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="non-teaching-header-icon">
+                <i class="bi bi-people"></i>
+            </span>
+            <div>
+                <h3 class="verification-card-title mb-0">
+                    Non Teaching Staff Details
+                </h3>
+                <div class="non-teaching-header-subtitle">
+                    Non-teaching staff employed by the institution
+                </div>
+            </div>
+        </div>
+
+        <span class="non-teaching-section-badge">
+            Non Teaching Staff
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model.Staff?.Any() == true)
+        {
+            <div class="non-teaching-table-wrapper">
+
+                <table class="table table-bordered table-hover align-middle mb-0 non-teaching-table">
+
+                    <thead>
+                        <tr>
+
+                            <th style="width: 60px;">
+                                #
+                            </th>
+
+                            <th>
+                                Staff Name
+                            </th>
+
+                            <th>
+                                Designation
+                            </th>
+
+                            <th>
+                                Mobile Number
+                            </th>
+
+                            <th>
+                                Salary Paid
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var staff in Model.Staff.Select((item, index) => new
+                        {
+                            Item = item,
+                            Index = index + 1
+                        }))
+                        {
+                            <tr>
+
+                                <td class="non-teaching-index">
+                                    @staff.Index
+                                </td>
+
+                                <td>
+                                    <span class="non-teaching-staff-name">
+                                        @(string.IsNullOrWhiteSpace(staff.Item.StaffName) ? "-" : staff.Item.StaffName)
+                                    </span>
+                                </td>
+
+                                <td class="non-teaching-designation">
+                                    @(string.IsNullOrWhiteSpace(staff.Item.Designation) ? "-" : staff.Item.Designation)
+                                </td>
+                                
+                                <td class="non-teaching-mobile">
+                                    @(string.IsNullOrWhiteSpace(staff.Item.MobileNumber) ? "-" : staff.Item.MobileNumber)
+                                </td>
+
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(staff.Item.SalaryPaid))
+                                    {
+                                        <span class="non-teaching-salary-placeholder">-</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="non-teaching-salary">@staff.Item.SalaryPaid</span>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="non-teaching-empty-state">
+
+                <span class="non-teaching-empty-icon">
+                    <i class="bi bi-people-fill"></i>
+                </span>
+
+                <h6>No non-teaching staff details available</h6>
+
+                <p>
+                    Non-teaching staff details are not available for verification at this time.
+                </p>
+
+            </div>
+        }
+
+
+        @* =====================================================
+           SECTION FEEDBACK
+           ===================================================== *@
+
+        @{
+            var nonTeachingStaffFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Non Teaching Staff Details");
+        }
+
+        @if (nonTeachingStaffFeedback != null)
+        {
+            <div class="mt-4">
+
+                @await Html.PartialAsync("_SectionFeedback", nonTeachingStaffFeedback)
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="~/js/verification-dashboard.js"
+            asp-append-version="true"></script>
+
+}

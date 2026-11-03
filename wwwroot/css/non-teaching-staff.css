@@ -1,0 +1,212 @@
+/* =========================================
+   NON TEACHING STAFF DETAILS
+   Simple scrollable table container
+========================================= */
+
+/* Table Container (vertical + horizontal scroll) */
+
+.non-teaching-table-wrapper {
+    width: 100%;
+    max-height: 440px;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+
+    /* Better touch scrolling */
+    -webkit-overflow-scrolling: touch;
+
+    /* Prevent the table from affecting page width */
+    max-width: 100%;
+
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+}
+
+/* Header icon */
+
+.non-teaching-header-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(168, 85, 247, 0.13);
+    color: #c084fc;
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.non-teaching-header-subtitle {
+    color: var(--text-muted, #94a3b8);
+    font-size: 12px;
+}
+
+.non-teaching-section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: rgba(168, 85, 247, 0.12);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.22);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+/* Table */
+
+.non-teaching-table-wrapper table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.non-teaching-table-wrapper th {
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-600);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    white-space: nowrap;
+}
+
+.non-teaching-table-wrapper td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.non-teaching-table-wrapper tbody tr:hover td {
+    background: var(--gray-50);
+}
+
+.non-teaching-table-wrapper tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Staff name column */
+
+.non-teaching-staff-name {
+    font-weight: 600;
+    color: var(--text-primary, #e2e8f0);
+}
+
+/* Designation column */
+
+.non-teaching-designation {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.9rem;
+}
+
+/* Mobile number column */
+
+.non-teaching-mobile {
+    font-family: var(--font-mono, "Courier New", monospace);
+    font-size: 0.875rem;
+    color: var(--text-primary, #e2e8f0);
+}
+
+/* Salary column */
+
+.non-teaching-salary {
+    font-weight: 700;
+    color: #34d399;
+    font-size: 0.95rem;
+    letter-spacing: 0.2px;
+}
+
+.non-teaching-salary-placeholder {
+    color: var(--text-muted, #94a3b8);
+    font-weight: 500;
+}
+
+/* Index column */
+
+.non-teaching-index {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Empty state */
+
+.non-teaching-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.non-teaching-empty-icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(168, 85, 247, 0.1);
+    color: #c084fc;
+    border-radius: 50%;
+    font-size: 26px;
+}
+
+.non-teaching-empty-state h6 {
+    margin: 0;
+    color: var(--text-primary, #e2e8f0);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.non-teaching-empty-state p {
+    margin: 0;
+    color: var(--text-muted, #94a3b8);
+    font-size: 13px;
+    line-height: 1.6;
+    max-width: 360px;
+}
+
+/* Card header alignment */
+
+.non-teaching-card .verification-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Mobile */
+
+@media (max-width: 576px) {
+
+    .non-teaching-card .verification-card-header {
+        align-items: flex-start;
+    }
+
+    .non-teaching-table-wrapper th,
+    .non-teaching-table-wrapper td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .non-teaching-empty-state {
+        padding: 30px 16px;
+    }
+
+    .non-teaching-empty-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+}
