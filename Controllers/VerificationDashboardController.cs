@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
 using VerificationPortal.Models.ViewModels;
@@ -6012,7 +6013,7 @@ namespace VerificationPortal.Controllers
                     Remarks = remarks,
                     VerifiedBy = User.Identity?.Name ?? GetUserDesignation()
                 };
-
+                var user = User.FindFirst(ClaimTypes.Name)?.Value;
                 var institution = await _context.AffInstitutionsDetails.FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
 
                 if (institution == null || string.IsNullOrWhiteSpace(institution.FacultyCode))
@@ -6044,6 +6045,7 @@ namespace VerificationPortal.Controllers
                     collegeCode,
                     courseLevel ?? string.Empty,
                     tab.TabId,
+                    user,
                     request);
 
                 TempData["SuccessMessage"] = "Verification saved successfully.";

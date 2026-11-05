@@ -12,6 +12,6 @@ namespace VerificationPortal.Services.Verification.Interfaces
 
         Task<List<VerificationHistoryViewModel>> GetVerificationHistoryAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
 
-        Task SaveTabWiseFeedbackAsync(int facultyId, string collegeCode, string courseLevel, int tabId, VerificationRequest request);
+        Task SaveTabWiseFeedbackAsync(int facultyId, string collegeCode, string courseLevel, int tabId, string user, VerificationRequest request);
     }
 }

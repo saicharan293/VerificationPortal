@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Claims;
 using VerificationPortal.DATA;
 using VerificationPortal.Exceptions;
 using VerificationPortal.Models;
@@ -25,6 +26,7 @@ namespace VerificationPortal.Services.Verification
             string collegeCode,
             string courseLevel,
             int tabId,
+            string user,
             VerificationRequest request)
         {
             var existing = await _context.TabWiseFeedbacks
@@ -32,13 +34,14 @@ namespace VerificationPortal.Services.Verification
                     x.FacultyId == facultyId &&
                     x.CollegeCode == collegeCode &&
                     x.CourseLevel == courseLevel &&
+                    x.VerifiedBy == user &&
                     x.TabId == tabId);
 
             if (existing != null)
             {
                 existing.VerificationStatus = request.Status;
                 existing.Remarks = request.Remarks;
-                existing.VerifiedBy = request.VerifiedBy;
+                existing.VerifiedBy = user;
                 existing.VerifiedOn = DateTime.Now;
             }
             else
@@ -51,7 +54,7 @@ namespace VerificationPortal.Services.Verification
                     TabId = tabId,
                     VerificationStatus = request.Status,
                     Remarks = request.Remarks,
-                    VerifiedBy = request.VerifiedBy,
+                    VerifiedBy = user,
                     VerifiedOn = DateTime.Now
                 });
             }
