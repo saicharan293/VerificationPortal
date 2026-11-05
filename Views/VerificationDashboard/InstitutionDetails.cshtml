@@ -707,71 +707,73 @@
 
 }
 
+@if(Model?.Institution?.FacultyCode == "2")
+{
+    <!-- Managing Other Health Science Colleges -->
+    <div class="verification-card" id="section_@otherHealthScienceFeedback?.SectionId">
 
-<!-- Managing Other Health Science Colleges -->
-<div class="verification-card" id="section_@otherHealthScienceFeedback?.SectionId">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-hospital"></i>
+                Managing Other Health Science Colleges
+            </h3>
+        </div>
 
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-hospital"></i>
-            Managing Other Health Science Colleges
-        </h3>
-    </div>
+        <div class="verification-card-body">
 
-    <div class="verification-card-body">
+            @if (Model.OtherHealthScienceColleges.Any())
+            {
+                <div class="table-responsive">
 
-        @if (Model.OtherHealthScienceColleges.Any())
-        {
-            <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
 
-                <table class="table table-bordered table-hover align-middle">
-
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>College Name</th>
-                            <th>Faculty</th>
-                            <th>Course Code</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @{
-                            var index = 1;
-                        }
-
-                        @foreach (var college in Model.OtherHealthScienceColleges)
-                        {
+                        <thead>
                             <tr>
-                                <td>@index</td>
-                                @* <td>@college.OtherCollegeCode</td> *@
-                                <td>@(college.CollegeName ?? "-")</td>
-                                <td>@(college.FacultyName ?? "-")</td>
-                                <td>@college.CourseName</td>
+                                <th>#</th>
+                                <th>College Name</th>
+                                <th>Faculty</th>
+                                <th>Course Code</th>
                             </tr>
+                        </thead>
 
-                            index++;
-                        }
+                        <tbody>
 
-                    </tbody>
+                            @{
+                                var index = 1;
+                            }
 
-                </table>
+                            @foreach (var college in Model.OtherHealthScienceColleges)
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    @* <td>@college.OtherCollegeCode</td> *@
+                                    <td>@(college.CollegeName ?? "-")</td>
+                                    <td>@(college.FacultyName ?? "-")</td>
+                                    <td>@college.CourseName</td>
+                                </tr>
 
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-light border mb-0">
-                <i class="bi bi-info-circle me-2"></i>
-                No other Health Science Colleges are being managed.
-            </div>
-        }
+                                index++;
+                            }
 
-        @if (otherHealthScienceFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", otherHealthScienceFeedback)
-        }
+                        </tbody>
 
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light border mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No other Health Science Colleges are being managed.
+                </div>
+            }
+
+            @if (otherHealthScienceFeedback != null)
+            {
+                @await Html.PartialAsync("_SectionFeedback", otherHealthScienceFeedback)
+            }
+
+        </div>
     </div>
-</div>
+}

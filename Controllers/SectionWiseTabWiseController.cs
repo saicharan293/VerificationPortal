@@ -6,6 +6,7 @@ using VerificationPortal.Models;
 using VerificationPortal.Services.Verification.Interfaces;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using System.Security.Claims;
 
 namespace VerificationPortal.Controllers
 {
@@ -174,6 +175,9 @@ namespace VerificationPortal.Controllers
                 }
                 try
                 {
+
+                    var user = (object?)User.FindFirst(ClaimTypes.Name)?.Value;
+
                     await using var command = connection.CreateCommand();
 
                     command.CommandText = "dbo.verification_SectionWiseFeedback";
@@ -186,7 +190,7 @@ namespace VerificationPortal.Controllers
                     command.Parameters.Add(new SqlParameter("@SectionName", SqlDbType.NVarChar, 255) { Value = model.SectionName });
                     command.Parameters.Add(new SqlParameter("@VerificationStatus", SqlDbType.NVarChar, 50) { Value = (object?)model.VerificationStatus ?? DBNull.Value });
                     command.Parameters.Add(new SqlParameter("@Remarks", SqlDbType.NVarChar, -1) { Value = (object?)model.Remarks ?? DBNull.Value });
-                    command.Parameters.Add(new SqlParameter("@VerifiedBy", SqlDbType.NVarChar, 255) { Value = (object?)User.Identity?.Name ?? DBNull.Value });
+                    command.Parameters.Add(new SqlParameter("@VerifiedBy", SqlDbType.NVarChar, 255) { Value = user ?? DBNull.Value });
 
                     await using var reader = await command.ExecuteReaderAsync();
 
