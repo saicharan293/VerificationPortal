@@ -65,10 +65,7 @@
                         @await Html.PartialAsync("_VerificationFeedback")
                     }
 
-                    @if ((ViewData["IsAdmin"] as bool?) == true || verificationLevel > 1)
-                    {
-                        @await Html.PartialAsync("_VerificationHistory", verificationHistory)
-                    }
+                    @await Html.PartialAsync("_VerificationHistory", verificationHistory)
 
                 </div>
 

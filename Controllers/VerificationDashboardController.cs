@@ -7701,6 +7701,45 @@ namespace VerificationPortal.Controllers
             ViewData["TabId"] = feedback.TabId;
 
             ViewData["TabName"] = tab.TabName;
+
+            // ==========================================
+            // VERIFICATION HISTORY - ALL USERS
+            // ==========================================
+
+            var historyQuery = _context.TabWiseFeedbacks
+                .AsNoTracking()
+                .Where(x =>
+                    x.CollegeCode == collegeCode &&
+                    x.VerifiedBy != currentUser &&
+                    x.TabId == tab.TabId);
+
+            if (facultyId.HasValue)
+            {
+                historyQuery = historyQuery.Where(x => x.FacultyId == facultyId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                historyQuery = historyQuery.Where(x => x.CourseLevel == courseLevel);
+            }
+
+            var verificationHistory = await historyQuery
+                .Select(x => new VerificationHistoryViewModel
+                {
+                    Designation = x.VerifiedBy,
+                    IsVerified = x.VerificationStatus == "accept" || x.VerificationStatus == "approved"
+                        ? true
+                        : x.VerificationStatus == "reject" || x.VerificationStatus == "rejected"
+                            ? false
+                            : null,
+                    Remarks = x.Remarks,
+                    VerifiedBy = x.VerifiedBy,
+                    VerifiedDate = x.VerifiedOn
+                })
+                .OrderByDescending(x => x.VerifiedDate)
+                .ToListAsync();
+
+            ViewData["VerificationHistory"] = verificationHistory;
         }
 
 
