@@ -46,6 +46,14 @@ namespace VerificationPortal.Models
         public List<TblRguhsFacultyUser> AvailableUsers { get; set; } = new();
         public List<AffiliationCollegeMaster> AvailableColleges { get; set; } = new();
         public List<Faculty> AvailableFaculties { get; set; } = new();
+
+        // Verification level
+        [Display(Name = "Verification Level")]
+        public int VerificationLevel { get; set; }
+
+        // Next verification level number to set on save (optional)
+        [Display(Name = "Next Verification Level")]
+        public int? NextVerificationLevel { get; set; }
     }
 
     public class CollegeMappingRangeViewModel
@@ -99,6 +107,14 @@ namespace VerificationPortal.Models
         public string CollegeTo { get; set; } = "";
 
         public bool IsActive { get; set; } = true;
+
+        // Verification level
+        [Display(Name = "Verification Level")]
+        public int VerificationLevel { get; set; }
+
+        // Next verification level number to set on save (optional)
+        [Display(Name = "Next Verification Level")]
+        public int? NextVerificationLevel { get; set; }
 
         // Display properties
         public string UserName { get; set; } = "";

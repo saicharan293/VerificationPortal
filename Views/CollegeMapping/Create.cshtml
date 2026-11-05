@@ -127,6 +127,26 @@
                 </div>
             </div>
 
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label asp-for="VerificationLevel" class="form-label">Verification Level</label>
+                    <select asp-for="VerificationLevel" class="form-select">
+                        <option value="">-- Select Level --</option>
+                        @for (int i = 1; i <= 10; i++)
+                        {
+                            <option value="@i" @(Model.VerificationLevel == i ? "selected" : "")>@i</option>
+                        }
+                    </select>
+                    <span asp-validation-for="VerificationLevel" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="NextVerificationLevel" class="form-label">Add Next Verification Level</label>
+                    <input type="number" asp-for="NextVerificationLevel" class="form-control" placeholder="Enter next level number" />
+                    <span asp-validation-for="NextVerificationLevel" class="text-danger"></span>
+                </div>
+            </div>
+
             <div class="d-flex gap-2 mt-4">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-check-lg"></i> Assign Colleges

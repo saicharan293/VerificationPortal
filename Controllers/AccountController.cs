@@ -169,6 +169,12 @@ namespace VerificationPortal.Controllers
                 HttpContext.Session.SetString("FacultyCode", faculty?.FacultyId.ToString() ?? "0");
                 HttpContext.Session.SetString("FacultyName", faculty?.FacultyName ?? "");
 
+                // Store verification level from college mapping (if any)
+                var mapping = await _context.TblCollegeMappings
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.UserId == user.UserId && m.FacultyCode == (user.Faculty ?? 0) && m.IsActive);
+                HttpContext.Session.SetInt32("VerificationLevel", mapping?.VerificationLevel ?? 0);
+
                 _logger.LogInformation($"User {user.UserName} logged in successfully with role {userRole}");
 
                 // Redirect based on role or return URL

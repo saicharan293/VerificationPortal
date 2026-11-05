@@ -217,6 +217,24 @@
                         <label class="form-check-label">Active</label>
                     </div>
                 </div>
+
+                <div class="col-12 col-md-6">
+                    <label asp-for="VerificationLevel" class="form-label">Verification Level</label>
+                    <select asp-for="VerificationLevel" class="form-select">
+                        <option value="">-- Select Level --</option>
+                        @for (int i = 1; i <= 10; i++)
+                        {
+                            <option value="@i" @(Model.VerificationLevel == i ? "selected" : "")>@i</option>
+                        }
+                    </select>
+                    <span asp-validation-for="VerificationLevel" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label asp-for="NextVerificationLevel" class="form-label">Add Next Verification Level</label>
+                    <input type="number" asp-for="NextVerificationLevel" class="form-control" placeholder="Enter next level number" />
+                    <span asp-validation-for="NextVerificationLevel" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="d-flex gap-2 mt-4">

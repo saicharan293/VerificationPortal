@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VerificationPortal.DATA;
@@ -302,22 +302,22 @@ namespace VerificationPortal.Controllers
                     }
                 }
 
-                if (overlappingMappings.Any())
-                {
-                    var users = string.Join(
-                        ", ",
-                        overlappingMappings
-                            .Select(x => x.UserName)
-                            .Distinct());
+                // if (overlappingMappings.Any())
+                // {
+                //     var users = string.Join(
+                //         ", ",
+                //         overlappingMappings
+                //             .Select(x => x.UserName)
+                //             .Distinct());
 
-                    ModelState.AddModelError(
-                        "",
-                        $"One or more selected colleges are already assigned to: {users}. " +
-                        "Only Admin users can have overlapping college assignments.");
+                //     ModelState.AddModelError(
+                //         "",
+                //         $"One or more selected colleges are already assigned to: {users}. " +
+                //         "Only Admin users can have overlapping college assignments.");
 
-                    await PopulateCreateViewModel(model);
-                    return View(model);
-                }
+                //     await PopulateCreateViewModel(model);
+                //     return View(model);
+                // }
             }
 
             // ---------------------------------------------------------
@@ -359,7 +359,9 @@ namespace VerificationPortal.Controllers
                 CreatedDate = DateTime.Now,
                 CreatedBy = User.Identity?.Name ?? "System",
                 IsActive = true,
-                VerificationLevel = maxLevel + 1
+                VerificationLevel = model.NextVerificationLevel.HasValue
+                    ? model.NextVerificationLevel.Value
+                    : (model.VerificationLevel > 0 ? model.VerificationLevel : maxLevel + 1)
             };
 
             _context.TblCollegeMappings.Add(mapping);
@@ -681,7 +683,8 @@ namespace VerificationPortal.Controllers
                     Name = c.CollegeName ?? ""
                 }).ToList(),
                 SelectedCollegeFromCode = mapping.CollegeFrom?.ToUpper() ?? "",
-                SelectedCollegeToCode = mapping.CollegeTo?.ToUpper() ?? ""
+                SelectedCollegeToCode = mapping.CollegeTo?.ToUpper() ?? "",
+                VerificationLevel = mapping.VerificationLevel
             };
 
             return View(model);
@@ -786,15 +789,15 @@ namespace VerificationPortal.Controllers
                         }
                     }
 
-                    if (conflicts.Any())
-                    {
-                        ModelState.AddModelError("",
-                            $"⚠️ <strong>Overlap Detected!</strong> The college range <strong>{newFromLetter}-{newToLetter}</strong> ({model.CollegeFrom}-{model.CollegeTo}) overlaps with existing mappings:<br/>" +
-                            string.Join("<br/>", conflicts.Select((c, i) => $"{i + 1}. {c}")) +
-                            "<br/>Please adjust the From/To letters or college codes to avoid conflicts.");
-                        await PopulateEditViewModel(model);
-                        return View(model);
-                    }
+                    // if (conflicts.Any())
+                    // {
+                    //     ModelState.AddModelError("",
+                    //         $"?? <strong>Overlap Detected!</strong> The college range <strong>{newFromLetter}-{newToLetter}</strong> ({model.CollegeFrom}-{model.CollegeTo}) overlaps with existing mappings:<br/>" +
+                    //         string.Join("<br/>", conflicts.Select((c, i) => $"{i + 1}. {c}")) +
+                    //         "<br/>Please adjust the From/To letters or college codes to avoid conflicts.");
+                    //     await PopulateEditViewModel(model);
+                    //     return View(model);
+                    // }
                 }
 
                 existing.FacultyCode = model.FacultyCode;
@@ -807,7 +810,15 @@ namespace VerificationPortal.Controllers
 
                 existing.IsActive = model.IsActive;
 
+                existing.VerificationLevel = model.NextVerificationLevel.HasValue
+                    ? model.NextVerificationLevel.Value
+                    : model.VerificationLevel;
+
                 await _context.SaveChangesAsync();
+
+                // Keep session in sync for the mapped user
+                if (existing.UserId > 0)
+                    HttpContext.Session.SetInt32("VerificationLevel", existing.VerificationLevel);
 
                 TempData["SuccessMessage"] = "College mapping updated successfully.";
 
