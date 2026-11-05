@@ -1,4 +1,4 @@
-
+USE Admission_Affiliation;
 
 CREATE TABLE TblVerificationLevel
 (

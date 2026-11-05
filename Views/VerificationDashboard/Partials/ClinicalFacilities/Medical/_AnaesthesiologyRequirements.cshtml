@@ -1,17 +1,17 @@
-﻿@model VerificationPortal.Models.NPTARequirementsPostVM
+@model VerificationPortal.Models.AnaesthesiologyRequirementsVerificationVM
 
 <div class="verification-card mt-4">
 
     @{
-        var nptaRequirementsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionId == 60);
+        var anaesthesiologyFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionName == "Anaesthesiology Requirements");
     }
 
-    <div class="verification-card-header">
+    <div class="verification-card-header" id="section_@anaesthesiologyFeedback?.SectionId">
 
         <h3 class="verification-card-title">
             <i class="bi bi-heart-pulse me-2"></i>
-            Nursing, Paramedical, Technical & Allied Services
+            Anaesthesiology Requirements
         </h3>
 
         <span class="badge bg-primary">
@@ -27,8 +27,7 @@
              !Model.Requirements.Any())
         {
             <div class="alert alert-info mb-0">
-                No Nursing, Paramedical, Technical & Allied Services
-                requirements found.
+                No Anaesthesiology Requirements found.
             </div>
         }
         else
@@ -39,23 +38,9 @@
 
                     <thead>
                         <tr>
-
-                            <th>
-                                #
-                            </th>
-
-                            <th>
-                                Requirement
-                            </th>
-
-                            @* <th>
-                                Section
-                            </th> *@
-
-                            <th>
-                                Availability
-                            </th>
-
+                            <th>#</th>
+                            <th>Requirement</th>
+                            <th>Availability</th>
                         </tr>
                     </thead>
 
@@ -74,37 +59,24 @@
                                 </td>
 
                                 <td class="fw-semibold">
-                                    @(string.IsNullOrWhiteSpace(
-                                        requirement.RequirementName)
+                                    @(string.IsNullOrWhiteSpace(requirement.RequirementName)
                                         ? "-"
                                         : requirement.RequirementName)
                                 </td>
 
-                                @* <td>
-                                    @requirement.SectionCode
-                                </td> *@
-
                                 <td>
-
-                                    @if (requirement.IsAvailable == true)
+                                    @if (requirement.IsAvailable)
                                     {
                                         <span class="badge bg-success">
                                             Available
                                         </span>
                                     }
-                                    else if (requirement.IsAvailable == false)
+                                    else
                                     {
                                         <span class="badge bg-danger">
                                             Not Available
                                         </span>
                                     }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">
-                                            Not Provided
-                                        </span>
-                                    }
-
                                 </td>
 
                             </tr>
@@ -119,11 +91,11 @@
             </div>
         }
 
-
-        @if (nptaRequirementsFeedback != null)
+        @if (anaesthesiologyFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", nptaRequirementsFeedback)
+            @await Html.PartialAsync("_SectionFeedback", anaesthesiologyFeedback)
         }
+
     </div>
 
 </div>

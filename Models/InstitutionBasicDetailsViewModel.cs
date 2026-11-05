@@ -275,6 +275,46 @@ namespace VerificationPortal.Models
         //public string? OwnOrRented { get; set; }
     }
 
+    public class SSAssociatedInstitutions
+    {
+        public int Id { get; set; }
+
+        public string? CourseCode { get; set; }
+        public string? CourseName { get; set; }
+        public string? CourseLevel { get; set; }
+
+        public string? FacultyCode { get; set; }
+
+        public string? AssociatedCollegeCode { get; set; }
+        public string? AssociatedCollegeName { get; set; }
+
+        public string? AssociatedFacultyCode { get; set; }
+        public string? AssociatedFacultyName { get; set; }
+
+        public int AnnualIntake { get; set; }
+
+        public int TypeOfAffiliation { get; set; }
+    }
+
+    public class AssociatedInstitutionVm
+    {
+        public VerificationPageContextVm PageContext { get; set; } = new();
+
+        public List<SSAssociatedInstitutions> AssociatedInstitutions { get; set; } = new();
+
+        public string CollegeCode { get; set; } = string.Empty;
+
+        public int TypeOfAffiliation { get; set; }
+
+        public string? CourseLevel { get; set; }
+
+        public string? ActiveTab { get; set; }
+
+        public string? UserDesignation { get; set; }
+
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+    }
+
     public class HostelFacilityRowVm
     {
         // From Mst_HostelFacilities

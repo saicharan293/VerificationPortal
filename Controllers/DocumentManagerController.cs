@@ -55,8 +55,9 @@ namespace VerificationPortal.Controllers
 
                 from section in sectionGroup.DefaultIfEmpty()
 
-                orderby document.DisplayOrder,
-                        document.DocumentName
+                orderby document.FacultyId,
+                        document.TabId,
+                        document.SectionId
 
                 select new DocumentListViewModel
                 {

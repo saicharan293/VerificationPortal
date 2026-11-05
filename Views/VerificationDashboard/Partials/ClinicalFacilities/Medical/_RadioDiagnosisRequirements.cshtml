@@ -1,0 +1,101 @@
+@model VerificationPortal.Models.RadioDiagnosisRequirementsVerificationVM
+
+<div class="verification-card mt-4">
+
+    @{
+        var radioDiagnosisFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionName == "Radio-Diagnosis Requirements");
+    }
+
+    <div class="verification-card-header" id="section_@radioDiagnosisFeedback?.SectionId">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-radioactive me-2"></i>
+            Radio-Diagnosis Requirements
+        </h3>
+
+        <span class="badge bg-primary">
+            @(Model?.Requirements?.Count ?? 0) Requirements
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null ||
+             Model.Requirements == null ||
+             !Model.Requirements.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No Radio-Diagnosis Requirements found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Requirement</th>
+                            <th>Availability</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var requirement in Model.Requirements)
+                        {
+                            <tr>
+
+                                <td>
+                                    @serialNo
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(requirement.RequirementName)
+                                        ? "-"
+                                        : requirement.RequirementName)
+                                </td>
+
+                                <td>
+                                    @if (requirement.IsAvailable)
+                                    {
+                                        <span class="badge bg-success">
+                                            Available
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Not Available
+                                        </span>
+                                    }
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+        @if (radioDiagnosisFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", radioDiagnosisFeedback)
+        }
+
+    </div>
+
+</div>

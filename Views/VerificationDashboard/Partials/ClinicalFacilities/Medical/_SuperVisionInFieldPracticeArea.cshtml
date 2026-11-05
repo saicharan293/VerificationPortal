@@ -1,0 +1,136 @@
+@model VerificationPortal.Models.SuperVisionInFieldPracticeAreaVerificationVM
+
+<div class="verification-card mt-4">
+
+    @{
+        var supervisionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionName == "Supervision in FPA");
+    }
+
+    <div class="verification-card-header" id="section_@supervisionFeedback?.SectionId">
+
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge me-2"></i>
+            Supervision in Field Practice Areas
+        </h3>
+
+        <span class="badge bg-primary">
+            @(Model?.Supervisors?.Count ?? 0) Supervisors
+        </span>
+
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model == null ||
+             Model.Supervisors == null ||
+             !Model.Supervisors.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No Supervision in Field Practice Area records found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Post</th>
+                            <th>Name</th>
+                            <th>Qualification</th>
+                            <th>Year of Qualification</th>
+                            <th>University</th>
+                            <th>UG From Date</th>
+                            <th>UG To Date</th>
+                            <th>PG From Date</th>
+                            <th>PG To Date</th>
+                            <th>Responsibilities</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var supervisor in Model.Supervisors)
+                        {
+                            <tr>
+
+                                <td>@serialNo</td>
+
+                                <td class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(supervisor.Post)
+                                        ? "-"
+                                        : supervisor.Post)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(supervisor.Name)
+                                        ? "-"
+                                        : supervisor.Name)
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(supervisor.Qualification)
+                                        ? "-"
+                                        : supervisor.Qualification)
+                                </td>
+
+                                <td>
+                                    @(supervisor.YearOfQualification?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(supervisor.University)
+                                        ? "-"
+                                        : supervisor.University)
+                                </td>
+
+                                <td>
+                                    @(supervisor.UgFromDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(supervisor.UgToDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(supervisor.PgFromDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(supervisor.PgToDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(supervisor.Responsibilities)
+                                        ? "-"
+                                        : supervisor.Responsibilities)
+                                </td>
+
+                            </tr>
+
+                            serialNo++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+        @if (supervisionFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", supervisionFeedback)
+        }
+
+    </div>
+
+</div>

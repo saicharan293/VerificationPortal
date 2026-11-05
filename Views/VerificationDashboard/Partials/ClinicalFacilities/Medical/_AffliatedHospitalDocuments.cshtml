@@ -1,0 +1,124 @@
+ @model VerificationPortal.Models.HospitalMedicalCertificatesVm
+
+ @{
+    var hospitalDocumentsFeedback =
+        (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionName == "Affiliated Hospital Documents");
+}
+
+<div class="verification-card mt-4"  id="section_@hospitalDocumentsFeedback?.SectionId">
+    <div class="verification-card-header">
+        <h3 class="verfication-card-title">
+            <i class="bi bi-hospital me-2"></i>
+            Affiliated Hospital Documents
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model?.Documents != null && Model.Documents.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <th>Hospital Name</th>
+                            <th>Hospital Type</th>
+                            <th>Total Beds</th>
+                            <th>Course Level</th>
+                            <th>Document Name</th>
+                            <th>Uploaded Date</th>
+                            <th style="width: 160px;">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            var serialNo = 1;
+                        }
+
+                        @foreach (var document in Model.Documents)
+                        {
+                            <tr>
+                                <td>@serialNo</td>
+
+                                <td class="fw-semibold">
+                                    @document.HospitalName
+                                </td>
+
+                                <td>
+                                    @document.HospitalType
+                                </td>
+
+                                <td>
+                                    @document.TotalBeds
+                                </td>
+
+                                <td>
+                                    @document.CourseLevel
+                                </td>
+
+                                <td>
+                                    @document.DocumentName
+                                </td>
+
+                                <td>
+                                    @document.CreatedDate.ToString("dd-MM-yyyy")
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(document.DocumentFilePath))
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewAffiliatedHospitalDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = document.DocumentId
+                                                    })!,
+
+                                                Title = document.DocumentName ?? "Hospital Document",
+
+                                                FacultyId = Convert.ToInt32(ViewBag.FacultyCode),
+
+                                                CollegeCode = document.CollegeCode,
+
+                                                DocumentId = document.DocumentId,
+
+                                                CanVerify = true
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Document Not Uploaded
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+
+                            serialNo++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                No affiliated hospital documents found.
+            </div>
+        }
+
+        @if (hospitalDocumentsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", hospitalDocumentsFeedback)
+        }
+    </div>
+</div>

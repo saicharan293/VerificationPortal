@@ -46,6 +46,7 @@ INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Bed Distributio
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Equipment List');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Department Offices And Educational Unit');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Hostel Details');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Associated Institution');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Vehicle Details');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'UG Academic Matters');
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Finance Details');
@@ -57,7 +58,7 @@ INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Research and Pu
 INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Library Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Faculty Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Teaching Experience');
---INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Clinical Facilities');
+INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Clinical Facilities');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Workshop Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Animal House Details');
 --INSERT INTO [dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Field Practice Area');
@@ -158,8 +159,31 @@ INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1,
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 21, 'Annual Financial Details - PG');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 21, 'Account & Audit Details - PG');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 25, 'Faculty Details');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Clinical Hospital Details');
---INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Clinical Statistics');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Clinical Hospital Details');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Clinical Statistics');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Affiliated Hospital Documents');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'OT Requirements');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Supervision in FPA');
+INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Indoor Beds Requirements');
+
+
+INSERT INTO MstSections (FacultyId, TabId, SectionName)
+VALUES
+(1, 61, 'Indoor Department Requirements'),
+(1, 61, 'Operation Theater Requirements'),
+(1, 61, 'Casualty Requirements'),
+(1, 61, 'CSSD and Laundry Requirements'),
+(1, 61, 'Radio-Diagnosis Requirements'),
+(1, 61, 'Anaesthesiology Requirements'),
+(1, 61, 'Central Laboratory Requirements'),
+(1, 61, 'Blood Bank Requirements'),
+(1, 61, 'Yoga Requirements'),
+(1, 61, 'Radiation Oncology Requirements'),
+(1, 61, 'Art Center Requirements'),
+(1, 61, 'Pharmacy Requirements'),
+(1, 61, 'Utilities Requirements'),
+(1, 61, 'Indoor Beds Units Requirements'),
+(1, 61, 'Out Patient Area Requirements');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Discipline Details');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Nursing, Paramedical, Technical & Allied Services');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Engineering & Allied Services');

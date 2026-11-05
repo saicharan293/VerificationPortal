@@ -1,16 +1,17 @@
-﻿@model VerificationPortal.Models.EngAlliedRequirementsPostVM
+ @model VerificationPortal.Models.CasualityRequirementsVerificationVM
 
 <div class="verification-card mt-4">
+
     @{
-        var engAlliedFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionId == 61);
+        var casualityFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                    ?.FirstOrDefault(x => x.SectionName == "Casualty Requirements");
     }
 
-    <div class="verification-card-header">
+    <div class="verification-card-header" id="section_@casualityFeedback?.SectionId">
 
         <h3 class="verification-card-title">
-            <i class="bi bi-gear-wide-connected me-2"></i>
-            Engineering & Allied Services
+            <i class="bi bi-hospital me-2"></i>
+            Casuality Requirements
         </h3>
 
         <span class="badge bg-primary">
@@ -26,7 +27,7 @@
              !Model.Requirements.Any())
         {
             <div class="alert alert-info mb-0">
-                No Engineering & Allied Services requirements found.
+                No Casuality Requirements found.
             </div>
         }
         else
@@ -37,21 +38,9 @@
 
                     <thead>
                         <tr>
-                            <th>
-                                #
-                            </th>
-
-                            <th>
-                                Requirement
-                            </th>
-
-                            @* <th>
-                                Section
-                            </th> *@
-
-                            <th>
-                                Availability
-                            </th>
+                            <th>#</th>
+                            <th>Requirement</th>
+                            <th>Availability</th>
                         </tr>
                     </thead>
 
@@ -70,34 +59,23 @@
                                 </td>
 
                                 <td class="fw-semibold">
-                                    @(string.IsNullOrWhiteSpace(
-                                        requirement.RequirementName)
+                                    @(string.IsNullOrWhiteSpace(requirement.RequirementName)
                                         ? "-"
                                         : requirement.RequirementName)
                                 </td>
 
-                                @* <td>
-                                    @requirement.SectionCode
-                                </td> *@
-
                                 <td>
 
-                                    @if (requirement.IsAvailable == true)
+                                    @if (requirement.IsAvailable)
                                     {
                                         <span class="badge bg-success">
                                             Available
                                         </span>
                                     }
-                                    else if (requirement.IsAvailable == false)
+                                    else
                                     {
                                         <span class="badge bg-danger">
                                             Not Available
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">
-                                            Not Provided
                                         </span>
                                     }
 
@@ -115,11 +93,11 @@
             </div>
         }
 
-
-        @if (engAlliedFeedback != null)
+        @if (casualityFeedback != null)
         {
-            @await Html.PartialAsync("_SectionFeedback", engAlliedFeedback)
+            @await Html.PartialAsync("_SectionFeedback", casualityFeedback)
         }
+
     </div>
 
 </div>

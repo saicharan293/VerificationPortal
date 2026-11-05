@@ -1,0 +1,98 @@
+
+@model VerificationPortal.Models.IndoorBedsRequirementsVerificationVM
+
+@{
+    var indoorBedsFeedback =
+        (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+        ?.FirstOrDefault(x => x.SectionName == "Indoor Beds Requirements"); // Replace 0 with actual MstSections SectionId
+}
+
+<div class="verification-card mt-4" id="section_@indoorBedsFeedback?.SectionId">
+
+    <div class="verification-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-hospital me-2"></i>
+            Indoor Beds Requirements
+        </h5>
+
+        <span class="badge bg-primary">
+            @(Model?.Items?.Count ?? 0) Records
+        </span>
+    </div>
+
+    <div class="verification-card-body">
+
+        @if (Model?.Items != null && Model.Items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60px;">#</th>
+                            <th>Department</th>
+                            <th>Seat Slab</th>
+                            <th>RGUHS Required Beds</th>
+                            <th>College Provided Beds</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            var serialNumber = 1;
+                        }
+
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@serialNumber</td>
+
+                                <td>
+                                    <strong>@item.DepartmentName</strong>
+                                </td>
+
+                                <td>@item.SeatSlab</td>
+
+                                <td>
+                                    @item.RGUHSintake
+                                </td>
+
+                                <td>
+                                    @item.CollegeIntake
+
+                                    @if (item.CollegeIntake >= item.RGUHSintake)
+                                    {
+                                        <span class="badge bg-success ms-2">
+                                            Meets Requirement
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger ms-2">
+                                            Below Requirement
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+
+                            serialNumber++;
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                No indoor beds requirements records found.
+            </div>
+        }
+
+        @if (indoorBedsFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", indoorBedsFeedback)
+        }
+
+    </div>
+</div>

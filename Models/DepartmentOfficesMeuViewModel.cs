@@ -61,6 +61,7 @@ namespace VerificationPortal.Models
 
         public string? DeuMembersListFilePath { get; set; }
         public int? DeuMembersListDocumentId { get; set; }
+        public int? MeuMembersListDocumentId { get; set; }
 
         public VerificationPageContextVm PageContext { get; set; } = new();
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();

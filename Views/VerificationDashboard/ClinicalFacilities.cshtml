@@ -54,43 +54,118 @@
 <div class="container-fluid">
 
     @await Html.PartialAsync(
-        "ClinicalFacilities/_ClinicalHospitalDetails",
+        "Partials/ClinicalFacilities/Dental/_ClinicalHospitalDetails",
         Model.HospitalDetails)
 
     @await Html.PartialAsync(
-        "ClinicalFacilities/_ClinicalStatistics",
+        "Partials/ClinicalFacilities/Dental/_ClinicalStatistics",
         Model.ClinicalStatistics)
 
     @if(Model?.FacultyCode.ToString() == "2")
     {
         @await Html.PartialAsync(
-            "ClinicalFacilities/_CertificatesAndDocuments",
+            "Partials/ClinicalFacilities/Dental/_CertificatesAndDocuments",
             Model.HospitalCertificates)
 
         @await Html.PartialAsync(
-            "ClinicalFacilities/_AnatomyActRegistration",
+            "Partials/ClinicalFacilities/Dental/_AnatomyActRegistration",
             Model.AnatomyActRegistration)
 
         @await Html.PartialAsync(
-            "ClinicalFacilities/_HospitalTieUp",
+            "Partials/ClinicalFacilities/Dental/_HospitalTieUp",
             Model.HospitalTieUp)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Dental/_DisciplineDetails",
+            Model.Disciplines)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Dental/_NPTARequirements",
+            Model.NptaRequirementPostvm)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Dental/_EngAlliedRequirements",
+            Model.EngAlliedRequirementPostvm)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Dental/_ClinicalWardBedDistribution",
+                        Model.DentalWardBedDistribution)
+    }
+    else if (Model?.FacultyCode.ToString() == "1")
+    {
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_AffliatedHospitalDocuments",
+            Model.HospitalMedicalCertificates)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_CasualityRequirements",
+            Model.CasualityRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_CSSDandLaundryRequirements",
+            Model.CSSDandLaundryRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_RadioDiagnosisRequirements",
+            Model.RadioDiagnosisRequirements)
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_AnaesthesiologyRequirements",
+            Model.AnaesthesiologyRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_CentralLaboratoryRequirements",
+            Model.CentralLaboratoryRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_BloodBankRequirements",
+            Model.BloodBankRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_YogaRequirements",
+            Model.YogaRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_RadiationOncologyRequirements",
+            Model.RadiationOncologyRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_ArtCenterRequirements",
+            Model.ArtCenterRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_PharmacyRequirements",
+            Model.PharmacyRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_SuperVisionInFieldPracticeArea.cshtml",
+            Model.SuperVisionInFieldPracticeArea)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_OutpatientAreaRequirements",
+            Model.OutpatientAreaRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_IndoorBedsRequirements",
+            Model.IndoorBedsRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_IndoorBedsUnitsRequirements",
+            Model.IndoorBedsUnitsRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_IndoorDepartmentRequirements",
+            Model.IndoorDepartmentRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_UtilitiesRequirements",
+            Model.UtilitiesRequirements)
+
+        @await Html.PartialAsync(
+            "Partials/ClinicalFacilities/Medical/_OTRequirements",
+            Model.OTRequirements)
+
     }
 
-    @await Html.PartialAsync(
-        "ClinicalFacilities/_DisciplineDetails",
-        Model.Disciplines)
-
-    @await Html.PartialAsync(
-        "ClinicalFacilities/_NPTARequirements",
-        Model.NptaRequirementPostvm)
-
-    @await Html.PartialAsync(
-        "ClinicalFacilities/_EngAlliedRequirements",
-        Model.EngAlliedRequirementPostvm)
-
-    @await Html.PartialAsync(
-        "ClinicalFacilities/_ClinicalWardBedDistribution",
-        Model.DentalWardBedDistribution)
 
 </div>
 

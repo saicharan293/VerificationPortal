@@ -103,6 +103,18 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link @(activeTab == "ClinicalFacilities" ? "active" : "")"
+                asp-controller="VerificationDashboard"
+                asp-action="ClinicalFacilities"
+                asp-route-collegeCode="@collegeCode">
+
+                <i class="bi bi-hospital"></i>
+
+                <span>Clinical Facilities</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
             <a asp-controller="VerificationDashboard"
                 asp-action="BedDistribution"
                 asp-route-collegeCode="@collegeCode"
@@ -131,6 +143,16 @@
                 class="nav-link @(activeTab == "HostelDetails" ? "active" : "")">
                 <i class="bi bi-house-door"></i>
                 <span>Hostel Details</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a asp-controller="VerificationDashboard"
+                asp-action="AssociatedInstitution"
+                asp-route-collegeCode="@collegeCode"
+                class="nav-link @(activeTab == "AssociatedInstitution" ? "active" : "")">
+                <i class="bi bi-building"></i>
+                <span>Associated Institution</span>
             </a>
         </li>
 
@@ -214,17 +236,6 @@
                 asp-controller="VerificationDashboard" asp-action="Courses" asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-book"></i>
                 <span>Courses and Intake</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "ClinicalFacilities" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="ClinicalFacilities"
-                asp-route-collegeCode="@collegeCode">
-
-                <i class="bi bi-hospital"></i>
-
-                <span>Clinical Facilities</span>
             </a>
         </li>
         

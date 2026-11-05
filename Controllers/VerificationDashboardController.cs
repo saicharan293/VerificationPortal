@@ -67,6 +67,7 @@ namespace VerificationPortal.Controllers
                 "ChairDistribution" => "Chair Distribution",
                 "BedDistribution" => "Bed Distribution",
                 "HostelDetails" => "Hostel Details",
+                "AssociatedInstitution" => "Associated Institution",
                 "DepartmentOfficesAndEducationalUnit" => "Department Offices And Educational Unit",
                 "EquipmentList" => "Equipment List",
                 "CA_VehicleDetails" => "Vehicle Details",
@@ -3305,61 +3306,61 @@ namespace VerificationPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewLandBuildingDocument( int id, string documentType)
+        public async Task<IActionResult> ViewLandBuildingDocument(int id, string documentType)
         {
-            var record = await _context.DentalCollegeLandBuildingDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id);
+            string? filePath = null;
 
-            if (record == null)
-                return NotFound();
-
-            string? filePath = documentType switch
+            if (documentType == "LandRecords" || documentType == "ApprovedBuildingPlan")
             {
-                "SaleDeed" =>
-                    record.SaleDeedDocumentPath,
+                var facultyCode = HttpContext.Session.GetString("FacultyCode");
+                var collegeCode = HttpContext.Session.GetString("CollegeCode");
+                var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
-                "EncumbranceCertificate" =>
-                    record.EncumbranceCertificateDocumentPath,
+                var teaching = await _context.SmallGroupTeachings
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.FacultyCode == facultyCode &&
+                        x.CollegeCode == collegeCode &&
+                        x.CourseLevel == courseLevel);
 
-                "LandUseCertificate" =>
-                    record.LandUseCertificateDocumentPath,
+                if (teaching == null)
+                    return NotFound();
 
-                "ApprovedLayoutPlan" =>
-                    record.ApprovedLayoutPlanDocumentPath,
+                filePath = documentType switch
+                {
+                    "LandRecords" => teaching.LandRecordsFilePath,
+                    "ApprovedBuildingPlan" => teaching.ApprovedBuildingPlanFilePath,
+                    _ => null
+                };
+            }
+            else
+            {
+                var record = await _context.DentalCollegeLandBuildingDetails
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
-                "LandSketch" =>
-                    record.LandSketchDocumentPath,
+                if (record == null)
+                    return NotFound();
 
-                "DistanceCertificate" =>
-                    record.DistanceCertificateDocumentPath,
-
-                "ApprovedBuildingPlan" =>
-                    record.ApprovedBuildingPlanDocumentPath,
-
-                "CompletionCertificate" =>
-                    record.CompletionCertificateDocumentPath,
-
-                "StructuralStabilityCertificate" =>
-                    record.StructuralStabilityCertificateDocumentPath,
-
-                "FireSafetyNoc" =>
-                    record.FireSafetyNocDocumentPath,
-
-                "LiftLicense" =>
-                    record.LiftLicenseDocumentPath,
-
-                "ElectricalSafetyCertificate" =>
-                    record.ElectricalSafetyCertificateDocumentPath,
-
-                "WaterSupplyCertificate" =>
-                    record.WaterSupplyCertificateDocumentPath,
-
-                "SewageSanitationApproval" =>
-                    record.SewageSanitationApprovalDocumentPath,
-
-                _ => null
-            };
+                filePath = documentType switch
+                {
+                    "SaleDeed" => record.SaleDeedDocumentPath,
+                    "EncumbranceCertificate" => record.EncumbranceCertificateDocumentPath,
+                    "LandUseCertificate" => record.LandUseCertificateDocumentPath,
+                    "ApprovedLayoutPlan" => record.ApprovedLayoutPlanDocumentPath,
+                    "LandSketch" => record.LandSketchDocumentPath,
+                    "DistanceCertificate" => record.DistanceCertificateDocumentPath,
+                    "ApprovedBuildingPlan" => record.ApprovedBuildingPlanDocumentPath,
+                    "CompletionCertificate" => record.CompletionCertificateDocumentPath,
+                    "StructuralStabilityCertificate" => record.StructuralStabilityCertificateDocumentPath,
+                    "FireSafetyNoc" => record.FireSafetyNocDocumentPath,
+                    "LiftLicense" => record.LiftLicenseDocumentPath,
+                    "ElectricalSafetyCertificate" => record.ElectricalSafetyCertificateDocumentPath,
+                    "WaterSupplyCertificate" => record.WaterSupplyCertificateDocumentPath,
+                    "SewageSanitationApproval" => record.SewageSanitationApprovalDocumentPath,
+                    _ => null
+                };
+            }
 
             if (string.IsNullOrWhiteSpace(filePath))
                 return NotFound("Document not available.");
@@ -4107,7 +4108,91 @@ namespace VerificationPortal.Controllers
             vm.PossessionProofDocumentId = await GetDocumentIdAsync("Possession Proof");
             vm.FacultyName = await GetFacultyName(Convert.ToInt32(context.FacultyCode));
 
-          
+
+
+            return View(vm);
+        }
+
+        // GET: /VerificationDashboard/AssociatedInstitution/{collegeCode}
+        [HttpGet]
+        public async Task<IActionResult> AssociatedInstitution(string collegeCode)
+        {
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return NotFound("College code is required.");
+
+            var context = await GetPageContextAsync(collegeCode);
+            int facultyCode = context.FacultyCodeInt;
+
+            PopulateCommonViewBags(context);
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            var associated = await (
+                from ai in _context.AssociatedInstitutions
+                where ai.CollegeCode == collegeCode && ai.FacultyCode == context.FacultyCode
+
+                join acm in _context.AffiliationCollegeMasters
+                    on ai.AssociatedCollegeCode equals acm.CollegeCode
+                    into collegejoin
+
+                from acm in collegejoin.DefaultIfEmpty()
+
+                join f in _context.Faculties
+                     on ai.FacultyCode equals f.FacultyId.ToString()
+                     into facultyjoin
+
+                from f in facultyjoin.DefaultIfEmpty()
+
+                join com in _context.MstCourses
+                    on ai.CourseCode equals com.CourseCode.ToString()
+                    into coursesjoin
+
+                from com in coursesjoin.DefaultIfEmpty()
+
+                select new SSAssociatedInstitutions
+                {
+                    Id = ai.Id,
+
+                    CourseCode = ai.CourseCode,
+                    CourseName = com != null ? com.CourseName : null,
+                    CourseLevel = ai.CourseLevel,
+
+                    FacultyCode = ai.FacultyCode,
+
+                    AssociatedCollegeCode = ai.AssociatedCollegeCode,
+                    AssociatedCollegeName = acm != null ? acm.CollegeName : null,
+
+                    AssociatedFacultyCode = ai.AssociatedFacultyCode,
+                    AssociatedFacultyName = f != null ? f.FacultyName : null,
+
+                    AnnualIntake = ai.AnnualIntake,
+                    TypeOfAffiliation = ai.TypeOfAffiliation
+                }
+            ).OrderBy(x => x.Id).ToListAsync();
+
+            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+
+            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Associated Institution", context.FacultyCodeInt);
+
+            var vm = new AssociatedInstitutionVm
+            {
+                PageContext = new VerificationPageContextVm
+                {
+                    CollegeCode = collegeCode,
+                    FacultyId = context.FacultyCodeInt,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = GetUserDesignation(),
+                },
+                AssociatedInstitutions = associated,
+                CollegeCode = collegeCode,
+                CourseLevel = courseLevel,
+                ActiveTab = nameof(AssociatedInstitution),
+                UserDesignation = GetUserDesignation(),
+                SectionFeedback = sectionFeedback
+            };
+
+            vm.PageContext.CollegeName = context.InstitutionName;
+            vm.PageContext.InstitutionName = context.InstitutionName;
 
             return View(vm);
         }
@@ -4276,6 +4361,8 @@ namespace VerificationPortal.Controllers
 
                 vm.HasMeuMembersListFile =
                     !string.IsNullOrWhiteSpace(entity.MeuMembersListFilePath);
+
+                vm.MeuMembersListDocumentId = await GetDocumentIdAsync("MEU Members List");
             }
 
 
