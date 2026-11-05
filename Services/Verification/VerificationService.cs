@@ -106,10 +106,10 @@ namespace VerificationPortal.Services.Verification
                 .AsNoTracking()
                 .FirstOrDefaultAsync(predicate);
 
-            if (entity == null)
-                throw new Exception($"{typeof(T).Name} record not found.");
-
             var result = new List<VerificationHistoryViewModel>();
+
+            if (entity == null)
+                return result;
 
             var properties = typeof(T).GetProperties();
 

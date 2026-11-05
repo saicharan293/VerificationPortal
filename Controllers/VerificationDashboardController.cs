@@ -395,11 +395,14 @@ namespace VerificationPortal.Controllers
 
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
+            var currentUser = User?.FindFirst("FullName")?.Value;
+
             var feedback = await _context.SectionWiseFeedbacks
                 .AsNoTracking()
                 .Where(x =>
                     x.CollegeCode == collegeCode &&
                     x.CourseLevel == courseLevel &&
+                    x.VerifiedBy == currentUser &&
                     x.TabId == tabId)
                 .ToListAsync();
 
@@ -446,11 +449,14 @@ namespace VerificationPortal.Controllers
                 .OrderBy(e => e.SectionId)
                 .ToListAsync();
 
+            var currentUser = User?.FindFirst("FullName")?.Value;
+
             var feedback = await _context.SectionWiseFeedbacks
                 .AsNoTracking()
                 .Where(e =>
                     e.CollegeCode == collegeCode &&
                     e.CourseLevel == courseLevel &&
+                    e.VerifiedBy == currentUser &&
                     e.TabId == tab.TabId
                 ).ToListAsync();
 
@@ -7624,11 +7630,20 @@ namespace VerificationPortal.Controllers
                 return;
             }
 
+            var currentUser = User.FindFirst("FullName").Value;
+
+             if (string.IsNullOrWhiteSpace(currentUser))
+            {
+                SetPendingVerificationViewData();
+                return;
+            }
+
             var feedbackQuery = _context.TabWiseFeedbacks
                 .AsNoTracking()
                 .Where(x =>
                     x.CollegeCode == collegeCode &&
-                    x.TabId == tab.TabId);
+                    x.TabId == tab.TabId &&
+                    x.VerifiedBy == currentUser);
 
             if (facultyId.HasValue)
             {
