@@ -21,6 +21,12 @@ INSERT INTO dbo.TblRguhsFacultyUser (UserName, Password, PasswordHash, IsActive,
 
 ----------------------------------
 
+SELECT * FROM TblRguhsFacultyUser
+
+update TblRguhsFacultyUser 
+set FailedLoginAttempts = 0 , lockoutendtime = null
+where failedloginattempts > 0
+
 --update MstTabs
 --set tabname = 'Classroom And Laboratory'
 --where TabName like '%classroom%';

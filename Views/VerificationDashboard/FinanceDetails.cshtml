@@ -408,7 +408,10 @@
                                                 courseLevel = Model.CourseLevel,
                                                 facultyCode = Model.FacultyCode
                                             })!,
-                                        Title = "Governing Council Document"
+                                        Title = "Governing Council Document",
+                                        DocumentId = Model.GoverningCouncilPdfId,
+                                        FacultyId = Convert.ToInt32(Model.FacultyCode),
+                                        CollegeCode = Model.CollegeCode
                                     })
                             }
                             else
@@ -445,7 +448,10 @@
                                                 courseLevel = Model.CourseLevel,
                                                 facultyCode = Model.FacultyCode
                                             })!,
-                                        Title = "Account Summary"
+                                        Title = "Account Summary",
+                                        DocumentId = Model.AccountSummaryPdfId,
+                                        FacultyId = Convert.ToInt32(Model.FacultyCode),
+                                        CollegeCode = Model.CollegeCode
                                     })
                             }
                             else
@@ -486,7 +492,10 @@
                                                 courseLevel = Model.CourseLevel,
                                                 facultyCode = Model.FacultyCode
                                             })!,
-                                        Title = "Audited Statement"
+                                        Title = "Audited Statement",
+                                        DocumentId = Model.AuditedStatementPdfId,
+                                        FacultyId = Convert.ToInt32(Model.FacultyCode),
+                                        CollegeCode = Model.CollegeCode
                                     })
                             }
                             else

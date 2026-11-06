@@ -151,7 +151,7 @@ namespace VerificationPortal.Controllers
 
             if (string.IsNullOrWhiteSpace(courseLevel))
             {
-                return RedirectToReturnUrl(model.ReturnUrl, nameof(InstitutionDetail), new { collegeCode = model.CollegeCode });
+                return RedirectToAction("Index", "Dashboard");
             }
 
             int savedSectionId  = 0;

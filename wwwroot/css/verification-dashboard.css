@@ -2230,7 +2230,7 @@ body {
    SECTION FEEDBACK
    ============================================================ */
 
-.section-feedback {
+/* .section-feedback {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     background: var(--bg-card);
@@ -2239,18 +2239,18 @@ body {
 
 .section-feedback-body {
     padding: 1.5rem;
-}
+} */
 
 
 /* ============================================================
    FORM LABELS
    ============================================================ */
 
-.section-feedback .form-label {
+/* .section-feedback .form-label {
     color: var(--text-secondary);
     font-weight: 600;
     margin-bottom: 0.65rem;
-}
+} */
 
 /* ============================================================
    STATUS SELECTOR
@@ -2388,7 +2388,7 @@ body {
    REMARKS
    ============================================================ */
 
-.section-feedback textarea {
+/* .section-feedback textarea {
     resize: vertical;
     min-height: 90px;
 }
@@ -2402,7 +2402,7 @@ body {
 }
 .section-feedback .row {
     align-items: flex-start;
-}
+} */
 
 .feedback-item {
     height: auto;
@@ -2562,7 +2562,7 @@ body {
    RESPONSIVE
    ============================================================ */
 
-@media (max-width: 767.98px) {
+/* @media (max-width: 767.98px) {
 
     .section-feedback-body {
         padding: 1rem;
@@ -2590,7 +2590,7 @@ body {
         align-items: flex-start;
         gap: 0.6rem;
     }
-}
+} */
 
 /* =========================================
    FIXED VERIFICATION TOP BAR

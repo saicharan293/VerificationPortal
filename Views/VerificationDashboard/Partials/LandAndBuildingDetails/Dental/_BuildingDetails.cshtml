@@ -86,7 +86,12 @@
         Remarks
     </h5>
 
-    <div class="alert alert-secondary">
+    <div class="px-3 py-2 rounded border border-1.5">
         @Model.LandBuilding.Remarks
     </div>
+}
+
+@if (Model.BuildingFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.BuildingFeedback)
 }

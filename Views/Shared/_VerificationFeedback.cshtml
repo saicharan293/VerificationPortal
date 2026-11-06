@@ -73,7 +73,7 @@
                     </div>
                 } *@
             </div>
-            <div class="feedback-body">
+            <div class="feedback-body" id="tab_@ViewData["TabId"]">
                 @if (ViewData["ShowFeedbackForm"] != null && (bool)ViewData["ShowFeedbackForm"])
                 {
                     <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>

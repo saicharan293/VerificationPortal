@@ -7,6 +7,7 @@
         public int FacultyCode { get; set; }
 
         public int AffiliationType { get; set; }
+        public string CourseLevel { get; set; }
 
         public LibraryGeneralVerification? General { get; set; }
 

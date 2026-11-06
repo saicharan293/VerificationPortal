@@ -349,14 +349,18 @@
         }
     );
 
-    document.addEventListener( "submit", 
-        function (event) {
-            if ( event.target && event.target.id === "documentFeedbackForm" ) {
-                saveDocumentFeedback(event);
-            }
+    document.addEventListener("submit", function (event) {
 
+        if (event.target?.id !== "documentFeedbackForm") {
+            return;
         }
-    );
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        saveDocumentFeedback(event);
+
+    }, true);
 
 })();
 

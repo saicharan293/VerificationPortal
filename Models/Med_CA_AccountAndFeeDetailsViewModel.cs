@@ -54,12 +54,15 @@ namespace VerificationPortal.Models
 
         public IFormFile? GoverningCouncilPdf { get; set; }
         public string? GoverningCouncilPdfName { get; set; }
+        public int? GoverningCouncilPdfId { get; set; }
 
         public IFormFile? AccountSummaryPdf { get; set; }
         public string? AccountSummaryPdfName { get; set; }
+        public int? AccountSummaryPdfId { get; set; }
 
         public IFormFile? AuditedStatementPdf { get; set; }
         public string? AuditedStatementPdfName { get; set; }
+        public int? AuditedStatementPdfId { get; set; }
 
         // ==================== DONATION FIELDS (Only for PG) ====================
         [RequiredIfPG(ErrorMessage = "Please specify whether donation is levied")]

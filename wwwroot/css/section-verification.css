@@ -1,0 +1,373 @@
+/* ============================================================
+   SECTION VERIFICATION – design tokens
+   Falls back to sensible values if your global vars are missing.
+   ============================================================ */
+
+.section-feedback {
+    --sv-border:        var(--border-color, #dfe3e8);
+    --sv-surface:       var(--bg-card, #ffffff);
+    --sv-surface-alt:   var(--bg-subtle, #f6f8fa);
+    --sv-text:          var(--text-primary, #1f2933);
+    --sv-text-muted:    var(--text-secondary, #5b6672);
+    --sv-radius-lg:     var(--border-radius-lg, 12px);
+    --sv-radius:        8px;
+
+    --sv-accept:        #1a7f4b;
+    --sv-accept-bg:     #e7f5ed;
+    --sv-accept-border: #9fd4b7;
+
+    --sv-reject:        #c0392b;
+    --sv-reject-bg:     #fdecea;
+    --sv-reject-border: #f0aaa3;
+
+    --sv-pending:       #8a6100;
+    --sv-pending-bg:    #fff6dd;
+    --sv-pending-border:#ecd08a;
+
+    --sv-focus:         #2b6cb0;
+    --sv-ease:          cubic-bezier(.2, .7, .2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .section-feedback {
+        --sv-accept:        #5fd49a;
+        --sv-accept-bg:     rgba(95, 212, 154, .12);
+        --sv-accept-border: rgba(95, 212, 154, .45);
+        --sv-reject:        #ff8a7d;
+        --sv-reject-bg:     rgba(255, 138, 125, .12);
+        --sv-reject-border: rgba(255, 138, 125, .45);
+        --sv-pending:       #f0c75e;
+        --sv-pending-bg:    rgba(240, 199, 94, .12);
+        --sv-pending-border:rgba(240, 199, 94, .45);
+        --sv-focus:         #7ab4f5;
+    }
+}
+
+
+/* ============================================================
+   CONTAINER
+   ============================================================ */
+
+.section-feedback {
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    background: var(--sv-surface);
+    color: var(--sv-text);
+    overflow: hidden;
+}
+
+.section-feedback-body {
+    padding: 1.5rem;
+}
+
+.section-feedback .row {
+    align-items: flex-start;
+}
+
+
+/* ============================================================
+   LABELS & HELPER TEXT
+   ============================================================ */
+
+.section-feedback .form-label,
+.section-feedback .feedback-label {
+    display: block;
+    margin-bottom: .6rem;
+    color: var(--sv-text);
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.section-feedback .form-text {
+    margin: .2rem 0 0;
+    color: var(--sv-text-muted) !important;
+    font-size: .8rem;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+/* Required / optional hint next to "Remarks" */
+.remarks-marker {
+    margin-left: .25rem;
+    font-size: .8rem;
+    font-weight: 500;
+}
+
+.remarks-marker.is-required { color: var(--sv-reject); }
+.remarks-marker.is-optional { color: var(--sv-text-muted); }
+
+
+/* ============================================================
+   STATUS SELECTOR (segmented choice)
+   ============================================================ */
+
+.verification-status-selector {
+    position: relative;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    width: 100%;
+    gap: .6rem !important;
+}
+
+.verification-status-selector .btn-check {
+    position: absolute !important;
+    clip: rect(0, 0, 0, 0) !important;
+    pointer-events: none !important;
+}
+
+.verification-status-btn {
+    flex: 1 1 0;
+    min-width: 7.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .7rem 1rem;
+    border: 1.5px solid var(--sv-border);
+    border-radius: var(--sv-radius);
+    background: var(--sv-surface);
+    color: var(--sv-text-muted);
+    font-size: .925rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color .15s var(--sv-ease),
+                border-color .15s var(--sv-ease),
+                color .15s var(--sv-ease),
+                box-shadow .15s var(--sv-ease);
+}
+
+.verification-status-btn i { font-size: 1.1rem; line-height: 1; }
+
+/* Idle icon is an outline; active icon is a tick/cross shown when selected */
+.verification-status-btn .icon-active { display: none; }
+
+.btn-check:checked + .verification-status-btn .icon-idle   { display: none; }
+.btn-check:checked + .verification-status-btn .icon-active { display: inline-block; }
+
+/* Hover (only for unselected options) */
+.btn-check:not(:checked) + .status-accepted:hover {
+    border-color: var(--sv-accept-border);
+    background: var(--sv-accept-bg);
+    color: var(--sv-accept);
+}
+.btn-check:not(:checked) + .status-rejected:hover {
+    border-color: var(--sv-reject-border);
+    background: var(--sv-reject-bg);
+    color: var(--sv-reject);
+}
+.btn-check:not(:checked) + .status-pending:hover {
+    border-color: var(--sv-pending-border);
+    background: var(--sv-pending-bg);
+    color: var(--sv-pending);
+}
+
+/* Selected */
+.btn-check:checked + .status-accepted {
+    border-color: var(--sv-accept);
+    background: var(--sv-accept-bg);
+    color: var(--sv-accept);
+    box-shadow: 0 0 0 1px var(--sv-accept) inset;
+}
+.btn-check:checked + .status-rejected {
+    border-color: var(--sv-reject);
+    background: var(--sv-reject-bg);
+    color: var(--sv-reject);
+    box-shadow: 0 0 0 1px var(--sv-reject) inset;
+}
+.btn-check:checked + .status-pending {
+    border-color: var(--sv-pending);
+    background: var(--sv-pending-bg);
+    color: var(--sv-pending);
+    box-shadow: 0 0 0 1px var(--sv-pending) inset;
+}
+
+/* Keyboard focus */
+.btn-check:focus-visible + .verification-status-btn {
+    outline: 3px solid var(--sv-focus);
+    outline-offset: 2px;
+}
+
+/* Validation message (shown by Bootstrap's .was-validated or manually) */
+.section-feedback .invalid-feedback {
+    margin-top: .5rem;
+    font-size: .8rem;
+    color: var(--sv-reject);
+}
+
+
+/* ============================================================
+   REMARKS
+   ============================================================ */
+
+.section-feedback textarea.form-control {
+    min-height: 96px;
+    resize: vertical;
+    border: 1.5px solid var(--sv-border);
+    border-radius: var(--sv-radius);
+    background: var(--sv-surface);
+    color: var(--sv-text);
+    font-size: .925rem;
+    line-height: 1.5;
+    padding: .7rem .85rem;
+    transition: border-color .15s var(--sv-ease), box-shadow .15s var(--sv-ease);
+}
+
+.section-feedback textarea.form-control::placeholder {
+    color: var(--sv-text-muted);
+    opacity: .7;
+}
+
+.section-feedback textarea.form-control:focus {
+    border-color: var(--sv-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sv-focus) 25%, transparent);
+    outline: 0;
+}
+
+
+/* ============================================================
+   DISPLAY MODE (saved feedback)
+   ============================================================ */
+
+.feedback-item { min-width: 0; }
+
+.feedback-value {
+    color: var(--sv-text);
+    font-size: .925rem;
+    line-height: 1.55;
+}
+
+/* Remarks read like a quoted note, not a form field */
+.feedback-remarks {
+    padding: .75rem 1rem;
+    border: 1px solid var(--sv-border);
+    border-left: 3px solid var(--sv-border);
+    border-radius: var(--sv-radius);
+    /* background: var(--sv-surface-alt); */
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* Status badge */
+.verification-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .45rem .9rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.status-badge-accepted {
+    color: var(--sv-accept);
+    background: var(--sv-accept-bg);
+    border-color: var(--sv-accept-border);
+}
+.status-badge-rejected {
+    color: var(--sv-reject);
+    background: var(--sv-reject-bg);
+    border-color: var(--sv-reject-border);
+}
+.status-badge-pending {
+    color: var(--sv-pending);
+    background: var(--sv-pending-bg);
+    border-color: var(--sv-pending-border);
+}
+
+/* Tint the remarks accent to match the decision */
+.section-feedback:has(.status-badge-accepted) .feedback-remarks { border-left-color: var(--sv-accept); }
+.section-feedback:has(.status-badge-rejected) .feedback-remarks { border-left-color: var(--sv-reject); }
+.section-feedback:has(.status-badge-pending)  .feedback-remarks { border-left-color: var(--sv-pending); }
+
+/* Verified by / on */
+.verification-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--sv-border);
+    color: var(--sv-text-muted);
+    font-size: .825rem;
+}
+
+.verification-meta i { margin-right: .3rem; }
+.verification-meta strong { color: var(--sv-text); font-weight: 600; }
+
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
+.verification-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .6rem;
+}
+
+.verification-form-actions .btn {
+    padding: .6rem 1.25rem;
+    font-weight: 600;
+    border-radius: var(--sv-radius);
+}
+
+/* The new-feedback save button is full width (w-100 in markup) */
+.verification-form-actions .btn.w-100 { justify-content: center; }
+
+
+/* ============================================================
+   EDIT MODE
+   ============================================================ */
+
+.verification-edit-form {
+    animation: verificationEditIn .2s var(--sv-ease);
+}
+
+@keyframes verificationEditIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+    .section-feedback-body { padding: 1rem; }
+
+    .verification-status-selector { flex-direction: column; }
+
+    .verification-status-btn { width: 100%; }
+
+    .verification-form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .verification-form-actions .btn { width: 100%; }
+
+    .verification-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .5rem;
+    }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .verification-edit-form { animation: none; }
+    .verification-status-btn,
+    .section-feedback textarea.form-control { transition: none; }
+}

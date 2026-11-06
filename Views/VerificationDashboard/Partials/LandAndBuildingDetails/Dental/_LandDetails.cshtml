@@ -38,3 +38,8 @@
                disabled />
     </div>
 </div>
+
+@if (Model.LandFeedback != null)
+{
+    @await Html.PartialAsync( "~/Views/Shared/_SectionFeedback.cshtml", Model.LandFeedback)
+}

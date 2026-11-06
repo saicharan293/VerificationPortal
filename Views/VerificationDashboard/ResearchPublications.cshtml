@@ -123,7 +123,10 @@
                                         {
                                             collegeCode = Model.CollegeCode
                                         })!,
-                                    Title = "Publications Document"
+                                    Title = "Publications Document",
+                                    DocumentId = Model.PublicationsPdfId,
+                                    CollegeCode = Model.CollegeCode,
+                                    FacultyId = Convert.ToInt32(Model.FacultyCode)
                                 })
                         }
                         else
@@ -272,7 +275,10 @@
                                         {
                                             collegeCode = Model.CollegeCode
                                         })!,
-                                    Title = "Clinical Trials Document"
+                                    Title = "Clinical Trials Document",
+                                    DocumentId = Model.ClinicalTrialsPdfId,
+                                    CollegeCode = Model.CollegeCode,
+                                    FacultyId = Convert.ToInt32(Model.FacultyCode)
                                 })
                         }
                         else
@@ -312,7 +318,10 @@
                                         {
                                             collegeCode = Model.CollegeCode
                                         })!,
-                                    Title = "Students Projects Document"
+                                    Title = "Students Projects Document",
+                                    DocumentId = Model.StudentsProjectsPdfId,
+                                    CollegeCode = Model.CollegeCode,
+                                    FacultyId = Convert.ToInt32(Model.FacultyCode)
                                 })
                         }
                         else
@@ -352,7 +361,10 @@
                                         {
                                             collegeCode = Model.CollegeCode
                                         })!,
-                                    Title = "Faculty Projects Document"
+                                    Title = "Faculty Projects Document",
+                                    DocumentId = Model.FacultyProjectsPdfId,
+                                    CollegeCode = Model.CollegeCode,
+                                    FacultyId = Convert.ToInt32(Model.FacultyCode)
                                 })
                         }
                         else
@@ -461,12 +473,12 @@
                                             : row.DeptName)
                                     </div>
 
-                                    @if (!string.IsNullOrWhiteSpace(row.DeptCode))
+                                    @* @if (!string.IsNullOrWhiteSpace(row.DeptCode))
                                     {
                                         <small class="text-muted">
                                             @row.DeptCode
                                         </small>
-                                    }
+                                    } *@
 
                                 </td>
 
@@ -495,7 +507,11 @@
                                                     })!,
                                                 Title = string.IsNullOrWhiteSpace(row.DeptName)
                                                     ? "Department Publication"
-                                                    : $"Publication - {row.DeptName}"
+                                                    : $"Publication - {row.DeptName}",
+                                                DocumentId = row.DocumentId,
+                                                CollegeCode = Model.CollegeCode,
+                                                FacultyId = Convert.ToInt32(Model.FacultyCode)
+
                                             })
                                     }
                                     else
