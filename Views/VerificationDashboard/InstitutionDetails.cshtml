@@ -2,51 +2,48 @@
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
-
+    var pageContext = Model.PageContext;
+    var verification = Model.TabwiseVerification; 
     ViewData["Title"] = "Institution Details";
-    ViewData["ActiveTab"] = ViewBag.ActiveTab;
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? Model?.Institution?.CollegeCode ?? "";
-    ViewData["FacultyCode"] = ViewBag.FacultyCode ?? Model?.Institution?.FacultyCode ?? "";
+    ViewData["ActiveTab"] = pageContext.ActiveTab;
+    ViewData["InstitutionName"] = pageContext.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = pageContext.CollegeCode ?? Model?.Institution?.CollegeCode ?? "";
+    ViewData["FacultyCode"] = pageContext.FacultyId.ToString() ?? Model?.Institution?.FacultyCode ?? "";
     ViewData["ShowFeedbackSection"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
-    ViewData["PrevTabAction"] = Url.Action( "TrustDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
-    ViewData["PrevTabLabel"] = "Previous : Trust Details";
-    ViewData["NextTabAction"] = Url.Action( "TrustDetails", "VerificationDashboard", new { collegeCode = ViewBag.CollegeCode });
-    ViewData["NextTabLabel"] = "Next : Trust Details";
+    ViewData["CurrentVerifier"] = $"{pageContext.CurrentVerifier} - {pageContext.UserDesignation}";
+    ViewData["PrevTabAction"] =
+        string.IsNullOrWhiteSpace(pageContext.PrevTabAction)
+            ? null
+            : Url.Action(
+                pageContext.PrevTabAction,
+                "VerificationDashboard",
+                new { collegeCode = pageContext.CollegeCode });
+    ViewData["PrevTabLabel"] = pageContext.PrevTabLabel ?? "Previous : Trust Details";
+    ViewData["NextTabAction"] =
+        string.IsNullOrWhiteSpace(pageContext.NextTabAction)
+            ? null
+            : Url.Action(
+                pageContext.NextTabAction,
+                "VerificationDashboard",
+                new { collegeCode = pageContext.CollegeCode });
+    ViewData["NextTabLabel"] = pageContext.NextTabLabel ?? "Next : Trust Details";
+
+     // ---------------------------------------------------------
+    // TAB-WISE VERIFICATION
+    // ---------------------------------------------------------
+
+    ViewData["IsAdmin"] = verification.IsAdmin;
+    ViewData["ExistingRemarks"] = verification.ExistingRemarks;
+    ViewData["ExistingStatus"] = verification.ExistingStatus;
+    ViewData["ExistingStatusClass"] = verification.ExistingStatusClass;
+    ViewData["VerifiedBy"] = verification.VerifiedBy;
+    ViewData["VerifiedDate"] = verification.VerifiedDate;
+    ViewData["ShowFeedbackForm"] = verification.ShowFeedbackForm;
+    ViewData["TabId"] = verification.TabId;
+    ViewData["TabName"] = verification.TabName;
+    ViewData["VerificationHistory"] = verification.VerificationHistory;
 }
 
-@{
-
-    //----------------------------------------------
-    // SECTION FEEDBACK
-    //----------------------------------------------
-
-    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
-
-    var basicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Basic Information");
-
-    var addressFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Address Details");
-
-    var contactFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Contact Information");
-
-    var institutionFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Institutional Details");
-
-    var headFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Head of Institution");
-
-    var nodalFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Nodal Officer Details");
-
-    var principalFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Principal Details");
-
-    var deanFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Dean or Director Details");
-
-    var trustFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Trust Details");
-
-    var administrativeFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Administrative Section");
-
-    var otherHealthScienceFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Managing Other Health Science Colleges");
-
-}
 
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>
@@ -62,718 +59,54 @@
 </div>
 
 <!-- Institution Basic Information -->
-<div class="verification-card" id="section_@basicFeedback?.SectionId">
-
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-info-circle"></i>
-            Basic Information
-        </h3>
-    </div>
-
-    <div class="verification-card-body">
-
-        <div class="row g-3">
-
-            @* Name of Institution *@
-            <div class="col-md-8">
-                <label class="form-label">
-                    Name of Institution
-                </label>
-
-                <input type="text" class="form-control" value="@Model.Institution.NameOfInstitution" disabled />
-            </div>
-
-
-            @* Type of Institution *@
-            <div class="col-md-4">
-                <label class="form-label">
-                    Type of Institution
-                </label>
-
-                <input type="text" class="form-control" value="@Model.TypeOfInstitutionText" disabled />
-            </div>
-
-
-            @* Year of Establishment *@
-            <div class="col-md-6">
-                <label class="form-label">
-                    Year of Establishment
-                </label>
-
-                <input type="text" class="form-control" value="@Model.Institution.YearOfEstablishment" disabled />
-            </div>
-
-
-            @* Status of College *@
-            <div class="col-md-6">
-                <label class="form-label">
-                    Status of College
-                </label>
-
-                <input type="text" class="form-control" value="@Model.StatusOfCollegeText" disabled />
-            </div>
-
-
-            @* Financing Authority *@
-            <div class="col-md-6">
-                <label class="form-label">
-                    Financing Authority
-                </label>
-
-                <input type="text" class="form-control" value="@Model.Institution.FinancingAuthority" disabled />
-            </div>
-
-
-            @* Minority Institute *@
-            <div class="col-md-3">
-                <label class="form-label">
-                    Minority Institute
-                </label>
-
-                <input type="text" class="form-control" value="@(Model.Institution.MinorityInstitute ? "Yes" : "No")" disabled />
-            </div>
-
-
-            @* Minority Category *@
-            <div class="col-md-3">
-                <label class="form-label">
-                    Minority Category
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       value="@(string.IsNullOrWhiteSpace(Model.Institution.MinorityCategory)
-                                           ? "-"
-                                           : Model.Institution.MinorityCategory)"
-                       disabled />
-            </div>
-
-
-            @* Attached to Medical College *@
-            <div class="col-md-6">
-                <label class="form-label">
-                    Attached to Medical College
-                </label>
-
-                <input type="text"  class="form-control" value="@(Model.Institution.AttachedToMedicalClg ? "Yes" : "No")" disabled />
-            </div>
-
-
-            @* Rural Institute *@
-            <div class="col-md-6">
-                <label class="form-label">
-                    Rural Institute
-                </label>
-
-                <input type="text" class="form-control" value="@(Model.Institution.RuralInstitute ? "Yes" : "No")" disabled />
-            </div>
-
-            @* =====================================================
-               GOVERNMENT AUTONOMOUS CERTIFICATE
-               ===================================================== *@
-            @if(Model.TypeOfInstitutionText == "Government/Autonomous")
-            {
-                
-                <div class="col-md-6">
-
-                    <label class="form-label">
-                        Government Autonomous Certificate Number
-                    </label>
-
-                    <input type="text"
-                           class="form-control"
-                           value="@(string.IsNullOrWhiteSpace(Model.Institution.GovAutonomousCertNumber)
-                               ? "-"
-                               : Model.Institution.GovAutonomousCertNumber)"
-                           disabled />
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label class="form-label">
-                        Government Autonomous Certificate
-                    </label>
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        Model.Institution.GovAutonomousCertPath))
-                    {
-                        @await Html.PartialAsync(
-                            "_DocumentViewerButton",
-                            new DocumentViewerVm
-                            {
-                                Url = Url.Action(
-                                    "ViewGovAutonomousCertificate",
-                                    "VerificationDashboard",
-                                    new
-                                    {
-                                        id = Model.Institution.InstitutionId
-                                    })!,
-
-                                Title = "Government Autonomous Certificate",
-
-                                DocumentId = Model.GovAutonomousDocumentId,
-
-                                FacultyId = Convert.ToInt32( Model.Institution.FacultyCode),
-
-                                CollegeCode = Model.Institution.CollegeCode
-                            })
-                    }
-                    else
-                    {
-                        <input type="text"
-                               class="form-control"
-                               value="-"
-                               disabled />
-                    }
-
-                </div>
-            }
-
-        </div>
-
-
-        @if (basicFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", basicFeedback)
-        }
-    </div>
-</div>
-
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_BasicInformation.cshtml", Model)
 
 <!-- Address Details -->
-<div class="verification-card"  id="section_@addressFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-geo-alt"></i>
-            Address Details
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-12">
-                <label class="form-label">Address</label>
-                <textarea class="form-control" rows="2" disabled>@Model.Institution.Address</textarea>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Village/Town/City</label>
-                <input type="text" class="form-control" value="@Model.Institution.VillageTownCity" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Taluk</label>
-                <input type="text" class="form-control" value="@Model.TalukText" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">District</label>
-                <input type="text" class="form-control" value="@Model.DistrictText" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Pin Code</label>
-                <input type="text" class="form-control" value="@Model.Institution.PinCode" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">STD Code</label>
-                <input type="text" class="form-control" value="@Model.Institution.StdCode" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Fax</label>
-                <input type="text" class="form-control" value="@Model.Institution.Fax" disabled />
-            </div>
-        </div>
-
-        @if (addressFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", addressFeedback)
-        }
-    </div>
-</div>
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_AddressDetails.cshtml", Model)
 
 
 <!-- Contact Information -->
-<div class="verification-card" id="section_@contactFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-telephone"></i>
-            Contact Information
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.Institution.MobileNumber" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Email ID</label>
-                <input type="email" class="form-control" value="@Model.Institution.EmailId" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Alternate Landline/Mobile</label>
-                <input type="text" class="form-control" value="@Model.Institution.AltLandlineMobile" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Alternate Email ID</label>
-                <input type="email" class="form-control" value="@Model.Institution.AltEmailId" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Website</label>
-                <input type="url" class="form-control" value="@Model.Institution.Website" disabled />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">College URL</label>
-                <input type="url" class="form-control" value="@Model.Institution.CollegeUrl" disabled />
-            </div>
-        </div>
-
-        @if (contactFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", contactFeedback)
-        }
-
-    </div>
-</div>
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_ContactInformation.cshtml", Model)
 
 
 <!-- Institutional Details -->
-<div class="verification-card" id="section_@institutionFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-building-check"></i>
-            Institutional Details
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Minority Institute</label>
-                <input type="text" class="form-control" value="@(Model.Institution.MinorityInstitute ? "Yes" : "No")" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Minority Category</label>
-                <input type="text" class="form-control" value="@Model.Institution.MinorityCategory" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Attached to Dental College</label>
-                <input type="text" class="form-control" value="@(Model.Institution.AttachedToMedicalClg ? "Yes" : "No")" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Rural Institute</label>
-                <input type="text" class="form-control" value="@(Model.Institution.RuralInstitute ? "Yes" : "No")" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Survey No / PID No</label>
-                <input type="text" class="form-control" value="@Model.Institution.SurveyNoPidNo" disabled />
-            </div>
-            @if(Model?.Institution?.FacultyCode == "2")
-            {    
-                <div class="col-md-4">
-                    <label class="form-label">Course Applied</label>
-                    <input type="text" class="form-control" value="@Model.Institution.CourseApplied" disabled />
-                </div>
-            }
-            
-            <div class="col-md-4">
-                <label class="form-label">Running Course</label>
-                <input type="text" class="form-control" value="@Model.Institution.RunningCourse" disabled />
-            </div>
-            @if(Model?.Institution?.FacultyCode == "2")
-            { 
-                <div class="col-md-4">
-                    <label class="form-label">Course Level</label>
-                    <input type="text" class="form-control" value="@Model.Institution.CourseLevel" disabled />
-                </div>
-            }
-            <div class="col-md-4">
-                <label class="form-label">Financing Authority</label>
-                <input type="text" class="form-control" value="@Model.Institution.FinancingAuthority" disabled />
-            </div>
-        </div>
-
-        
-        @if (institutionFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", institutionFeedback)
-        }
-    </div>
-</div>
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_InstitutionDetails.cshtml", Model)
 
 
 <!-- Head of Institution -->
-<div class="verification-card" id="section_@headFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-person-badge"></i>
-            Head of Institution
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Head of Institution Name</label>
-                <input type="text" class="form-control" value="@Model.Institution.HeadOfInstitution" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.Institution.HeadOfInstitutionMobNo" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" value="@Model.Institution.HeadOfInstitutionEmail" disabled />
-            </div>
-            <div class="col-12">
-                <label class="form-label">Address</label>
-                <textarea class="form-control" rows="2" disabled>@Model.Institution.HeadAddress</textarea>
-            </div>
-        </div>
-
-        
-        @if (headFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", headFeedback)
-        }
-    </div>
-</div>
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_HeadOfInstitution.cshtml", Model)
 
 
 <!-- Nodal Officer -->
-<div class="verification-card" id="section_@nodalFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-person-lines-fill"></i>
-            Nodal Officer Details
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Name</label>
-                <input type="text" class="form-control" value="@Model.Institution.NodalOfficerName" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.Institution.NodalOfficerMobNumber" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" value="@Model.Institution.NodalOfficerEmail" disabled />
-            </div>
-        </div>
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_NodalOfficer.cshtml", Model)
 
-        @if (nodalFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", nodalFeedback)
-        }
-    </div>
-</div>
+
+@* Principal Details (Preview) *@
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_PrincipalDetails.cshtml", Model)
 
 
 
+@* Dean/Director Details (Preview) *@
+@await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_DeanDirectorDetails.cshtml", Model)
 
 
-<!-- Principal Details (Preview) -->
-<div class="verification-card" id="section_@principalFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-mortarboard"></i>
-            Principal Details (Preview - Full details in Principal Details tab)
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Principal Name</label>
-                <input type="text" class="form-control" value="@Model.Institution.PrincipalName" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.Institution.PrincipalMobNo" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" value="@Model.Institution.PrincipalEmail" disabled />
-            </div>
-        </div>
-
-        @if (principalFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", principalFeedback)
-        }
-    </div>
-</div>
-
-
-
-<!-- Dean/Director Details (Preview) -->
-<div class="verification-card" id="section_@deanFeedback?.SectionId">
-    <div class="verification-card-header">
-        <h3 class="verification-card-title">
-            <i class="bi bi-person-badge"></i>
-            Dean or Director Details (Preview - Full details in Dean/Director tab)
-        </h3>
-    </div>
-    <div class="verification-card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Dean Name</label>
-                <input type="text" class="form-control" value="@Model.Institution.DeanName" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.Institution.DeanMobileNumber" disabled />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" value="@Model.Institution.DeanEmailId" disabled />
-            </div>
-
-            <!-- Appointment Order -->
-            <div class="col-md-12">
-
-                <label class="form-label">
-                    Appointment Order of Dean
-                </label>
-
-                @if (!string.IsNullOrWhiteSpace(
-                    Model.Institution.DocumentDataPath))
-                {
-                    @await Html.PartialAsync(
-                        "_DocumentViewerButton",
-                        new DocumentViewerVm
-                        {
-                            Url = Url.Action(
-                                "ViewDeanAppointmentOrderDocument",
-                                "VerificationDashboard",
-                                new
-                                {
-                                    id = Model.Institution.InstitutionId
-                                })!,
-
-                            Title = "Appointment Order of Dean",
-
-                            DocumentId = Model.AppointmentOrderDocumentId,
-
-                            FacultyId = Convert.ToInt32(Model.Institution.FacultyCode),
-
-                            CollegeCode = Model.Institution.CollegeCode
-                        })
-                }
-                else
-                {
-                    <input type="text" class="form-control" value="-" disabled />
-                }
-
-            </div>
-        </div>
-
-        
-        @if (deanFeedback != null)
-        {
-            @await Html.PartialAsync("_SectionFeedback", deanFeedback)
-        }
-    </div>
-</div>
-
-@if (Model.HasTrustDetails==true)
+@if (Model?.HasTrustDetails==true)
 {    
-    <!-- Trust Details (Preview) -->
-    <div class="verification-card" id="section_@trustFeedback?.SectionId">
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-building"></i>
-                Trust Details <small style="font-size: 0.675em;">(Preview - Full details in Trust Details tab)</small>
-            </h3>
-        </div>
-        <div class="verification-card-body">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Trust Name</label>
-                    <input type="text" class="form-control" value="@Model.Institution.TrustName" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Trust President</label>
-                    <input type="text" class="form-control" value="@Model.Institution.TrustPresidentName" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">President Contact</label>
-                    <input type="text" class="form-control" value="@Model.Institution.TrustPresidentContactNo" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Trust Address</label>
-                    <input type="text" class="form-control" value="@Model.Institution.TrustAddress" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Trust Establishment Date</label>
-                    <input type="text" class="form-control" value="@(Model.Institution.TrustEstablishmentDate?.ToString("dd MMM yyyy") ?? "")" disabled />
-                </div>
-            </div>
+    @* Trust Details (Preview) *@
+    @await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_TrustDetails.cshtml", Model)
 
-            @if (trustFeedback != null)
-            {
-                @await Html.PartialAsync("_SectionFeedback", trustFeedback)
-            }
-        </div>
-    </div>
 }
 
-@if(Model.Institution.FacultyCode == "2" && Model.HasAdministrativeAuthority == true)
+@if(Model?.Institution.FacultyCode == "2" && Model.HasAdministrativeAuthority == true)
 {
-    <!-- Administrative Details -->
-    <div class="verification-card" id="section_@administrativeFeedback?.SectionId">
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-bank"></i>
-                Administrative Details
-            </h3>
-        </div>
-
-        <div class="verification-card-body">
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Name of Administrative Authority
-                    </label>
-
-                    <input type="text"
-                           class="form-control"
-                           value="@(string.IsNullOrWhiteSpace(Model.Institution.NameOfAdministrativeAuthority)
-                               ? "-"
-                               : Model.Institution.NameOfAdministrativeAuthority)"
-                           disabled />
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Address of Administrative Authority
-                    </label>
-
-                    <textarea class="form-control"
-                              rows="2"
-                              disabled>@(string.IsNullOrWhiteSpace(Model.Institution.AddressOfAdministrativeAuthority)
-                                  ? "-"
-                                  : Model.Institution.AddressOfAdministrativeAuthority)</textarea>
-                </div>
-
-                <div class="col-md-12">
-                    <label class="form-label">
-                        Members of Governing Body / Council
-                    </label>
-
-                    @if (!string.IsNullOrWhiteSpace(Model.Institution.MembersOfGoverningBodyOrCouncilFilePath))
-                    {
-                        @await Html.PartialAsync(
-                            "_DocumentViewerButton",
-                            new DocumentViewerVm
-                            {
-                                Url = Url.Action(
-                                    "ViewGoverningBodyCouncilDocument",
-                                    "VerificationDashboard",
-                                    new
-                                    {
-                                        id = Model.Institution.InstitutionId,
-                                        documentType = "GoverningBodyCouncil"
-                                    })!,
-
-                                Title = "Members of Governing Body / Council",
-
-                                FacultyId = Convert.ToInt32( Model.Institution.FacultyCode),
-
-                                DocumentId = Model.MemberOfGovBodyDocumentId,
-
-                                CollegeCode = Model.Institution.CollegeCode,
-                            
-                                CanVerify = true
-                            })
-                    }
-                    else
-                    {
-                        <input type="text"
-                               class="form-control"
-                               value="-"
-                               disabled />
-                    }
-                </div>
-
-            </div>
-
-            @if (administrativeFeedback != null)
-            {
-                @await Html.PartialAsync( "_SectionFeedback", administrativeFeedback)
-            }
-        </div>
-    </div>
+    @* Administrative Details *@
+    @await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_AdministrativeDetails.cshtml", Model)
+    
 
 }
 
 @if(Model?.Institution?.FacultyCode == "2")
 {
-    <!-- Managing Other Health Science Colleges -->
-    <div class="verification-card" id="section_@otherHealthScienceFeedback?.SectionId">
-
-        <div class="verification-card-header">
-            <h3 class="verification-card-title">
-                <i class="bi bi-hospital"></i>
-                Managing Other Health Science Colleges
-            </h3>
-        </div>
-
-        <div class="verification-card-body">
-
-            @if (Model.OtherHealthScienceColleges.Any())
-            {
-                <div class="table-responsive">
-
-                    <table class="table table-bordered table-hover align-middle">
-
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>College Name</th>
-                                <th>Faculty</th>
-                                <th>Course Code</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            @{
-                                var index = 1;
-                            }
-
-                            @foreach (var college in Model.OtherHealthScienceColleges)
-                            {
-                                <tr>
-                                    <td>@index</td>
-                                    @* <td>@college.OtherCollegeCode</td> *@
-                                    <td>@(college.CollegeName ?? "-")</td>
-                                    <td>@(college.FacultyName ?? "-")</td>
-                                    <td>@college.CourseName</td>
-                                </tr>
-
-                                index++;
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-light border mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
-                    No other Health Science Colleges are being managed.
-                </div>
-            }
-
-            @if (otherHealthScienceFeedback != null)
-            {
-                @await Html.PartialAsync("_SectionFeedback", otherHealthScienceFeedback)
-            }
-
-        </div>
-    </div>
+    @* Managing Other Health Science Colleges *@
+    @await Html.PartialAsync("~/Views/VerificationDashboard/Partials/InstitutionDetails/_OtherHealthScienceColleges.cshtml", Model)
 }

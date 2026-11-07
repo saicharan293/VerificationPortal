@@ -1,0 +1,91 @@
+﻿@model VerificationPortal.Models.InstitutionDetailsVerificationVm
+
+@{
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var administrativeFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Administrative Section");
+}
+
+<div class="verification-card" id="section_@administrativeFeedback?.SectionId">
+        <div class="verification-card-header">
+            <h3 class="verification-card-title">
+                <i class="bi bi-bank"></i>
+                Administrative Details
+            </h3>
+        </div>
+
+        <div class="verification-card-body">
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Name of Administrative Authority
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="@(string.IsNullOrWhiteSpace(Model.Institution.NameOfAdministrativeAuthority)
+                               ? "-"
+                               : Model.Institution.NameOfAdministrativeAuthority)"
+                           disabled />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Address of Administrative Authority
+                    </label>
+
+                    <textarea class="form-control"
+                              rows="2"
+                              disabled>@(string.IsNullOrWhiteSpace(Model.Institution.AddressOfAdministrativeAuthority)
+                                  ? "-"
+                                  : Model.Institution.AddressOfAdministrativeAuthority)</textarea>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">
+                        Members of Governing Body / Council
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Institution.MembersOfGoverningBodyOrCouncilFilePath))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewGoverningBodyCouncilDocument",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        id = Model.Institution.InstitutionId,
+                                        documentType = "GoverningBodyCouncil"
+                                    })!,
+
+                                Title = "Members of Governing Body / Council",
+
+                                FacultyId = Convert.ToInt32( Model.Institution.FacultyCode),
+
+                                DocumentId = Model.MemberOfGovBodyDocumentId,
+
+                                CollegeCode = Model.Institution.CollegeCode,
+                            
+                                CanVerify = true
+                            })
+                    }
+                    else
+                    {
+                        <input type="text"
+                               class="form-control"
+                               value="-"
+                               disabled />
+                    }
+                </div>
+
+            </div>
+
+            @if (administrativeFeedback != null)
+            {
+                @await Html.PartialAsync( "_SectionFeedback", administrativeFeedback)
+            }
+        </div>
+    </div>

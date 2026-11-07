@@ -21,13 +21,32 @@ namespace VerificationPortal.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IVerificationService _verificationService;
         private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
+        private readonly IInstitutionDetailsService _institutionDetailsService;
+        private readonly ITabService _tabService;
+        private readonly IVerificationPageContextService _verificationPageContextService;
+        private readonly ITabWiseVerificationService _tabWiseVerificationService;
+        private readonly ISectionFeedbackService _sectionFeedbackService;
+
         private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
 
-        public VerificationDashboardController(ApplicationDbContext context, IVerificationService verificationService, IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService)
+        public VerificationDashboardController(
+            ApplicationDbContext context, 
+            IVerificationService verificationService,
+            IInstitutionDetailsService institutionDetailsService,
+            IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService,
+            ITabWiseVerificationService tabWiseVerificationService,
+            ITabService tabService,
+            ISectionFeedbackService sectionFeedbackService,
+            IVerificationPageContextService verificationPageContextService)
         {
             _context = context;
             _verificationService = verificationService;
+            _institutionDetailsService = institutionDetailsService;
             _clinicalFacilitiesCompositeService = clinicalFacilitiesCompositeService;
+            _tabWiseVerificationService = tabWiseVerificationService;
+            _tabService = tabService;
+            _sectionFeedbackService = sectionFeedbackService;
+            _verificationPageContextService = verificationPageContextService;
         }
 
         protected string BaseMedicalPath
@@ -126,205 +145,43 @@ namespace VerificationPortal.Controllers
 
             var context = await GetPageContextAsync(collegeCode);
 
-            PopulateCommonViewBags(context);
-
-            ViewBag.ActiveTab = "InstitutionDetails";
-            ViewBag.UserDesignation = GetUserDesignation();
-
             var facultyCode = context.Faculty.FacultyId;
-
-
-            // ---------------------------------------------------------
-            // COLLEGE
-            // ---------------------------------------------------------
-
-            var college = await _context.AffiliationCollegeMasters
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c =>
-                    c.CollegeCode == collegeCode);
-
-            ViewBag.CollegeName =
-                college?.CollegeName ?? "Unknown College";
-
-
-            // ---------------------------------------------------------
-            // INSTITUTION DETAILS
-            // ---------------------------------------------------------
-
-            var institution = await _context.AffInstitutionsDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x =>
-                    x.CollegeCode == collegeCode);
-
-            if (institution == null)
-            {
-                return NotFound(
-                    $"Institution details not found for college code: {collegeCode}");
-            }
-
-
-            // ---------------------------------------------------------
-            // TYPE OF INSTITUTION
-            // ---------------------------------------------------------
-
-            string typeOfInstitution = institution.TypeOfInstitution;
-
-            if (int.TryParse(institution.TypeOfInstitution, out int institutionTypeId))
-            {
-                typeOfInstitution =
-                    await _context.MstInstitutionTypes
-                        .AsNoTracking()
-                        .Where(x =>
-                            x.InstitutionTypeId == institutionTypeId)
-                        .Select(x => x.InstitutionType)
-                        .FirstOrDefaultAsync()
-                    ?? institution.TypeOfInstitution;
-            }
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+            var isAdmin = IsAdminUser();
             
-            ViewData["TabId"]  = await GetTabIdByAsync("Institutional Details");
-            //ViewBag.TypeOfInstitution = typeOfInstitution;
+            var tabName  = _tabService.GetDatabaseTabName("InstitutionDetails");
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyCode);
 
+            var result = await _institutionDetailsService.GetInstitutionDetailsAsync(collegeCode);
 
-            // ---------------------------------------------------------
-            // STATUS OF COLLEGE
-            // ---------------------------------------------------------
-
-            string statusOfCollege = institution.StatusOfCollege;
-
-            if (byte.TryParse(institution.StatusOfCollege, out byte statusId))
+            if(result == null)
             {
-                statusOfCollege =
-                    await _context.AffInstitutionStatusMasters
-                        .AsNoTracking()
-                        .Where(x =>
-                            x.InstitutionStatusId == statusId &&
-                            x.IsActive)
-                        .Select(x => x.StatusName)
-                        .FirstOrDefaultAsync()
-                    ?? institution.StatusOfCollege;
+                return NotFound($"Institution Details not found for college:{result?.CollegeName ?? collegeCode}");
             }
 
-            //ViewBag.StatusOfCollege = statusOfCollege;
 
 
-            // ---------------------------------------------------------
-            // TALUK
-            // ---------------------------------------------------------
+            var vm = result.ViewModel;
 
-            string taluk = institution.Taluk;
-
-            if (!string.IsNullOrWhiteSpace(institution.Taluk))
+            vm.PageContext = new VerificationPageContextVm
             {
-                taluk =
-                    await _context.TalukMasters
-                        .AsNoTracking()
-                        .Where(x =>
-                            x.TalukId == institution.Taluk)
-                        .Select(x => x.TalukName)
-                        .FirstOrDefaultAsync()
-                    ?? institution.Taluk;
-            }
-
-            //ViewBag.Taluk = taluk;
-
-
-            // ---------------------------------------------------------
-            // DISTRICT
-            // ---------------------------------------------------------
-
-            string district = institution.District;
-
-            if (!string.IsNullOrWhiteSpace(institution.District))
-            {
-                district =
-                    await _context.DistrictMasters
-                        .AsNoTracking()
-                        .Where(x =>
-                            x.DistrictId == institution.District)
-                        .Select(x => x.DistrictName)
-                        .FirstOrDefaultAsync()
-                    ?? institution.District;
-            }
-
-            //ViewBag.District = district;
-
-            //-----------------------------------------------------------
-            // MANAGING OTHER HEALTH SCIENCE COLLEGES
-            //-----------------------------------------------------------
-
-            var otherHealthScienceColleges = await _context.OtherHealthScienceColleges
-                .AsNoTracking()
-                .Where(e => e.CollegeCode == collegeCode)
-                .Join(
-                    _context.MstCourses,
-                    ohs => ohs.CourseCode,
-                    course => course.CourseCode,
-                    (ohs, course) => new OtherHealthScienceCollegeVm
-                    {
-                        OtherCollegeCode = ohs.OtherCollegeCode,
-                        CollegeName = ohs.OtherCollegeCodeNavigation.CollegeName,
-                        FacultyName = ohs.Faculty.FacultyName,
-                        CourseCode = course.CourseCode,
-                        CourseName = course.CourseName
-                    })
-                .ToListAsync();
-
-            var documentNames = new List<string>
-            {
-                "Appointment Order of Dean",
-                "Government Autonomous Certificate"
+                FacultyId = facultyCode,
+                CollegeCode = collegeCode,
+                CollegeName = result.CollegeName,
+                InstitutionName = context.InstitutionName,
+                FacultyName = context.FacultyName,
+                CurrentVerifier = verifierName,
+                UserDesignation = GetUserDesignation(),
+                IsAdmin = isAdmin,
+                IsSection = IsSectionUser(),
+                ActiveTab = "InstitutionDetails",
+                TabId = tabId,
             };
 
-            if (institution.FacultyCode == "2") // Dental
-            {
-                documentNames.Add("Members of Governing Body or Council");
-            }
-
-            var documentIds = await _context.MstDocuments
-                .AsNoTracking()
-                .Where(d => d.FacultyId.ToString() == institution.FacultyCode &&
-                            documentNames.Contains(d.DocumentName))
-                .ToDictionaryAsync(
-                    d => d.DocumentName,
-                    d => d.DocumentId);
-
-            documentIds.TryGetValue( "Members of Governing Body or Council", out var memberofGovBodyDocumentId);
-
-            documentIds.TryGetValue( "Appointment Order of Dean", out var deanAppointmentOrderDocumentId);
-
-            documentIds.TryGetValue( "Government Autonomous Certificate", out var govAutonomousCertificateId);
-
-            // ---------------------------------------------------------
-            // VERIFICATION
-            // ---------------------------------------------------------
-
-            //await SetVerificationViewData<AffInstitutionsDetail>(collegeCode);
-
-            var databaseTabName = GetDatabaseTabName("InstitutionDetails");
-
-            await SetTabWiseVerificationViewData( collegeCode, databaseTabName, facultyCode);
-
-            //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync( collegeCode, 1);
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, databaseTabName, facultyCode);
-
-            // ---------------------------------------------------------
-            // VIEW MODEL
-            // ---------------------------------------------------------
-
-            var vm = new InstitutionDetailsVerificationVm
-            {
-                Institution = institution,
-                TypeOfInstitutionText = typeOfInstitution,
-                StatusOfCollegeText = statusOfCollege,
-                TalukText = taluk,
-                DistrictText = district,
-                MemberOfGovBodyDocumentId = memberofGovBodyDocumentId,
-                AppointmentOrderDocumentId = deanAppointmentOrderDocumentId,
-                GovAutonomousDocumentId = govAutonomousCertificateId,
-                OtherHealthScienceColleges = otherHealthScienceColleges,
-                HasTrustDetails = institution.TypeOfInstitution != "11",
-                SectionFeedback = sectionFeedback
-            };
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName ?? string.Empty, facultyCode, courseLevel, isAdmin);
+            var returnUrl = $"{Request.Path}{Request.QueryString}";
+            vm.SectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync( collegeCode, tabName, facultyCode, courseLevel, verifierName, isAdmin, returnUrl);
 
             return View(vm);
         }
@@ -444,7 +301,7 @@ namespace VerificationPortal.Controllers
             }).ToList();
         }
 
-        private async Task<List<SectionFeedbackViewModel>> GetTabSectionFeedbackByTabNameAsync(string collegeCode, string tabName, int facultyCode)
+        private async Task<List<SectionFeedbackViewModel>> GetSectionFeedbackByTabNameAsync(string collegeCode, string tabName, int facultyCode)
         {
             if (IsAdminUser()) 
                 return new List<SectionFeedbackViewModel>();
@@ -593,7 +450,7 @@ namespace VerificationPortal.Controllers
             await SetTabWiseVerificationViewData(collegeCode, databaseTabName, context.FacultyCodeInt);
 
             //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Trust Details", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Trust Details", context.FacultyCodeInt);
 
             return View(institution);
         }
@@ -795,7 +652,7 @@ namespace VerificationPortal.Controllers
             await SetTabWiseVerificationViewData( collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Trust Member Details", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Trust Member Details", context.FacultyCodeInt);
 
             return View(trustMembers);
         }
@@ -1255,7 +1112,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Dean or Director Details", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Dean or Director Details", context.FacultyCodeInt);
 
             return View(vm);
         }
@@ -1419,7 +1276,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Chair Distribution", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Chair Distribution", context.FacultyCodeInt);
 
             return View(model);
         }
@@ -1880,7 +1737,7 @@ namespace VerificationPortal.Controllers
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Principal Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Principal Details", context.FacultyCodeInt);
 
             var model = new PrincipalDetailsViewModel
             {
@@ -2491,7 +2348,7 @@ namespace VerificationPortal.Controllers
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "UG Course Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "UG Course Details", context.FacultyCodeInt);
 
             // ---------------------------------------------------------
             // PAGE CONTEXT
@@ -2874,7 +2731,7 @@ namespace VerificationPortal.Controllers
             // SECTION FEEDBACK
             // ---------------------------------------------------------
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land And Building Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Land And Building Details", context.FacultyCodeInt);
 
             var landFeedback = sectionFeedback?.FirstOrDefault(x => x.SectionName == "Land Details");
 
@@ -3141,7 +2998,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, nameof(LandAndBuildingDetails), context.FacultyCodeInt);
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Land And Building Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Land And Building Details", context.FacultyCodeInt);
 
             var landFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Land Details");
             var buildingFeedback = sectionFeedback?.FirstOrDefault(e => e.SectionName == "Building Details");
@@ -3575,7 +3432,7 @@ namespace VerificationPortal.Controllers
             // Populate strongly typed page context
 
 
-            model.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Classroom And Laboratory", facultyCode);
+            model.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Classroom And Laboratory", facultyCode);
 
             return View(model);
         }
@@ -3727,7 +3584,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Equipment List", context.FacultyCodeInt);
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Equipment List", context.FacultyCodeInt);
             // vm.SectionFeedback = feedbackList?.FirstOrDefault(e => e.SectionName == "Equipment Details");
 
             return View(vm);
@@ -3943,21 +3800,7 @@ namespace VerificationPortal.Controllers
         }
         private async Task<VerificationPageContext> GetPageContextAsync(string collegeCode)
         {
-            var institution = await _context.AffInstitutionsDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
-
-            if (institution == null)
-                throw new Exception($"Institution not found for college code '{collegeCode}'.");
-
-            if (string.IsNullOrWhiteSpace(institution.FacultyCode))
-                throw new Exception("Faculty code not found.");
-
-            var faculty = await _context.Faculties.AsNoTracking().FirstOrDefaultAsync(x => x.FacultyId.ToString() == institution.FacultyCode);
-
-            if(faculty == null)
-                throw new Exception("Faculty Not found.");
-
+            
             var userId = HttpContext.Session.GetString("UserId");
 
             if (string.IsNullOrWhiteSpace(userId))
@@ -3965,21 +3808,11 @@ namespace VerificationPortal.Controllers
                 throw new Exception("User session expired. Please login again.");
             }
 
-             var user = await _context.TblRguhsFacultyUsers
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId.ToString() == userId);
+            var context = await _verificationPageContextService.GetPageContextAsync(collegeCode, userId ?? string.Empty);
+            
+            HttpContext.Session.SetString("FacultyCode", context.FacultyCode);
 
-            if (user == null)
-                throw new Exception("Logged-in user not found.");
-
-            HttpContext.Session.SetString("FacultyCode", faculty.FacultyId.ToString());
-
-            return new VerificationPageContext
-            {
-                Institution = institution,
-                Faculty = faculty,
-                User = user
-            };
+            return context;
         }
 
         private void PopulateCommonViewBags(VerificationPageContext context)
@@ -4078,7 +3911,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Bed Distribution", context.FacultyCodeInt);
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Bed Distribution", context.FacultyCodeInt);
 
             return View(vm);
         }
@@ -4110,7 +3943,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Hostel Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Hostel Details", context.FacultyCodeInt);
 
 
             var vm = new AffHostelDetailsCreateVm
@@ -4204,7 +4037,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Associated Institution", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Associated Institution", context.FacultyCodeInt);
 
             var vm = new AssociatedInstitutionVm
             {
@@ -4401,7 +4234,7 @@ namespace VerificationPortal.Controllers
             //await SetVerificationViewData<AffInstitutionsDetail>( collegeCode);
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Department Offices And Educational Unit", context.FacultyCodeInt);
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Department Offices And Educational Unit", context.FacultyCodeInt);
 
             return View(vm);
         }
@@ -4508,7 +4341,7 @@ namespace VerificationPortal.Controllers
                 WorkshopDetails = workshopDetails,
 
                 // Use the actual tab ID configured for Workshop Details.
-                SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Workshop Details", context.FacultyCodeInt)
+                SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Workshop Details", context.FacultyCodeInt)
             };
 
             ViewData["TabId"]  = await GetTabIdByAsync("Workshop Details");
@@ -4552,7 +4385,7 @@ namespace VerificationPortal.Controllers
                 },
 
                 AnimalHouseDetails = animalHouseDetails,
-                SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Animal House Details", context.FacultyCodeInt)
+                SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Animal House Details", context.FacultyCodeInt)
             };
 
             ViewData["TabId"]  = await GetTabIdByAsync("Animal House Details");
@@ -4791,7 +4624,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Vehicle Details", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Vehicle Details", context.FacultyCodeInt);
 
             return View(vm);
         }
@@ -5025,7 +4858,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "UG Academic Matters", pageContext.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "UG Academic Matters", pageContext.FacultyCodeInt);
 
 
             return View("UgAcademicMatters", model);
@@ -5486,7 +5319,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            model.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library Services", pageContext.FacultyCodeInt);
+            model.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Library Services", pageContext.FacultyCodeInt);
 
             return View("LibraryServices", model);
         }
@@ -5886,7 +5719,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            model.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Research and Publications", pageContext.FacultyCodeInt);
+            model.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Research and Publications", pageContext.FacultyCodeInt);
             return View("ResearchPublications", model);
 
         }
@@ -6244,7 +6077,7 @@ namespace VerificationPortal.Controllers
                 //await SetVerificationViewData<MedCaAccountAndFeeDetail>(collegeCode);
                 await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-                vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Finance Details", pageContext.FacultyCodeInt);
+                vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Finance Details", pageContext.FacultyCodeInt);
 
                 return View("FinanceDetails", vm);
             }
@@ -6451,7 +6284,7 @@ namespace VerificationPortal.Controllers
             ViewBag.FacultyCode = facultyCode;
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
-            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Staff Pay Scale", pageContext.FacultyCodeInt);
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Staff Pay Scale", pageContext.FacultyCodeInt);
             return View("StaffPayScale", vm);
         }
 
@@ -6541,7 +6374,7 @@ namespace VerificationPortal.Controllers
                 CollegeCode = collegeCode,
                 FacultyCode = pageContext.FacultyCode,
                 StaffOther = staffOther,
-                SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Staff Other Details", pageContext.FacultyCodeInt)
+                SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Staff Other Details", pageContext.FacultyCodeInt)
             };
 
             // Verification data for THIS section only
@@ -6550,7 +6383,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            staffOther.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Staff Other Details", pageContext.FacultyCodeInt);
+            staffOther.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Staff Other Details", pageContext.FacultyCodeInt);
             ViewData["ActiveTab"] = ControllerContext.ActionDescriptor.ActionName;
 
             return View("StaffOtherDetails", vm);
@@ -6624,7 +6457,7 @@ namespace VerificationPortal.Controllers
 
                 Items = items,
                 Services = services,
-                SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library Expenditure and Services", pageContext.FacultyCodeInt)
+                SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Library Expenditure and Services", pageContext.FacultyCodeInt)
             };
 
             // 5. Load verification status for this section
@@ -6680,7 +6513,7 @@ namespace VerificationPortal.Controllers
                 .ToListAsync();
 
             // Load section feedback
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library Staff Details", pageContext.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Library Staff Details", pageContext.FacultyCodeInt);
 
             // Prepare verification ViewModel
             var vm = new LibraryStaffVerificationVm
@@ -6806,7 +6639,7 @@ namespace VerificationPortal.Controllers
 
                 Details = details ?? new UserDetailsItemVm(),
 
-                SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library User Details", pageContext.FacultyCodeInt)
+                SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Library User Details", pageContext.FacultyCodeInt)
             };
 
             // Common verification data
@@ -7192,7 +7025,7 @@ namespace VerificationPortal.Controllers
             //        collegeCode,
             //        34); // TODO: actual section ID
 
-            var feeStructureFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, "Payment Details", pageContext.FacultyCodeInt);
+            var feeStructureFeedback = await GetSectionFeedbackByTabNameAsync( collegeCode, "Payment Details", pageContext.FacultyCodeInt);
 
             // =========================================================
             // 15. FINAL VM
@@ -7409,7 +7242,7 @@ namespace VerificationPortal.Controllers
             //        collegeCode,
             //        35);
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Action Taken Report", pageContext.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Action Taken Report", pageContext.FacultyCodeInt);
 
 
             // =========================================================
@@ -7564,7 +7397,7 @@ namespace VerificationPortal.Controllers
             // --------------------------------------------------
             // 4. Get Section Feedback
             // --------------------------------------------------
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync( collegeCode, "Faculty Repository", pageContext.FacultyCodeInt); // TODO: replace with actual SectionId
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync( collegeCode, "Faculty Repository", pageContext.FacultyCodeInt); // TODO: replace with actual SectionId
 
             // --------------------------------------------------
             // 5. Build ViewModel
@@ -8173,7 +8006,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Library Details", pageContext.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Library Details", pageContext.FacultyCodeInt);
 
             return View("LibraryDetails", model);
         }
@@ -8392,7 +8225,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Faculty Details", pageContext.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Faculty Details", pageContext.FacultyCodeInt);
 
             return View("FacultyDetails", model);
         }
@@ -8750,7 +8583,7 @@ namespace VerificationPortal.Controllers
 
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Teaching Experience", pageContext.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Teaching Experience", pageContext.FacultyCodeInt);
 
             return View("TeachingExperience", model);
         }
@@ -8803,7 +8636,7 @@ namespace VerificationPortal.Controllers
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
 
 
-            ViewBag.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Clinical Facilities", context.FacultyCodeInt);
+            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Clinical Facilities", context.FacultyCodeInt);
 
             return View(model);
         }
@@ -9132,7 +8965,7 @@ namespace VerificationPortal.Controllers
             // --------------------------------------------------
             // 3. Get Section Feedback
             // --------------------------------------------------
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(collegeCode, "Non Teaching Staff Details", pageContext.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Non Teaching Staff Details", pageContext.FacultyCodeInt);
 
             // --------------------------------------------------
             // 4. Build ViewModel
@@ -9377,7 +9210,7 @@ namespace VerificationPortal.Controllers
             // Section feedback
             // --------------------------------------------------
 
-            vm.SectionFeedback = await GetTabSectionFeedbackByTabNameAsync(
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(
                 collegeCode,
                 "Payment Details",
                 facultyId);
@@ -9471,7 +9304,7 @@ namespace VerificationPortal.Controllers
                 .OrderBy(x => x.DisplayOrder)
                 .ToListAsync();
 
-            var sectionFeedback = await GetTabSectionFeedbackByTabNameAsync(
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(
                 collegeCode, "Geo Tagged Photos", pageContext.FacultyCodeInt);
 
             // Group photos by category from backend

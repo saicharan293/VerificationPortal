@@ -1,0 +1,75 @@
+﻿@model VerificationPortal.Models.InstitutionDetailsVerificationVm
+
+@{
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var deanFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Dean or Director Details");
+}
+
+<div class="verification-card" id="section_@deanFeedback?.SectionId">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge"></i>
+            Dean or Director Details (Preview - Full details in Dean/Director tab)
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Dean Name</label>
+                <input type="text" class="form-control" value="@Model.Institution.DeanName" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" value="@Model.Institution.DeanMobileNumber" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="@Model.Institution.DeanEmailId" disabled />
+            </div>
+
+            <!-- Appointment Order -->
+            <div class="col-md-12">
+
+                <label class="form-label">
+                    Appointment Order of Dean
+                </label>
+
+                @if (!string.IsNullOrWhiteSpace(
+                    Model.Institution.DocumentDataPath))
+                {
+                    @await Html.PartialAsync(
+                        "_DocumentViewerButton",
+                        new DocumentViewerVm
+                        {
+                            Url = Url.Action(
+                                "ViewDeanAppointmentOrderDocument",
+                                "VerificationDashboard",
+                                new
+                                {
+                                    id = Model.Institution.InstitutionId
+                                })!,
+
+                            Title = "Appointment Order of Dean",
+
+                            DocumentId = Model.AppointmentOrderDocumentId,
+
+                            FacultyId = Convert.ToInt32(Model.Institution.FacultyCode),
+
+                            CollegeCode = Model.Institution.CollegeCode
+                        })
+                }
+                else
+                {
+                    <input type="text" class="form-control" value="-" disabled />
+                }
+
+            </div>
+        </div>
+
+        
+        @if (deanFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", deanFeedback)
+        }
+    </div>
+</div>

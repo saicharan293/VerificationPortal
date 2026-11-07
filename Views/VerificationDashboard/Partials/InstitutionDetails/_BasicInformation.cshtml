@@ -1,0 +1,186 @@
+﻿@model VerificationPortal.Models.InstitutionDetailsVerificationVm
+
+@{
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var basicFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Basic Information");
+}
+
+<div class="verification-card" id="section_@basicFeedback?.SectionId">
+
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-info-circle"></i>
+            Basic Information
+        </h3>
+    </div>
+
+    <div class="verification-card-body">
+
+        <div class="row g-3">
+
+            @* Name of Institution *@
+            <div class="col-md-8">
+                <label class="form-label">
+                    Name of Institution
+                </label>
+
+                <input type="text" class="form-control" value="@Model.Institution.NameOfInstitution" disabled />
+            </div>
+
+
+            @* Type of Institution *@
+            <div class="col-md-4">
+                <label class="form-label">
+                    Type of Institution
+                </label>
+
+                <input type="text" class="form-control" value="@Model.TypeOfInstitutionText" disabled />
+            </div>
+
+
+            @* Year of Establishment *@
+            <div class="col-md-6">
+                <label class="form-label">
+                    Year of Establishment
+                </label>
+
+                <input type="text" class="form-control" value="@Model.Institution.YearOfEstablishment" disabled />
+            </div>
+
+
+            @* Status of College *@
+            <div class="col-md-6">
+                <label class="form-label">
+                    Status of College
+                </label>
+
+                <input type="text" class="form-control" value="@Model.StatusOfCollegeText" disabled />
+            </div>
+
+
+            @* Financing Authority *@
+            <div class="col-md-6">
+                <label class="form-label">
+                    Financing Authority
+                </label>
+
+                <input type="text" class="form-control" value="@Model.Institution.FinancingAuthority" disabled />
+            </div>
+
+
+            @* Minority Institute *@
+            <div class="col-md-3">
+                <label class="form-label">
+                    Minority Institute
+                </label>
+
+                <input type="text" class="form-control" value="@(Model.Institution.MinorityInstitute ? "Yes" : "No")" disabled />
+            </div>
+
+
+            @* Minority Category *@
+            <div class="col-md-3">
+                <label class="form-label">
+                    Minority Category
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="@(string.IsNullOrWhiteSpace(Model.Institution.MinorityCategory)
+                                           ? "-"
+                                           : Model.Institution.MinorityCategory)"
+                       disabled />
+            </div>
+
+
+            @* Attached to Medical College *@
+            <div class="col-md-6">
+                <label class="form-label">
+                    Attached to Medical College
+                </label>
+
+                <input type="text"  class="form-control" value="@(Model.Institution.AttachedToMedicalClg ? "Yes" : "No")" disabled />
+            </div>
+
+
+            @* Rural Institute *@
+            <div class="col-md-6">
+                <label class="form-label">
+                    Rural Institute
+                </label>
+
+                <input type="text" class="form-control" value="@(Model.Institution.RuralInstitute ? "Yes" : "No")" disabled />
+            </div>
+
+            @* =====================================================
+               GOVERNMENT AUTONOMOUS CERTIFICATE
+               ===================================================== *@
+            @if(Model.TypeOfInstitutionText == "Government/Autonomous")
+            {
+                
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Government Autonomous Certificate Number
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="@(string.IsNullOrWhiteSpace(Model.Institution.GovAutonomousCertNumber)
+                               ? "-"
+                               : Model.Institution.GovAutonomousCertNumber)"
+                           disabled />
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Government Autonomous Certificate
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model.Institution.GovAutonomousCertPath))
+                    {
+                        @await Html.PartialAsync(
+                            "_DocumentViewerButton",
+                            new DocumentViewerVm
+                            {
+                                Url = Url.Action(
+                                    "ViewGovAutonomousCertificate",
+                                    "VerificationDashboard",
+                                    new
+                                    {
+                                        id = Model.Institution.InstitutionId
+                                    })!,
+
+                                Title = "Government Autonomous Certificate",
+
+                                DocumentId = Model.GovAutonomousDocumentId,
+
+                                FacultyId = Convert.ToInt32( Model.Institution.FacultyCode),
+
+                                CollegeCode = Model.Institution.CollegeCode
+                            })
+                    }
+                    else
+                    {
+                        <input type="text"
+                               class="form-control"
+                               value="-"
+                               disabled />
+                    }
+
+                </div>
+            }
+
+        </div>
+
+
+        @if (basicFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", basicFeedback)
+        }
+    </div>
+</div>

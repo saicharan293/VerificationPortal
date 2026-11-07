@@ -1,0 +1,41 @@
+﻿@model VerificationPortal.Models.InstitutionDetailsVerificationVm
+
+@{
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var headFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Head of Institution");
+}
+
+<div class="verification-card" id="section_@headFeedback?.SectionId">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-badge"></i>
+            Head of Institution
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Head of Institution Name</label>
+                <input type="text" class="form-control" value="@Model.Institution.HeadOfInstitution" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" value="@Model.Institution.HeadOfInstitutionMobNo" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="@Model.Institution.HeadOfInstitutionEmail" disabled />
+            </div>
+            <div class="col-12">
+                <label class="form-label">Address</label>
+                <textarea class="form-control" rows="2" disabled>@Model.Institution.HeadAddress</textarea>
+            </div>
+        </div>
+
+        
+        @if (headFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", headFeedback)
+        }
+    </div>
+</div>

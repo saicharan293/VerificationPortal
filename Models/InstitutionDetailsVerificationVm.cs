@@ -2,6 +2,7 @@
 {
     public class InstitutionDetailsVerificationVm
     {
+        public VerificationPageContextVm PageContext { get; set; } = new();
         public AffInstitutionsDetail Institution { get; set; } = null!;
 
         public string? TypeOfInstitutionText { get; set; }
@@ -19,6 +20,8 @@
         // Managing Other Health Science Colleges
         public List<OtherHealthScienceCollegeVm> OtherHealthScienceColleges { get; set; } = new();
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+        
     }
 
     public class OtherHealthScienceCollegeVm

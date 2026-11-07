@@ -8,6 +8,7 @@ using VerificationPortal.Models;
 using VerificationPortal.Services.Verification;
 using VerificationPortal.Services.Verification.Handlers;
 using VerificationPortal.Services.Verification.Interfaces;
+using VerificationPortal.Services.Verification.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,11 @@ builder.Services.AddScoped<IVerificationService, VerificationService>();
 builder.Services.AddScoped<IClinicalFacilitiesCompositeService, ClinicalFacilitiesCompositeService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IVerificationPageService, VerificationPageService>();
+builder.Services.AddScoped<IInstitutionDetailsService, InstitutionDetailsService>();
+builder.Services.AddScoped<ITabWiseVerificationService, TabWiseVerificationService>();
+builder.Services.AddScoped<ISectionFeedbackService, SectionFeedbackService>();
+builder.Services.AddScoped<IVerificationPageContextService, VerificationPageContextService>();
+builder.Services.AddScoped<ITabService, TabService>();
 builder.Services.AddScoped<InstitutionTypeFilter>();
 
 builder.Services.AddScoped(typeof(IVerificationHandler<>), typeof(GenericVerificationHandler<>));

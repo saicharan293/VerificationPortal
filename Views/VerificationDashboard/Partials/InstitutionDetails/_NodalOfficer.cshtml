@@ -1,0 +1,36 @@
+﻿@model VerificationPortal.Models.InstitutionDetailsVerificationVm
+
+@{
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var nodalFeedback = sectionFeedback.FirstOrDefault( x => x.SectionName == "Nodal Officer Details");
+}
+
+<div class="verification-card" id="section_@nodalFeedback?.SectionId">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-person-lines-fill"></i>
+            Nodal Officer Details
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" value="@Model.Institution.NodalOfficerName" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" value="@Model.Institution.NodalOfficerMobNumber" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="@Model.Institution.NodalOfficerEmail" disabled />
+            </div>
+        </div>
+
+        @if (nodalFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", nodalFeedback)
+        }
+    </div>
+</div>

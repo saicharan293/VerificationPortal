@@ -59,7 +59,6 @@ GO
 --FROM [Admission_Affiliation].[dbo].[MstTabs]
 --ORDER BY FacultyId, TabId;
 
-
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Institution Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Trust Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Trust Member Details');
@@ -83,7 +82,8 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VAL
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Non Teaching Staff Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Payment Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Geo Tagged Photos');
-INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Associated Institution');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Clinical Facilities');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (1, 'Associated Institutions');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Institution Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Trust Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Trust Member Details');
@@ -122,7 +122,6 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VAL
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Faculty Repository');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Non Teaching Staff Details');
 
-
 /* =======================================================
     MST SECTION INSERT QUERIES
     ====================================================== */
@@ -144,11 +143,11 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Head of Institution');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Nodal Officer Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Principal Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Dean / Director Details');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Dean or Director Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Trust Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 2, 'Trust Information');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 3, 'Trust Members');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 4, 'Dean / Director Information');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 4, 'Dean or Director Information');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 4, 'Teaching Experience');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 4, 'Administrative Experience');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 5, 'Principal Information');
@@ -223,11 +222,11 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 37, 'Head of Institution');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 37, 'Nodal Officer Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 37, 'Principal Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 37, 'Dean / Director Details');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 37, 'Dean or Director Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 37, 'Trust Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 38, 'Trust Information');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 39, 'Trust Members');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 40, 'Dean / Director Information');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 40, 'Dean or Director Information');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 40, 'Teaching Experience');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 40, 'Administrative Experience');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 41, 'Principal Information');
@@ -290,4 +289,105 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 60, 'Attached Hospital');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 60, 'ICU');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 60, 'Labs');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Associated Institution Details');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Indoor Department Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Operation Theater Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Casualty Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'CSSD and Laundry Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Radio-Diagnosis Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Anaesthesiology Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Central Laboratory Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Blood Bank Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Yoga Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Radiation Oncology Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Art Center Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Pharmacy Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Utilities Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Indoor Beds Units Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Out Patient Area Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Clinical Hospital Details');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Clinical Statistics');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Affiliated Hospital Documents');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'OT Requirements');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Supervision in FPA');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 61, 'Indoor Beds Requirements');
+
+
+
+
+
+--  SELECT
+--    'INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ' +
+--    '([DocumentId], [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (' +
+--    CAST([DocumentId] AS VARCHAR(20)) + ', ' +
+--    CAST([FacultyId] AS VARCHAR(20)) + ', ' +
+--    CAST([TabId] AS VARCHAR(20)) + ', ' +
+--    CAST([SectionId] AS VARCHAR(20)) + ', ' +
+--    CASE
+--        WHEN [DocumentName] IS NULL THEN 'NULL'
+--        ELSE '''' + REPLACE([DocumentName], '''', '''''') + ''''
+--    END + ', ' +
+--    CASE
+--        WHEN [IsMandatory] IS NULL THEN 'NULL'
+--        WHEN [IsMandatory] = 1 THEN '1'
+--        ELSE '0'
+--    END + ', ' +
+--    COALESCE(CAST([DisplayOrder] AS VARCHAR(20)), 'NULL') + ', ' +
+--    CASE
+--        WHEN [IsActive] IS NULL THEN 'NULL'
+--        WHEN [IsActive] = 1 THEN '1'
+--        ELSE '0'
+--    END +
+--    ');' AS InsertQuery
+--FROM [Admission_Affiliation].[dbo].[MstDocument]
+--ORDER BY [DocumentId];
+
+
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 1, 1, 'Government Autonomous Certificate', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 37, 80, 'Government Autonomous Certificate', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 1, 8, 'Appointment Order of Dean', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 37, 87, 'Appointment Order of Dean', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 1, 63, 'Members of Governing Body or Council', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 6, 19, 'Previous Year Notification', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 6, 21, 'GOK Order', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 6, 22, 'RGUHS Notification', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 42, 98, 'Previous Year Notification', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 42, 100, 'GOK Order', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 42, 101, 'RGUHS Notification', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 43, 103, 'Land Records', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 43, 104, 'Approved Building Plan', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 47, 118, 'MEU Members List', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (2, 14, 35, 'DEU Members List', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 48, 119, 'Possession Proof', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 51, 127, 'Governing Council Document', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 51, 127, 'Account Summary', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 51, 127, 'Audited Statement', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'Form 16 Details', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'AEBAS – Last Three Months', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'AEBAS – Inspection Day', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'Provident Fund', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'ESI', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 135, 'Publications Document', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 135, 'Clinical Trials Document', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 135, 'Students Projects Document', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 135, 'Faculty Projects Document', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Anatomy', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Anesthesiology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Biochemistry', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Community Medicine', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Dentistry', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Dermatology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Forensic Medicine and Toxicology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - General Medicine', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - General Surgery', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Microbiology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Obstetrics and Gynecology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Ophthalmology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Orthopedics', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Otorhinolaryngology (ENT)', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Pathology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Pediatrics', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Pharmacology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Physiology', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Psychiatry', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 136, 'Publication - Radiodiagnosis', 0, NULL, 1);
+

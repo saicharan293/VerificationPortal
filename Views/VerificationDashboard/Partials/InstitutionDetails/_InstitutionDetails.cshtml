@@ -1,0 +1,68 @@
+﻿@model VerificationPortal.Models.InstitutionDetailsVerificationVm
+
+@{
+    var sectionFeedback = Model.SectionFeedback  ?? new List<VerificationPortal.Models.SectionFeedbackViewModel>();
+    var institutionFeedback = sectionFeedback.FirstOrDefault(x => x.SectionName == "Institutional Details");
+}
+
+<div class="verification-card" id="section_@institutionFeedback?.SectionId">
+    <div class="verification-card-header">
+        <h3 class="verification-card-title">
+            <i class="bi bi-building-check"></i>
+            Institutional Details
+        </h3>
+    </div>
+    <div class="verification-card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Minority Institute</label>
+                <input type="text" class="form-control" value="@(Model.Institution.MinorityInstitute ? "Yes" : "No")" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Minority Category</label>
+                <input type="text" class="form-control" value="@Model.Institution.MinorityCategory" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Attached to Dental College</label>
+                <input type="text" class="form-control" value="@(Model.Institution.AttachedToMedicalClg ? "Yes" : "No")" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Rural Institute</label>
+                <input type="text" class="form-control" value="@(Model.Institution.RuralInstitute ? "Yes" : "No")" disabled />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Survey No / PID No</label>
+                <input type="text" class="form-control" value="@Model.Institution.SurveyNoPidNo" disabled />
+            </div>
+            @if(Model?.Institution?.FacultyCode == "2")
+            {    
+                <div class="col-md-4">
+                    <label class="form-label">Course Applied</label>
+                    <input type="text" class="form-control" value="@Model.Institution.CourseApplied" disabled />
+                </div>
+            }
+            
+            <div class="col-md-4">
+                <label class="form-label">Running Course</label>
+                <input type="text" class="form-control" value="@Model.Institution.RunningCourse" disabled />
+            </div>
+            @if(Model?.Institution?.FacultyCode == "2")
+            { 
+                <div class="col-md-4">
+                    <label class="form-label">Course Level</label>
+                    <input type="text" class="form-control" value="@Model.Institution.CourseLevel" disabled />
+                </div>
+            }
+            <div class="col-md-4">
+                <label class="form-label">Financing Authority</label>
+                <input type="text" class="form-control" value="@Model.Institution.FinancingAuthority" disabled />
+            </div>
+        </div>
+
+        
+        @if (institutionFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", institutionFeedback)
+        }
+    </div>
+</div>

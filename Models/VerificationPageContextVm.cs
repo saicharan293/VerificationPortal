@@ -7,11 +7,16 @@
         public string? CollegeName { get; set; }
         public string? InstitutionName { get; set; }
         public string? FacultyName { get; set; }
-
+        public string? UserDesignation { get; set; }
+        public bool IsAdmin { get; set; }
         public string? CurrentVerifier { get; set; }
 
         public string VerificationStatus { get; set; } = "Pending";
         public string StatusBadgeClass { get; set; } = "pending";
+
+        public string? ActiveTab { get; set; }
+        public int? TabId { get; set; }
+        public bool IsSection { get; set; }
 
         public string? PrevTabAction { get; set; }
         public string? PrevTabLabel { get; set; }
