@@ -91,7 +91,7 @@
                                 <th>Mobile Number</th>
                                 <th>Age</th>
                                 <th>Joining Date</th>
-                                <th>Verification Status</th>
+                                @* <th>Verification Status</th> *@
                             </tr>
                         </thead>
                         <tbody>
@@ -105,12 +105,12 @@
                                     <td>@member.MobileNumber</td>
                                     <td>@(member.Age?.ToString() ?? "-")</td>
                                     <td>@(member.JoiningDate?.ToString("dd MMM yyyy") ?? "-")</td>
-                                    <td>
+                                    @* <td>
                                         @{
                                             var statusBadge = GetVerificationStatusBadge(member);
                                             @Html.Raw(statusBadge)
                                         }
-                                    </td>
+                                    </td> *@
                                 </tr>
                             }
                         </tbody>
@@ -134,29 +134,3 @@
     </div>
 
 
-
-@functions {
-    private string GetVerificationStatusBadge(VerificationPortal.Models.ContinuationTrustMemberDetail member)
-    {
-        // Check the highest verification level
-        if (member.IsVcVerified == true) return "<span class=\"badge bg-success\"><i class=\"bi bi-check-circle me-1\"></i>VC Verified</span>";
-        if (member.IsDrVerified == true) return "<span class=\"badge bg-primary\"><i class=\"bi bi-check-circle me-1\"></i>Director Verified</span>";
-        if (member.IsReVerified == true) return "<span class=\"badge bg-info\"><i class=\"bi bi-check-circle me-1\"></i>Registrar Eval Verified</span>";
-        if (member.IsRgVerified == true) return "<span class=\"badge bg-info\"><i class=\"bi bi-check-circle me-1\"></i>Registrar Verified</span>";
-        if (member.IsArVerified == true) return "<span class=\"badge bg-secondary\"><i class=\"bi bi-check-circle me-1\"></i>AR Verified</span>";
-        if (member.IsSoVerified == true) return "<span class=\"badge bg-success text-dark\"><i class=\"bi bi-check-circle me-1\"></i>SO Verified</span>";
-        if (member.IsJrVerified == true) return "<span class=\"badge bg-success text-dark\"><i class=\"bi bi-check-circle me-1\"></i>JR Verified</span>";
-        if (member.IsDeoVerified == true) return "<span class=\"badge bg-success text-dark\"><i class=\"bi bi-check-circle me-1\"></i>DEO Verified</span>";
-
-        if (member.IsDeoVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by DEO</span>";
-        if (member.IsJrVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by JR</span>";
-        if (member.IsSoVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by SO</span>";
-        if (member.IsArVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by AR</span>";
-        if (member.IsRgVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by Registrar</span>";
-        if (member.IsReVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by Registrar Eval</span>";
-        if (member.IsDrVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by Director</span>";
-        if (member.IsVcVerified == false) return "<span class=\"badge bg-danger\"><i class=\"bi bi-x-circle me-1\"></i>Rejected by VC</span>";
-
-        return "<span class=\"badge bg-secondary\"><i class=\"bi bi-hourglass-split me-1\"></i>Pending</span>";
-    }
-}

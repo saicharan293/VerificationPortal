@@ -4,42 +4,38 @@
    ============================================================ */
 
 .section-feedback {
-    --sv-border:        var(--border-color, #dfe3e8);
-    --sv-surface:       var(--bg-card, #ffffff);
-    --sv-surface-alt:   var(--bg-subtle, #f6f8fa);
-    --sv-text:          var(--text-primary, #1f2933);
-    --sv-text-muted:    var(--text-secondary, #5b6672);
-    --sv-radius-lg:     var(--border-radius-lg, 12px);
-    --sv-radius:        8px;
-
-    --sv-accept:        #1a7f4b;
-    --sv-accept-bg:     #e7f5ed;
+    --sv-border: var(--border-color, #dfe3e8);
+    --sv-surface: var(--bg-card, #ffffff);
+    --sv-surface-alt: var(--bg-subtle, #f6f8fa);
+    --sv-text: var(--text-primary, #1f2933);
+    --sv-text-muted: var(--text-secondary, #5b6672);
+    --sv-radius-lg: var(--border-radius-lg, 12px);
+    --sv-radius: 8px;
+    --sv-accept: #1a7f4b;
+    --sv-accept-bg: #e7f5ed;
     --sv-accept-border: #9fd4b7;
-
-    --sv-reject:        #c0392b;
-    --sv-reject-bg:     #fdecea;
+    --sv-reject: #c0392b;
+    --sv-reject-bg: #fdecea;
     --sv-reject-border: #f0aaa3;
-
-    --sv-pending:       #8a6100;
-    --sv-pending-bg:    #fff6dd;
-    --sv-pending-border:#ecd08a;
-
-    --sv-focus:         #2b6cb0;
-    --sv-ease:          cubic-bezier(.2, .7, .2, 1);
+    --sv-pending: #8a6100;
+    --sv-pending-bg: #fff6dd;
+    --sv-pending-border: #ecd08a;
+    --sv-focus: #2b6cb0;
+    --sv-ease: cubic-bezier(.2, .7, .2, 1);
 }
 
 @media (prefers-color-scheme: dark) {
     .section-feedback {
-        --sv-accept:        #5fd49a;
-        --sv-accept-bg:     rgba(95, 212, 154, .12);
+        --sv-accept: #5fd49a;
+        --sv-accept-bg: rgba(95, 212, 154, .12);
         --sv-accept-border: rgba(95, 212, 154, .45);
-        --sv-reject:        #ff8a7d;
-        --sv-reject-bg:     rgba(255, 138, 125, .12);
+        --sv-reject: #ff8a7d;
+        --sv-reject-bg: rgba(255, 138, 125, .12);
         --sv-reject-border: rgba(255, 138, 125, .45);
-        --sv-pending:       #f0c75e;
-        --sv-pending-bg:    rgba(240, 199, 94, .12);
-        --sv-pending-border:rgba(240, 199, 94, .45);
-        --sv-focus:         #7ab4f5;
+        --sv-pending: #f0c75e;
+        --sv-pending-bg: rgba(240, 199, 94, .12);
+        --sv-pending-border: rgba(240, 199, 94, .45);
+        --sv-focus: #7ab4f5;
     }
 }
 
@@ -94,8 +90,13 @@
     font-weight: 500;
 }
 
-.remarks-marker.is-required { color: var(--sv-reject); }
-.remarks-marker.is-optional { color: var(--sv-text-muted); }
+.remarks-marker.is-required {
+    color: var(--sv-reject);
+}
+
+.remarks-marker.is-optional {
+    color: var(--sv-text-muted);
+}
 
 
 /* ============================================================
@@ -133,19 +134,26 @@
     line-height: 1.2;
     cursor: pointer;
     user-select: none;
-    transition: background-color .15s var(--sv-ease),
-                border-color .15s var(--sv-ease),
-                color .15s var(--sv-ease),
-                box-shadow .15s var(--sv-ease);
+    transition: background-color .15s var(--sv-ease), border-color .15s var(--sv-ease), color .15s var(--sv-ease), box-shadow .15s var(--sv-ease);
 }
 
-.verification-status-btn i { font-size: 1.1rem; line-height: 1; }
+.verification-status-btn i {
+    font-size: 1.1rem;
+    line-height: 1;
+}
 
 /* Idle icon is an outline; active icon is a tick/cross shown when selected */
-.verification-status-btn .icon-active { display: none; }
+.verification-status-btn .icon-active {
+    display: none;
+}
 
-.btn-check:checked + .verification-status-btn .icon-idle   { display: none; }
-.btn-check:checked + .verification-status-btn .icon-active { display: inline-block; }
+.btn-check:checked + .verification-status-btn .icon-idle {
+    display: none;
+}
+
+.btn-check:checked + .verification-status-btn .icon-active {
+    display: inline-block;
+}
 
 /* Hover (only for unselected options) */
 .btn-check:not(:checked) + .status-accepted:hover {
@@ -153,11 +161,13 @@
     background: var(--sv-accept-bg);
     color: var(--sv-accept);
 }
+
 .btn-check:not(:checked) + .status-rejected:hover {
     border-color: var(--sv-reject-border);
     background: var(--sv-reject-bg);
     color: var(--sv-reject);
 }
+
 .btn-check:not(:checked) + .status-pending:hover {
     border-color: var(--sv-pending-border);
     background: var(--sv-pending-bg);
@@ -171,12 +181,14 @@
     color: var(--sv-accept);
     box-shadow: 0 0 0 1px var(--sv-accept) inset;
 }
+
 .btn-check:checked + .status-rejected {
     border-color: var(--sv-reject);
     background: var(--sv-reject-bg);
     color: var(--sv-reject);
     box-shadow: 0 0 0 1px var(--sv-reject) inset;
 }
+
 .btn-check:checked + .status-pending {
     border-color: var(--sv-pending);
     background: var(--sv-pending-bg);
@@ -231,7 +243,9 @@
    DISPLAY MODE (saved feedback)
    ============================================================ */
 
-.feedback-item { min-width: 0; }
+.feedback-item {
+    min-width: 0;
+}
 
 .feedback-value {
     color: var(--sv-text);
@@ -268,11 +282,13 @@
     background: var(--sv-accept-bg);
     border-color: var(--sv-accept-border);
 }
+
 .status-badge-rejected {
     color: var(--sv-reject);
     background: var(--sv-reject-bg);
     border-color: var(--sv-reject-border);
 }
+
 .status-badge-pending {
     color: var(--sv-pending);
     background: var(--sv-pending-bg);
@@ -280,9 +296,17 @@
 }
 
 /* Tint the remarks accent to match the decision */
-.section-feedback:has(.status-badge-accepted) .feedback-remarks { border-left-color: var(--sv-accept); }
-.section-feedback:has(.status-badge-rejected) .feedback-remarks { border-left-color: var(--sv-reject); }
-.section-feedback:has(.status-badge-pending)  .feedback-remarks { border-left-color: var(--sv-pending); }
+.section-feedback:has(.status-badge-accepted) .feedback-remarks {
+    border-left-color: var(--sv-accept);
+}
+
+.section-feedback:has(.status-badge-rejected) .feedback-remarks {
+    border-left-color: var(--sv-reject);
+}
+
+.section-feedback:has(.status-badge-pending) .feedback-remarks {
+    border-left-color: var(--sv-pending);
+}
 
 /* Verified by / on */
 .verification-meta {
@@ -296,8 +320,14 @@
     font-size: .825rem;
 }
 
-.verification-meta i { margin-right: .3rem; }
-.verification-meta strong { color: var(--sv-text); font-weight: 600; }
+.verification-meta i {
+    margin-right: .3rem;
+}
+
+.verification-meta strong {
+    color: var(--sv-text);
+    font-weight: 600;
+}
 
 
 /* ============================================================
@@ -318,7 +348,9 @@
 }
 
 /* The new-feedback save button is full width (w-100 in markup) */
-.verification-form-actions .btn.w-100 { justify-content: center; }
+.verification-form-actions .btn.w-100 {
+    justify-content: center;
+}
 
 
 /* ============================================================
@@ -330,8 +362,15 @@
 }
 
 @keyframes verificationEditIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 
@@ -341,18 +380,26 @@
 
 @media (max-width: 767.98px) {
 
-    .section-feedback-body { padding: 1rem; }
+    .section-feedback-body {
+        padding: 1rem;
+    }
 
-    .verification-status-selector { flex-direction: column; }
+    .verification-status-selector {
+        flex-direction: column;
+    }
 
-    .verification-status-btn { width: 100%; }
+    .verification-status-btn {
+        width: 100%;
+    }
 
     .verification-form-actions {
         flex-direction: column-reverse;
         align-items: stretch;
     }
 
-    .verification-form-actions .btn { width: 100%; }
+    .verification-form-actions .btn {
+        width: 100%;
+    }
 
     .verification-meta {
         flex-direction: column;
@@ -367,7 +414,207 @@
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    .verification-edit-form { animation: none; }
+    .verification-edit-form {
+        animation: none;
+    }
+
     .verification-status-btn,
-    .section-feedback textarea.form-control { transition: none; }
+    .section-feedback textarea.form-control {
+        transition: none;
+    }
+}
+
+
+/* ============================================================
+   SAVED / ALREADY SUBMITTED FEEDBACK
+   Designed for the page background: #1e293b
+   New feedback forms keep their existing styles.
+   ============================================================ */
+
+.section-feedback:has(.verification-status-badge) {
+    --sv-border: #475569;
+    --sv-surface: #243247;
+    --sv-surface-alt: #29384d;
+    --sv-text: #f1f5f9;
+    --sv-text-muted: #cbd5e1;
+    --sv-accept: #86efac;
+    --sv-accept-bg: rgba(22, 163, 74, .13);
+    --sv-accept-border: rgba(74, 222, 128, .35);
+    --sv-reject: #fca5a5;
+    --sv-reject-bg: rgba(220, 38, 38, .13);
+    --sv-reject-border: rgba(248, 113, 113, .35);
+    --sv-pending: #fde68a;
+    --sv-pending-bg: rgba(217, 119, 6, .13);
+    --sv-pending-border: rgba(251, 191, 36, .35);
+    border: 1px solid #475569;
+    border-radius: 14px;
+    background: #243247;
+    color: #f1f5f9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .20), 0 1px 3px rgba(0, 0, 0, .15);
+    transition: border-color .25s var(--sv-ease), box-shadow .25s var(--sv-ease);
+}
+
+.section-feedback:has(.verification-status-badge):hover {
+    border-color: #64748b;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .25), 0 2px 5px rgba(0, 0, 0, .12);
+}
+
+.section-feedback:has(.verification-status-badge) .section-feedback-body {
+    padding: 1.35rem;
+}
+
+/* Status and remarks panels */
+.section-feedback:has(.verification-status-badge) .feedback-item {
+    height: auto;
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    background: #1e293b;
+}
+
+.section-feedback:has(.verification-status-badge) .feedback-item:hover {
+    border-color: #64748b;
+}
+
+.section-feedback:has(.verification-status-badge) .feedback-label,
+.section-feedback:has(.verification-status-badge) .feedback-item .form-label {
+    color: #cbd5e1;
+    font-size: .825rem;
+    font-weight: 600;
+    letter-spacing: .025em;
+    margin-bottom: .7rem;
+}
+
+.section-feedback:has(.verification-status-badge) .feedback-value {
+    color: #f1f5f9;
+    font-size: .925rem;
+    line-height: 1.6;
+}
+
+/* Remarks */
+.section-feedback:has(.verification-status-badge) .feedback-remarks {
+    /* min-height: unset; */
+    padding: .65rem .85rem;
+    height: 100px;
+    width: 90%;
+    border: 1px solid #475569;
+    border-left: 3px solid #64748b;
+    border-radius: 8px;
+    background: #29384d;
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    /* overflow-wrap: anywhere; */
+}
+
+.section-feedback:has(.status-badge-accepted) .feedback-remarks {
+    border-left-color: #4ade80;
+}
+
+.section-feedback:has(.status-badge-rejected) .feedback-remarks {
+    border-left-color: #f87171;
+}
+
+.section-feedback:has(.status-badge-pending) .feedback-remarks {
+    border-left-color: #fbbf24;
+}
+
+/* Submitted status badge */
+.section-feedback:has(.verification-status-badge) .verification-status-badge {
+    padding: .55rem .9rem;
+    border-radius: 8px;
+    font-size: .825rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+/* Verification history */
+.section-feedback:has(.verification-status-badge) .verification-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .65rem 1.5rem;
+    padding: .85rem 1rem;
+    border: 1px solid #475569;
+    border-radius: 9px;
+    background: #1e293b;
+    color: #cbd5e1;
+    font-size: .8rem;
+}
+
+.section-feedback:has(.verification-status-badge) .verification-meta i {
+    color: #60a5fa;
+    margin-right: .3rem;
+}
+
+.section-feedback:has(.verification-status-badge) .verification-meta strong {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+/* Edit action */
+.section-feedback:has(.verification-status-badge) .btn-edit-section-verification {
+    padding: .55rem 1rem;
+    border: 1px solid #d97706;
+    border-radius: 8px;
+    color: #fbbf24;
+    background: rgba(217, 119, 6, .08);
+    font-size: .825rem;
+    font-weight: 600;
+    transition: color .2s ease, background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.section-feedback:has(.verification-status-badge) .btn-edit-section-verification:hover {
+    color: #fff;
+    background: #b45309;
+    border-color: #d97706;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, .22);
+    transform: translateY(-1px);
+}
+
+.section-feedback:has(.verification-status-badge) .btn-edit-section-verification:focus-visible {
+    outline: 3px solid rgba(251, 191, 36, .45);
+    outline-offset: 2px;
+}
+
+/* Mobile spacing for saved feedback */
+@media (max-width: 767.98px) {
+    .section-feedback:has(.verification-status-badge) .section-feedback-body {
+        padding: 1rem;
+    }
+
+    .section-feedback:has(.verification-status-badge) .feedback-item {
+        padding: .85rem;
+    }
+
+    .section-feedback:has(.verification-status-badge) .verification-meta {
+        align-items: flex-start;
+        gap: .5rem;
+    }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .section-feedback:has(.verification-status-badge),
+    .section-feedback:has(.verification-status-badge) .feedback-item,
+    .section-feedback:has(.verification-status-badge) .btn-edit-section-verification {
+        transition: none;
+    }
+}
+
+.section-feedback .feedback-remarks {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 10px 14px;
+    line-height: 1.5;
+}
+
+.section-feedback .feedback-remarks .text-muted {
+    display: block;
+    margin: 0;
+    padding: 0;
 }

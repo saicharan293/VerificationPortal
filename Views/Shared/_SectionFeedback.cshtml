@@ -36,10 +36,10 @@
                     <input type="hidden" name="CourseLevel" value="@Model.CourseLevel" />
                     <input type="hidden" name="SectionId" value="@Model.SectionId" />
 
-                    <div class="row g-4">
+                    <div class="d-flex flex-column gap-3">
 
                         @* Verification Status *@
-                        <div class="col-lg-5">
+                        <div class="">
 
                             <label class="form-label">
                                 Verification Status
@@ -100,7 +100,7 @@
 
 
                         @* Remarks *@
-                        <div class="col-lg-7">
+                        <div class="">
 
                             <label class="form-label">
                                 Remarks <span class="remarks-marker"></span>
@@ -156,10 +156,10 @@
 
             <div id="verificationDisplay_@Model.SectionId">
 
-                <div class="row g-4">
+                <div class="d-flex flex-column gap-3">
 
                     @* Status *@
-                    <div class="col-lg-5">
+                    <div class="">
 
                         <div class="feedback-item">
 
@@ -201,9 +201,9 @@
 
 
                     @* Remarks *@
-                    <div class="col-lg-7">
+                    <div class="">
 
-                        <div class="feedback-item">
+                        <div class="feedback-item" >
 
                             <label class="form-label">
                                 Remarks <span class="remarks-marker"></span>

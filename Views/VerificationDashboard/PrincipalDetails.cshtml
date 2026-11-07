@@ -8,8 +8,8 @@
     ViewData["InstitutionName"] = Model.Institution?.NameOfInstitution ?? "Unknown Institution";
     ViewData["CollegeCode"] = Model.Institution?.CollegeCode ?? "";
     ViewData["FacultyName"] = Model.Institution?.FacultyCode ?? "";
-    ViewData["VerificationStatus"] = Model.Institution?.IsDeoVerified == true ? "Verified" : Model.Institution?.IsDeoVerified == false ? "Rejected" : "Pending";
-    ViewData["StatusBadgeClass"] = Model.Institution?.IsDeoVerified == true ? "verified" : Model.Institution?.IsDeoVerified == false ? "rejected" : "pending";
+    // ViewData["VerificationStatus"] = Model.Institution?.IsDeoVerified == true ? "Verified" : Model.Institution?.IsDeoVerified == false ? "Rejected" : "Pending";
+    // ViewData["StatusBadgeClass"] = Model.Institution?.IsDeoVerified == true ? "verified" : Model.Institution?.IsDeoVerified == false ? "rejected" : "pending";
     ViewData["ShowFeedbackSection"] = true;
     ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
     ViewData["NextTabAction"] = Url.Action( "Courses", "VerificationDashboard", new { collegeCode = Model.Institution?.CollegeCode });

@@ -6,8 +6,8 @@
     ViewData["InstitutionName"] = Model?.NameOfInstitution ?? "Unknown Institution";
     ViewData["CollegeCode"] = Model?.CollegeCode ?? "";
     ViewData["FacultyName"] = Model?.FacultyCode ?? "";
-    ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
-    ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
+    // ViewData["VerificationStatus"] = Model?.IsDeoVerified == true ? "Verified" : Model?.IsDeoVerified == false ? "Rejected" : "Pending";
+    // ViewData["StatusBadgeClass"] = Model?.IsDeoVerified == true ? "verified" : Model?.IsDeoVerified == false ? "rejected" : "pending";
     ViewData["ShowFeedbackSection"] = true;
     ViewData["ShowFeedbackForm"] = false; // No feedback form for coming soon pages
 }
