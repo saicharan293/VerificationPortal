@@ -116,10 +116,10 @@ INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1,
 INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 43, 'Museum Availability');
 
 select * from mstsections
-where FacultyId = 1
+where FacultyId = 2
 
 select * from MstTabs
-where FacultyId = 1
+where FacultyId = 2
 
 select t.TabId, t.TabName, s.SectionName, s.SectionId from MstTabs as t
 join MstSections as s
@@ -211,3 +211,13 @@ VALUES
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Certificates and Future Development Documents');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Anatomy Act Registration');
 --INSERT INTO [dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (1, 27, 'Hospital Tie up');
+
+select * from MstDocument
+
+select * from DocumentWiseFeedback
+where DocumentId = 2
+
+delete from DocumentWiseFeedback
+
+select * from TblRguhsFacultyUser
+where Faculty = 1
