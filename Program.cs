@@ -26,6 +26,7 @@ builder.Services.AddScoped<IClinicalFacilitiesCompositeService, ClinicalFaciliti
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IVerificationPageService, VerificationPageService>();
 builder.Services.AddScoped<IInstitutionDetailsService, InstitutionDetailsService>();
+builder.Services.AddScoped<IPrincipalDetailsService, PrincipalDetailsService>();
 builder.Services.AddScoped<ITabWiseVerificationService, TabWiseVerificationService>();
 builder.Services.AddScoped<ISectionFeedbackService, SectionFeedbackService>();
 builder.Services.AddScoped<IVerificationPageContextService, VerificationPageContextService>();

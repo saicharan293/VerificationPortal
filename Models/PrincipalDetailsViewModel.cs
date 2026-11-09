@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using VerificationPortal.Services.Verification.Models;
 
 namespace VerificationPortal.Models
 {
@@ -28,9 +29,16 @@ namespace VerificationPortal.Models
         { get; set; } = new();
 
         // Experience college dropdown/list
-        public List<SelectListItem> ExperienceColleges { get; set; }
+        public List<SelectListItem> ExperienceColleges { get; set; } = new();
 
-        // Verification feedback
+        // Shared page context
+        public VerificationPageContextVm PageContext { get; set; } = new();
+
+        // Verification
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
+        public VerificationDisplayModel? Verification { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace VerificationPortal.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IVerificationService _verificationService;
         private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
+        private readonly IPrincipalDetailsService _principalDetailsService;
         private readonly IInstitutionDetailsService _institutionDetailsService;
         private readonly IDocumentViewerService _documentViewerService;
         private readonly ITabService _tabService;
@@ -39,7 +40,8 @@ namespace VerificationPortal.Controllers
             ITabWiseVerificationService tabWiseVerificationService,
             ITabService tabService,
             ISectionFeedbackService sectionFeedbackService,
-            IVerificationPageContextService verificationPageContextService)
+            IVerificationPageContextService verificationPageContextService,
+            IPrincipalDetailsService principalDetailsService)
         {
             _context = context;
             _verificationService = verificationService;
@@ -50,6 +52,7 @@ namespace VerificationPortal.Controllers
             _tabService = tabService;
             _sectionFeedbackService = sectionFeedbackService;
             _verificationPageContextService = verificationPageContextService;
+            _principalDetailsService = principalDetailsService;
         }
 
         protected string BaseMedicalPath
@@ -1463,49 +1466,22 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
 
-            // ---------------------------------------------------------
-            // PAGE CONTEXT
-            // ---------------------------------------------------------
-
             var context = await GetPageContextAsync(collegeCode);
 
-            PopulateCommonViewBags(context);
+            var facultyCode = context.FacultyCode;
+            var facultyCodeInt = context.FacultyCodeInt;
 
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
-            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Principal Details", context.FacultyCodeInt);
+            var isAdmin = IsAdminUser();
 
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
 
-            // ---------------------------------------------------------
-            // INSTITUTION
-            // ---------------------------------------------------------
+            var userDesignation = GetUserDesignation();
 
-            var institution = await _context.AffInstitutionsDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x =>
-                    x.CollegeCode == collegeCode);
+            // TAB DETAILS
 
-            if (institution == null)
-            {
-                return NotFound(
-                    $"Institution details not found for college code: {collegeCode}");
-            }
+            var tabName = _tabService.GetDatabaseTabName("PrincipalDetails");
 
-            var facultyCode = institution.FacultyCode;
-
-
-            // ---------------------------------------------------------
-            // COLLEGE NAME
-            // ---------------------------------------------------------
-
-            var college = await _context.AffiliationCollegeMasters
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x =>
-                    x.CollegeCode == collegeCode);
-
-            //ViewBag.CollegeName =
-            //    college?.CollegeName ?? "Unknown College";
-
+            var tabId = await _tabService.GetTabIdAsync( tabName, facultyCodeInt);
 
             // ---------------------------------------------------------
             // EXPERIENCE COLLEGE LIST
@@ -1514,162 +1490,44 @@ namespace VerificationPortal.Controllers
             var experienceColleges =
                 await GetAllExperienceCollegesAsync(facultyCode);
 
-            //ViewBag.ExperienceColleges =
-            //    experienceColleges;
+            var vm = await _principalDetailsService.GetPrincipalDetailsAsync(collegeCode, experienceColleges);
 
-
-            // ---------------------------------------------------------
-            // PRINCIPAL
-            // ---------------------------------------------------------
-
-            var principal = await _context.AffPrincipalDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x =>
-                    x.CollegeCode == collegeCode &&
-                    x.FacultyCode == facultyCode);
-
-            if (principal == null)
+            if (vm == null)
             {
                 return NotFound(
                     $"Principal details not found for college code: {collegeCode}");
             }
 
+            // PAGE CONTEXT VIEW MODEL
 
-            // ---------------------------------------------------------
-            // QUALIFICATION NAME
-            // ---------------------------------------------------------
-
-            string principalQualification = "-";
-
-            if (int.TryParse(
-                principal.DeanQualification,
-                out int qualificationId))
+            vm.PageContext = new VerificationPageContextVm
             {
-                principalQualification =
-                    await _context.MstCourses
-                        .AsNoTracking()
-                        .Where(c => c.Id == qualificationId)
-                        .Select(c => c.CourseName)
-                        .FirstOrDefaultAsync()
-                    ?? principal.DeanQualification
-                    ?? "-";
-            }
-            else
-            {
-                principalQualification =  principal.DeanQualification ?? "-";
-            }
+                FacultyId = facultyCodeInt,
+                CollegeCode = collegeCode,
+                CollegeName = vm.CollegeName,
+                InstitutionName = context.InstitutionName,
+                FacultyName = context.FacultyName,
+                CurrentVerifier = verifierName,
+                UserDesignation = userDesignation,
+                IsAdmin = isAdmin,
+                IsSection = IsSectionUser(),
+                ActiveTab = "PrincipalDetails",
+                TabId = tabId,
 
-            // RECOGNITION
-            string recognitionLabel = "Recognized by DCI";
-            string recognitionStatus = "-";
+                PrevTabAction = "DeanDirectorDetails",
+                PrevTabLabel = "Previous: Dean or Director Details",
 
-
-            // ---------------------------------------------------------
-            // PRINCIPAL BASIC INFORMATION
-            // ---------------------------------------------------------
-
-            //ViewBag.PrincipalName =
-            //    principal.DeanOrDirectorName ?? "-";
-
-            //ViewBag.PrincipalQualification =
-            //    principalQualification;
-
-            //ViewBag.PrincipalQualificationDate =
-            //    principal.DeanQualificationDate?
-            //        .ToString("dd-MM-yyyy") ?? "-";
-
-            //ViewBag.PrincipalUniversity =
-            //    principal.DeanUniversity ?? "-";
-
-            //ViewBag.PrincipalStateCouncilNumber =
-            //    principal.DeanStateCouncilNumber ?? "-";
-
-
-            // ---------------------------------------------------------
-            // RECOGNITION
-            // ---------------------------------------------------------
-
-            if (facultyCode == "2")
-            {
-                recognitionLabel = "Recognized by DCI";
-
-                recognitionStatus = principal.RecognizedByDci == true
-                    ? "Yes"
-                    : principal.RecognizedByDci == false ? "No" : "-";
-            }
-            else if(facultyCode == "1")
-            {
-                recognitionLabel = "Recognized by MCI";
-
-                recognitionStatus = principal.RecognizedByMci == true
-                    ? "Yes"
-                    : principal.RecognizedByMci == false ? "No" : "-";
-            }
-
-
-            // ---------------------------------------------------------
-            // TEACHING EXPERIENCE
-            // ---------------------------------------------------------
-
-            var teachingExperiences =
-                await _context.AffPrincipalTeachingExperiences
-                    .AsNoTracking()
-                    .Where(t => t.DeanId == principal.Id)
-                    .OrderBy(t => t.Id)
-                    .ToListAsync();
-
-
-            //ViewBag.TeachingExperiences =
-            //    teachingExperiences;
-
-
-            // ---------------------------------------------------------
-            // ADMINISTRATIVE EXPERIENCE
-            // ---------------------------------------------------------
-
-            var administrativeExperiences =
-                await _context.AffPrincipalAdministrativeExperiences
-                    .AsNoTracking()
-                    .Where(a =>  a.DeanId == principal.Id)
-                    .OrderBy(a => a.Id)
-                    .ToListAsync();
-
-
-            //ViewBag.AdministrativeExperiences =
-            //    administrativeExperiences;
-
-
-            // ---------------------------------------------------------
-            // VERIFICATION
-            // ---------------------------------------------------------
-
-            //await SetVerificationViewData<AffPrincipalDetail>(
-            //    collegeCode);
-
-
-            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
-
-
-            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Principal Details", context.FacultyCodeInt);
-
-            var model = new PrincipalDetailsViewModel
-            {
-                Institution = institution,
-                CollegeName = college?.CollegeName ?? "Unknown College",
-                PrincipalName = principal.DeanOrDirectorName ?? "-",
-                PrincipalQualification = principalQualification,
-                PrincipalQualificationDate = principal.DeanQualificationDate?.ToString("dd-MM-yyyy") ?? "-",
-                PrincipalUniversity = principal.DeanUniversity ?? "-",
-                PrincipalStateCouncilNumber = principal.DeanStateCouncilNumber ?? "-",
-                RecognitionLabel = recognitionLabel,
-                RecognitionStatus = recognitionStatus,
-                TeachingExperiences = teachingExperiences,
-                AdministrativeExperiences = administrativeExperiences,
-                ExperienceColleges = experienceColleges,
-                SectionFeedback = sectionFeedback
+                NextTabAction = "ChairDistribution",
+                NextTabLabel = "Next: Chair Distribution"
             };
 
-            return View(model);
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync( collegeCode, tabName, verifierName, facultyCodeInt, HttpContext.Session.GetString("CourseLevel"), isAdmin);
+
+            var returnUrl = Request.Path + Request.QueryString;
+
+            vm.SectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync( collegeCode, tabName, facultyCodeInt, HttpContext.Session.GetString("CourseLevel"), verifierName, isAdmin, returnUrl);
+
+            return View(vm);
         }
 
         // Placeholder actions for remaining tabs (to be implemented later)
