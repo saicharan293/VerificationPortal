@@ -22,6 +22,7 @@ namespace VerificationPortal.Controllers
         private readonly IVerificationService _verificationService;
         private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
         private readonly IInstitutionDetailsService _institutionDetailsService;
+        private readonly IDocumentViewerService _documentViewerService;
         private readonly ITabService _tabService;
         private readonly IVerificationPageContextService _verificationPageContextService;
         private readonly ITabWiseVerificationService _tabWiseVerificationService;
@@ -34,6 +35,7 @@ namespace VerificationPortal.Controllers
             IVerificationService verificationService,
             IInstitutionDetailsService institutionDetailsService,
             IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService,
+            IDocumentViewerService documentViewerService,
             ITabWiseVerificationService tabWiseVerificationService,
             ITabService tabService,
             ISectionFeedbackService sectionFeedbackService,
@@ -43,6 +45,7 @@ namespace VerificationPortal.Controllers
             _verificationService = verificationService;
             _institutionDetailsService = institutionDetailsService;
             _clinicalFacilitiesCompositeService = clinicalFacilitiesCompositeService;
+            _documentViewerService = documentViewerService;
             _tabWiseVerificationService = tabWiseVerificationService;
             _tabService = tabService;
             _sectionFeedbackService = sectionFeedbackService;
@@ -67,69 +70,6 @@ namespace VerificationPortal.Controllers
                     ? @"E:\Affiliation_Dental"
                     : @"D:\Affiliation_Dental";
             }
-        }
-
-        private string GetDatabaseTabName(string activeTab)
-        {
-            return activeTab switch
-            {
-                "InstitutionDetails" => "Institution Details",
-                "TrustDetails" => "Trust Details",
-                "TrustMemberDetails" => "Trust Member Details",
-                "DeanDirectorDetails" => "Dean or Director Details",
-                "PrincipalDetails" => "Principal Details",
-                "UGCourseDetails" => "UG Course Details",
-                "UgCourseDetails" => "UG Course Details",
-                "CollegeDesignation" => "Faculty Repository",
-                "ClinicalFacilities" => "Clinical Facilities",
-                "LandAndBuildingDetails" => "Land And Building Details",
-                "ClassroomAndLaboratory" => "Classroom And Laboratory",
-                "ChairDistribution" => "Chair Distribution",
-                "BedDistribution" => "Bed Distribution",
-                "HostelDetails" => "Hostel Details",
-                "AssociatedInstitution" => "Associated Institution",
-                "DepartmentOfficesAndEducationalUnit" => "Department Offices And Educational Unit",
-                "EquipmentList" => "Equipment List",
-                "CA_VehicleDetails" => "Vehicle Details",
-                "WorkShopDetails" => "Workshop Details",
-                "AnimalHouseDetails" => "Animal House Details",
-                "UgAcademicMatters" => "UG Academic Matters",
-                "StaffPayScale" => "Staff Pay Scale",
-                "StaffOtherDetails" => "Staff Other Details",
-                "FinanceDetails" => "Finance Details",
-                "LibraryServices" => "Library Services",
-                "ResearchPublications" => "Research and Publications",
-                "LibraryDetails" => "Library Details",
-                "LibraryExpenditure" => "Library Expenditure and Services",
-                "LibraryStaffDetails" => "Library Staff Details",
-                "UserDetails" => "Library User Details",
-                "DentalFeePaymentVerification" => "Payment Details",
-                "PaymentDetails" => "Payment Details",
-                "FacultyDetails" => "Faculty Details",
-                "NonTeachingStaffDetails" => "Non Teaching Staff Details",
-                "TeachingExperience" => "Teaching Experience",
-                "ActionTakenDeficiencyReport" => "Action Taken Report",
-                "GeoTaggedPhotos" => "Geo Tagged Photos",
-
-
-
-
-                // Add other mappings here later
-                // "OtherTab" => "Other Tab",
-
-                _ => activeTab
-            };
-        }
-
-        private async Task<int> GetTabIdByAsync(string tabName)
-        {
-            var facultyCode = HttpContext.Session.GetString("FacultyCode");
-
-            if (string.IsNullOrWhiteSpace(facultyCode))
-                return 0;
-
-            var tabId = await _context.MstTabs.Where(e => e.TabName == tabName && e.FacultyId.ToString() == facultyCode).Select(e=>(int?)e.TabId).FirstOrDefaultAsync();
-            return tabId ?? 0;
         }
 
         // GET: /VerificationDashboard/InstitutionDetails/{collegeCode}
@@ -186,6 +126,16 @@ namespace VerificationPortal.Controllers
             return View(vm);
         }
 
+        private IActionResult ViewStoredDocument(string? storedPath)
+        {
+            var filePath = _documentViewerService.ResolveDocumentPath(storedPath);
+
+            if (string.IsNullOrWhiteSpace(filePath) || !_documentViewerService.DocumentExists(filePath))
+                return NotFound("Document not found.");
+
+            return PhysicalFile(filePath, _documentViewerService.GetDocumentContentType(filePath));
+        }
+
         [HttpGet]
         public IActionResult ViewGoverningBodyCouncilDocument(int id)
         {
@@ -195,17 +145,7 @@ namespace VerificationPortal.Controllers
             if (institution == null)
                 return NotFound();
 
-            var storedPath = institution.MembersOfGoverningBodyOrCouncilFilePath;
-
-            if (string.IsNullOrWhiteSpace(storedPath))
-                return NotFound();
-
-            var filePath = ResolveDocumentPath(storedPath);
-
-            if (!System.IO.File.Exists(filePath))
-                return NotFound();
-
-            return PhysicalFile( filePath, GetDocumentContentType(filePath));
+            return ViewStoredDocument(institution.MembersOfGoverningBodyOrCouncilFilePath);
         }
 
         [HttpGet]
@@ -217,17 +157,7 @@ namespace VerificationPortal.Controllers
             if (institution == null)
                 return NotFound();
 
-            var storedPath = institution.DocumentDataPath;
-
-            if (string.IsNullOrWhiteSpace(storedPath))
-                return NotFound();
-
-            var filePath = ResolveDocumentPath(storedPath);
-
-            if (!System.IO.File.Exists(filePath))
-                return NotFound();
-
-            return PhysicalFile( filePath, GetDocumentContentType(filePath));
+            return ViewStoredDocument(institution.DocumentDataPath);
         }
 
         [HttpGet]
@@ -238,17 +168,7 @@ namespace VerificationPortal.Controllers
             if (institution == null)
                 return NotFound();
 
-            var storedPath = institution.GovAutonomousCertPath;
-
-            if (string.IsNullOrWhiteSpace(storedPath))
-                return NotFound();
-
-            var filePath = ResolveDocumentPath(storedPath);
-
-            if (!System.IO.File.Exists(filePath))
-                return NotFound();
-
-            return PhysicalFile( filePath, GetDocumentContentType(filePath));
+            return ViewStoredDocument(institution.GovAutonomousCertPath);
         }
 
         private async Task<List<SectionFeedbackViewModel>> GetTabSectionFeedbackAsync(string collegeCode, int tabId)
@@ -379,17 +299,22 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
 
-            var context =
-                await GetPageContextAsync(collegeCode);
+            var context =  await GetPageContextAsync(collegeCode);
 
-            PopulateCommonViewBags(context);
+            var facultyCode = context.FacultyCodeInt;
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+            var isAdmin = IsAdminUser();
+            var designation = GetUserDesignation();
 
-            ViewBag.ActiveTab =  ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
-            ViewData["TabId"]  = await GetTabIdByAsync("Trust Details");
+            // TAB DETAILS
+            var tabName = _tabService.GetDatabaseTabName("TrustDetails");
 
-            var institution =
-                await _context.InstitutionBasicDetails
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyCode);
+
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Trust Details", context.FacultyCodeInt);
+
+            var institution = await _context.InstitutionBasicDetails
                     .AsNoTracking()
                     .FirstOrDefaultAsync(i =>
                         i.CollegeCode == collegeCode);
@@ -400,24 +325,12 @@ namespace VerificationPortal.Controllers
                     $"Institution details not found for college code: {collegeCode}");
             }
 
-            var college =
-                await _context.AffiliationCollegeMasters
+            var college = await _context.AffiliationCollegeMasters
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c =>
                         c.CollegeCode == collegeCode);
 
-            ViewBag.CollegeName =
-                college?.CollegeName ?? "Unknown College";
-
-
-            // --------------------------------------------------------
-            // GET MASTER DOCUMENTS
-            // --------------------------------------------------------
-
-            // These documents can be matched with the actual
-            // document fields displayed on the Trust Details page.
-
-            ViewBag.Documents = await GetDocumentMappingsAsync(Convert.ToInt32(context.FacultyCode), 2, 10);
+            var documents = await GetDocumentMappingsAsync( facultyCode, 2, 10);
 
             // ---------------------------------------------------------
             // VERIFICATION
@@ -440,19 +353,43 @@ namespace VerificationPortal.Controllers
                 verification = null;
             }
 
-            //SetVerificationViewData(
-            //    verification,
-            //    hasSectionData,
-            //    "Institution details have not been submitted for this college.");
+            var tabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName, context.FacultyCodeInt, courseLevel, isAdmin);
 
-            var databaseTabName = GetDatabaseTabName("TrustDetails");
+            var returnUrl = $"{Request.Path}{Request.QueryString}";
 
-            await SetTabWiseVerificationViewData(collegeCode, databaseTabName, context.FacultyCodeInt);
+            var databaseTabName =  _tabService.GetDatabaseTabName("TrustDetails");
 
-            //ViewBag.SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 2);
-            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Trust Details", context.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Trust Details", context.FacultyCodeInt);
 
-            return View(institution);
+            var vm = new TrustDetailsVerificationVm
+            {
+                Institution = institution,
+                Documents = documents,
+                Verification = verification,
+                TabwiseVerification = tabwiseVerification,
+                SectionFeedback = sectionFeedback,
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyCode,
+                    CollegeCode = collegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = institution.NameOfInstitution,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = $"{verifierName} - {designation}",
+                    UserDesignation = designation,
+                    IsAdmin = isAdmin,
+                    IsSection = IsSectionUser(),
+                    ActiveTab = "TrustDetails",
+                    TabId = tabId,
+
+                    PrevTabAction = "InstitutionDetails",
+                    PrevTabLabel = "Previous: Institution Details",
+
+                    NextTabAction = "TrustMemberDetails",
+                    NextTabLabel = "Next: Trust Member Details"
+                }
+            };
+            return View(vm);
         }
 
         public IActionResult ViewTrustDetailsPageDocument(int id, string documentType)
@@ -614,7 +551,7 @@ namespace VerificationPortal.Controllers
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
             ViewBag.InstitutionName = institution?.NameOfInstitution ?? "Unknown Institution";
-            ViewData["TabId"]  = await GetTabIdByAsync("Trust Member Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Trust Member Details", Convert.ToInt32(college.FacultyCode));
             var trustMemberDocument =
                 await _context.ContinuationTrustMemberDocuments
                     .AsNoTracking()
@@ -755,40 +692,40 @@ namespace VerificationPortal.Controllers
             };
         }
 
-        protected async Task<List<string>> GetSortedCourseLevels(string collegeCode)
-        {
+        //protected async Task<List<string>> GetSortedCourseLevels(string collegeCode)
+        //{
 
-            var order = new List<string> { "UG", "PG", "SS" };
+        //    var order = new List<string> { "UG", "PG", "SS" };
 
-            var levels = await (
-                from ai in _context.AcademicIntakes
-                join mc in _context.MstCourses
-                    on ai.Courses equals mc.CourseCode.ToString()
-                where ai.CollegeCode == collegeCode && ai.Ay2026TotalIntake > 0
-                      && !string.IsNullOrEmpty(ai.Courses)
-                select mc.CourseLevel
-            )
-            .Distinct()
-            .ToListAsync();
+        //    var levels = await (
+        //        from ai in _context.AcademicIntakes
+        //        join mc in _context.MstCourses
+        //            on ai.Courses equals mc.CourseCode.ToString()
+        //        where ai.CollegeCode == collegeCode && ai.Ay2026TotalIntake > 0
+        //              && !string.IsNullOrEmpty(ai.Courses)
+        //        select mc.CourseLevel
+        //    )
+        //    .Distinct()
+        //    .ToListAsync();
 
-            levels = levels
-                .Where(l => !string.IsNullOrWhiteSpace(l))
-                .Select(l => l.Trim().ToUpper())
-                .Distinct()
-                .OrderBy(l => order.Contains(l)
-                    ? order.IndexOf(l)
-                    : int.MaxValue)
-                .ThenBy(l => l)
-                .ToList();
+        //    levels = levels
+        //        .Where(l => !string.IsNullOrWhiteSpace(l))
+        //        .Select(l => l.Trim().ToUpper())
+        //        .Distinct()
+        //        .OrderBy(l => order.Contains(l)
+        //            ? order.IndexOf(l)
+        //            : int.MaxValue)
+        //        .ThenBy(l => l)
+        //        .ToList();
 
-            // fallback
-            if (!levels.Any())
-            {
-                levels.Add("UG");
-            }
+        //    // fallback
+        //    if (!levels.Any())
+        //    {
+        //        levels.Add("UG");
+        //    }
 
-            return levels;
-        }
+        //    return levels;
+        //}
 
 
         private async Task<List<SelectListItem>> GetAffiliationCollegesAsync( string facultyCode)
@@ -848,6 +785,62 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required.");
 
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.FacultyCode;
+            var facultyCodeInt = context.FacultyCodeInt;
+
+            var isAdmin = IsAdminUser();
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var userDesignation = GetUserDesignation();
+            var tabName = _tabService.GetDatabaseTabName("DeanDirectorDetails");
+
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyCodeInt);
+
+
+            // ---------------------------------------------------------
+            // COLLEGE
+            // ---------------------------------------------------------
+
+            var college = await _context.AffiliationCollegeMasters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c =>
+                    c.CollegeCode == collegeCode);
+
+
+            // QUALIFICATIONS
+
+            var qualifications = await _context.MstCourses
+                .AsNoTracking()
+                .Where(c =>
+                    !string.IsNullOrEmpty(c.CourseName) &&
+                    c.FacultyCode.ToString() == facultyCode)
+                .OrderBy(c => c.CourseName)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CourseName
+                })
+                .ToListAsync();
+
+            // ---------------------------------------------------------
+            // EXPERIENCE COLLEGES
+            // Includes:
+            // 1. AffiliationCollegeMasters
+            // 2. AffiliationOthersCollegeMasters
+            // ---------------------------------------------------------
+
+            var experienceColleges = await GetAllExperienceCollegesAsync(facultyCode);
+
+            var experienceCollegeList = experienceColleges
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Value,
+                    Text = c.Text
+                })
+                .ToList();
+
             // ---------------------------------------------------------
             // INSTITUTION
             // ---------------------------------------------------------
@@ -862,73 +855,6 @@ namespace VerificationPortal.Controllers
                 return NotFound(
                     $"Institution details not found for college code: {collegeCode}");
             }
-
-            var facultyCode = institution.FacultyCode;
-
-            ViewData["TabId"]  = await GetTabIdByAsync("Dean or Director Details");
-
-            // ---------------------------------------------------------
-            // COLLEGE
-            // ---------------------------------------------------------
-
-            var college = await _context.AffiliationCollegeMasters
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c =>
-                    c.CollegeCode == collegeCode);
-
-            ViewBag.CollegeCode = collegeCode;
-
-            ViewBag.CollegeName =
-                college?.CollegeName ?? "Unknown College";
-
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-
-            ViewBag.UserDesignation = GetUserDesignation();
-
-            // ---------------------------------------------------------
-            // QUALIFICATIONS
-            // ---------------------------------------------------------
-
-            ViewBag.Qualifications = new SelectList(
-                await _context.MstCourses
-                    .AsNoTracking()
-                    .Where(c =>
-                        !string.IsNullOrEmpty(c.CourseName) &&
-                        c.FacultyCode.ToString() == facultyCode)
-                    .OrderBy(c => c.CourseName)
-                    .Select(c => new
-                    {
-                        c.Id,
-                        c.CourseName
-                    })
-                    .ToListAsync(),
-                "Id",
-                "CourseName"
-            );
-
-
-            // ---------------------------------------------------------
-            // EXPERIENCE COLLEGES
-            // Includes:
-            // 1. AffiliationCollegeMasters
-            // 2. AffiliationOthersCollegeMasters
-            // ---------------------------------------------------------
-
-            var experienceColleges =
-                await GetAllExperienceCollegesAsync(facultyCode);
-
-            ViewBag.ExperienceColleges =
-                experienceColleges;
-
-            // Optional - keep this if other parts of the page
-            // need a SelectList.
-            ViewBag.CollegeList =
-                new SelectList(
-                    experienceColleges,
-                    "Value",
-                    "Text"
-                );
-
 
             // ---------------------------------------------------------
             // DEAN / DIRECTOR
@@ -946,173 +872,132 @@ namespace VerificationPortal.Controllers
                     "Dean or Director Details not found.");
             }
 
-
-            // ---------------------------------------------------------
-            // VIEW MODEL
-            // ---------------------------------------------------------
-
-            var vm = new DeanDetailsViewModel
+            var deanVm = new DeanDetailsViewModel
             {
                 FacultyCode = facultyCode,
                 CollegeCode = collegeCode,
-
-                DeanOrDirectorName =
-                    dean.DeanOrDirectorName,
-
-                DeanQualification =
-                    dean.DeanQualification,
-
-                DeanQualificationDate =
-                    dean.DeanQualificationDate,
-
-                DeanUniversity =
-                    dean.DeanUniversity,
-
-                DeanStateCouncilNumber =
-                    dean.DeanStateCouncilNumber
+                DeanOrDirectorName = dean.DeanOrDirectorName,
+                DeanQualification = dean.DeanQualification,
+                DeanUniversity = dean.DeanUniversity,
+                DeanStateCouncilNumber = dean.DeanStateCouncilNumber
             };
 
+            var qualificationName = "-";
 
-            // ---------------------------------------------------------
-            // QUALIFICATION NAME
-            // ---------------------------------------------------------
-
-            ViewBag.DeanQualificationName = "-";
-
-            if (int.TryParse(
-                dean.DeanQualification,
-                out int qualificationId))
+            if (int.TryParse(dean.DeanQualification, out int qualificationId))
             {
-                ViewBag.DeanQualificationName =
+                qualificationName =
                     await _context.MstCourses
                         .AsNoTracking()
-                        .Where(c =>
-                            c.Id == qualificationId)
-                        .Select(c =>
-                            c.CourseName)
+                        .Where(c => c.Id == qualificationId)
+                        .Select(c => c.CourseName)
                         .FirstOrDefaultAsync()
                     ?? dean.DeanQualification
                     ?? "-";
             }
             else
             {
-                ViewBag.DeanQualificationName =
-                    dean.DeanQualification ?? "-";
+                qualificationName = dean.DeanQualification ?? "-";
             }
-
-
-            // ---------------------------------------------------------
-            // RECOGNITION
-            // ---------------------------------------------------------
 
             if (facultyCode == "2")
             {
-                vm.RecognizedByDCI =
-                    dean.RecognizedByDci ?? false;
+                deanVm.RecognizedByDCI = dean.RecognizedByDci ?? false;
             }
             else
             {
-                vm.RecognizedByMCI =
-                    dean.RecognizedByMci ?? false;
+                deanVm.RecognizedByMCI = dean.RecognizedByMci ?? false;
             }
 
+            deanVm.TeachingExperiences = await _context.AffDeanTeachingExperiences
+                .AsNoTracking()
+                .Where(t => t.DeanId == dean.Id)
+                .Select(e => new TeachingExperienceRow
+                {
+                    Designation = e.Designation,
+                    CollegeCode = e.Collegecode,
+                    ExpCollegeCode = e.ExpCollegeCode,
+                    OtherCollege = e.OtherCollege,
+                    FromDate = e.FromDate,
+                    ToDate = e.ToDate,
+                    TeachingExperienceYears = e.TotalExperienceYears
+                })
+                .ToListAsync();
 
-            // ---------------------------------------------------------
-            // TEACHING EXPERIENCE
-            // ---------------------------------------------------------
+            deanVm.AdministrativeExperiences = await _context.AffDeanAdministrativeExperiences
+                .AsNoTracking()
+                .Where(e => e.DeanId == dean.Id)
+                .Select(e => new AdministrativeExperienceRow
+                {
+                    PostHeld = e.PostHeld,
+                    FromDate = e.FromDate,
+                    ExpCollegeCode = e.ExpCollegeCode,
+                    OtherCollege = e.OtherCollege,
+                    ToDate = e.ToDate,
+                    TotalExperienceYears = e.TotalExperienceYears
+                })
+                .ToListAsync();
 
-            vm.TeachingExperiences =
-                await _context.AffDeanTeachingExperiences
-                    .AsNoTracking()
-                    .Where(t =>
-                        t.DeanId == dean.Id)
-                    .Select(t => new TeachingExperienceRow
-                    {
-                        Designation =
-                            t.Designation,
-
-                        CollegeCode =
-                            t.Collegecode,
-
-                        ExpCollegeCode =
-                            t.ExpCollegeCode,
-
-                        OtherCollege =
-                            t.OtherCollege,
-
-                        FromDate =
-                            t.FromDate,
-
-                        ToDate =
-                            t.ToDate,
-
-                        TeachingExperienceYears =
-                            t.TotalExperienceYears
-                    })
-                    .ToListAsync();
-
-
-            // ---------------------------------------------------------
-            // ADMINISTRATIVE EXPERIENCE
-            // ---------------------------------------------------------
-
-            vm.AdministrativeExperiences =
-                await _context.AffDeanAdministrativeExperiences
-                    .AsNoTracking()
-                    .Where(a =>
-                        a.DeanId == dean.Id)
-                    .Select(a => new AdministrativeExperienceRow
-                    {
-                        PostHeld =
-                            a.PostHeld,
-
-                        FromDate =
-                            a.FromDate,
-
-                        ExpCollegeCode =
-                            a.ExpCollegeCode,
-
-                        OtherCollege =
-                            a.OtherCollege,
-
-                        ToDate =
-                            a.ToDate,
-
-                        TotalExperienceYears =
-                            a.TotalExperienceYears
-                    })
-                    .ToListAsync();
-
-
-            // ---------------------------------------------------------
             // DEFAULT ROWS
-            // ---------------------------------------------------------
 
-            if (!vm.TeachingExperiences.Any())
+            if (!deanVm.TeachingExperiences.Any())
             {
-                vm.TeachingExperiences.Add(
-                    new TeachingExperienceRow());
+                deanVm.TeachingExperiences.Add(new TeachingExperienceRow());
             }
 
-            if (!vm.AdministrativeExperiences.Any())
+            if (!deanVm.AdministrativeExperiences.Any())
             {
-                vm.AdministrativeExperiences.Add(
-                    new AdministrativeExperienceRow());
+                deanVm.AdministrativeExperiences.Add(new AdministrativeExperienceRow());
             }
 
+            // PAGE VIEW MODEL
 
-            // ---------------------------------------------------------
-            // VERIFICATION
-            // ---------------------------------------------------------
+            var vm = new DeanDirectorDetailsPageVm
+            {
+                DeanDetails = deanVm,
+                Qualifications = qualifications,
+                ExperienceColleges = experienceCollegeList,
+                DeanQualificationName = qualificationName,
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyCodeInt,
+                    CollegeCode = collegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = context.InstitutionName,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = verifierName,
+                    UserDesignation = userDesignation,
+                    IsAdmin = isAdmin,
+                    IsSection = IsSectionUser(),
+                    ActiveTab = "DeanDirectorDetails",
+                    TabId = tabId
+                }
+            };
 
-            //await SetVerificationViewData<AffDeanOrDirectorDetail>(
-            //    collegeCode);
+            // TAB-WISE VERIFICATION
 
-            var context = await GetPageContextAsync(collegeCode);
+            vm.TabwiseVerification =
+                await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(
+                    collegeCode,
+                    tabName,
+                    verifierName,
+                    facultyCodeInt,
+                    HttpContext.Session.GetString("CourseLevel"),
+                    isAdmin);
 
-            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+            // SECTION FEEDBACK
 
-            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Dean or Director Details", context.FacultyCodeInt);
+            var returnUrl = Request.Path + Request.QueryString;
+
+            vm.SectionFeedback =
+                await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync(
+                    collegeCode,
+                    tabName,
+                    facultyCodeInt,
+                    HttpContext.Session.GetString("CourseLevel"),
+                    verifierName,
+                    isAdmin,
+                    returnUrl);
 
             return View(vm);
         }
@@ -1128,7 +1013,6 @@ namespace VerificationPortal.Controllers
             var institution = await _context.AffInstitutionsDetails
                 .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Chair Distribution");
 
             if (institution == null)
             {
@@ -1139,6 +1023,9 @@ namespace VerificationPortal.Controllers
                 .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
 
             int facultyCode = Convert.ToInt32(institution.FacultyCode);
+
+            ViewData["TabId"] = await _tabService.GetTabIdAsync("Chair Distribution", facultyCode);
+
 
             var academicIntakes = await _context.AcademicIntakes
                 .Where(x =>
@@ -1560,7 +1447,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
-            ViewData["TabId"]  = await GetTabIdByAsync("Principal Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Principal Details", context.FacultyCodeInt);
 
 
             // ---------------------------------------------------------
@@ -1836,7 +1723,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
-            ViewData["TabId"]  = await GetTabIdByAsync("PG Course Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("PG Course Details", context.FacultyCodeInt);
 
 
             // ---------------------------------------------------------
@@ -2341,7 +2228,7 @@ namespace VerificationPortal.Controllers
                     x => x.Key,
                     x => x.First().DocumentId);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("UG Course Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("UG Course Details", context.FacultyCodeInt);
 
             //await SetVerificationViewData<AffiliationCourseDetail>(collegeCode);
 
@@ -2660,7 +2547,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
-            ViewData["TabId"]  = await GetTabIdByAsync("Land And Building Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Land And Building Details", context.FacultyCodeInt);
 
 
             return context.FacultyCodeInt switch
@@ -3371,7 +3258,7 @@ namespace VerificationPortal.Controllers
             var institution = context.Institution;
             var faculty = context.Faculty;
             ViewData["CollegeCode"] = context.CollegeCode;
-            ViewData["TabId"]  = await GetTabIdByAsync("Classroom And Laboratory");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Classroom And Laboratory", context.FacultyCodeInt);
 
             var college = await _context.AffiliationCollegeMasters
                 .AsNoTracking()
@@ -3536,7 +3423,7 @@ namespace VerificationPortal.Controllers
                 return NotFound("Faculty code not found.");
 
             var context = await GetPageContextAsync(collegeCode);
-            ViewData["TabId"]  = await GetTabIdByAsync("Equipment List");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Equipment List", context.FacultyCodeInt);
 
             var vm = new EquipmentPageVM
             {
@@ -3836,7 +3723,7 @@ namespace VerificationPortal.Controllers
             var college = await _context.AffiliationCollegeMasters
                 .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Bed Distribution");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Bed Distribution", context.FacultyCodeInt);
 
             PopulateCommonViewBags(context);
 
@@ -3925,7 +3812,7 @@ namespace VerificationPortal.Controllers
 
             var context = await GetPageContextAsync(collegeCode);
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
-            ViewData["TabId"]  = await GetTabIdByAsync("Hostel Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Hostel Details", context.FacultyCodeInt);
 
             PopulateCommonViewBags(context);
 
@@ -3990,7 +3877,7 @@ namespace VerificationPortal.Controllers
             PopulateCommonViewBags(context);
 
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
-            ViewData["TabId"]  = await GetTabIdByAsync("Associated Institutions");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Associated Institutions", context.FacultyCodeInt);
 
             var associated = await (
                 from ai in _context.AssociatedInstitutions
@@ -4108,7 +3995,7 @@ namespace VerificationPortal.Controllers
 
             ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
             ViewBag.UserDesignation = GetUserDesignation();
-            ViewData["TabId"]  = await GetTabIdByAsync("Department Offices And Educational Unit");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Department Offices And Educational Unit", context.FacultyCodeInt);
             // Use FacultyCode from VerificationPageContext
             var facultyCode = context.FacultyCode;
 
@@ -4344,7 +4231,7 @@ namespace VerificationPortal.Controllers
                 SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Workshop Details", context.FacultyCodeInt)
             };
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Workshop Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Workshop Details", context.FacultyCodeInt);
 
             //await SetVerificationViewData<WorkShopDetail>(collegeCode);
 
@@ -4388,7 +4275,7 @@ namespace VerificationPortal.Controllers
                 SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Animal House Details", context.FacultyCodeInt)
             };
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Animal House Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Animal House Details", context.FacultyCodeInt);
 
             //await SetVerificationViewData<AnimalHouseDetail>(collegeCode);
             await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
@@ -4409,7 +4296,7 @@ namespace VerificationPortal.Controllers
                 .Where(x => x.FacultyCode == context.FacultyCodeInt)
                 .ToListAsync();
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Field Practice Area");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Field Practice Area", context.FacultyCodeInt);
 
             var ruralFieldTypeIds = fieldTypes
                 .Where(x => x.FieldType.Contains(
@@ -4570,7 +4457,7 @@ namespace VerificationPortal.Controllers
             var institution = pageContext.Institution;
             var facultyCode = institution.FacultyCode!.Trim();
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Vehicle Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Vehicle Details", pageContext.FacultyCodeInt);
 
             // Get vehicle details
             var vehicles = await _context.CaVehicleDetails
@@ -4647,7 +4534,7 @@ namespace VerificationPortal.Controllers
             if (!int.TryParse(institution.FacultyCode.Trim(), out int facultyId))
                 return NotFound("Invalid faculty code.");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("UG Academic Matters");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("UG Academic Matters", pageContext.FacultyCodeInt);
             var affiliationType =
                 HttpContext.Session.GetInt32("AffiliationType") ?? 2;
 
@@ -4876,7 +4763,7 @@ namespace VerificationPortal.Controllers
             var pageContext = await GetPageContextAsync(collegeCode);
 
             var institution = pageContext.Institution;
-            ViewData["TabId"]  = await GetTabIdByAsync("PG Academic Matters");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("PG Academic Matters", pageContext.FacultyCodeInt);
             var facultyCode = institution.FacultyCode?.Trim();
 
             if (string.IsNullOrWhiteSpace(facultyCode))
@@ -5099,7 +4986,7 @@ namespace VerificationPortal.Controllers
 
             var pageContext = await GetPageContextAsync(collegeCode);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Library Services");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Library Services", pageContext.FacultyCodeInt);
 
             var facultyCodeString =
                 pageContext.Institution.FacultyCode?.Trim();
@@ -5596,7 +5483,7 @@ namespace VerificationPortal.Controllers
 
             var pageContext = await GetPageContextAsync(collegeCode);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Research and Publications");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Research and Publications", pageContext.FacultyCodeInt);
 
             var facultyCodeString =
                 pageContext.Institution.FacultyCode?.Trim();
@@ -5949,7 +5836,7 @@ namespace VerificationPortal.Controllers
                 var facultyCode = Convert.ToInt32(institution.FacultyCode);
 
 
-                var databaseTabName = GetDatabaseTabName(tabName);
+                var databaseTabName = _tabService.GetDatabaseTabName(tabName);
 
 
                 var tab = await _context.MstTabs
@@ -5996,7 +5883,7 @@ namespace VerificationPortal.Controllers
                 var facultyCode = institution.FacultyCode!.Trim();
 
                 var courseLevel = HttpContext.Session.GetString("CourseLevel");
-                ViewData["TabId"]  = await GetTabIdByAsync("Finance Details");
+                ViewData["TabId"]  = await _tabService.GetTabIdAsync("Finance Details", pageContext.FacultyCodeInt);
 
                 if (string.IsNullOrWhiteSpace(courseLevel))
                 {
@@ -6223,7 +6110,7 @@ namespace VerificationPortal.Controllers
             // Course levels
             var selectedLevel = HttpContext.Session.GetString("CourseLevel");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Staff Pay Scale");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Staff Pay Scale", pageContext.FacultyCodeInt);
 
             if (string.IsNullOrWhiteSpace(selectedLevel))
                 return NotFound("Course level not found.");
@@ -6300,7 +6187,7 @@ namespace VerificationPortal.Controllers
             // Get selected course level from PageContext
             var selectedLevel = HttpContext.Session.GetString("CourseLevel");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Staff Other Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Staff Other Details", pageContext.FacultyCodeInt);
 
             if (string.IsNullOrWhiteSpace(selectedLevel))
                 return NotFound("Course level not found.");
@@ -6395,7 +6282,7 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode)) return RedirectToAction("Login", "Account");
 
             var pageContext = await GetPageContextAsync(collegeCode);
-            ViewData["TabId"]  = await GetTabIdByAsync("Library Expenditure and Services");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Library Expenditure and Services", pageContext.FacultyCodeInt);
 
             //----------------------------------------
             // LIBRARY EXPENDITURES
@@ -6476,7 +6363,7 @@ namespace VerificationPortal.Controllers
             // Common institution and faculty context
             var pageContext = await GetPageContextAsync(collegeCode);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Library Staff Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Library Staff Details", pageContext.FacultyCodeInt);
 
             var facultyId = pageContext.FacultyCodeInt;
             var courseLevel = HttpContext.Session.GetString("CourseLevel");
@@ -6567,7 +6454,7 @@ namespace VerificationPortal.Controllers
             // Common institution and faculty context
             var pageContext = await GetPageContextAsync(collegeCode);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Library User Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Library User Details", pageContext.FacultyCodeInt);
 
             var facultyId = pageContext.FacultyCodeInt;
 
@@ -6661,7 +6548,6 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return RedirectToAction("Login", "Account");
             
-            ViewData["TabId"]  = await GetTabIdByAsync("Payment Details");
 
             // =========================================================
             // 2. Get Page Context
@@ -6669,6 +6555,8 @@ namespace VerificationPortal.Controllers
 
             var pageContext =
                 await GetPageContextAsync(collegeCode);
+
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Payment Details", pageContext.FacultyCodeInt);
 
             var facultyId =
                 pageContext.FacultyCodeInt;
@@ -7167,7 +7055,6 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return RedirectToAction("Login", "Account");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Action Taken Report");
 
             // =========================================================
             // 2. Get Page Context
@@ -7175,6 +7062,8 @@ namespace VerificationPortal.Controllers
 
             var pageContext =
                 await GetPageContextAsync(collegeCode);
+
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Action Taken Report", pageContext.FacultyCodeInt);
 
             var facultyId =
                 pageContext.FacultyCodeInt;
@@ -7548,7 +7437,7 @@ namespace VerificationPortal.Controllers
         {
             ViewData["IsAdmin"] = IsAdminUser();
 
-            var databaseTabName = GetDatabaseTabName(tabName);
+            var databaseTabName = _tabService.GetDatabaseTabName(tabName);
 
 
             var tabQuery = _context.MstTabs.AsNoTracking().Where(t => t.TabName == databaseTabName);
@@ -7758,7 +7647,6 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return RedirectToAction("Login", "Account");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Library Details");
 
             // ---------------------------------------------------------
             // PAGE CONTEXT
@@ -7766,6 +7654,8 @@ namespace VerificationPortal.Controllers
 
             var pageContext =
                 await GetPageContextAsync(collegeCode);
+
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Library Details", pageContext.FacultyCodeInt);
 
             var facultyCodeString =
                 pageContext.Institution.FacultyCode?.Trim();
@@ -8027,7 +7917,6 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return RedirectToAction("Login", "Account");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Faculty Details");
 
             // ---------------------------------------------------------
             // PAGE CONTEXT
@@ -8035,6 +7924,8 @@ namespace VerificationPortal.Controllers
 
             var pageContext =
                 await GetPageContextAsync(collegeCode);
+
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Faculty Details", pageContext.FacultyCodeInt);
 
             var facultyCodeString =
                 pageContext.Institution.FacultyCode?.Trim();
@@ -8247,13 +8138,14 @@ namespace VerificationPortal.Controllers
             if (string.IsNullOrWhiteSpace(collegeCode))
                 return RedirectToAction("Login", "Account");
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Teaching Experience");
             // ---------------------------------------------------------
             // PAGE CONTEXT
             // ---------------------------------------------------------
 
             var pageContext =
                 await GetPageContextAsync(collegeCode);
+
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Teaching Experience", pageContext.FacultyCodeInt);
 
             var facultyCodeString =
                 pageContext.Institution.FacultyCode?.Trim();
@@ -8627,7 +8519,7 @@ namespace VerificationPortal.Controllers
                         collegeCode,
                         context);
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Clinical Facilities");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Clinical Facilities", context.FacultyCodeInt);
 
             // IMPORTANT:
             // This loads existing verification status / remarks
@@ -8924,7 +8816,7 @@ namespace VerificationPortal.Controllers
 
             var facultyId = pageContext.FacultyCodeInt;
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Non Teaching Staff Details");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Non Teaching Staff Details", pageContext.FacultyCodeInt);
 
             if (facultyId <= 0)
                 return NotFound("Faculty information not found.");
@@ -9058,7 +8950,7 @@ namespace VerificationPortal.Controllers
                 CourseLevel = courseLevel
             };
 
-            ViewData["TabId"]  = await GetTabIdByAsync("PaymentDetails");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("PaymentDetails", pageContext.FacultyCodeInt);
 
             // --------------------------------------------------
             // Resolve course level group from session
@@ -9295,7 +9187,7 @@ namespace VerificationPortal.Controllers
                 })
                 .ToListAsync();
 
-            ViewData["TabId"]  = await GetTabIdByAsync("Geo Tagged Photos");
+            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Geo Tagged Photos", pageContext.FacultyCodeInt);
             
             // Fetch all categories for reference
             var categories = await _context.GeoPhotoCategoryMasters

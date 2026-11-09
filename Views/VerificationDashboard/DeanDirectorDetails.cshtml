@@ -1,4 +1,4 @@
-@model VerificationPortal.Models.DeanDetailsViewModel
+@model VerificationPortal.Models.DeanDirectorDetailsPageVm
 @using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
@@ -9,56 +9,20 @@
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
-    ViewData["Title"] = "Dean or Director Details - Verification Dashboard";
-    ViewData["ActiveTab"] = "DeanDirectorDetails";
+    var dean = Model.DeanDetails;
+    var pageContext = Model.PageContext;
 
-    ViewData["InstitutionName"] =
-        ViewBag.CollegeName ?? "Unknown Institution";
-
-    ViewData["CollegeCode"] =
-        Model?.CollegeCode ?? "";
-
-    ViewData["FacultyName"] =
-        Model?.FacultyCode ?? "";
-
-    ViewData["VerificationStatus"] =
-        ViewBag.IsVerified == true
-            ? "Verified"
-            : ViewBag.IsVerified == false
-                ? "Rejected"
-                : "Pending";
-
-    ViewData["StatusBadgeClass"] =
-        ViewBag.IsVerified == true
-            ? "verified"
-            : ViewBag.IsVerified == false
-                ? "rejected"
-                : "pending";
-
+    ViewData["Title"] = "Dean or Director Details";
     ViewData["ShowFeedbackSection"] = true;
 
-    ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
-
-    ViewData["NextTabAction"] =
-        Url.Action(
-            "PrincipalDetails",
-            "VerificationDashboard",
-            new { collegeCode = Model.CollegeCode });
-
-    ViewData["NextTabLabel"] =
-        "Next: Principal Details";
-
-    ViewData["PrevTabAction"] =
-        Url.Action(
-            "TrustMemberDetails",
-            "VerificationDashboard",
-            new { collegeCode = Model.CollegeCode });
-
-    ViewData["PrevTabLabel"] =
-        "Previous: Trust Member Details";
-
-    ViewBag.ActiveTab = "DeanDirectorDetails";
+    // Temporary compatibility for the existing shared layout.
+    ViewData["ActiveTab"] = pageContext.ActiveTab;
+    ViewData["InstitutionName"] = pageContext.InstitutionName;
+    ViewData["CollegeCode"] = pageContext.CollegeCode;
+    ViewData["FacultyCode"] = pageContext.FacultyId.ToString();
+    ViewData["FacultyName"] = pageContext.FacultyName;
+    ViewData["CurrentVerifier"] = pageContext.CurrentVerifier;
+    ViewData["UserDesignation"] = pageContext.UserDesignation;
 }
 
 
@@ -103,8 +67,7 @@
 <!-- DEAN / DIRECTOR INFORMATION -->
 <!-- ========================================================= -->
 @{
-    var deanInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Dean / Director Information");
+    var deanInfoFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Dean or Director Information");
 }
 <div class="verification-card mb-4" id="section_@deanInfoFeedback?.SectionId">
 
@@ -131,7 +94,7 @@
 
                 <input type="text"
                        class="form-control"
-                       value="@Model.DeanOrDirectorName"
+                       value="@dean.DeanOrDirectorName"
                        disabled />
 
             </div>
@@ -146,7 +109,7 @@
 
                 <input type="text"
                        class="form-control"
-                       value="@ViewBag.DeanQualificationName"
+                       value="@Model.DeanQualificationName"
                        disabled />
 
             </div>
@@ -161,7 +124,7 @@
 
                 <input type="text"
                        class="form-control"
-                       value="@(Model.DeanQualificationDate?.ToString("dd-MM-yyyy") ?? "-")"
+                       value="@(dean.DeanQualificationDate?.ToString("dd-MM-yyyy") ?? "-")"
                        disabled />
 
             </div>
@@ -176,7 +139,7 @@
 
                 <input type="text"
                        class="form-control"
-                       value="@Model.DeanUniversity"
+                       value="@dean.DeanUniversity"
                        disabled />
 
             </div>
@@ -191,7 +154,7 @@
 
                 <input type="text"
                        class="form-control"
-                       value="@Model.DeanStateCouncilNumber"
+                       value="@dean.DeanStateCouncilNumber"
                        disabled />
 
             </div>
@@ -201,21 +164,21 @@
             <div class="col-md-6">
 
                 <label class="form-label">
-                    Recognition By @(Model.FacultyCode=="2" ? "DCI" : "MCI")
+                    Recognition By @(dean.FacultyCode=="2" ? "DCI" : "MCI")
                 </label>
 
-                @if (Model.FacultyCode == "2")
+                @if (dean.FacultyCode == "2")
                 {
                     <input type="text"
                            class="form-control"
-                           value="@(Model.RecognizedByDCI ? "Yes" : "No")"
+                           value="@(dean.RecognizedByDCI ? "Yes" : "No")"
                            disabled />
                 }
                 else
                 {
                     <input type="text"
                            class="form-control"
-                           value="@(Model.RecognizedByMCI ? "Yes" : "No")"
+                           value="@(dean.RecognizedByMCI ? "Yes" : "No")"
                            disabled />
                 }
 
@@ -238,7 +201,7 @@
 <!-- ========================================================= -->
 
 @{
-    var deanTeachFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+    var deanTeachFeedback = Model.SectionFeedback
                                 ?.FirstOrDefault(x => x.SectionName == "Teaching Experience");
 }
 
@@ -256,8 +219,8 @@
 
     <div class="verification-card-body">
 
-        @if (Model.TeachingExperiences != null &&
-             Model.TeachingExperiences.Any())
+        @if (dean.TeachingExperiences != null &&
+             dean.TeachingExperiences.Any())
         {
             <div class="table-responsive">
 
@@ -302,12 +265,9 @@
 
                     <tbody>
 
-                        @for (int i = 0;
-                              i < Model.TeachingExperiences.Count;
-                              i++)
+                        @for (int i = 0; i < dean.TeachingExperiences.Count; i++)
                         {
-                            var experience =
-                                Model.TeachingExperiences[i];
+                            var experience = dean.TeachingExperiences[i];
 
                             // Convert ExpCollegeCode -> College Name
                             var collegeName = "-";
@@ -320,10 +280,7 @@
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.Designation)
-                                        ? "-"
-                                        : experience.Designation)
+                                    @(string.IsNullOrWhiteSpace(experience.Designation) ? "-" : experience.Designation)
                                 </td>
 
                                 <td>
@@ -344,25 +301,19 @@
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.OtherCollege)
-                                        ? "-"
-                                        : experience.OtherCollege)
+                                    @(string.IsNullOrWhiteSpace(experience.OtherCollege) ? "-" : experience.OtherCollege)
                                 </td>
 
                                 <td>
-                                    @(experience.FromDate?
-                                        .ToString("dd-MM-yyyy") ?? "-")
+                                    @(experience.FromDate?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
 
                                 <td>
-                                    @(experience.ToDate?
-                                        .ToString("dd-MM-yyyy") ?? "-")
+                                    @(experience.ToDate?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
 
                                 <td>
-                                    @(experience.TeachingExperienceYears?
-                                        .ToString() ?? "-")
+                                    @(experience.TeachingExperienceYears?.ToString() ?? "-")
                                 </td>
 
                             </tr>
@@ -398,8 +349,7 @@
 <!-- ADMINISTRATIVE EXPERIENCE -->
 <!-- ========================================================= -->
 @{
-    var deanAdminFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
+    var deanAdminFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
 }
 
 <div class="verification-card mb-4" id="section_@deanAdminFeedback?.SectionId">
@@ -416,8 +366,7 @@
 
     <div class="verification-card-body">
 
-        @if (Model.AdministrativeExperiences != null &&
-             Model.AdministrativeExperiences.Any())
+        @if (dean.AdministrativeExperiences != null && dean.AdministrativeExperiences.Any())
         {
             <div class="table-responsive">
 
@@ -463,12 +412,9 @@
                     
                     <tbody>
 
-                        @for (int i = 0;
-                              i < Model.AdministrativeExperiences.Count;
-                              i++)
+                        @for (int i = 0; i < dean.AdministrativeExperiences.Count; i++)
                         {
-                            var experience =
-                                Model.AdministrativeExperiences[i];
+                            var experience = dean.AdministrativeExperiences[i];
 
                             // Convert ExpCollegeCode -> College Name
                             
@@ -480,10 +426,7 @@
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.PostHeld)
-                                        ? "-"
-                                        : experience.PostHeld)
+                                    @(string.IsNullOrWhiteSpace( experience.PostHeld) ? "-" : experience.PostHeld)
                                 </td>
 
                                 <td>
@@ -505,25 +448,19 @@
                                 </td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(
-                                        experience.OtherCollege)
-                                        ? "-"
-                                        : experience.OtherCollege)
+                                    @(string.IsNullOrWhiteSpace( experience.OtherCollege) ? "-" : experience.OtherCollege)
                                 </td>
 
                                 <td>
-                                    @(experience.FromDate?
-                                        .ToString("dd-MM-yyyy") ?? "-")
+                                    @(experience.FromDate?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
 
                                 <td>
-                                    @(experience.ToDate?
-                                        .ToString("dd-MM-yyyy") ?? "-")
+                                    @(experience.ToDate?.ToString("dd-MM-yyyy") ?? "-")
                                 </td>
 
                                 <td>
-                                    @(experience.TotalExperienceYears?
-                                        .ToString() ?? "-")
+                                    @(experience.TotalExperienceYears?.ToString() ?? "-")
                                 </td>
 
                             </tr>

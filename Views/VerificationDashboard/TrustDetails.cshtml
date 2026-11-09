@@ -1,51 +1,14 @@
-@model VerificationPortal.Models.InstitutionBasicDetail
+@model VerificationPortal.Models.TrustDetailsVerificationVm
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
+    var pageContext = Model.PageContext;
+    var institution = Model.Institution;
+    var documentMappings = Model.Documents;
+
     ViewData["Title"] = "Trust Details";
-    ViewData["ActiveTab"] = "TrustDetails";
-
-    ViewData["InstitutionName"] =
-        Model?.NameOfInstitution ?? "Unknown Institution";
-
-    ViewData["CollegeCode"] =
-        Model?.CollegeCode ?? "";
-
-    ViewData["FacultyName"] =
-        Model?.FacultyCode ?? "";
-
-    
-
-    // Enable feedback section
     ViewData["ShowFeedbackSection"] = true;
-
-    // DO NOT set ShowFeedbackForm here.
-    // SetVerificationViewData<InstitutionBasicDetail>()
-    // controls whether the editable form or display-only section is shown.
-
-    ViewData["CurrentVerifier"] =
-        User.Identity?.Name + " - " + ViewBag.UserDesignation;
-
-    ViewData["NextTabAction"] =
-        Url.Action(
-            "TrustMemberDetails",
-            "VerificationDashboard",
-            new { collegeCode = Model?.CollegeCode });
-
-    ViewData["NextTabLabel"] =
-        "Next: Trust Member Details";
-
-    ViewData["PrevTabAction"] =
-        Url.Action(
-            "InstitutionDetails",
-            "VerificationDashboard",
-            new { collegeCode = Model?.CollegeCode });
-
-    ViewData["PrevTabLabel"] =
-        "Previous: Institution Details";
-
-    var documentMappings =  ViewBag.Documents as Dictionary<string, int> ?? new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase);
 
     int? GetDocumentId(string documentName)
     {
@@ -55,7 +18,10 @@
             ? documentId
             : null;
     }
+
+    var trustInfoFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Trust Information");
 }
+
 @section Styles {
 }
 
@@ -80,10 +46,8 @@
         <p>Review the trust details below. Provide your remarks in the remarks field below, and select the verification status (Accept/Reject). Once completed, you can proceed to the next tab: <strong>Trust Member Details</strong>.</p>
     </div>
 </div>
-@{
-    var trustInfoFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Trust Information");
-}
+
+
 <!-- Trust Information Card -->
 <div class="verification-card mb-4">
     <div class="verification-card-header">
@@ -99,35 +63,35 @@
             <!-- Trust Details -->
             <div class="col-md-6">
                 <label class="form-label">Trust Name</label>
-                <input type="text" class="form-control" value="@Model.TrustName" disabled />
+                <input type="text" class="form-control" value="@institution.TrustName" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">PAN Number</label>
-                <input type="text" class="form-control" value="@Model.Pannumber" disabled />
+                <input type="text" class="form-control" value="@institution.Pannumber" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Registration Number</label>
-                <input type="text" class="form-control" value="@Model.RegistrationNumber" disabled />
+                <input type="text" class="form-control" value="@institution.RegistrationNumber" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Registration Date</label>
-                <input type="text" class="form-control" value="@(Model.RegistrationDate?.ToString("dd MMM yyyy") ?? "Not provided")" disabled />
+                <input type="text" class="form-control" value="@(institution.RegistrationDate?.ToString("dd MMM yyyy") ?? "Not provided")" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">President Name</label>
-                <input type="text" class="form-control" value="@Model.PresidentName" disabled />
+                <input type="text" class="form-control" value="@institution.PresidentName" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Category of Organisation</label>
-                <input type="text" class="form-control" value="@Model.CategoryOfOrganisation" disabled />
+                <input type="text" class="form-control" value="@institution.CategoryOfOrganisation" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">GOK Obtained Trust Name</label>
-                <input type="text" class="form-control" value="@Model.GokobtainedTrustName" disabled />
+                <input type="text" class="form-control" value="@institution.GokobtainedTrustName" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Amendments</label>
-                <input type="text" class="form-control" value="@(Model.Amendments == true ? "Yes" : Model.Amendments == false ? "No" : "Not specified")" disabled />
+                <input type="text" class="form-control" value="@(institution.Amendments == true ? "Yes" : institution.Amendments == false ? "No" : "Not specified")" disabled />
             </div>
             @* <div class="col-md-6">
                 <label class="form-label">Aadhaar Number</label>
@@ -149,52 +113,52 @@
             <!-- Contact Person Details -->
             <div class="col-md-4">
                 <label class="form-label">Contact Person Name</label>
-                <input type="text" class="form-control" value="@Model.ContactPersonName" disabled />
+                <input type="text" class="form-control" value="@institution.ContactPersonName" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Contact Person Designation</label>
-                <input type="text" class="form-control" value="@Model.ContactPersonRelation" disabled />
+                <input type="text" class="form-control" value="@institution.ContactPersonRelation" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Contact Person Mobile</label>
-                <input type="text" class="form-control" value="@Model.ContactPersonMobile" disabled />
+                <input type="text" class="form-control" value="@institution.ContactPersonMobile" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Address</label>
-                <input type="text" class="form-control" value="@Model.AddressOfInstitution" disabled />
+                <input type="text" class="form-control" value="@institution.AddressOfInstitution" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Pincode</label>
-                <input type="text" class="form-control" value="@Model.PinCode" disabled />
+                <input type="text" class="form-control" value="@institution.PinCode" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" value="@Model.MobileNumber" disabled />
+                <input type="text" class="form-control" value="@institution.MobileNumber" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">STD code</label>
-                <input type="text" class="form-control" value="@Model.StdCode" disabled />
+                <input type="text" class="form-control" value="@institution.StdCode" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Fax</label>
-                <input type="text" class="form-control" value="@Model.Fax" disabled />
+                <input type="text" class="form-control" value="@institution.Fax" disabled />
             </div>
             <div class="col-md-4">
                 <label class="form-label">Alternate Mobile/Landline Number</label>
-                <input type="text" class="form-control" value="@Model.AltLandlineOrMobile" disabled />
+                <input type="text" class="form-control" value="@institution.AltLandlineOrMobile" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Email Id</label>
-                <input type="text" class="form-control" value="@Model.EmailId" disabled />
+                <input type="text" class="form-control" value="@institution.EmailId" disabled />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Alternate Email Id</label>
-                <input type="text" class="form-control" value="@Model.AltEmailId" disabled />
+                <input type="text" class="form-control" value="@institution.AltEmailId" disabled />
             </div>
                 
             <div class="col-md-6">
                 <label class="form-label">Created On</label>
-                <input type="text" class="form-control" value="@Model.CreatedOn.ToString("dd MMM yyyy HH:mm")" disabled />
+                <input type="text" class="form-control" value="@institution.CreatedOn.ToString("dd MMM yyyy HH:mm")" disabled />
             </div>
 
             <!-- Required Documents -->
@@ -206,7 +170,7 @@
             <div class="col-md-6">
                 <label class="form-label">GOK Order Document</label>
 
-                @if (!string.IsNullOrWhiteSpace(Model.GokOrderExistingCoursesFilePath))
+                @if (!string.IsNullOrWhiteSpace(institution.GokOrderExistingCoursesFilePath))
                 {
                     @await Html.PartialAsync(
                         "_DocumentViewerButton",
@@ -217,16 +181,16 @@
                                 "VerificationDashboard",
                                 new
                                 {
-                                    id = Model.InstitutionId,
+                                    id = institution.InstitutionId,
                                     documentType = "AmendedDoc"
                                 })!,
                             Title = "Amended Document",
 
                             DocumentId = GetDocumentId("GOK Order Document"),
 
-                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+                            FacultyId = Convert.ToInt32(institution.FacultyCode),
 
-                            CollegeCode = Model.CollegeCode
+                            CollegeCode = institution.CollegeCode
                         })
                 }
                 else
@@ -239,7 +203,7 @@
             <div class="col-md-6">
                 <label class="form-label">Trust PAN</label>
 
-                @if (!string.IsNullOrWhiteSpace(Model.PanfilePath))
+                @if (!string.IsNullOrWhiteSpace(institution.PanfilePath))
                 {
                     @await Html.PartialAsync(
                         "_DocumentViewerButton",
@@ -250,15 +214,15 @@
                                 "VerificationDashboard",
                                 new
                                 {
-                                    id = Model.InstitutionId,
+                                    id = institution.InstitutionId,
                                     documentType = "Panfile"
                                 })!,
                             Title = "Trust PAN",
                             DocumentId = GetDocumentId("Trust PAN"),
 
-                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+                            FacultyId = Convert.ToInt32(institution.FacultyCode),
 
-                            CollegeCode = Model.CollegeCode
+                            CollegeCode = institution.CollegeCode
                         })
                 }
                 else
@@ -271,7 +235,7 @@
             <div class="col-md-6">
                 <label class="form-label">Bank Statement</label>
 
-                @if (!string.IsNullOrWhiteSpace(Model.BankStatementFilePath))
+                @if (!string.IsNullOrWhiteSpace(institution.BankStatementFilePath))
                 {
                     @await Html.PartialAsync(
                         "_DocumentViewerButton",
@@ -282,15 +246,15 @@
                                 "VerificationDashboard",
                                 new
                                 {
-                                    id = Model.InstitutionId,
+                                    id = institution.InstitutionId,
                                     documentType = "BankStatement"
                                 })!,
                             Title = "Bank Statement",
                             DocumentId = GetDocumentId("Bank Statement"),
 
-                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+                            FacultyId = Convert.ToInt32(institution.FacultyCode),
 
-                            CollegeCode = Model.CollegeCode
+                            CollegeCode = institution.CollegeCode
                         })
                 }
                 else
@@ -303,7 +267,7 @@
             <div class="col-md-6">
                 <label class="form-label">Registration Certificate</label>
 
-                @if (!string.IsNullOrWhiteSpace(Model.RegistrationCertificateFilePath))
+                @if (!string.IsNullOrWhiteSpace(institution.RegistrationCertificateFilePath))
                 {
                     @await Html.PartialAsync(
                         "_DocumentViewerButton",
@@ -314,16 +278,16 @@
                                 "VerificationDashboard",
                                 new
                                 {
-                                    id = Model.InstitutionId,
+                                    id = institution.InstitutionId,
                                     documentType = "RegistrationCertificate"
                                 })!,
                             Title = "Registration Certificate",
 
                             DocumentId = GetDocumentId("Registration Certificate"),
 
-                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+                            FacultyId = Convert.ToInt32(institution.FacultyCode),
 
-                            CollegeCode = Model.CollegeCode
+                            CollegeCode = institution.CollegeCode
                         })
                 }
                 else
@@ -336,7 +300,7 @@
             <div class="col-md-6">
                 <label class="form-label">Audit Statement</label>
 
-                @if (!string.IsNullOrWhiteSpace(Model.AuditStatementFilePath))
+                @if (!string.IsNullOrWhiteSpace(institution.AuditStatementFilePath))
                 {
                     @await Html.PartialAsync(
                         "_DocumentViewerButton",
@@ -347,7 +311,7 @@
                                 "VerificationDashboard",
                                 new
                                 {
-                                    id = Model.InstitutionId,
+                                    id = institution.InstitutionId,
                                     documentType = "AuditStatement"
                                 })!,
 
@@ -355,9 +319,9 @@
 
                             DocumentId = GetDocumentId("Audit Statement"),
 
-                            FacultyId = Convert.ToInt32(Model.FacultyCode),
+                            FacultyId = Convert.ToInt32(institution.FacultyCode),
 
-                            CollegeCode = Model.CollegeCode
+                            CollegeCode = institution.CollegeCode
                         })
                 }
                 else
@@ -368,7 +332,7 @@
 
             <div class="col-md-6">
                 <label class="form-label">Other Dental College in City</label>
-                <input type="text" class="form-control" value="@(Model.OtherDentalCollegeInCity == true ? "Yes" : Model.OtherDentalCollegeInCity == false ? "No" : "Not specified")" disabled />
+                <input type="text" class="form-control" value="@(institution.OtherDentalCollegeInCity == true ? "Yes" : institution.OtherDentalCollegeInCity == false ? "No" : "Not specified")" disabled />
             </div>
         </div>
 

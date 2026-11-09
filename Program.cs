@@ -29,6 +29,7 @@ builder.Services.AddScoped<IInstitutionDetailsService, InstitutionDetailsService
 builder.Services.AddScoped<ITabWiseVerificationService, TabWiseVerificationService>();
 builder.Services.AddScoped<ISectionFeedbackService, SectionFeedbackService>();
 builder.Services.AddScoped<IVerificationPageContextService, VerificationPageContextService>();
+builder.Services.AddScoped<IDocumentViewerService, DocumentViewerService>();
 builder.Services.AddScoped<ITabService, TabService>();
 builder.Services.AddScoped<InstitutionTypeFilter>();
 
