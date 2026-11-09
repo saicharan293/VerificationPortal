@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using VerificationPortal.Application.Interfaces;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
 using VerificationPortal.Models.ViewModels;
@@ -23,6 +24,7 @@ namespace VerificationPortal.Controllers
         private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
         private readonly IPrincipalDetailsService _principalDetailsService;
         private readonly IInstitutionDetailsService _institutionDetailsService;
+        private readonly ICollegeDesignationService _collegeDesignationService;
         private readonly IDocumentViewerService _documentViewerService;
         private readonly ITabService _tabService;
         private readonly IVerificationPageContextService _verificationPageContextService;
@@ -36,6 +38,7 @@ namespace VerificationPortal.Controllers
             IVerificationService verificationService,
             IInstitutionDetailsService institutionDetailsService,
             IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService,
+            ICollegeDesignationService collegeDesignationService,
             IDocumentViewerService documentViewerService,
             ITabWiseVerificationService tabWiseVerificationService,
             ITabService tabService,
@@ -48,6 +51,7 @@ namespace VerificationPortal.Controllers
             _institutionDetailsService = institutionDetailsService;
             _clinicalFacilitiesCompositeService = clinicalFacilitiesCompositeService;
             _documentViewerService = documentViewerService;
+            _collegeDesignationService = collegeDesignationService;
             _tabWiseVerificationService = tabWiseVerificationService;
             _tabService = tabService;
             _sectionFeedbackService = sectionFeedbackService;
@@ -7131,90 +7135,56 @@ namespace VerificationPortal.Controllers
                 return BadRequest("Affiliation type is not configured.");
             }
 
-            // --------------------------------------------------
-            // 3. Get College Designation Details
-            // --------------------------------------------------
-            var designations =
-                await _context.CollegeDesignationDetails
-                    .AsNoTracking()
-                    .Where(x =>
-                        x.CollegeCode == collegeCode &&
-                        x.FacultyCode == facultyId.ToString() )
-                    .Select(x => new CollegeDesignationItemVm
-                    {
-                        Id = x.Id,
+            // COLLEGE DESIGNATIONS
 
-                        FacultyCode = x.FacultyCode,
+            var designations = await _collegeDesignationService.GetCollegeDesignationsAsync( collegeCode, facultyId);
+            var isAdmin = IsAdminUser();
 
-                        CollegeCode = x.CollegeCode,
+            var verifierName = User.FindFirst("FullName")?.Value
+                               ?? string.Empty;
 
-                        Designation = x.Designation,
+            var tabName = _tabService.GetDatabaseTabName("CollegeDesignation");
 
-                        DesignationCode = x.DesignationCode,
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyId);
 
-                        Department = x.Department,
+            // SECTION FEEDBACK
 
-                        DepartmentCode = x.DepartmentCode,
+            var returnUrl = Request.Path + Request.QueryString;
 
-                        SeatSlabId = x.SeatSlabId,
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
-                        RequiredIntake = x.RequiredIntake,
+            var sectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync( collegeCode, tabName, facultyId, courseLevel, verifierName, isAdmin, returnUrl);
 
-                        AvailableIntake = x.AvailableIntake,
+            // PAGE VIEW MODEL
 
-                    })
-                    .OrderBy(x => x.Department)
-                    .ThenBy(x => x.Designation)
-                    .ToListAsync();
-
-            // --------------------------------------------------
-            // 4. Get Section Feedback
-            // --------------------------------------------------
-            var sectionFeedback = await GetSectionFeedbackByTabNameAsync( collegeCode, "Faculty Repository", pageContext.FacultyCodeInt); // TODO: replace with actual SectionId
-
-            // --------------------------------------------------
-            // 5. Build ViewModel
-            // --------------------------------------------------
             var vm = new CollegeDesignationVerificationVm
             {
                 PageContext = new VerificationPageContextVm
                 {
                     FacultyId = facultyId,
-
                     CollegeCode = collegeCode,
-
                     InstitutionName = pageContext.Institution.NameOfInstitution,
-
                     FacultyName = pageContext.FacultyName,
+                    CurrentVerifier = verifierName,
+                    UserDesignation = GetUserDesignation(),
+                    IsAdmin = isAdmin,
+                    IsSection = IsSectionUser(),
+                    ActiveTab = "CollegeDesignation",
+                    TabId = tabId,
 
-                    CurrentVerifier = $"{User.Identity?.Name} - {GetUserDesignation()}",
+                    PrevTabAction = "PreviousSection",
+                    PrevTabLabel = "Previous: Previous Section",
 
-                    VerificationStatus = "Pending",
-
-                    StatusBadgeClass = "pending",
-
-                    PrevTabAction = Url.Action("PreviousSection", "VerificationDashboard", new { collegeCode }),
-
-                    PrevTabLabel = "Previous : Previous Section",
-
-                    NextTabAction = Url.Action( "NextSection", "VerificationDashboard", new { collegeCode }),
-
-                    NextTabLabel = "Next : Next Section"
+                    NextTabAction = "NextSection",
+                    NextTabLabel = "Next: Next Section"
                 },
 
                 Designations = designations,
 
-                SectionFeedback = sectionFeedback
+                SectionFeedback = sectionFeedback,
             };
 
-            // --------------------------------------------------
-            // 6. Common verification ViewData
-            // --------------------------------------------------
-            //await SetVerificationViewData<CollegeDesignationDetail>( collegeCode);
-
-
-            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
-
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName, facultyId, courseLevel, isAdmin);
 
             // --------------------------------------------------
             // 7. Return View
