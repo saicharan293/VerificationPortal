@@ -1,30 +1,43 @@
-﻿@model List<VerificationPortal.Models.DentalChairVm>
+﻿@model VerificationPortal.Models.ChairDistributionPageVm
 
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
 
+    var pageContext = Model.PageContext;
+    var chairs = Model.Chairs;
+
     ViewData["Title"] = "Chair Distribution - Verification Dashboard";
-    ViewData["ActiveTab"] = "ChairDistribution";
-
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
-
     ViewData["ShowFeedbackSection"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
 
-    ViewData["PrevTabAction"] = Url.Action(
-        "ClassroomAndLaboratory",
-        "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+    // Temporary compatibility with the existing shared layout.
+    ViewData["ActiveTab"] = pageContext.ActiveTab;
+    ViewData["InstitutionName"] = pageContext.InstitutionName;
+    ViewData["CollegeCode"] = pageContext.CollegeCode;
+    ViewData["FacultyCode"] = pageContext.FacultyId.ToString();
+    ViewData["FacultyName"] = pageContext.FacultyName;
+    ViewData["CurrentVerifier"] = pageContext.CurrentVerifier;
+    ViewData["UserDesignation"] = pageContext.UserDesignation;
 
-    ViewData["PrevTabLabel"] = "Previous: Classroom And Laboratory";
+    ViewData["PrevTabAction"] = pageContext.PrevTabAction == null
+        ? null
+        : Url.Action(
+            pageContext.PrevTabAction,
+            "VerificationDashboard",
+            new { collegeCode = pageContext.CollegeCode });
 
-    ViewData["NextTabAction"] = Url.Action(
-        "TeachingStaffDepartmentWise",
-        "VerificationDashboard",
-        new { collegeCode = ViewBag.CollegeCode });
+    ViewData["PrevTabLabel"] = pageContext.PrevTabLabel;
 
-    ViewData["NextTabLabel"] = "Next: Teaching Staff Department Wise";
+    ViewData["NextTabAction"] = pageContext.NextTabAction == null
+        ? null
+        : Url.Action(
+            pageContext.NextTabAction,
+            "VerificationDashboard",
+            new { collegeCode = pageContext.CollegeCode });
+
+    ViewData["NextTabLabel"] = pageContext.NextTabLabel;
+
+    var chairDistributionFeedback = Model.SectionFeedback
+        .FirstOrDefault(x => x.SectionName == "Chair Distribution Details");
 }
 
 @section Scripts {
@@ -57,10 +70,6 @@
     </div>
 </div>
 
-@{
-    var chairDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionName == "Chair Distribution Details");
-}
 
 <div class="verification-card">
 
@@ -72,13 +81,10 @@
     </div>
 
     <div class="verification-card-body">
-
-        @if (Model != null && Model.Any())
+        @if (chairs != null && chairs.Any())
         {
             <div class="table-responsive">
-
                 <table class="table table-bordered table-hover align-middle">
-
                     <thead class="table-light">
                         <tr>
                             <th style="width:60px;">#</th>
@@ -91,29 +97,23 @@
                     </thead>
 
                     <tbody>
-
                         @{
                             int sl = 1;
                         }
 
-                        @foreach (var item in Model)
+                        @foreach (var item in chairs)
                         {
                             <tr>
 
                                 <td>@sl</td>
-
                                 <td>@item.CourseName</td>
-
                                 <td>@item.CourseLevel</td>
-
                                 <td>@item.SeatSlab</td>
-
                                 <td>
                                     <span class="badge bg-primary">
                                         @item.ChairsRequired
                                     </span>
                                 </td>
-
                                 <td>
                                     @if (item.ChairsExisting >= item.ChairsRequired)
                                     {
@@ -128,16 +128,11 @@
                                         </span>
                                     }
                                 </td>
-
                             </tr>
-
                             sl++;
                         }
-
                     </tbody>
-
                 </table>
-
             </div>
         }
         else
@@ -148,12 +143,9 @@
             </div>
         }
 
-
         @if (chairDistributionFeedback != null)
         {
             @await Html.PartialAsync("_SectionFeedback", chairDistributionFeedback)
         }
     </div>
-
 </div>
-

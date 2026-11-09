@@ -1019,12 +1019,23 @@ namespace VerificationPortal.Controllers
                 return NotFound($"Institution details not found for college code: {collegeCode}");
             }
 
+            var facultyCode = Convert.ToInt32(institution.FacultyCode);
+
+            // PAGE CONTEXT
+
+            var context = await GetPageContextAsync(collegeCode);
+
+            var isAdmin = IsAdminUser();
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var userDesignation = GetUserDesignation();
+
+            var tabName = _tabService.GetDatabaseTabName("ChairDistribution");
+
+            var tabId = await _tabService.GetTabIdAsync(
+                tabName, facultyCode);
+
             var college = await _context.AffiliationCollegeMasters
                 .FirstOrDefaultAsync(x => x.CollegeCode == collegeCode);
-
-            int facultyCode = Convert.ToInt32(institution.FacultyCode);
-
-            ViewData["TabId"] = await _tabService.GetTabIdAsync("Chair Distribution", facultyCode);
 
 
             var academicIntakes = await _context.AcademicIntakes
@@ -1048,7 +1059,7 @@ namespace VerificationPortal.Controllers
                     x.CollegeCode == collegeCode &&
                     x.FacultyCode == facultyCode);
 
-            List<DentalChairVm> model = new();
+            List<DentalChairVm> chairs = new();
 
             // Existing logic from your Affiliation controller
             if (collegeCourseExists)
@@ -1086,7 +1097,7 @@ namespace VerificationPortal.Controllers
                     var existing = savedDentalChairs
                         .FirstOrDefault(x => x.CourseCode == course.CourseCode);
 
-                    model.Add(new DentalChairVm
+                    chairs.Add(new DentalChairVm
                     {
                         CourseCode = course.CourseCode,
                         CourseName = course.CourseName,
@@ -1138,7 +1149,7 @@ namespace VerificationPortal.Controllers
                     var existing = savedDentalChairs
                         .FirstOrDefault(x => x.CourseCode == course.CourseCode);
 
-                    model.Add(new DentalChairVm
+                    chairs.Add(new DentalChairVm
                     {
                         CourseCode = course.CourseCode,
                         CourseName = course.CourseName,
@@ -1151,21 +1162,36 @@ namespace VerificationPortal.Controllers
                     });
                 }
             }
+            // PAGE VIEW MODEL
 
-            ViewBag.CollegeCode = collegeCode;
-            ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
-            ViewBag.InstitutionName = institution.NameOfInstitution ?? "Unknown Institution";
-            ViewBag.ActiveTab = ControllerContext.ActionDescriptor.ActionName;
-            ViewBag.UserDesignation = GetUserDesignation();
+            var vm = new ChairDistributionPageVm
+            {
+                Chairs = chairs,
 
-            //await SetVerificationViewData<DentalChair>(collegeCode);
-            var context = await GetPageContextAsync(collegeCode);
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyCode,
+                    CollegeCode = collegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = context.InstitutionName,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = verifierName,
+                    UserDesignation = userDesignation,
+                    IsAdmin = isAdmin,
+                    IsSection = IsSectionUser(),
+                    ActiveTab = "ChairDistribution",
+                    TabId = tabId
+                }
+            };
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync( collegeCode, tabName, verifierName, facultyCode, HttpContext.Session.GetString("CourseLevel"), isAdmin);
 
-            await SetTabWiseVerificationViewData(collegeCode, ControllerContext.ActionDescriptor.ActionName, context.FacultyCodeInt);
+            // SECTION FEEDBACK
 
-            ViewBag.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Chair Distribution", context.FacultyCodeInt);
+            var returnUrl = Request.Path + Request.QueryString;
 
-            return View(model);
+            vm.SectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync( collegeCode, tabName, facultyCode, HttpContext.Session.GetString("CourseLevel"), verifierName, isAdmin, returnUrl);
+
+            return View(vm);
         }
 
         private async Task SetVerificationViewData<T>(  string collegeCode,  int? facultyId = null) where T : class
