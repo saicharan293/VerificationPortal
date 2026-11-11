@@ -1,0 +1,386 @@
+﻿
+@model VerificationPortal.Models.AcademicIntakePageViewModel1
+
+@using VerificationPortal.Models
+
+@{
+    Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
+
+    ViewData["Title"] = "Academic Intake Details";
+
+    var pageContext = Model.PageContext;
+    var verification = Model.TabwiseVerification;
+
+    var sectionFeedback = Model.SectionFeedback
+        ?? new List<SectionFeedbackViewModel>();
+
+    // Shared verification layout
+    ViewData["ActiveTab"] = pageContext.ActiveTab;
+    ViewData["InstitutionName"] = pageContext.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = pageContext.CollegeCode ?? Model.CollegeCode;
+    ViewData["FacultyCode"] = pageContext.FacultyId.ToString();
+    ViewData["ShowFeedbackSection"] = true;
+    ViewData["CurrentVerifier"] = pageContext.CurrentVerifier;
+
+    ViewData["PrevTabAction"] = pageContext.PrevTabAction;
+    ViewData["PrevTabLabel"] = pageContext.PrevTabLabel;
+
+    ViewData["NextTabAction"] = pageContext.NextTabAction;
+    ViewData["NextTabLabel"] = pageContext.NextTabLabel;
+
+    // Tab-wise verification
+    ViewData["IsAdmin"] = verification?.IsAdmin ?? false;
+    ViewData["ExistingRemarks"] = verification?.ExistingRemarks;
+    ViewData["ExistingStatus"] = verification?.ExistingStatus;
+    ViewData["ExistingStatusClass"] = verification?.ExistingStatusClass;
+    ViewData["VerifiedBy"] = verification?.VerifiedBy;
+    ViewData["VerifiedDate"] = verification?.VerifiedDate;
+    ViewData["ShowFeedbackForm"] = verification?.ShowFeedbackForm ?? false;
+    ViewData["TabId"] = verification?.TabId;
+    ViewData["TabName"] = verification?.TabName;
+    ViewData["VerificationHistory"] = verification?.VerificationHistory;
+}
+
+@{
+    var courses = Model.CourseLevel switch
+    {
+        "UG" => Model.UgCourses,
+        "PG" => Model.PgCourses,
+        "SS" => Model.SsCourses,
+        _ => new List<IntakeByLevelViewModel1>()
+    };
+}
+
+<link rel="stylesheet" href="~/css/section-verification.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/dental-increase-intake.css" asp-append-version="true" />
+
+
+<div class="academic-intake-page">
+
+    <!-- PAGE HEADER -->
+    <div class="ai-header">
+        <h3>
+            <i class="bi bi-bar-chart-line me-2"></i>
+            Academic Year-wise Intake Details
+        </h3>
+
+        <div class="ai-header-meta">
+            <span>
+                <i class="bi bi-building me-1"></i>
+                @(pageContext.InstitutionName ?? Model.CollegeName ?? "Institution")
+            </span>
+
+            <span>
+                <i class="bi bi-hash me-1"></i>
+                College Code: @Model.CollegeCode
+            </span>
+
+            <span>
+                <i class="bi bi-mortarboard me-1"></i>
+                Faculty: Dental
+            </span>
+        </div>
+    </div>
+
+    <!-- VERIFICATION INSTRUCTION -->
+    <div class="ai-note">
+        <div class="d-flex gap-2 align-items-start">
+            <i class="bi bi-info-circle fs-5"></i>
+            <div>
+                <strong>Verification Instructions</strong>
+                <p class="mb-0 mt-1">
+                    Review the submitted academic intake details for each course.
+                    Pay particular attention to the AY 2026–27 and AY 2027–28
+                    existing intake, requested intake and total intake values.
+                    Check the availability of supporting documents before
+                    completing verification.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAVED INTAKE SUMMARY -->
+    <div class="ai-card">
+
+        <div class="ai-card-header">
+            <h5>
+                <i class="bi bi-clipboard-check me-2"></i>
+                Course Intake Details
+            </h5>
+
+            <span class="ai-count">
+                @(Model.SavedIntakes?.Count ?? 0) Records
+            </span>
+        </div>
+
+        <div class="ai-table-wrap">
+
+            @if (Model.SavedIntakes != null && Model.SavedIntakes.Any())
+            {
+                <table class="ai-table ai-summary-table">
+
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <th>Course Level</th>
+                            <th style="text-align:left">Course Name</th>
+                            <th>Ay 2025-26 Existing</th>
+                            <th>Ay 2025-26 Lop</th>
+                            <th>AY 2025-26 Total</th>
+                            <th>AY 2025-26 LOP Document</th>
+                            <th>AY 2025-26 DCI Document</th>
+                            <th>AY 2026-27 Existing</th>
+                            <th>AY 2026-27 Lop</th>
+                            <th>AY 2026-27 Total</th>
+                            @* <th>AY 2027–28 Total</th> *@
+                            <th>AY 2026-27 DCI Document</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            var savedIndex = 1;
+                        }
+
+                        @foreach (var row in Model.SavedIntakes)
+                        {
+                            <tr>
+                                <td>@savedIndex</td>
+
+                                <td>
+                                    <span class="ai-level @(row.CourseLevel == "UG" ? "ug" : row.CourseLevel == "PG" ? "pg" : "ss")">
+                                        @row.CourseLevel
+                                    </span>
+                                </td>
+
+                                <td class="ai-course">
+                                    @row.CourseName
+                                </td>
+
+                                <td>
+                                    <span class="ai-value">
+                                        @row.AY2026_ExistingIntake
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="ai-value">
+                                        @row.AY2026_AddReqIntake
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="ai-value">
+                                        @row.AY2026_TotalIntake
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (row.HasLopDocument)
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton", 
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewIntakeDocument", 
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = row.Id,
+                                                        docType = "LOPDENTAL2025",
+                                                        CollegeCode = Model.CollegeCode
+                                                    })!,
+                                                Title = "LOP Document",
+                                                DocumentId = row.Id,
+                                                FacultyId = Model.PageContext.FacultyId,
+                                                CollegeCode = Model.CollegeCode
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="ai-document missing">
+                                            <i class="bi bi-dash-circle"></i> Not available
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (row.Has2025DciDocument)
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton", 
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewIntakeDocument", 
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = row.Id,
+                                                        docType = "DCI2025",
+                                                        CollegeCode = Model.CollegeCode
+                                                    })!,
+                                                Title = "DCI Document",
+                                                DocumentId = row.Id,
+                                                FacultyId = Model.PageContext.FacultyId,
+                                                CollegeCode = Model.CollegeCode
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="ai-document missing">
+                                            <i class="bi bi-dash-circle"></i> Not available
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="ai-value">
+                                        @row.AY2027_ExistingIntake
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="ai-value">
+                                        @row.AY2027_AddReqIntake
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="ai-value highlight">
+                                        @row.AY2027_TotalIntake
+                                    </span>
+                                </td>
+
+                                @* <td>
+                                    <span class="ai-value highlight">
+                                        @row.AY2027_TotalIntake
+                                    </span>
+                                </td> *@
+
+                                
+
+                                <td>
+                                    @if (row.Has2026DciDocument)
+                                    {
+                                        @await Html.PartialAsync(
+                                            "_DocumentViewerButton",
+                                            new DocumentViewerVm
+                                            {
+                                                Url = Url.Action(
+                                                    "ViewIntakeDocument",
+                                                    "VerificationDashboard",
+                                                    new
+                                                    {
+                                                        id = row.Id,
+                                                        docType = "DCI2026",
+                                                        CollegeCode = Model.CollegeCode
+                                                    })!,
+
+                                                Title = "DCI Document",
+                                                DocumentId = row.Id,
+                                                FacultyId = Model.PageContext.FacultyId,
+                                                CollegeCode = Model.CollegeCode
+                                            })
+                                    }
+                                    else
+                                    {
+                                        <span class="ai-document missing">
+                                            Not available
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+
+                            savedIndex++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="ai-empty">
+                    <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+                    No saved intake records available.
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- SECTION-WISE FEEDBACK -->
+    @if (sectionFeedback.Any())
+    {
+        <div class="ai-card">
+
+            <div class="ai-card-header">
+                <h5>
+                    <i class="bi bi-chat-square-text me-2"></i>
+                    Section-wise Verification
+                </h5>
+            </div>
+
+            <div class="p-3">
+                @foreach (var feedback in sectionFeedback)
+                {
+                    @await Html.PartialAsync("_SectionFeedback", feedback)
+                }
+            </div>
+
+        </div>
+    }
+
+    <!-- NAVIGATION -->
+    <div class="d-flex justify-content-between flex-wrap gap-2 mt-4 mb-4">
+
+        @if (!string.IsNullOrWhiteSpace(pageContext.PrevTabAction))
+        {
+            <a href="@pageContext.PrevTabAction"
+               class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                @(pageContext.PrevTabLabel ?? "Previous")
+            </a>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(pageContext.NextTabAction))
+        {
+            <a href="@pageContext.NextTabAction"
+               class="btn btn-primary">
+                @(pageContext.NextTabLabel ?? "Next")
+                <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const tabs = document.querySelectorAll(
+                ".academic-intake-page .ai-tab"
+            );
+
+            const panels = document.querySelectorAll(
+                ".academic-intake-page .ai-panel"
+            );
+
+            tabs.forEach(tab => {
+
+                tab.addEventListener("click", function () {
+                    const selectedPanel = this.dataset.panel;
+                    tabs.forEach(x => x.classList.remove("active"));
+                    panels.forEach(x => x.classList.remove("active"));
+                    this.classList.add("active");
+                    document.getElementById("panel-" + selectedPanel)?.classList.add("active");
+                });
+
+            });
+
+        });
+    </script>
+}

@@ -28,6 +28,7 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IVerificationPageService, VerificationPageService>();
 builder.Services.AddScoped<IInstitutionDetailsService, InstitutionDetailsService>();
 builder.Services.AddScoped<IPrincipalDetailsService, PrincipalDetailsService>();
+builder.Services.AddScoped<IAcademicIntakeService, AcademicIntakeService>();
 builder.Services.AddScoped<ICollegeDesignationService, CollegeDesignationService>();
 builder.Services.AddScoped<ITabWiseVerificationService, TabWiseVerificationService>();
 builder.Services.AddScoped<ISectionFeedbackService, SectionFeedbackService>();

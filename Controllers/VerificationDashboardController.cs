@@ -24,10 +24,12 @@ namespace VerificationPortal.Controllers
         private readonly IClinicalFacilitiesCompositeService _clinicalFacilitiesCompositeService;
         private readonly IPrincipalDetailsService _principalDetailsService;
         private readonly IInstitutionDetailsService _institutionDetailsService;
+        private readonly IAcademicIntakeService _dentalIncreaseIntakeService;
         private readonly ICollegeDesignationService _collegeDesignationService;
         private readonly IDocumentViewerService _documentViewerService;
         private readonly ITabService _tabService;
         private readonly IVerificationPageContextService _verificationPageContextService;
+        private readonly IVerificationPageService _verificationPageService;
         private readonly ITabWiseVerificationService _tabWiseVerificationService;
         private readonly ISectionFeedbackService _sectionFeedbackService;
 
@@ -39,22 +41,26 @@ namespace VerificationPortal.Controllers
             IInstitutionDetailsService institutionDetailsService,
             IClinicalFacilitiesCompositeService clinicalFacilitiesCompositeService,
             ICollegeDesignationService collegeDesignationService,
+            IAcademicIntakeService academicIntakeService,
             IDocumentViewerService documentViewerService,
             ITabWiseVerificationService tabWiseVerificationService,
             ITabService tabService,
             ISectionFeedbackService sectionFeedbackService,
             IVerificationPageContextService verificationPageContextService,
+            IVerificationPageService verificationPageService,
             IPrincipalDetailsService principalDetailsService)
         {
             _context = context;
             _verificationService = verificationService;
             _institutionDetailsService = institutionDetailsService;
             _clinicalFacilitiesCompositeService = clinicalFacilitiesCompositeService;
+            _dentalIncreaseIntakeService = academicIntakeService;
             _documentViewerService = documentViewerService;
             _collegeDesignationService = collegeDesignationService;
             _tabWiseVerificationService = tabWiseVerificationService;
             _tabService = tabService;
             _sectionFeedbackService = sectionFeedbackService;
+            _verificationPageService = verificationPageService;
             _verificationPageContextService = verificationPageContextService;
             _principalDetailsService = principalDetailsService;
         }
@@ -528,6 +534,135 @@ namespace VerificationPortal.Controllers
                 ".webp" => "image/webp",
                 _ => "application/octet-stream"
             };
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> DentalIncreaseIntake(string collegeCode)
+        {
+            var facultyCode = HttpContext.Session.GetString("FacultyCode");
+            //var collegeCode = HttpContext.Session.GetString("CollegeCode");
+            var collegeName = HttpContext.Session.GetString("CollegeName");
+
+
+            if (string.IsNullOrEmpty(facultyCode) ||
+                string.IsNullOrEmpty(collegeCode))
+            {
+                return BadRequest("Invalid college session.");
+            }
+
+            if (!int.TryParse(facultyCode, out int facultyId))
+                return BadRequest("Invalid faculty code");
+
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+            if (string.IsNullOrWhiteSpace(courseLevel))
+                return BadRequest("Course level not found in session.");
+
+            // Fetch page data through service
+            var model = await _dentalIncreaseIntakeService.GetDentalAcademicIntakeAsync( collegeCode, facultyId, collegeName, courseLevel);
+            if (model == null)
+                return NotFound();
+
+            // Preserve existing session values
+            var seatSlab = await _dentalIncreaseIntakeService.GetSeatSlabAsync(collegeCode);
+
+            var hospitalDetailsId = await _dentalIncreaseIntakeService.GetHospitalDetailsIdAsync(collegeCode);
+
+            HttpContext.Session.SetString("SeatSlab", seatSlab.ToString());
+
+            HttpContext.Session.SetString("HospitalDetailsId",hospitalDetailsId.ToString());
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ViewIntakeDocument(int id, string docType, string collegeCode)
+        {
+
+            if (id <= 0)
+                return BadRequest("Invalid intake record.");
+
+            var record = _context.AcademicIntakes
+                .FirstOrDefault(x => x.Id == id);
+
+            if (record == null)
+                return NotFound("Academic intake record not found.");
+
+            //var collegeCode = HttpContext.Session.GetString("CollegeCode") ?? collegeCode;
+            if(string.IsNullOrWhiteSpace(collegeCode) || record.CollegeCode != collegeCode)
+            {
+                return Forbid();
+            }
+
+            string? fileName = null;
+            string? folderName = null;
+
+            switch (docType)
+            {
+                case "LOPDENTAL2025":
+                    fileName = record.Ay2025LopDentalDocument;
+                    folderName = "AY2025_LOP_DENTAL";
+                    break;
+
+                case "DCI2025":
+                    fileName = record.Ay2025Dcidocument;
+                    folderName = "AY2025_DCI";
+                    break;
+
+                case "KSDC2025":
+                    fileName = record.Ay2025Ksdcdocument;
+                    folderName = "AY2025_KSDC";
+                    break;
+
+                case "DCI2026":
+                    fileName = record.Ay2026Dcidocument;
+                    folderName = "AY2026_DCI";
+                    break;
+
+                case "KSDC2026":
+                    fileName = record.Ay2026Ksdcdocument;
+                    folderName = "AY2026_KSDC";
+                    break;
+
+                case "DCI2027":
+                    fileName = record.Ay2027Dcidocument;
+                    folderName = "AY2027_DCI";
+                    break;
+
+                case "KSDC2027":
+                    fileName = record.Ay2027Ksdcdocument;
+                    folderName = "AY2027_KSDC";
+                    break;
+
+                case "NMC2025":
+                    if (record.Ay2025NmcDocument == null || record.Ay2025NmcDocument.Length == 0)
+                    {
+                        return NotFound();
+                    }
+
+                    return File(record.Ay2025NmcDocument, "application/pdf");
+
+                default:
+                    return BadRequest("Invalid document type.");
+            }
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                return NotFound();
+
+            // Prevent path traversal through the stored filename.
+            if (Path.GetFileName(fileName) != fileName)
+                return BadRequest("Invalid document path.");
+
+            var fullPath = Path.Combine(
+                BaseDentalPath,
+                folderName!,
+                fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            return PhysicalFile(fullPath, GetDocumentContentType(fullPath));
         }
 
         // GET: /VerificationDashboard/TrustMemberDetails/{collegeCode}

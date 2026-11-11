@@ -32,6 +32,17 @@ public class SessionValidationMiddleware
                     context.Session.SetString("UserId", userId);
                 }
             }
+
+            
+            var courseLevel = context.Session.GetString("CourseLevel");
+
+            if (string.IsNullOrWhiteSpace(courseLevel) ||
+                !new[] { "UG", "PG", "SS" }
+                    .Contains(courseLevel.ToUpperInvariant()))
+            {
+                context.Response.Redirect("/MyColleges/Index");
+                return;
+            }
         }
         await _next(context);
     }
