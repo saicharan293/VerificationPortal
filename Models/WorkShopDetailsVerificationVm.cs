@@ -18,5 +18,6 @@ namespace VerificationPortal.Models
 
         // Section-level verification feedback
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 }

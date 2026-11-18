@@ -23,5 +23,9 @@
 
         public string? NextTabAction { get; set; }
         public string? NextTabLabel { get; set; }
+        public HashSet<string> CompletedTabNames {get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+        public List<TabSectionVerificationStatusVm> TabVerificationDetails { get; set; } = new();
+
     }
 }

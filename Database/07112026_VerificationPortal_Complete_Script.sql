@@ -253,7 +253,7 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VAL
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Principal Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'UG Course Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'PG Course Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Courses and Intake');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Dental Increase Intake');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Land And Building Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Classroom And Laboratory');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Chair Distribution');
@@ -318,11 +318,11 @@ BEGIN TRY
     (2, N'Institution Details', N'Head of Institution'),
     (2, N'Institution Details', N'Nodal Officer Details'),
     (2, N'Institution Details', N'Principal Details'),
-    (2, N'Institution Details', N'Dean / Director Details'),
+    (2, N'Institution Details', N'Dean or Director Details'),
     (2, N'Institution Details', N'Trust Details'),
     (2, N'Trust Details', N'Trust Information'),
     (2, N'Trust Member Details', N'Trust Members'),
-    (2, N'Dean or Director Details', N'Dean / Director Information'),
+    (2, N'Dean or Director Details', N'Dean or Director Information'),
     (2, N'Dean or Director Details', N'Teaching Experience'),
     (2, N'Dean or Director Details', N'Administrative Experience'),
     (2, N'Principal Details', N'Principal Information'),
@@ -370,8 +370,8 @@ BEGIN TRY
     (2, N'Clinical Facilities', N'Clinical Hospital Details'),
     (2, N'Clinical Facilities', N'Clinical Statistics'),
     (2, N'Clinical Facilities', N'Discipline Details'),
-    (2, N'Clinical Facilities', N'Nursing, Paramedical, Technical & Allied Services'),
-    (2, N'Clinical Facilities', N'Engineering & Allied Services'),
+    (2, N'Clinical Facilities', N'Nursing, Paramedical, Technical and Allied Services'),
+    (2, N'Clinical Facilities', N'Engineering and Allied Services'),
     (2, N'Clinical Facilities', N'Ward-wise Bed Distribution in Attached Hospital'),
     (2, N'Institution Details', N'Administrative Section'),
     (2, N'Institution Details', N'Managing Other Health Science Colleges'),
@@ -397,11 +397,11 @@ BEGIN TRY
     (1, N'Institution Details', N'Head of Institution'),
     (1, N'Institution Details', N'Nodal Officer Details'),
     (1, N'Institution Details', N'Principal Details'),
-    (1, N'Institution Details', N'Dean / Director Details'),
+    (1, N'Institution Details', N'Dean or Director Details'),
     (1, N'Institution Details', N'Trust Details'),
     (1, N'Trust Details', N'Trust Information'),
     (1, N'Trust Member Details', N'Trust Members'),
-    (1, N'Dean or Director Details', N'Dean / Director Information'),
+    (1, N'Dean or Director Details', N'Dean or Director Information'),
     (1, N'Dean or Director Details', N'Teaching Experience'),
     (1, N'Dean or Director Details', N'Administrative Experience'),
     (1, N'Principal Details', N'Principal Information'),
@@ -744,8 +744,8 @@ INSERT INTO @DocumentSeed
 VALUES
     (2, N'Institution Details', N'Basic Information', N'Government Autonomous Certificate', 0, NULL, 1),
     (1, N'Institution Details', N'Basic Information', N'Government Autonomous Certificate', 0, NULL, 1),
-    (2, N'Institution Details', N'Dean / Director Details', N'Appointment Order of Dean', 0, NULL, 1),
-    (1, N'Institution Details', N'Dean / Director Details', N'Appointment Order of Dean', 0, NULL, 1),
+    (2, N'Institution Details', N'Dean or Director Details', N'Appointment Order of Dean', 0, NULL, 1),
+    (1, N'Institution Details', N'Dean or Director Details', N'Appointment Order of Dean', 0, NULL, 1),
     (2, N'Institution Details', N'Administrative Section', N'Members of Governing Body or Council', 0, NULL, 1),
     (2, N'UG Course Details', N'Previous Details', N'Previous Year Notification', 0, NULL, 1),
     (2, N'UG Course Details', N'Year of Obtaining EC & FC from Government of Karnataka', N'GOK Order', 0, NULL, 1),
@@ -762,8 +762,8 @@ VALUES
     (1, N'Finance Details', N'Account & Audit Details - UG', N'Account Summary', 0, NULL, 1),
     (1, N'Finance Details', N'Account & Audit Details - UG', N'Audited Statement', 0, NULL, 1),
     (1, N'Staff Other Details', N'Staff Other Details', N'Form 16 Details', 0, NULL, 1),
-    (1, N'Staff Other Details', N'Staff Other Details', N'AEBAS – Last Three Months', 0, NULL, 1),
-    (1, N'Staff Other Details', N'Staff Other Details', N'AEBAS – Inspection Day', 0, NULL, 1),
+    (1, N'Staff Other Details', N'Staff Other Details', N'AEBAS ï¿½ Last Three Months', 0, NULL, 1),
+    (1, N'Staff Other Details', N'Staff Other Details', N'AEBAS ï¿½ Inspection Day', 0, NULL, 1),
     (1, N'Staff Other Details', N'Staff Other Details', N'Provident Fund', 0, NULL, 1),
     (1, N'Staff Other Details', N'Staff Other Details', N'ESI', 0, NULL, 1),
     (1, N'Research and Publications', N'Research and Publication Details', N'Publications Document', 0, NULL, 1),

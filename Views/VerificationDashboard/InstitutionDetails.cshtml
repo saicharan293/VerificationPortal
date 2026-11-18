@@ -28,22 +28,26 @@
                 new { collegeCode = pageContext.CollegeCode });
     ViewData["NextTabLabel"] = pageContext.NextTabLabel ?? "Next : Trust Details";
 
-     // ---------------------------------------------------------
+    // ---------------------------------------------------------
     // TAB-WISE VERIFICATION
     // ---------------------------------------------------------
 
-    ViewData["IsAdmin"] = verification.IsAdmin;
-    ViewData["ExistingRemarks"] = verification.ExistingRemarks;
-    ViewData["ExistingStatus"] = verification.ExistingStatus;
-    ViewData["ExistingStatusClass"] = verification.ExistingStatusClass;
-    ViewData["VerifiedBy"] = verification.VerifiedBy;
-    ViewData["VerifiedDate"] = verification.VerifiedDate;
+    ViewData["IsAdmin"] = verification?.IsAdmin ?? false;
+    ViewData["ExistingRemarks"] = verification?.ExistingRemarks;
+    ViewData["ExistingStatus"] = verification?.ExistingStatus ?? "Pending";
+    ViewData["ExistingStatusClass"] = verification?.ExistingStatusClass ?? "bg-warning";
+    ViewData["VerifiedBy"] = verification?.VerifiedBy;
+    ViewData["VerifiedDate"] = verification?.VerifiedDate;
+    ViewData["ShowFeedbackForm"] = verification?.ShowFeedbackForm ?? true;
+    ViewData["TabId"] = verification?.TabId;
+    ViewData["TabName"] = verification?.TabName;
+    ViewData["VerificationHistory"] = verification?.VerificationHistory ?? new List<VerificationHistoryViewModel>();
     ViewData["ShowFeedbackForm"] = verification.ShowFeedbackForm;
-    ViewData["TabId"] = verification.TabId;
-    ViewData["TabName"] = verification.TabName;
-    ViewData["VerificationHistory"] = verification.VerificationHistory;
-}
 
+    ViewData["DebugFeedback"] = verification.ShowFeedbackForm;
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+}
 
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>

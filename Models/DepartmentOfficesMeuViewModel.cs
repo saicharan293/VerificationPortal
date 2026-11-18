@@ -66,6 +66,8 @@ namespace VerificationPortal.Models
         public VerificationPageContextVm PageContext { get; set; } = new();
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
 
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (HasMedicalEducationUnit == true)

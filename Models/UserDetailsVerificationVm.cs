@@ -9,6 +9,7 @@ namespace VerificationPortal.Models
         public UserDetailsItemVm Details { get; set; } = new();
 
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class UserDetailsItemVm

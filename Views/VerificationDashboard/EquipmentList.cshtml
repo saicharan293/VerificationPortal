@@ -33,6 +33,7 @@
     bool isDental = Model.FacultyCode == 2;
 
     var equipmentListFeedback = Model.SectionFeedback?.FirstOrDefault(e=>e.SectionName == "Equipment Details");
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 <link rel="stylesheet"

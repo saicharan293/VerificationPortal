@@ -1,4 +1,4 @@
-﻿
+﻿@model VerificationPortal.Models.TabWiseVerificationResultVm
 <style>
     .status-options {
         display: flex;
@@ -74,7 +74,7 @@
                 } *@
             </div>
             <div class="feedback-body" id="tab_@ViewData["TabId"]">
-                @if (ViewData["ShowFeedbackForm"] != null && (bool)ViewData["ShowFeedbackForm"])
+                @if (Model.ShowFeedbackForm)
                 {
                     <form asp-controller="VerificationDashboard" asp-action="SaveVerification" method="post" class="feedback-form needs-validation" novalidate>
                         <input type="hidden" name="collegeCode" value="@ViewData["CollegeCode"]" />
@@ -87,7 +87,7 @@
                                 <div class="status-options" role="group" aria-label="Verification status">
                                     <input type="radio" class="btn-check" name="status" id="statusAccept" value="accept"
                                         autocomplete="off" required
-                                        checked="@(ViewData["ExistingStatus"]?.ToString() == "Approved")" />
+                                        checked="@(Model.ExistingStatus == "Approved")" />
                                     <label class="btn btn-status btn-status-accept" for="statusAccept">
                                         <i class="bi bi-check-circle-fill icon-idle"></i>
                                         <i class="bi bi-check-lg icon-active"></i>
@@ -96,7 +96,7 @@
 
                                     <input type="radio" class="btn-check" name="status" id="statusReject" value="reject"
                                         autocomplete="off"
-                                        checked="@(ViewData["ExistingStatus"]?.ToString() == "Rejected")" />
+                                        checked="@(Model.ExistingStatus == "Rejected")" />
                                     <label class="btn btn-status btn-status-reject" for="statusReject">
                                         <i class="bi bi-x-circle-fill icon-idle"></i>
                                         <i class="bi bi-x-lg icon-active"></i>
@@ -151,12 +151,12 @@
                     <div id="verificationDisplay">
 
 
-                        @if (!string.IsNullOrWhiteSpace(ViewData["ExistingRemarks"]?.ToString()))
+                        @if (!string.IsNullOrWhiteSpace(Model.ExistingRemarks))
                         {
                             <div class="feedback-item">
                                 <label class="feedback-label">Previous Remarks</label>
                                 <div class="feedback-value">
-                                    @ViewData["ExistingRemarks"]
+                                    @Model.ExistingRemarks
                                 </div>
                             </div>
                         }
@@ -170,31 +170,31 @@
                             </div>
                         }
 
-                        @if (ViewData["ExistingStatus"] != null)
+                        @if (Model.ExistingStatus != null)
                         {
                             <div class="feedback-item">
                                 <label class="feedback-label">Previous Status</label>
                                 <div class="feedback-value">
-                                    <span class="status-badge @ViewData["ExistingStatusClass"]">
-                                        @ViewData["ExistingStatus"]
+                                    <span class="status-badge @Model.ExistingStatusClass">
+                                        @Model.ExistingStatus
                                     </span>
                                 </div>
                             </div>
                         }
 
-                        @if (ViewData["VerifiedBy"] != null)
+                        @if (Model.VerifiedBy != null)
                         {
                             <div class="feedback-item">
                                 <label class="feedback-label">Verified By</label>
-                                <div class="feedback-value">@ViewData["VerifiedBy"]</div>
+                                <div class="feedback-value">@Model.VerifiedBy</div>
                             </div>
                         }
 
-                        @if (ViewData["VerifiedDate"] != null)
+                        @if (Model.VerifiedDate != null)
                         {
                             <div class="feedback-item">
                                 <label class="feedback-label">Verified Date</label>
-                                <div class="feedback-value">@ViewData["VerifiedDate"]</div>
+                                <div class="feedback-value">@Model.VerifiedDate</div>
                             </div>
                         }
 

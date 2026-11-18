@@ -247,5 +247,7 @@ namespace VerificationPortal.Models
         // Replace object with the actual return type
         // of GetTabSectionFeedbackAsync().
         public object? SectionFeedback { get; set; }
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 }

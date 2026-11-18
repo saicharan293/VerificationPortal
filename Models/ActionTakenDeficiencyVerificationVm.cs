@@ -29,6 +29,7 @@ namespace VerificationPortal.Models
 
 
         public int? RelevantReportDocId { get; set; }
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
 
     }
 

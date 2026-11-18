@@ -38,6 +38,8 @@
 
     var chairDistributionFeedback = Model.SectionFeedback
         .FirstOrDefault(x => x.SectionName == "Chair Distribution Details");
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 @section Scripts {

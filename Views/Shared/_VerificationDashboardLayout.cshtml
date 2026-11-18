@@ -45,7 +45,14 @@
 <body>
     <div class="verification-dashboard">
         <!-- Sidebar -->
-        @await Html.PartialAsync("_VerificationSidebar")
+        @await Html.PartialAsync(
+            "_VerificationSidebar",
+            null,
+            new ViewDataDictionary(ViewData)
+            {
+                ["CompletedTabNames"] = ViewData["CompletedTabNames"],
+                ["TabVerificationDetails"] = ViewData["TabVerificationDetails"] 
+            })
 
         @await Html.PartialAsync("_VerificationSummaryModal")
 
@@ -59,10 +66,11 @@
             <div class="main-scroll">
                 <!-- Page Content -->
                 <div class="page-content">
+
                     @RenderBody()
                     @if (ViewData["ShowFeedbackSection"] is true)
                     {
-                        @await Html.PartialAsync("_VerificationFeedback")
+                        @await Html.PartialAsync("_VerificationFeedback", ViewData["TabwiseVerification"])
                     }
 
                     @await Html.PartialAsync("_VerificationHistory", verificationHistory)

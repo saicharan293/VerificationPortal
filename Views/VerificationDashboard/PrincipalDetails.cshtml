@@ -21,6 +21,7 @@
     var principalInfoFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Principal Information");
     var principalTeachFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Teaching Experience");
     var principalAdminFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Administrative Experience");
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 <!-- ========================================================= -->
 <!-- PAGE HEADER -->

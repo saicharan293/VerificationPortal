@@ -20,7 +20,7 @@ namespace VerificationPortal.Services.Verification.Services
                 IsAdmin = isAdmin,
                 ExistingStatus = "Pending",
                 ExistingStatusClass = "bg-warning",
-                ShowFeedbackForm = false
+                ShowFeedbackForm = true
             };
 
             if (string.IsNullOrWhiteSpace(collegeCode) || string.IsNullOrWhiteSpace(tabName))
@@ -103,12 +103,9 @@ namespace VerificationPortal.Services.Verification.Services
 
             result.VerifiedBy = feedback.VerifiedBy;
 
-            result.VerifiedDate = feedback.VerifiedOn?
-                .ToString("dd-MM-yyyy hh:mm tt");
+            result.VerifiedDate = feedback.VerifiedOn?.ToString("dd-MM-yyyy hh:mm tt");
 
-            result.ShowFeedbackForm =
-                string.IsNullOrWhiteSpace(
-                    feedback.VerificationStatus);
+            result.ShowFeedbackForm = false;
 
             result.TabId = feedback.TabId;
 

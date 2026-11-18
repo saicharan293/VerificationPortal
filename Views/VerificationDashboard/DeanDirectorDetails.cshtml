@@ -11,7 +11,6 @@
 
     var dean = Model.DeanDetails;
     var pageContext = Model.PageContext;
-
     ViewData["Title"] = "Dean or Director Details";
     ViewData["ShowFeedbackSection"] = true;
 
@@ -23,8 +22,8 @@
     ViewData["FacultyName"] = pageContext.FacultyName;
     ViewData["CurrentVerifier"] = pageContext.CurrentVerifier;
     ViewData["UserDesignation"] = pageContext.UserDesignation;
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
-
 
 <!-- Page Header -->
 <div class="page-header mb-4">
@@ -64,7 +63,7 @@
 
 
 <!-- ========================================================= -->
-<!-- DEAN / DIRECTOR INFORMATION -->
+<!-- Dean or Director INFORMATION -->
 <!-- ========================================================= -->
 @{
     var deanInfoFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Dean or Director Information");
@@ -75,7 +74,7 @@
 
         <h3 class="verification-card-title">
             <i class="bi bi-person-badge"></i>
-            Dean / Director Information
+            Dean or Director Information
         </h3>
 
     </div>
@@ -89,7 +88,7 @@
             <div class="col-md-6">
 
                 <label class="form-label">
-                    Dean / Director Name
+                    Dean or Director Name
                 </label>
 
                 <input type="text"

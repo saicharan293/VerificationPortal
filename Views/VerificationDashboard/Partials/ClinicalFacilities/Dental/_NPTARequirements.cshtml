@@ -4,14 +4,14 @@
 
     @{
         var nptaRequirementsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionId == 60);
+                                    ?.FirstOrDefault(x => x.SectionName == "Nursing, Paramedical, Technical and Allied Services");
     }
 
     <div class="verification-card-header" id="section_@nptaRequirementsFeedback?.SectionId">
 
         <h3 class="verification-card-title">
             <i class="bi bi-heart-pulse me-2"></i>
-            Nursing, Paramedical, Technical & Allied Services
+            Nursing, Paramedical, Technical and Allied Services
         </h3>
 
         <span class="badge bg-primary">
@@ -27,7 +27,7 @@
              !Model.Requirements.Any())
         {
             <div class="alert alert-info mb-0">
-                No Nursing, Paramedical, Technical & Allied Services
+                No Nursing, Paramedical, Technical and Allied Services
                 requirements found.
             </div>
         }

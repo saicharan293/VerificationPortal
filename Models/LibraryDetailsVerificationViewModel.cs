@@ -19,6 +19,8 @@
 
         public List<LibraryEquipmentVerificationRow> Equipments { get; set; } = new();
         public LibraryFinanceVerification? Finance { get; set; }
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class LibraryGeneralVerification

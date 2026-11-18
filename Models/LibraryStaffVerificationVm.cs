@@ -10,6 +10,7 @@ namespace VerificationPortal.Models
         public List<LibraryStaffItemVm> Staff { get; set; } = new();
 
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class LibraryStaffItemVm

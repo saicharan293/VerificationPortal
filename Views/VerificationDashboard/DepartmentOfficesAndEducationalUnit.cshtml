@@ -28,6 +28,7 @@
         new { collegeCode = ViewBag.CollegeCode });
 
     ViewData["NextTabLabel"] = "Next : Hospital Details";
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 @section Scripts {
@@ -68,7 +69,7 @@
 @if (Model.PageContext.FacultyId == 2)
 {
     <!-- ================= DENTAL EDUCATION UNIT ================= -->
-    @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/DepartmentOfficesEducationalUnit/_DEU.cshtml",  Model)
+    @await Html.PartialAsync( "~/Views/VerificationDashboard/Partials/DepartmentOfficeEducationalUnit/_DEU.cshtml",  Model)
 
 }
 else

@@ -25,6 +25,8 @@
 
     var libraryExpenditureFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Library Expenditure");
 
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+
 }
 
 <div class="verification-page-header">
@@ -60,7 +62,7 @@
            SECTION 1 : LIBRARY SERVICES AVAILABILITY
            ========================================================= *@
 
-        <div class="mb-4">
+        <div class="mb-4" id="@libraryServicesFeedback.SectionId">
 
             <h5 class="fw-semibold mb-3">
                 <i class="bi bi-journal-check me-2"></i>
@@ -155,7 +157,7 @@
 
         <section>
 
-            <h5 class="fw-semibold mb-3">
+            <h5 class="fw-semibold mb-3" id="@libraryExpenditureFeedback.SectionId">
                 <i class="bi bi-cash-stack me-2"></i>
                 Library Expenditure
             </h5>

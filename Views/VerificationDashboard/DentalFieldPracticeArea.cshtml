@@ -24,10 +24,10 @@
 
     // Replace these IDs with the actual Rural and Urban section IDs.
     var ruralFeedback = Model.SectionFeedback
-        .FirstOrDefault(x => x.SectionId == 67);
+        .FirstOrDefault(x => x.SectionName == "Rural Field Practice Area");
 
     var urbanFeedback = Model.SectionFeedback
-        .FirstOrDefault(x => x.SectionId == 68);
+        .FirstOrDefault(x => x.SectionName == "Urban Field Practice Area");
 
     var rural = Model.RuralFieldPracticeArea.FieldPracticeArea;
     var urban = Model.UrbanFieldPracticeArea.FieldPracticeArea;
@@ -37,6 +37,8 @@
 
     var urbanFieldType = Model.FieldTypes
         .FirstOrDefault(x => x.Id == urban.FieldTypeId);
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 @section Scripts {
@@ -245,24 +247,16 @@
 
             <hr class="my-4" />
 
-            <h6 class="fw-bold mb-3">
+            <h6 class="fw-bold mb-3" id="@ruralFeedback?.SectionId">
                 <i class="bi bi-chat-left-text me-2"></i>
                 Rural Section Feedback
             </h6>
 
             @if (ruralFeedback != null)
             {
-                @await Html.PartialAsync(
-                    "_SectionFeedback",
-                    ruralFeedback)
+                @await Html.PartialAsync( "_SectionFeedback", ruralFeedback)
             }
-            else
-            {
-                <div class="alert alert-light border mb-0">
-                    No Rural section feedback data was found.
-                </div>
-            }
-
+            
         </div>
     </div>
 
@@ -433,22 +427,14 @@
 
             <hr class="my-4" />
 
-            <h6 class="fw-bold mb-3">
+            <h6 class="fw-bold mb-3" id="@urbanFeedback?.SectionId">
                 <i class="bi bi-chat-left-text me-2"></i>
                 Urban Section Feedback
             </h6>
 
             @if (urbanFeedback != null)
             {
-                @await Html.PartialAsync(
-                    "_SectionFeedback",
-                    urbanFeedback)
-            }
-            else
-            {
-                <div class="alert alert-light border mb-0">
-                    No Urban section feedback data was found.
-                </div>
+                @await Html.PartialAsync( "_SectionFeedback", urbanFeedback)
             }
 
         </div>

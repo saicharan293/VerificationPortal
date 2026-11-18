@@ -32,6 +32,8 @@
         ViewBag.DepartmentMasters
         as List<VerificationPortal.Models.DepartmentMaster>
         ?? new List<VerificationPortal.Models.DepartmentMaster>();
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 <style>
     .department-library-scroll {

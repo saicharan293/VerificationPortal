@@ -9,6 +9,7 @@
 
         // Courses
         public List<UgCourseDetailVerificationVm> Courses { get; set; }  = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
 

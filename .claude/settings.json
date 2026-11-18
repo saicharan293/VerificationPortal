@@ -1,0 +1,8 @@
+
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://router.bynara.id/v1",
+    "ANTHROPIC_AUTH_TOKEN": "sk-nry-UmkHlgD0g50YZFgoKR7bHdiFcHitUDd-DSJKqxSRxsE",
+    "ANTHROPIC_MODEL": "agnes-2.5-flash"
+  }
+}

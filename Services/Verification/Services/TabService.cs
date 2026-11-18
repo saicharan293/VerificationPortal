@@ -27,6 +27,8 @@ namespace VerificationPortal.Services.Verification.Services
                 "TrustMemberDetails" => "Trust Member Details",
                 "DeanDirectorDetails" => "Dean or Director Details",
                 "PrincipalDetails" => "Principal Details",
+                "DentalIncreaseIntake" => "Dental Increase Intake",
+                "DentalFieldPracticeArea" => "Field Practice Area",
                 "UGCourseDetails" => "UG Course Details",
                 "UgCourseDetails" => "UG Course Details",
                 "CollegeDesignation" => "Faculty Repository",

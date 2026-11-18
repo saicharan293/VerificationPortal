@@ -5,7 +5,7 @@
     <div class="verification-card-header">
         @{
             var wardBedDistributionFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                        ?.FirstOrDefault(x => x.SectionId == 62);
+                                        ?.FirstOrDefault(x => x.SectionName == "Ward-wise Bed Distribution in Attached Hospital");
         }
 
         <h3 class="verification-card-title" id="section_@wardBedDistributionFeedback?.SectionId">

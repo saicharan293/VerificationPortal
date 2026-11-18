@@ -9,8 +9,11 @@
     var statusBadgeClass = ViewData["StatusBadgeClass"]?.ToString();
     var existingCourseLevel = Context.Session.GetString("CourseLevel");
     var facultyCode = Context?.Session.GetString("FacultyCode");
-}
 
+
+    var completedTabNames = ViewData["CompletedTabNames"] as HashSet<string> ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    var tabVerificationDetails = ViewData["TabVerificationDetails"]  as List<TabSectionVerificationStatusVm> ?? new List<TabSectionVerificationStatusVm>();
+}
 <aside class="verification-sidebar" id="verificationSidebar" role="navigation" aria-label="Verification sections">
     @* <div class="sidebar-header">
         <div class="sidebar-brand">
@@ -47,13 +50,27 @@
         </div>
 
         <!-- Navigation Tabs -->
-        @if(facultyCode == "1")
+        @if (facultyCode == "1")
         {
-            @await Html.PartialAsync("~/Views/Shared/SideBarList/_SidebarMedicalList.cshtml")
+            @await Html.PartialAsync(
+                "~/Views/Shared/SideBarList/_SidebarMedicalList.cshtml",
+                null,
+                new ViewDataDictionary(ViewData)
+                {
+                    ["CompletedTabNames"] = completedTabNames,
+                    ["TabVerificationDetails"] = tabVerificationDetails
+                })
         }
-        else if(facultyCode == "2")
+        else if (facultyCode == "2")
         {
-            @await Html.PartialAsync("~/Views/Shared/SideBarList/_SidebarDentalList.cshtml")
+            @await Html.PartialAsync(
+                "~/Views/Shared/SideBarList/_SidebarDentalList.cshtml",
+                null,
+                new ViewDataDictionary(ViewData)
+                {
+                    ["CompletedTabNames"] = completedTabNames,
+                    ["TabVerificationDetails"] = tabVerificationDetails
+                })
         }
     </div>
 </aside>

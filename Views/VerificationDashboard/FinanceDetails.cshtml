@@ -63,6 +63,8 @@
     var annualFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == annualSectionName);
 
     var accountFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == accountSectionName);
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 

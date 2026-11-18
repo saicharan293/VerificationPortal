@@ -56,6 +56,8 @@
         ("Provident Fund", staffOther?.ProvidentFundPdfName, staffOther?.ProvidentFundPdfId, "PF", "Provident Fund"),
         ("ESI", staffOther?.ESIPdfName, staffOther?.ESIPdfId, "ESI", "ESI")
     });
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 <style>
     .min-width-0 {
@@ -92,7 +94,7 @@
         <span class="badge bg-primary"> Staff Details </span>
     </div>
 
-    <div class="verification-card-body">
+    <div class="verification-card-body" id="@staffOtherDetailsFeedback.SectionId">
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="verification-field">

@@ -75,6 +75,8 @@
         public List<DentalWardBedDistributionVm> DentalWards { get; set; } = new();
 
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     

@@ -28,6 +28,8 @@
 
     // Replace 43 with the actual User Details SectionId
     var userDetailsFeedback = Model.SectionFeedback? .FirstOrDefault(x => x.SectionName == "Library User Details");
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 <div class="verification-page-header">
@@ -274,11 +276,9 @@
 
         @if (userDetailsFeedback != null)
         {
-            <div class="mt-4">
+            <div class="mt-4" id="@userDetailsFeedback.SectionId">
 
-                @await Html.PartialAsync(
-                    "_SectionFeedback",
-                    userDetailsFeedback)
+                @await Html.PartialAsync( "_SectionFeedback",  userDetailsFeedback)
 
             </div>
         }

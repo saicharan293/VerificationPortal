@@ -271,6 +271,7 @@ namespace VerificationPortal.Models
 
         public string? FacultyName { get; set; }
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
 
         //public string? OwnOrRented { get; set; }
     }

@@ -369,7 +369,7 @@ namespace VerificationPortal.Services.Verification
 
                 // =========================================================
                 // NPTA REQUIREMENTS
-                // Nursing, Paramedical, Technical & Allied Services
+                // Nursing, Paramedical, Technical and Allied Services
                 // =========================================================
 
                 var nptaMasters = await _context.MstDentalServices
@@ -389,7 +389,7 @@ namespace VerificationPortal.Services.Verification
                     .ToListAsync();
 
                 // =========================================================
-                // ENGINEERING & ALLIED SERVICES
+                // Engineering and Allied Services
                 // Section Code = 2
                 // =========================================================
 

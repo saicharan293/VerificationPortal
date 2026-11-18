@@ -10,6 +10,8 @@
 
         public List<FacultyDetailsVerificationRow> FacultyDetails { get; set; }
             = new();
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class FacultyDetailsVerificationRow

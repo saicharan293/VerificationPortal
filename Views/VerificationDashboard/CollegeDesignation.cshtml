@@ -27,6 +27,8 @@
 
     var sectionFeedback =
             Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "Faculty Repository");
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">

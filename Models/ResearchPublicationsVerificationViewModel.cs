@@ -37,6 +37,8 @@
         public List<DepartmentWisePublicationVerificationRow>
             DepartmentWisePublications
         { get; set; } = new();
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
 

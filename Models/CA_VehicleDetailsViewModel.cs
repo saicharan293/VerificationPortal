@@ -49,5 +49,6 @@ namespace VerificationPortal.Models
 
         // Existing rows (no validation needed here)
         public List<CA_VehicleDetailsViewModel> ExistingList { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 }

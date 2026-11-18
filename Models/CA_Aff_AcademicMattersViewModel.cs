@@ -26,6 +26,8 @@ namespace VerificationPortal.Models
         public List<ExaminationSchemeRowViewModel> ExaminationSchemess { get; set; }
     = new();
         public List<StudentRegisterRecordViewModel> StudentRegisterRecords { get; set; } = new List<StudentRegisterRecordViewModel>();
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class CourseCurriculumDisplayViewModel

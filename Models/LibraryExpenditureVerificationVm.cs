@@ -16,6 +16,8 @@ namespace VerificationPortal.Models
 
         // Feedback for this verification page
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class LibraryExpenditureItemVm

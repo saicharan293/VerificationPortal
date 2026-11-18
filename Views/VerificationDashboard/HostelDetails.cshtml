@@ -36,6 +36,8 @@
     var commonRoomFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Common Room Facilities");
 
     var hostelFacilitiesFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Hostel Facilities");
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 @section Scripts {
     <script src="~/js/verification-dashboard.js" asp-append-version="true"></script>

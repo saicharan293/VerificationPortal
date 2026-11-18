@@ -3,14 +3,14 @@
 <div class="verification-card mt-4">
     @{
         var engAlliedFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionId == 61);
+                                    ?.FirstOrDefault(x => x.SectionName == "Engineering and Allied Services");
     }
 
     <div class="verification-card-header" id="section_@engAlliedFeedback?.SectionId">
 
         <h3 class="verification-card-title">
             <i class="bi bi-gear-wide-connected me-2"></i>
-            Engineering & Allied Services
+            Engineering and Allied Services
         </h3>
 
         <span class="badge bg-primary">
@@ -26,7 +26,7 @@
              !Model.Requirements.Any())
         {
             <div class="alert alert-info mb-0">
-                No Engineering & Allied Services requirements found.
+                No Engineering and Allied Services requirements found.
             </div>
         }
         else

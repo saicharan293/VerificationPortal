@@ -9,6 +9,8 @@
     var existingCourseLevel = Context.Session.GetString("CourseLevel");
 
     bool isGovt = ViewData["TypeOfInstitution"]?.ToString() == "Government/Autonomous";
+    
+    var completedTabNames = ViewData["CompletedTabNames"] as HashSet<string> ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 }
 
 <!-- Navigation Tabs -->
@@ -19,6 +21,11 @@
                 asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-building"></i>
                 <span>Institution Details</span>
+
+                @if(completedTabNames.Contains("Institution Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         @if (!isGovt)

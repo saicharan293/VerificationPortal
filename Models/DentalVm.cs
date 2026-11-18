@@ -12,6 +12,7 @@ namespace VerificationPortal.Models
         public List<SectionFeedbackViewModel>? SectionFeedback { get; set; }
         public string? AcademicYear { get; set; }
         public List<SelectListItem> Departments { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class AddEquipmentVM

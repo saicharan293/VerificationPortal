@@ -91,7 +91,7 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VAL
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Principal Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'UG Course Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'PG Course Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Courses and Intake');
+INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Dental Increase Intake');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Land And Building Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Classroom And Laboratory');
 INSERT INTO [Admission_Affiliation].[dbo].[MstTabs] ([FacultyId], [TabName]) VALUES (2, 'Chair Distribution');
@@ -195,8 +195,8 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Clinical Hospital Details');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Clinical Statistics');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Discipline Details');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Nursing, Paramedical, Technical & Allied Services');
-INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Engineering & Allied Services');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Nursing, Paramedical, Technical and Allied Services');
+INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Engineering and Allied Services');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 27, 'Ward-wise Bed Distribution in Attached Hospital');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Administrative Section');
 INSERT INTO [Admission_Affiliation].[dbo].[MstSections] ([FacultyId], [TabId], [SectionName]) VALUES (2, 1, 'Managing Other Health Science Colleges');
@@ -362,8 +362,8 @@ INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], 
 INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 51, 127, 'Account Summary', 0, NULL, 1);
 INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 51, 127, 'Audited Statement', 0, NULL, 1);
 INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'Form 16 Details', 0, NULL, 1);
-INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'AEBAS – Last Three Months', 0, NULL, 1);
-INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'AEBAS – Inspection Day', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'AEBAS ï¿½ Last Three Months', 0, NULL, 1);
+INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'AEBAS ï¿½ Inspection Day', 0, NULL, 1);
 INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'Provident Fund', 0, NULL, 1);
 INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 53, 129, 'ESI', 0, NULL, 1);
 INSERT INTO [Admission_Affiliation].[dbo].[MstDocument] ( [FacultyId], [TabId], [SectionId], [DocumentName], [IsMandatory], [DisplayOrder], [IsActive]) VALUES (1, 55, 135, 'Publications Document', 0, NULL, 1);

@@ -75,6 +75,7 @@ namespace VerificationPortal.Models
         public bool IsPG => CourseLevel?.Trim().ToUpper() == "PG";
 
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]

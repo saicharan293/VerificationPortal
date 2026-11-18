@@ -3030,7 +3030,7 @@ BEGIN TRY
 
         (2, N'UG Course Details'),
         (2, N'PG Course Details'),
-        (2, N'Courses and Intake'),
+        (2, N'Dental Increase Intake'),
 
         (2, N'Land And Building Details'),
         (2, N'Classroom And Laboratory'),
@@ -3099,7 +3099,7 @@ BEGIN TRY
             (N'Trust Member Details', N'Trust Members'),
 
             /* Dean or Director Details */
-            (N'Dean or Director Details', N'Dean / Director Information'),
+            (N'Dean or Director Details', N'Dean or Director Information'),
             (N'Dean or Director Details', N'Teaching Experience'),
             (N'Dean or Director Details', N'Administrative Experience'),
 
@@ -3189,8 +3189,8 @@ BEGIN TRY
             (N'Clinical Facilities', N'Clinical Hospital Details'),
             (N'Clinical Facilities', N'Clinical Statistics'),
             (N'Clinical Facilities', N'Discipline Details'),
-            (N'Clinical Facilities', N'Nursing, Paramedical, Technical & Allied Services'),
-            (N'Clinical Facilities', N'Engineering & Allied Services'),
+            (N'Clinical Facilities', N'Nursing, Paramedical, Technical and Allied Services'),
+            (N'Clinical Facilities', N'Engineering and Allied Services'),
             (N'Clinical Facilities', N'Ward-wise Bed Distribution in Attached Hospital'),
             (N'Action Taken Report', N'Action Taken Report'),
     ) V(TabName, SectionName)

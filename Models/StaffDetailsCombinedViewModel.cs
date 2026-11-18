@@ -23,6 +23,7 @@ namespace VerificationPortal.Models
         public VerificationFeedbackViewModel? StaffPayScaleVerification { get; set; }
 
         public VerificationFeedbackViewModel? StaffOtherDetailsVerification { get; set; }
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class VerificationFeedbackViewModel

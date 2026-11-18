@@ -58,6 +58,7 @@
         public SuperVisionInFieldPracticeAreaVerificationVM SuperVisionInFieldPracticeArea { get; set; } = new();
 
         public IndoorBedsRequirementsVerificationVM IndoorBedsRequirements { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
 
     }
 

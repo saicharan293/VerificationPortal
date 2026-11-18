@@ -1,5 +1,8 @@
 ﻿@model VerificationPortal.Models.HospitalCertificatesVm
-
+@{
+    var certificatesFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
+                                ?.FirstOrDefault(x => x.SectionName == "Certificates and Future Development Documents");
+}
 <div class="verification-card mt-4">
     <div class="verification-card-header">
         <h3 class="verfication-card-title">
@@ -149,6 +152,11 @@
                 </tbody>
             </table>
         </div>
+
+        @if (certificatesFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", certificatesFeedback)
+        }
     </div>
 </div>
 

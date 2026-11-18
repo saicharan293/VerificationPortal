@@ -17,10 +17,12 @@
 ============================================================ */
 :root,
 [data-theme="light"] {
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
     --report-primary: var(--primary, #2563eb);
+    --report-primary-dark: var(--primary-dark, #1d4ed8);
     --report-primary-light: var(--primary-light, #3b82f6);
     --report-primary-light-gray: var(--primary-light, #f8fafc);
-    --report-primary-dark: var(--primary-dark, #1d4ed8);
     --report-success: #10b981;
     --report-warning: #f59e0b;
     --report-danger: #ef4444;
@@ -111,17 +113,87 @@
 /* ============================================================
    REPORT CARD HEADER
 ============================================================ */
-
 .report-card-header {
-    background: linear-gradient( 135deg, var(--report-primary) 0%, var(--report-primary-dark) 100% );
-    color: #ffffff;
-    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 1rem;
+
+    padding: 1.5rem 1.75rem;
+    min-height: 110px;
+
+    color: #ffffff;
+    background:
+        radial-gradient(circle at top right,rgba(255, 255, 255, 0.18), transparent 35% ),
+        linear-gradient(135deg, var(--report-primary) 0%, var(--report-primary-dark) 100% );
+
+    border-radius: 1rem;
+    box-shadow:
+        0 10px 25px rgba(30, 64, 175, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
 }
+
+/* Decorative shine */
+.report-card-header::after {
+    content: "";
+    position: absolute;
+    top: -60%;
+    right: -10%;
+    width: 220px;
+    height: 220px;
+
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Keep header content above the decoration */
+.report-card-header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.report-card-header:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 14px 30px rgba(30, 64, 175, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Optional title styling */
+.report-card-header h2,
+.report-card-header h3 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Optional subtitle styling */
+.report-card-header p {
+    margin: 0.35rem 0 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+/* Mobile layout */
+@media (max-width: 640px) {
+    .report-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1.25rem;
+        border-radius: 0.75rem;
+    }
+}
+
 
 .report-card-title {
     display: flex;
@@ -542,7 +614,7 @@
 }
 
 .college-name-link {
-    color: var(--report-primary);
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
     transition: var(--report-transition-fast);

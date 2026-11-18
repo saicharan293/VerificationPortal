@@ -16,6 +16,7 @@
         public int FacultyId { get; set; }
 
         public string? CollegeCode { get; set; }
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class VerificationDocumentVm

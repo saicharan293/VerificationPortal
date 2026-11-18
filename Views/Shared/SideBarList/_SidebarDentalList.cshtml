@@ -9,6 +9,8 @@
     var existingCourseLevel = Context.Session.GetString("CourseLevel");
 
     bool isGovt = ViewData["TypeOfInstitution"]?.ToString() == "Government/Autonomous";
+
+    var completedTabNames = ViewData["CompletedTabNames"] as HashSet<string>  ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 }
 
 <!-- Navigation Tabs -->
@@ -19,6 +21,10 @@
                 asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-building"></i>
                 <span>Institution Details</span>
+                @if(completedTabNames.Contains("Institution Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         @if (!isGovt)
@@ -43,6 +49,10 @@
                 asp-controller="VerificationDashboard" asp-action="DeanDirectorDetails" asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-person-badge"></i>
                 <span>Dean or Director Details</span>
+                @if (completedTabNames.Contains("Dean or Director Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -50,6 +60,10 @@
                 asp-controller="VerificationDashboard" asp-action="PrincipalDetails" asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-mortarboard"></i>
                 <span>Principal Details</span>
+                @if (completedTabNames.Contains("Principal Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         @if(existingCourseLevel == "UG")
@@ -59,6 +73,10 @@
                     asp-controller="VerificationDashboard" asp-action="UGCourseDetails" asp-route-collegeCode="@collegeCode">
                     <i class="bi bi-mortarboard"></i>
                     <span>Ug Course Details</span>
+                    @if (completedTabNames.Contains("Ug Course Details"))
+                    {
+                        <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                    }
                 </a>
             </li>
         }
@@ -69,6 +87,10 @@
                     asp-controller="VerificationDashboard" asp-action="PgCourseDetails" asp-route-collegeCode="@collegeCode">
                     <i class="bi bi-mortarboard"></i>
                     <span>Pg Course Details</span>
+                    @if (completedTabNames.Contains("Pg Course Details"))
+                    {
+                        <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                    }
                 </a>
             </li>
         }
@@ -78,7 +100,10 @@
 
                 <i class="bi bi-people-fill"></i>
                 <span> Faculty Repository </span>
-
+                @if (completedTabNames.Contains("Faculty Repository"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -90,6 +115,10 @@
                 <i class="bi bi-hospital"></i>
 
                 <span>Clinical Facilities</span>
+                @if (completedTabNames.Contains("Clinical Facilities"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -97,6 +126,11 @@
                 asp-controller="VerificationDashboard" asp-action="DentalIncreaseIntake" asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-book"></i>
                 <span>Courses and Intake</span>
+
+                @if (completedTabNames.Contains("Dental Increase Intake"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         
@@ -107,6 +141,10 @@
                 asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-building"></i>
                 <span>Land And Building Details</span>
+                @if (completedTabNames.Contains("Land And Building Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -117,6 +155,10 @@
                 asp-route-collegeCode="@collegeCode">
                 <i class="bi bi-houses"></i>
                 <span>Classroom And Laboratory</span>
+                @if (completedTabNames.Contains("Classroom And Laboratory"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -128,6 +170,10 @@
 
                 <i class="bi bi-grid-3x3-gap"></i>
                 <span>Chair Distribution</span>
+                @if (completedTabNames.Contains("Chair Distribution"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -139,6 +185,10 @@
                 <i class="bi bi-hospital"></i>
 
                 <span>Bed Distribution</span>
+                @if (completedTabNames.Contains("Bed Distribution"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -148,6 +198,10 @@
                 class="nav-link @(activeTab == "HostelDetails" ? "active" : "")">
                 <i class="bi bi-house-door"></i>
                 <span>Hostel Details</span>
+                @if (completedTabNames.Contains("Hostel Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -157,6 +211,10 @@
                 class="nav-link @(activeTab == "DepartmentOfficesAndEducationalUnit" ? "active" : "")">
                 <i class="bi bi-building"></i>
                 <span>Department Offices And Educational Unit</span>
+                @if (completedTabNames.Contains("Department Offices And Educational Unit"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -167,7 +225,10 @@
 
                 <i class="bi bi-tools"></i>
                 <span>Equipment List</span>
-
+                @if (completedTabNames.Contains("Equipment List"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         
@@ -179,6 +240,11 @@
 
                 <i class="bi bi-car-front"></i>
                 <span>Vehicle Details</span>
+
+                @if (completedTabNames.Contains("Vehicle Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -189,6 +255,10 @@
 
                 <i class="bi bi-building-gear"></i>
                 <span>Workshop Details</span>
+                @if (completedTabNames.Contains("Workshop Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -200,6 +270,10 @@
 
                 <i class="bi bi-house-heart"></i>
                 <span>Animal House Details</span>
+                @if (completedTabNames.Contains("Animal House Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -211,6 +285,10 @@
 
                 <i class="bi bi-geo-alt"></i>
                 <span>Dental Field Practice Area</span>
+                @if (completedTabNames.Contains("Field Practice Area"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -225,6 +303,10 @@
                     <i class="bi bi-mortarboard"></i>
 
                     <span>UG Academic Matters</span>
+                    @if (completedTabNames.Contains("UG Academic Matters"))
+                    {
+                        <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                    }
                 </a>
             </li>
         }
@@ -239,6 +321,10 @@
 
                     <i class="bi bi-mortarboard"></i>
                     <span>PG Academic Matters</span>
+                    @if (completedTabNames.Contains("PG Academic Matters"))
+                    {
+                        <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                    }
                 </a>
             </li>
         }
@@ -248,6 +334,10 @@
 
                 <i class="bi bi-bank"></i>
                 <span>Finance Details</span>
+                @if (completedTabNames.Contains("Finance Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -256,6 +346,10 @@
 
                 <i class="bi bi-wallet2"></i>
                 <span> Staff Pay Scale </span>
+                @if (completedTabNames.Contains("Staff Pay Scale"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
 
             </a>
         </li>
@@ -265,7 +359,10 @@
 
                 <i class="bi bi-people"></i>
                 <span> Staff Other Details </span>
-
+                @if (completedTabNames.Contains("Staff Other Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
 
         </li>
@@ -276,6 +373,10 @@
 
                 <i class="bi bi-book"></i>
                 <span>Library Services</span>
+                @if (completedTabNames.Contains("Library Services"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -284,7 +385,11 @@
                 class="nav-link @(activeTab == "ResearchPublications" ? "active" : "")">
 
                 <i class="bi bi-journal-text"></i>
-                <span>Research &amp; Publications</span>
+                <span>Research and Publications</span>
+                @if (completedTabNames.Contains("Research and Publications"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -293,6 +398,10 @@
 
                 <i class="bi bi-book-half"></i>
                 <span>Library Details</span>
+                @if (completedTabNames.Contains("Library Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         <li class="nav-item">
@@ -301,6 +410,10 @@
 
                 <i class="bi bi-cash-coin"></i>
                 <span>Library Expenditure</span>
+                @if (completedTabNames.Contains("Library Expenditure and Services"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -310,6 +423,10 @@
 
                 <i class="bi bi-person-badge"></i>
                 <span>Library Staff Details</span>
+                @if (completedTabNames.Contains("Library Staff Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -319,6 +436,10 @@
 
                 <i class="bi bi-people"></i>
                 <span>User Details</span>
+                @if (completedTabNames.Contains("Library User Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -328,6 +449,10 @@
 
                 <i class="bi bi-credit-card"></i>
                 <span>Payment Details</span>
+                @if (completedTabNames.Contains("Workshop Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
 
@@ -337,6 +462,10 @@
 
                 <i class="bi bi-person-badge"></i>
                 <span>Faculty Details</span>
+                @if (completedTabNames.Contains("Faculty Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
 
             </a>
         </li>
@@ -346,6 +475,10 @@
 
                 <i class="bi bi-people"></i>
                 <span>Non Teaching Staff Details</span>
+                @if (completedTabNames.Contains("Non Teaching Staff Details"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
 
             </a>
         </li>
@@ -358,6 +491,10 @@
                 <i class="bi bi-clock-history"></i>
 
                 <span>Teaching Experience</span>
+                @if (completedTabNames.Contains("Teaching Experience"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
         
@@ -368,6 +505,10 @@
                 <i class="bi bi-file-earmark-check"></i>
 
                 <span>Action Taken Deficiency Report</span>
+                @if (completedTabNames.Contains("Action Taken Report"))
+                {
+                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
+                }
             </a>
         </li>
     </ul>

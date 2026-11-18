@@ -138,7 +138,8 @@ namespace VerificationPortal.Services.Verification.Services
 
                 OtherHealthScienceColleges = otherHealthScienceColleges,
 
-                HasTrustDetails = institution.TypeOfInstitution != "11"
+                HasTrustDetails = institution.TypeOfInstitution != "11",
+                HasAdministrativeAuthority = !string.IsNullOrWhiteSpace(institution.NameOfAdministrativeAuthority)
             };
 
             return new InstitutionDetailsPageData
