@@ -174,6 +174,8 @@ namespace VerificationPortal.Models
     : CA_Aff_BaseAcademicMattersViewModel
     {
         // future PG-specific properties here
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
     }
 
     public class CA_Aff_SsAcademicMattersViewModel

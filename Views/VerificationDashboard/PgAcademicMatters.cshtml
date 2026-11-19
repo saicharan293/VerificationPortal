@@ -39,6 +39,9 @@
 
     ViewData["NextTabLabel"] =
         "Next : Next Section";
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+
 }
 
 @section Scripts {
@@ -78,7 +81,7 @@
 
 @{
     var pgCourseFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 39);
+                                ?.FirstOrDefault(x => x.SectionName == "PG Academic Performance");
 }
 
 <div class="verification-card mt-4">

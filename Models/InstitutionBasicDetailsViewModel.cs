@@ -314,6 +314,8 @@ namespace VerificationPortal.Models
         public string? UserDesignation { get; set; }
 
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+
     }
 
     public class HostelFacilityRowVm

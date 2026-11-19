@@ -103,7 +103,7 @@
                     </label>
 
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace( staffOther?.TeachersUpdatedInEMS) ? "-" : staffOther.TeachersUpdatedInEMS)
+                        @(string.Equals(staffOther?.TeachersUpdatedInEMS?.Trim(), "Y", StringComparison.OrdinalIgnoreCase)  ? "Available" : "Not Available")
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
                         Examiner Details Attached
                     </label>
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace( staffOther?.ExaminerDetailsAttached) ? "-" : staffOther.ExaminerDetailsAttached)
+                        @(string.Equals( staffOther?.ExaminerDetailsAttached?.Trim(), "Y", StringComparison.OrdinalIgnoreCase) ? "Available" : "Not Available")
                     </div>
                 </div>
             </div>
@@ -129,7 +129,7 @@
                     </label>
 
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace(staffOther?.ServiceRegisterMaintained) ? "-" : staffOther.ServiceRegisterMaintained)
+                        @(string.Equals(staffOther?.ServiceRegisterMaintained?.Trim(), "Y", StringComparison.OrdinalIgnoreCase) ? "Available" : "Not Available")
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@
                         Acquittance Register Maintained
                     </label>
                     <div class="verification-value">
-                        @(string.IsNullOrWhiteSpace( staffOther?.AcquittanceRegisterMaintained) ? "-" : staffOther.AcquittanceRegisterMaintained)
+                        @(string.Equals(staffOther?.AcquittanceRegisterMaintained, "Y", StringComparison.OrdinalIgnoreCase) ? "Available" : "Not Available")
                     </div>
                 </div>
             </div>

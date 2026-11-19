@@ -174,3 +174,23 @@
         flex-wrap: wrap;
     }
 }
+
+
+/* Automatically highlights ANY nav-link containing the success checkmark */
+.nav-link:has(.bi-check-circle-fill) {
+    background-color: rgba(25, 135, 84, 0.08);
+    border-left: 3px solid #198754;
+    color: #146c43;
+    font-weight: 600;
+}
+
+.nav-link:has(.bi-check-circle-fill):hover {
+    background-color: rgba(25, 135, 84, 0.14);
+}
+
+/* Keep active state dominant when viewing a completed tab */
+.nav-link.active:has(.bi-check-circle-fill) {
+    background-color: var(--dental-navy, #002855);
+    border-left: 3px solid #20c997;
+    color: #ffffff;
+}

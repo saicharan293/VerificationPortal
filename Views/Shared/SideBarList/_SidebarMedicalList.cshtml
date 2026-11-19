@@ -1,3 +1,4 @@
+
 @* Sidebar partial for Verification Dashboard *@
 @{
     var activeTab = ViewData["ActiveTab"]?.ToString() ?? "";
@@ -6,358 +7,88 @@
     var facultyName = ViewData["FacultyName"]?.ToString() ?? "";
     var verificationStatus = ViewData["VerificationStatus"]?.ToString();
     var statusBadgeClass = ViewData["StatusBadgeClass"]?.ToString();
+
     var existingCourseLevel = Context.Session.GetString("CourseLevel");
 
     bool isGovt = ViewData["TypeOfInstitution"]?.ToString() == "Government/Autonomous";
-    
-    var completedTabNames = ViewData["CompletedTabNames"] as HashSet<string> ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    var completedTabNames = ViewData["CompletedTabNames"] as HashSet<string>
+        ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    var navTabs = new (string Action, string Label, string Icon, bool Show, string CompletedLabel)[]
+    {
+        ("InstitutionDetails", "Institution Details", "bi-building", true, "Institution Details"),
+
+        ("TrustDetails", "Trust Details", "bi-building", !isGovt, "Trust Details"),
+        ("TrustMemberDetails", "Trust Member Details", "bi-people", !isGovt, "Trust Member Details"),
+
+        ("DeanDirectorDetails", "Dean or Director Details", "bi-person-badge", true, "Dean or Director Details"),
+        ("PrincipalDetails", "Principal Details", "bi-mortarboard", true, "Principal Details"),
+
+        ("UGCourseDetails", "Ug Course Details", "bi-mortarboard", existingCourseLevel == "UG", "Ug Course Details"),
+        ("PgCourseDetails", "Pg Course Details", "bi-mortarboard", existingCourseLevel == "PG", "Pg Course Details"),
+
+        ("LandAndBuildingDetails", "Land And Building Details", "bi-building", true, "Land And Building Details"),
+        ("ClassroomAndLaboratory", "Classroom And Laboratory", "bi-houses", true, "Classroom And Laboratory"),
+        ("EquipmentList", "Equipment List", "bi-tools", true, "Equipment List"),
+        ("ClinicalFacilities", "Clinical Facilities", "bi-hospital", true, "Clinical Facilities"),
+        ("BedDistribution", "Bed Distribution", "bi-hospital", true, "Bed Distribution"),
+        ("DepartmentOfficesAndEducationalUnit", "Department Offices And Educational Unit", "bi-building", true, "Department Offices And Educational Unit"),
+        ("HostelDetails", "Hostel Details", "bi-house-door", true, "Hostel Details"),
+        ("AssociatedInstitution", "Associated Institution", "bi-building", true, "Associated Institution"),
+        ("CA_VehicleDetails", "Vehicle Details", "bi-car-front", true, "Vehicle Details"),
+
+        ("UgAcademicMatters", "UG Academic Matters", "bi-mortarboard", existingCourseLevel == "UG", "UG Academic Matters"),
+        ("PgAcademicMatters", "PG Academic Matters", "bi-mortarboard", existingCourseLevel == "PG", "PG Academic Matters"),
+
+        ("FinanceDetails", "Finance Details", "bi-cash-stack", true, "Finance Details"),
+        ("StaffPayScale", "Staff Pay Scale", "bi-wallet2", true, "Staff Pay Scale"),
+        ("StaffOtherDetails", "Staff Other Details", "bi-people", true, "Staff Other Details"),
+        ("CollegeDesignation", "Faculty Repository", "bi-people-fill", true, "Faculty Repository"),
+        ("Courses", "Courses and Intake", "bi-book", true, "Courses"),
+
+        ("LibraryServices", "Library Services", "bi-book", true, "Library Services"),
+        ("ResearchPublications", "Research and Publications", "bi-journal-text", true, "Research and Publications"),
+        ("LibraryDetails", "Library Details", "bi-book-half", true, "Library Details"),
+        ("FacultyDetails", "Faculty Details", "bi-person-badge", true, "Faculty Details"),
+        ("NonTeachingStaffDetails", "Non Teaching Staff Details", "bi-people", true, "Non Teaching Staff Details"),
+        ("TeachingExperience", "Teaching Experience", "bi-clock-history", true, "Teaching Experience"),
+        ("PaymentDetails", "Payment Details", "bi-credit-card", true, "Payment Details"),
+        ("GeoTaggedPhotos", "Geo Tagged Photos", "bi-camera", true, "Geo Tagged Photos")
+    };
 }
 
 <!-- Navigation Tabs -->
 <nav class="sidebar-nav" aria-label="Verification sections">
     <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "InstitutionDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard" asp-action="InstitutionDetails" asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-building"></i>
-                <span>Institution Details</span>
 
-                @if(completedTabNames.Contains("Institution Details"))
-                {
-                    <i class="bi bi-check-circle-fill text-success ms-auto" title="Verification Completed"></i>
-                }
-            </a>
-        </li>
-        @if (!isGovt)
+        @foreach (var tab in navTabs.Where(t => t.Show))
         {
+            var isActive = activeTab == tab.Action;
+            var isCompleted = completedTabNames.Contains(tab.CompletedLabel);
+
             <li class="nav-item">
-                <a class="nav-link @(activeTab == "TrustDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard" asp-action="TrustDetails" asp-route-collegeCode="@collegeCode">
-                    <i class="bi bi-building"></i>
-                    <span>Trust Details</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(activeTab == "TrustMemberDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard" asp-action="TrustMemberDetails" asp-route-collegeCode="@collegeCode">
-                    <i class="bi bi-people"></i>
-                    <span>Trust Member Details</span>
+                <a class="nav-link @(isActive ? "active" : "")"
+                   asp-controller="VerificationDashboard"
+                   asp-action="@tab.Action"
+                   asp-route-collegeCode="@collegeCode">
+
+                    <i class="bi @tab.Icon"></i>
+                    <span>@tab.Label</span>
+
+                    @if (isCompleted)
+                    {
+                        <i class="bi bi-check-circle-fill text-success ms-auto"
+                           title="Verification Completed"></i>
+                    }
                 </a>
             </li>
         }
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "DeanDirectorDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard" asp-action="DeanDirectorDetails" asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-person-badge"></i>
-                <span>Dean or Director Details</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "PrincipalDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard" asp-action="PrincipalDetails" asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-mortarboard"></i>
-                <span>Principal Details</span>
-            </a>
-        </li>
-        @if(existingCourseLevel == "UG")
-        {
-            <li class="nav-item">
-                <a class="nav-link @(activeTab == "UGCourseDetails" ? "active" : "")"
-                    asp-controller="VerificationDashboard" asp-action="UGCourseDetails" asp-route-collegeCode="@collegeCode">
-                    <i class="bi bi-mortarboard"></i>
-                    <span>Ug Course Details</span>
-                </a>
-            </li>
-        }
-        else if(existingCourseLevel == "PG")
-        {
-            <li class="nav-item">
-                <a class="nav-link @(activeTab == "PgCourseDetails" ? "active" : "")"
-                    asp-controller="VerificationDashboard" asp-action="PgCourseDetails" asp-route-collegeCode="@collegeCode">
-                    <i class="bi bi-mortarboard"></i>
-                    <span>Pg Course Details</span>
-                </a>
-            </li>
-        }
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "LandAndBuildingDetails" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="LandAndBuildingDetails"
-                asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-building"></i>
-                <span>Land And Building Details</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "ClassroomAndLaboratory" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="ClassroomAndLaboratory"
-                asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-houses"></i>
-                <span>Classroom And Laboratory</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="EquipmentList"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "EquipmentList" ? "active" : "")">
-
-                <i class="bi bi-tools"></i>
-                <span>Equipment List</span>
-
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "ClinicalFacilities" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="ClinicalFacilities"
-                asp-route-collegeCode="@collegeCode">
-
-                <i class="bi bi-hospital"></i>
-
-                <span>Clinical Facilities</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="BedDistribution"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "BedDistribution" ? "active" : "")">
-
-                <i class="bi bi-hospital"></i>
-
-                <span>Bed Distribution</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="DepartmentOfficesAndEducationalUnit"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "DepartmentOfficesAndEducationalUnit" ? "active" : "")">
-                <i class="bi bi-building"></i>
-                <span>Department Offices And Educational Unit</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="HostelDetails"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "HostelDetails" ? "active" : "")">
-                <i class="bi bi-house-door"></i>
-                <span>Hostel Details</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="AssociatedInstitution"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "AssociatedInstitution" ? "active" : "")">
-                <i class="bi bi-building"></i>
-                <span>Associated Institution</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="CA_VehicleDetails"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "CAVehicleDetails" ? "active" : "")">
-
-                <i class="bi bi-car-front"></i>
-                <span>Vehicle Details</span>
-            </a>
-        </li>
-
-        @if (existingCourseLevel == "UG")
-        {
-            <li class="nav-item">
-                <a asp-controller="VerificationDashboard"
-                asp-action="UgAcademicMatters"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "UgAcademicMatters" ? "active" : "")">
-
-                    <i class="bi bi-mortarboard"></i>
-
-                    <span>UG Academic Matters</span>
-                </a>
-            </li>
-        }
-
-        @if (existingCourseLevel == "PG")
-        {
-            <li class="nav-item">
-                <a asp-controller="VerificationDashboard"
-                asp-action="PgAcademicMatters"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "PgAcademicMatters" ? "active" : "")">
-
-                    <i class="bi bi-mortarboard"></i>
-                    <span>PG Academic Matters</span>
-                </a>
-            </li>
-        }
-
-        <li class="nav-item">
-            <a href="@Url.Action( "FinanceDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "FinanceDetails" ? "active" : "")">
-
-                <i class="bi bi-cash-stack"></i>
-                <span>Finance Details</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a href="@Url.Action("StaffPayScale", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "StaffPayScale" ? "active" : "")">
-                <i class="bi bi-wallet2"></i>
-                <span> Staff Pay Scale </span>
-
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="@Url.Action("StaffOtherDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "StaffOtherDetails" ? "active" : "")">
-                <i class="bi bi-people"></i>
-                <span> Staff Other Details </span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a href="@Url.Action("CollegeDesignation", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "CollegeDesignation" ? "active" : "")">
-
-                <i class="bi bi-people-fill"></i>
-                <span> Faculty Repository </span>
-
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "Courses" ? "active" : "")"
-                asp-controller="VerificationDashboard" asp-action="Courses" asp-route-collegeCode="@collegeCode">
-                <i class="bi bi-book"></i>
-                <span>Courses and Intake</span>
-            </a>
-        </li>
-        
-        @* <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="WorkShopDetails"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "WorkShopDetails" ? "active" : "")">
-
-                <i class="bi bi-building-gear"></i>
-                <span>Workshop Details</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="AnimalHouseDetails"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "AnimalHouseDetails" ? "active" : "")">
-
-                <i class="bi bi-house-heart"></i>
-                <span>Animal House Details</span>
-            </a>
-        </li> *@
-
-        @* <li class="nav-item">
-            <a asp-controller="VerificationDashboard"
-                asp-action="DentalFieldPracticeArea"
-                asp-route-collegeCode="@collegeCode"
-                class="nav-link @(activeTab == "DentalFieldPracticeArea" ? "active" : "")">
-
-                <i class="bi bi-geo-alt"></i>
-                <span>Dental Field Practice Area</span>
-            </a>
-        </li> *@
-
-        
-        <li class="nav-item">
-            <a href="@Url.Action("LibraryServices", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "LibraryServices" ? "active" : "")">
-
-                <i class="bi bi-book"></i>
-                <span>Library Services</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="@Url.Action("ResearchPublications", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "ResearchPublications" ? "active" : "")">
-
-                <i class="bi bi-journal-text"></i>
-                <span>Research and Publications</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="@Url.Action("LibraryDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "LibraryDetails" ? "active" : "")">
-
-                <i class="bi bi-book-half"></i>
-                <span>Library Details</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a href="@Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "FacultyDetails" ? "active" : "")">
-
-                <i class="bi bi-person-badge"></i>
-                <span>Faculty Details</span>
-
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="@Url.Action("NonTeachingStaffDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "NonTeachingStaffDetails" ? "active" : "")">
-
-                <i class="bi bi-people"></i>
-                <span>Non Teaching Staff Details</span>
-
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link @(activeTab == "TeachingExperience" ? "active" : "")"
-                asp-controller="VerificationDashboard"
-                asp-action="TeachingExperience"
-                asp-route-collegeCode="@collegeCode">
-
-                <i class="bi bi-clock-history"></i>
-
-                <span>Teaching Experience</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a href="@Url.Action("PaymentDetails", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "PaymentDetails" ? "active" : "")">
-
-                <i class="bi bi-credit-card"></i>
-                <span>Payment Details</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="@Url.Action("GeoTaggedPhotos", "VerificationDashboard", new { collegeCode = collegeCode })"
-                class="nav-link @(activeTab == "GeoTaggedPhotos" ? "active" : "")">
-
-                <i class="bi bi-camera"></i>
-                <span>Geo Tagged Photos</span>
-            </a>
-        </li>
-
     </ul>
 </nav>
 
-<!-- Sidebar Overlay for Mobile -->
+@* Sidebar Overlay for Mobile *@
 @* <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div> *@
 
-<!-- Verification Summary Modal -->
+@* Verification Summary Modal *@
 @* <partial name="_VerificationSummaryModal" /> *@

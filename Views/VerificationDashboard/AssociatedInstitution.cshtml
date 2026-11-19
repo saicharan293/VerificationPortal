@@ -30,6 +30,8 @@
     ViewData["NextTabLabel"] = "Next : Vehicle Details";
 
     var associatedFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Associated Institution Details");
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
 }
 
 @section Scripts {
