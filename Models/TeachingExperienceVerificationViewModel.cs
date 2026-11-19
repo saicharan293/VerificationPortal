@@ -14,6 +14,7 @@
         } = new();
 
         public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+        public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
     }
 
 

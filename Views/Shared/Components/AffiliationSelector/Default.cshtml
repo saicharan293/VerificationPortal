@@ -166,6 +166,9 @@ else
 
                             @foreach (var level in Model.CourseLevels)
                             {
+
+                                //SKIP PG AND SS FOR FACULTY CODE 1
+                                if (Model.FacultyCode == 1 && (level.Level == "PG" || level.Level == "SS")) continue;
                                 bool isDisabled = Model.FacultyCode == 1 && level.Level != "UG";
 
                                 <button type="button"

@@ -4089,7 +4089,7 @@ namespace VerificationPortal.Controllers
                     CollegeCode = collegeCode,
                     FacultyId = context.FacultyCodeInt,
                     FacultyName = context.FacultyName,
-                    CurrentVerifier = GetUserDesignation(),
+                    CurrentVerifier = GetUserDesignation()
                 },
                 AssociatedInstitutions = associated,
                 CollegeCode = collegeCode,
@@ -4102,7 +4102,7 @@ namespace VerificationPortal.Controllers
             vm.PageContext.CollegeName = context.InstitutionName;
             vm.PageContext.InstitutionName = context.InstitutionName;
 
-            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Staff Pay Scale", context.FacultyCodeInt);
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Associated Institution", context.FacultyCodeInt);
 
             var isAdmin = IsAdminUser();
 
@@ -4122,6 +4122,7 @@ namespace VerificationPortal.Controllers
             var completedTabNames = verificationDetails.Where(e => e.IsCompleted).Select(e => e.TabName).ToHashSet(StringComparer.OrdinalIgnoreCase);
             ViewData["CompletedTabNames"] = completedTabNames;
             ViewData["TabVerificationDetails"] = verificationDetails;
+            vm.PageContext.TabId = tabId;
             vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName, facultyCodeInt, courseLevel, isAdmin);
 
 
@@ -9050,7 +9051,7 @@ namespace VerificationPortal.Controllers
             ViewData["CompletedTabNames"] = completedTabNames;
             ViewData["TabVerificationDetails"] = verificationDetails;
             model.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName, facultyCodeInt, courseLevel, isAdmin);
-
+            model.SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Teaching Experience", pageContext.FacultyCodeInt);
 
             return View("TeachingExperience", model);
         }
@@ -9546,6 +9547,18 @@ namespace VerificationPortal.Controllers
             var courseLevel = HttpContext.Session.GetString("CourseLevel")
                 ?? HttpContext.Session.GetString("SelectedCourseLevel");
 
+            var verificationDetails = await GetTabVerificationDetailsAsync(pageContext.FacultyCodeInt, collegeCode, courseLevel, pageContext.Institution.TypeOfInstitution);
+
+            var completedTabNames = verificationDetails.Where(e => e.IsCompleted).Select(e => e.TabName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var facultyCode = pageContext.Faculty.FacultyId;
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var isAdmin = IsAdminUser();
+
+            var tabName = _tabService.GetDatabaseTabName("PaymentDetails");
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyCode);
+
+            var tabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName ?? string.Empty, facultyCode, courseLevel, isAdmin);
             var vm = new PaymentDetailsVm
             {
                 PageContext = new VerificationPageContextVm
@@ -9560,14 +9573,16 @@ namespace VerificationPortal.Controllers
                     PrevTabAction = Url.Action("FinanceDetails", "VerificationDashboard", new { collegeCode }),
                     PrevTabLabel = "Previous : Finance Details",
                     NextTabAction = Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode }),
-                    NextTabLabel = "Next : Faculty Details"
+                    NextTabLabel = "Next : Faculty Details",
+                    CompletedTabNames = completedTabNames,
+                    TabVerificationDetails = verificationDetails
                 },
                 CollegeCode = collegeCode,
                 CourseLevel = courseLevel
             };
 
             ViewData["TabId"]  = await _tabService.GetTabIdAsync("PaymentDetails", pageContext.FacultyCodeInt);
-
+            ViewData["TabwiseVerification"] = tabwiseVerification;
             // --------------------------------------------------
             // Resolve course level group from session
             // --------------------------------------------------
@@ -9718,17 +9733,11 @@ namespace VerificationPortal.Controllers
             // Section feedback
             // --------------------------------------------------
 
-            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync(
-                collegeCode,
-                "Payment Details",
-                facultyId);
+            vm.SectionFeedback = await GetSectionFeedbackByTabNameAsync( collegeCode, "Payment Details", facultyId);
 
-            await SetTabWiseVerificationViewData(
-                collegeCode,
-                ControllerContext.ActionDescriptor.ActionName,
-                facultyId);
+            await SetTabWiseVerificationViewData( collegeCode, ControllerContext.ActionDescriptor.ActionName, facultyId);
 
-            return View("PaymentDetails", vm);
+            return View(vm);
         }
 
         // GET: /VerificationDashboard/ViewPaymentScreenshot/{collegeCode}

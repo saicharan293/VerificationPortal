@@ -32,6 +32,7 @@
     var associatedFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Associated Institution Details");
 
     ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+    ViewData["TabId"] = Model.PageContext.TabId;
 }
 
 @section Scripts {

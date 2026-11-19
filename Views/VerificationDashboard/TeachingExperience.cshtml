@@ -39,6 +39,9 @@
         "Next : Next Section";
 
     ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+
+     var teachingExperienceFeedback = Model.SectionFeedback.FirstOrDefault(x => x.SectionName == "Teaching Experience");
+
 }
 
 
@@ -330,6 +333,10 @@
             }
         }
 
+        @if (teachingExperienceFeedback != null)
+        {
+            @await Html.PartialAsync("_SectionFeedback", teachingExperienceFeedback)
+        }
     </div>
 
 </div>
