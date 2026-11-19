@@ -35,6 +35,9 @@
 
     var transactionFeedback =
         Model.FeeStructureFeedback?.FirstOrDefault(x => x.SectionName == "Payment Receipt Details");
+
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+
 }
 
 <div class="container-fluid px-3 px-md-4 py-3">

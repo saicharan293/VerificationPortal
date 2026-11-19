@@ -34,6 +34,7 @@ builder.Services.AddScoped<ITabWiseVerificationService, TabWiseVerificationServi
 builder.Services.AddScoped<ISectionFeedbackService, SectionFeedbackService>();
 builder.Services.AddScoped<IVerificationPageContextService, VerificationPageContextService>();
 builder.Services.AddScoped<IDocumentViewerService, DocumentViewerService>();
+builder.Services.AddScoped<ICollegeVerificationStatusService, CollegeVerificationStatusService>();
 builder.Services.AddScoped<ITabService, TabService>();
 builder.Services.AddScoped<InstitutionTypeFilter>();
 

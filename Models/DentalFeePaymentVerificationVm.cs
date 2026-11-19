@@ -40,6 +40,9 @@ namespace VerificationPortal.Models
         // Keep this only if your page has a general feedback section.
         public List<SectionFeedbackViewModel> SectionFeedback { get; set; }
             = new();
+
+        public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+
     }
 
     public class DentalApplicableCourseVerificationVm

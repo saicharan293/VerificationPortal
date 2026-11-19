@@ -1,20 +1,23 @@
-@model List<VerificationPortal.Models.AffiliationPgSsCourseDetail>
+@model VerificationPortal.ViewModels.PgCourseDetailsViewModel
+
 @{
     Layout = "~/Views/Shared/_VerificationDashboardLayout.cshtml";
     ViewData["Title"] = "PG Course Details - Verification Dashboard";
-    ViewData["ActiveTab"] = "PgCourseDetails";
-    ViewData["InstitutionName"] = ViewBag.InstitutionName ?? "Unknown Institution";
-    ViewData["CollegeCode"] = ViewBag.CollegeCode ?? "";
-    ViewData["FacultyName"] = ViewBag.FacultyName ?? "";
-    ViewData["VerificationStatus"] = "Pending";
-    ViewData["StatusBadgeClass"] = "pending";
+    ViewData["ActiveTab"] = Model.PageContext.ActiveTab ?? "PgCourseDetails";
+    ViewData["InstitutionName"] = Model.PageContext.InstitutionName ?? "Unknown Institution";
+    ViewData["CollegeCode"] = Model.PageContext.CollegeCode ?? "";
+    ViewData["FacultyName"] = Model.PageContext.FacultyName ?? "";
+    ViewData["VerificationStatus"] = Model.PageContext.VerificationStatus;
+    ViewData["StatusBadgeClass"] = Model.PageContext.StatusBadgeClass;
     ViewData["ShowFeedbackSection"] = true;
-    // ViewData["ShowFeedbackForm"] = true;
-    ViewData["CurrentVerifier"] = User.Identity?.Name + " - " + ViewBag.UserDesignation;
-    ViewData["NextTabAction"] = ViewBag.NextTabAction;
-    ViewData["NextTabLabel"] = ViewBag.NextTabLabel;
-    ViewData["PrevTabAction"] = ViewBag.PrevTabAction;
-    ViewData["PrevTabLabel"] = ViewBag.PrevTabLabel;
+    ViewData["CurrentVerifier"] = $"{Model.PageContext.CurrentVerifier} - {Model.PageContext.UserDesignation}";
+    ViewData["NextTabAction"] = Model.PageContext.NextTabAction;
+    ViewData["NextTabLabel"] = Model.PageContext.NextTabLabel;
+    ViewData["PrevTabAction"] = Model.PageContext.PrevTabAction;
+    ViewData["PrevTabLabel"] = Model.PageContext.PrevTabLabel;
+    ViewData["TabId"] = Model.PageContext.TabId;
+    ViewData["CompletedTabNames"] = Model.PageContext.CompletedTabNames;
+    ViewData["TabVerificationDetails"] = Model.PageContext.TabVerificationDetails;
 }
 
 @section Styles {
@@ -30,8 +33,7 @@
 </div>
 
 @{
-    var pgFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                ?.FirstOrDefault(x => x.SectionId == 24);
+    var pgFeedback = Model.SectionFeedback?.FirstOrDefault(x => x.SectionName == "PG Course Details");
 }
 
 <!-- PG/SS Courses Table Card -->
@@ -41,22 +43,18 @@
             <i class="bi bi-mortarboard"></i>
             PG Course Details
         </h3>
-        <span class="badge bg-primary ms-2">@(Model?.Count ?? 0) Courses</span>
+        <span class="badge bg-primary ms-2">@(Model.Courses?.Count ?? 0) Courses</span>
     </div>
     <div class="verification-card-body">
-        @if (Model != null && Model.Count > 0)
+        @if (Model.Courses != null && Model.Courses.Count > 0)
         {
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            @* <th>Course Code</th> *@
                             <th>Course Name</th>
-                            @* <th>Type of Affiliation</th> *@
                             <th>Course Level</th>
-                            @* <th>Course Prefix</th> *@
-                            @* <th>Present Intake</th> *@
                             <th>LOP Intake</th>
                             <th>LOP Date</th>
                             <th>Recognition by NMC</th>
@@ -65,14 +63,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (int i = 0; i < Model.Count; i++)
+                        @for (int i = 0; i < Model.Courses.Count; i++)
                         {
-                            var course = Model[i];
+                            var course = Model.Courses[i];
                             <tr>
                                 <td>@(i + 1)</td>
-                                @* <td><code>@course.CourseCode</code></td> *@
                                 <td><strong>@course.CourseName</strong></td>
-                                @* <td><span class="badge bg-secondary">@course.TypeOfAffiliation</span></td> *@
                                 <td>
                                     @{
                                         var levelBadge = course.CourseLevel switch
@@ -84,9 +80,7 @@
                                     }
                                     <span class="">@course.CourseLevel</span>
                                 </td>
-                                @* <td>@course.CoursePrefix</td> *@
                                 <td>@course.PresentIntake</td>
-                                @* <td>@course.RguhsIntake</td> *@
                                 <td>@(course.Lopdate?.ToString("dd MMM yyyy") ?? "-")</td>
                                 <td>@(course.DateofRecognitionByNmc?.ToString("dd MMM yyyy") ?? "-")</td>
                                 <td>@(course.DateofRecognitionByDci?.ToString("dd MMM yyyy") ?? "-")</td>

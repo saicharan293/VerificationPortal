@@ -4,13 +4,26 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
+using VerificationPortal.Services.Verification.Interfaces;
 namespace VerificationPortal.Controllers
 {
     [Authorize]
-    public class MyCollegesController(ApplicationDbContext context, ILogger<MyCollegesController> logger) : Controller
+    public class MyCollegesController : Controller
     {
-        private readonly ApplicationDbContext _context = context;
-        private readonly ILogger<MyCollegesController> _logger = logger;
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<MyCollegesController> _logger;
+        private readonly ICollegeVerificationStatusService _verificationStatusService;
+
+        public MyCollegesController(
+            ApplicationDbContext context, 
+            ICollegeVerificationStatusService verificationStatusService,
+            ILogger<MyCollegesController> logger)
+        {
+            _context = context;
+            _verificationStatusService = verificationStatusService;
+            _logger = logger;
+
+        }
 
         private bool IsAdminUser()
         {
@@ -272,42 +285,108 @@ namespace VerificationPortal.Controllers
             return result;
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetVerificationStatuses( int facultyId, List<string> collegeCodes)
         {
-            if (collegeCodes == null || !collegeCodes.Any())
+            if (facultyId <= 0 || collegeCodes == null || !collegeCodes.Any())
             {
-                return Json(new Dictionary<string, CollegeFeedbackStatusViewModel>());
+                return BadRequest(new { success = false, message = "Invalid request." });
             }
 
-            var totalSections = await _context.MstSections
-                .AsNoTracking()
-                .CountAsync(s => s.FacultyId == facultyId);
+            // 1. Get Course Level from Session
+            var courseLevel = HttpContext.Session.GetString("CourseLevel");
 
-            var allFeedback = await _context.SectionWiseFeedbacks
+            if (string.IsNullOrWhiteSpace(courseLevel))
+            {
+                return Unauthorized();
+            }
+
+            // 2. Get Logged-in User ID
+            if (!int.TryParse( User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            // 3. Remove duplicates and invalid college codes
+            collegeCodes = collegeCodes
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.Trim())
+                .Distinct()
+                .ToList();
+
+            if (!collegeCodes.Any())
+            {
+                return BadRequest(new { success = false, message = "No valid college codes." });
+            }
+
+            // 4. Get active mappings for logged-in user and faculty
+            var mappings = await _context.TblCollegeMappings
                 .AsNoTracking()
-                .Where(f =>
-                    f.FacultyId == facultyId &&
-                    collegeCodes.Contains(f.CollegeCode))
+                .Where(m =>
+                    m.UserId == userId &&
+                    m.FacultyCode == facultyId &&
+                    m.IsActive &&
+                    m.CollegeFrom != null &&
+                    m.CollegeTo != null)
+                .Select(m => new
+                {
+                    m.CollegeFrom,
+                    m.CollegeTo
+                })
                 .ToListAsync();
 
-            var result =
-                new Dictionary<string, CollegeFeedbackStatusViewModel>();
+            // 5. Verify that every requested college is authorized
+            bool isAuthorized = collegeCodes.All(collegeCode =>
+                mappings.Any(m =>
+                    string.Compare(m.CollegeFrom, collegeCode, StringComparison.Ordinal) <= 0 &&
+                    string.Compare(m.CollegeTo, collegeCode, StringComparison.Ordinal) >= 0
+                ));
+
+            if (!isAuthorized)
+            {
+                return Forbid();
+            }
+
+            // 6. Get Institution Types for all colleges
+            var institutionTypes = await _context.AffInstitutionsDetails
+                .AsNoTracking()
+                .Where(e => collegeCodes.Contains(e.CollegeCode))
+                .Select(e => new
+                {
+                    e.CollegeCode,
+                    e.TypeOfInstitution
+                })
+                .ToListAsync();
+
+            var institutionTypeDictionary = institutionTypes
+                .GroupBy(e => e.CollegeCode)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First().TypeOfInstitution
+                );
+
+            // 7. Get Overall Verification Status for each college
+            var result = new Dictionary<string, object>();
 
             foreach (var collegeCode in collegeCodes)
             {
-                var collegeFeedback = allFeedback
-                    .Where(f => f.CollegeCode == collegeCode)
-                    .ToList();
+                institutionTypeDictionary.TryGetValue(collegeCode, out var typeOfInstitution);
 
-                result[collegeCode] =
-                    GetCollegeFeedbackStatus(
-                        collegeFeedback,
-                        totalSections);
+                var status =
+                    await _verificationStatusService.GetOverallVerificationStatusAsync( facultyId, collegeCode, courseLevel, typeOfInstitution );
+
+                result[collegeCode] = new { status };
             }
 
-            return Json(result);
+            // 8. Return all college statuses
+            return Json(new
+            {
+                success = true,
+                statuses = result
+            });
         }
+
 
         private CollegeFeedbackStatusViewModel GetCollegeFeedbackStatus( List<SectionWiseFeedback> collegeFeedback, int totalSections)
         {
@@ -410,6 +489,43 @@ namespace VerificationPortal.Controllers
             };
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetCollegeVerificationStatus(string collegeCode, int facultyId)
+        //{
+        //    if(string.IsNullOrWhiteSpace(collegeCode)) return BadRequest(new { success = false });
+
+        //    var courseLevel = HttpContext.Session.GetString("CourseLevel");
+
+        //    if(string.IsNullOrWhiteSpace(courseLevel)) return Unauthorized();
+
+
+        //    if(!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var typeOfInstitution = await _context.AffInstitutionsDetails.Where(e => e.CollegeCode == collegeCode).Select(e => e.TypeOfInstitution).FirstOrDefaultAsync();
+        //    var isAuthorized = await _context.TblCollegeMappings
+        //        .AsNoTracking()
+        //        .AnyAsync(m => 
+        //            m.UserId == userId &&
+        //            m.FacultyCode == facultyId &&
+        //            m.IsActive &&
+        //            m.CollegeFrom != null &&
+        //            m.CollegeTo != null &&
+        //            string.Compare(m.CollegeFrom, collegeCode) <= 0 &&
+        //            string.Compare(m.CollegeTo, collegeCode) >= 0);
+            
+        //    if(!isAuthorized) return Forbid();
+
+        //    var status = await _verificationStatusService.GetOverallVerificationStatusAsync(facultyId, collegeCode, courseLevel, typeOfInstitution);
+
+        //    return Json(new
+        //    {
+        //        success = true,
+        //        status
+        //    });
+        //}
 
     }
 }

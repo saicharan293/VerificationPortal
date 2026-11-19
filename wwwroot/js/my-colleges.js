@@ -1,39 +1,70 @@
-﻿
+﻿document.addEventListener("DOMContentLoaded", function () {
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Add search/filter functionality for college tables
-    const searchInputs = document.querySelectorAll('.college-search');
+    // =====================================================
+    // PAGE CONFIGURATION
+    // =====================================================
+
+    const page = document.getElementById("myCollegePage");
+
+    if (!page) {
+        console.error("myCollegePage element not found.");
+        return;
+    }
+
+    const statusUrl = page.dataset.statusUrl;
+
+    if (!statusUrl) {
+        console.error("Verification status URL not configured.");
+        return;
+    }
+
+    // =====================================================
+    // SEARCH FUNCTIONALITY
+    // =====================================================
+
+    const searchInputs = document.querySelectorAll(".college-search");
 
     searchInputs.forEach(input => {
-        input.addEventListener('keyup', function () {
+
+        input.addEventListener("input", function () {
+
             const filter = this.value.toUpperCase();
-            const table = this.closest('.colleges-container').querySelector('table');
-            const rows = table.querySelectorAll('tbody tr');
+
+            const container = this.closest(".colleges-container");
+
+            if (!container) return;
+
+            const rows = container.querySelectorAll("tbody tr");
 
             rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                let match = false;
-                cells.forEach(cell => {
-                    if (cell.textContent.toUpperCase().includes(filter)) {
-                        match = true;
-                    }
-                });
-                row.style.display = match ? '' : 'none';
+
+                const match = row.textContent
+                    .toUpperCase()
+                    .includes(filter);
+
+                row.style.display = match ? "" : "none";
             });
         });
     });
 
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    // =====================================================
+    // TOOLTIP INITIALIZATION
+    // =====================================================
+
+    if (typeof bootstrap !== "undefined") {
+
+        const tooltipTriggerList = document.querySelectorAll(
+            '[data-bs-toggle="tooltip"]'
+        );
+
+        tooltipTriggerList.forEach(element => {
+            new bootstrap.Tooltip(element);
+        });
+    }
 
     // =====================================================
-    // LOAD VERIFICATION STATUSES
+    // LOAD VERIFICATION STATUSES (BULK API)
     // =====================================================
-    const page = document.getElementById("myCollegesPage");
-    const statusUrl = page.dataset.statusUrl;
 
     loadVerificationStatuses();
 
@@ -55,24 +86,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 facultyGroups[facultyId] = [];
             }
 
-            // Prevent duplicate college codes
+            // Avoid duplicate college codes
             if (!facultyGroups[facultyId].includes(collegeCode)) {
                 facultyGroups[facultyId].push(collegeCode);
             }
         });
 
-        // Call API separately for each faculty
-        for (const facultyId in facultyGroups) {
+        // One API request per faculty
+        for (const facultyId of Object.keys(facultyGroups)) {
 
             const collegeCodes = facultyGroups[facultyId];
 
-            if (!collegeCodes || collegeCodes.length === 0) {
+            if (!collegeCodes.length) {
                 continue;
             }
 
             try {
 
-                // Build query string
+                // Build query parameters
                 const params = new URLSearchParams();
 
                 params.append("facultyId", facultyId);
@@ -84,70 +115,71 @@ document.addEventListener("DOMContentLoaded", function () {
                 const response = await fetch(`${statusUrl}?${params.toString()}`);
 
                 if (!response.ok) {
-                    throw new Error("Failed to load verification statuses.");
+                    throw new Error( `Failed to load statuses. HTTP ${response.status}` );
                 }
 
-                const statuses = await response.json();
+                const result = await response.json();
 
-                updateVerificationStatuses(statuses);
+                if (!result.success || !result.statuses) {
+                    throw new Error("Invalid verification status response.");
+                }
+
+                updateVerificationStatuses( result.statuses, facultyId );
 
             }
             catch (error) {
 
                 console.error(
-                    "Error loading verification statuses:",
+                    `Error loading statuses for faculty ${facultyId}:`,
                     error
                 );
 
-                // Show error state
                 collegeCodes.forEach(collegeCode => {
 
                     const elements = document.querySelectorAll(
-                        `.verification-status[data-college-code="${collegeCode}"][data-faculty-id="${facultyId}"]`
+                        `.verification-status[data-college-code="${CSS.escape(collegeCode)}"][data-faculty-id="${CSS.escape(facultyId)}"]`
                     );
 
                     elements.forEach(element => {
 
-                        element.className =
-                            "status-badge pending verification-status";
+                        element.className = "status-badge pending verification-status";
 
                         element.innerHTML = `
-                                <i class="bi bi-exclamation-circle me-1"></i>
-                                <span class="status-text">Unable to Load</span>
-                            `;
+                            <i class="bi bi-exclamation-circle me-1"></i>
+                            <span class="status-text">Unable to Load</span>
+                        `;
                     });
                 });
             }
         }
     }
 
-
     // =====================================================
-    // UPDATE STATUS UI
+    // UPDATE VERIFICATION STATUS UI
     // =====================================================
 
-    function updateVerificationStatuses(statuses) {
+    function updateVerificationStatuses(statuses, facultyId) {
 
-        if (!statuses) {
-            return;
-        }
+        if (!statuses) return;
 
         Object.keys(statuses).forEach(collegeCode => {
 
             const statusData = statuses[collegeCode];
 
             const elements = document.querySelectorAll(
-                `.verification-status[data-college-code="${collegeCode}"]`
+                `.verification-status[data-college-code="${CSS.escape(collegeCode)}"][data-faculty-id="${CSS.escape(facultyId)}"]`
             );
 
             elements.forEach(element => {
 
+                const statusText = statusData.status || "Pending";
+
                 let statusClass = "";
                 let icon = "";
-                let statusText = statusData.status || "Pending";
 
                 switch (statusText.toLowerCase()) {
 
+                    case "accepted":
                     case "completed":
                     case "verified":
                         statusClass = "completed";
@@ -159,25 +191,26 @@ document.addEventListener("DOMContentLoaded", function () {
                         icon = "bi-x-circle-fill";
                         break;
 
+                    case "not started":
+                        statusClass = "pending";
+                        icon = "bi-circle";
+                        break;
+
                     case "pending":
                     default:
                         statusClass = "pending";
                         icon = "bi-hourglass-split";
-                        statusText = "Pending";
                         break;
                 }
 
-                element.className =
-                    "status-badge " +
-                    statusClass +
-                    " verification-status";
+                element.className = `status-badge ${statusClass} verification-status`;
 
                 element.innerHTML = `
-                        <i class="bi ${icon} me-1"></i>
-                        <span class="status-text">${statusText}</span>
-                    `;
+                    <i class="bi ${icon} me-1"></i>
+                    <span class="status-text">${statusText}</span>
+                `;
 
-                // Optional tooltip with section counts
+                // Tooltip information
                 element.title =
                     `Completed: ${statusData.completedSections ?? 0} / ${statusData.totalSections ?? 0}
                     Pending: ${statusData.pendingSections ?? 0}
@@ -186,68 +219,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-    // =====================================================
-    // SEARCH FUNCTIONALITY
-    // =====================================================
-
-    // const searchInputs =
-    //     document.querySelectorAll('.college-search');
-
-    searchInputs.forEach(input => {
-
-        input.addEventListener('keyup', function() {
-
-            const filter =
-                this.value.toUpperCase();
-
-            const table =
-                this.closest('.colleges-container')
-                    .querySelector('table');
-
-            const rows =
-                table.querySelectorAll('tbody tr');
-
-            rows.forEach(row => {
-
-                const cells =
-                    row.querySelectorAll('td');
-
-                let match = false;
-
-                cells.forEach(cell => {
-
-                    if (
-                        cell.textContent
-                            .toUpperCase()
-                            .includes(filter)
-                    ) {
-                        match = true;
-                    }
-                });
-
-                row.style.display =
-                    match ? '' : 'none';
-            });
-        });
-    });
-
-
-    // =====================================================
-    // TOOLTIP INITIALIZATION
-    // =====================================================
-
-    // const tooltipTriggerList =
-    //     [].slice.call(
-    //         document.querySelectorAll(
-    //             '[data-bs-toggle="tooltip"]'
-    //         )
-    //     );
-
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-
-        return new bootstrap.Tooltip(
-            tooltipTriggerEl
-        );
-    });
 });
