@@ -9,6 +9,7 @@ using System.Security.Claims;
 using VerificationPortal.Application.Interfaces;
 using VerificationPortal.DATA;
 using VerificationPortal.Models;
+using VerificationPortal.Models.Verification;
 using VerificationPortal.Models.ViewModels;
 using VerificationPortal.Services.Verification;
 using VerificationPortal.Services.Verification.Interfaces;
@@ -33,6 +34,7 @@ namespace VerificationPortal.Controllers
         private readonly IVerificationPageService _verificationPageService;
         private readonly ITabWiseVerificationService _tabWiseVerificationService;
         private readonly ISectionFeedbackService _sectionFeedbackService;
+        private readonly IMedicalCollegeCourseIntakeVerificationService _medicalCollegeCourseIntakeVerificationService;
 
         private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
 
@@ -49,7 +51,8 @@ namespace VerificationPortal.Controllers
             ISectionFeedbackService sectionFeedbackService,
             IVerificationPageContextService verificationPageContextService,
             IVerificationPageService verificationPageService,
-            IPrincipalDetailsService principalDetailsService)
+            IPrincipalDetailsService principalDetailsService,
+            IMedicalCollegeCourseIntakeVerificationService medicalCollegeCourseIntakeVerificationService)
         {
             _context = context;
             _verificationService = verificationService;
@@ -64,6 +67,7 @@ namespace VerificationPortal.Controllers
             _verificationPageService = verificationPageService;
             _verificationPageContextService = verificationPageContextService;
             _principalDetailsService = principalDetailsService;
+            _medicalCollegeCourseIntakeVerificationService = medicalCollegeCourseIntakeVerificationService;
         }
 
         protected string BaseMedicalPath
@@ -1650,32 +1654,392 @@ namespace VerificationPortal.Controllers
         }
 
         // Placeholder actions for remaining tabs (to be implemented later)
+
         [HttpGet]
         public async Task<IActionResult> Courses(string collegeCode)
         {
-            if (string.IsNullOrEmpty(collegeCode))
+            if (string.IsNullOrWhiteSpace(collegeCode))
                 return NotFound("College code is required");
 
             var institution = await _context.AffInstitutionsDetails
                 .FirstOrDefaultAsync(i => i.CollegeCode == collegeCode);
+
             if (institution == null)
                 return NotFound($"Institution not found for college code: {collegeCode}");
 
             var college = await _context.AffiliationCollegeMasters
                 .FirstOrDefaultAsync(c => c.CollegeCode == collegeCode);
 
+            // Page details
             ViewBag.CollegeCode = collegeCode;
             ViewBag.CollegeName = college?.CollegeName ?? "Unknown College";
             ViewBag.ActiveTab = "Courses";
-            ViewBag.ComingSoon = true;
+            ViewBag.ComingSoon = false;
             ViewBag.TabTitle = "Courses and Intake";
             ViewBag.TabIcon = "bi-book";
             ViewBag.UserDesignation = GetUserDesignation();
 
-            return View("ComingSoon", institution);
+            // Page context
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.Faculty.FacultyId;
+            var facultyCodeInt = context.FacultyCodeInt;
+
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var courseLevel = HttpContext.Session.GetString("CourseLevel")?.Trim().ToUpperInvariant();
+            var isAdmin = IsAdminUser();
+
+            // Tab details
+            var tabName = _tabService.GetDatabaseTabName("Courses");
+
+            var tabId = await _tabService.GetTabIdAsync( tabName, facultyCodeInt );
+
+            // Verification details
+            var verificationDetails = await GetTabVerificationDetailsAsync(
+                facultyCodeInt,
+                collegeCode,
+                courseLevel,
+                context.Institution.TypeOfInstitution
+            );
+
+            var completedTabNames = verificationDetails
+                .Where(e => e.IsCompleted)
+                .Select(e => e.TabName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            ViewData["CompletedTabNames"] = completedTabNames;
+            ViewData["TabVerificationDetails"] = verificationDetails;
+            ViewData["TabId"] = tabId;
+
+            // Main ViewModel
+            var vm = new AcademicIntakeVerificationVm
+            {
+                InstitutionId = institution.InstitutionId,
+                CollegeCode = institution.CollegeCode,
+                FacultyCode = institution.FacultyCode,
+                FacultyId = facultyCodeInt,
+                CollegeName = college?.CollegeName ?? "Unknown College",
+
+                TypeOfInstitution = institution.TypeOfInstitution,
+                NameOfInstitution = institution.NameOfInstitution,
+                Address = institution.Address,
+                VillageTownCity = institution.VillageTownCity,
+                Taluk = institution.Taluk,
+                District = institution.District,
+                PinCode = institution.PinCode,
+                MobileNumber = institution.MobileNumber,
+                EmailId = institution.EmailId,
+                CourseLevel = courseLevel,
+
+                PageContext = new VerificationPageContextVm
+                {
+                    FacultyId = facultyCode,
+                    CollegeCode = collegeCode,
+                    CollegeName = college?.CollegeName ?? "Unknown College",
+                    InstitutionName = context.InstitutionName,
+                    FacultyName = context.FacultyName,
+                    CurrentVerifier = verifierName,
+                    UserDesignation = GetUserDesignation(),
+                    IsAdmin = isAdmin,
+                    IsSection = IsSectionUser(),
+                    ActiveTab = "Courses",
+                    TabId = tabId,
+                    CompletedTabNames = completedTabNames,
+                    TabVerificationDetails = verificationDetails
+                }
+            };
+
+            // Populate Academic Intake
+            await BuildAcademicIntakeVerificationData( vm, institution.FacultyCode, collegeCode, facultyCodeInt );
+
+            // Filter courses based on Session CourseLevel
+            switch (courseLevel)
+            {
+                case "UG":
+                    vm.PgCourses.Clear();
+                    vm.SsCourses.Clear();
+                    break;
+
+                case "PG":
+                    vm.UgCourses.Clear();
+                    vm.SsCourses.Clear();
+                    break;
+
+                case "SS":
+                    vm.UgCourses.Clear();
+                    vm.PgCourses.Clear();
+                    break;
+
+                default:
+                    vm.UgCourses.Clear();
+                    vm.PgCourses.Clear();
+                    vm.SsCourses.Clear();
+                    break;
+            }
+
+            // Filter saved intake records by selected course level
+            if (!string.IsNullOrWhiteSpace(courseLevel))
+            {
+                vm.SavedIntakes = vm.SavedIntakes
+                    .Where(x => string.Equals(
+                        x.CourseLevel?.Trim(),
+                        courseLevel,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+            else
+            {
+                vm.SavedIntakes.Clear();
+            }
+
+            // Tabwise verification
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName, facultyCodeInt, courseLevel, isAdmin );
+
+            // Section feedback
+            var returnUrl = Request.Path + Request.QueryString;
+
+            vm.SectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync( collegeCode, tabName, facultyCodeInt, courseLevel, verifierName, isAdmin, returnUrl );
+
+            return View(vm);
         }
 
-        
+        [HttpGet]
+        public IActionResult ViewAcademicIntakeDocument(int id, string docType)
+        {
+            var record = _context.AcademicIntakes
+                .FirstOrDefault(x => x.Id == id);
+
+            if (record == null)
+                return NotFound();
+
+            string? fileName = null;
+            string? folderName = null;
+
+            switch (docType)
+            {
+                case "LOPDENTAL2025":
+                    fileName = record.Ay2025LopDentalDocument;
+                    folderName = "AY2025_LOP_DENTAL";
+                    break;
+
+                case "DCI2025":
+                    fileName = record.Ay2025Dcidocument;
+                    folderName = "AY2025_DCI";
+                    break;
+
+                case "KSDC2025":
+                    fileName = record.Ay2025Ksdcdocument;
+                    folderName = "AY2025_KSDC";
+                    break;
+
+                case "DCI2026":
+                    fileName = record.Ay2026Dcidocument;
+                    folderName = "AY2026_DCI";
+                    break;
+
+                case "KSDC2026":
+                    fileName = record.Ay2026Ksdcdocument;
+                    folderName = "AY2026_KSDC";
+                    break;
+
+                case "DCI2027":
+                    fileName = record.Ay2027Dcidocument;
+                    folderName = "AY2027_DCI";
+                    break;
+
+                case "KSDC2027":
+                    fileName = record.Ay2027Ksdcdocument;
+                    folderName = "AY2027_KSDC";
+                    break;
+
+                case "NMC2025":
+                    if (record.Ay2025NmcDocument == null || record.Ay2025NmcDocument.Length == 0)
+                    {
+                        return NotFound();
+                    }
+
+                    return File( record.Ay2025NmcDocument, "application/pdf");
+
+                default:
+                    return BadRequest();
+            }
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                return NotFound();
+
+            var fullPath = Path.Combine(
+                BaseDentalPath,
+                folderName!,
+                fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            return PhysicalFile(fullPath, "application/pdf");
+        }
+
+        private async Task BuildAcademicIntakeVerificationData( AcademicIntakeVerificationVm model, string facultyCode, string collegeCode, int facultyId)
+        {
+            // Set model metadata
+            model.FacultyCode = facultyCode;
+            model.CollegeCode = collegeCode;
+            model.FacultyId = facultyId;
+
+            // Load intake details
+            var intakeDetails = await _context.CollegeCourseIntakeDetails
+                .Where(d => d.FacultyCode == facultyId &&
+                            d.CollegeCode == collegeCode)
+                .ToListAsync();
+
+            // Load master courses
+            var allCourses = await _context.MstCourses
+                .Where(c => c.FacultyCode == facultyId)
+                .ToListAsync();
+
+            // Load saved academic intake records
+            var existingIntakes = await _context.AcademicIntakes
+                .Where(x => x.FacultyCode == facultyCode &&
+                            x.CollegeCode == collegeCode)
+                .ToListAsync();
+
+            // Create lookup dictionaries to avoid duplicate join records
+            var intakeDetailsLookup = intakeDetails
+                .GroupBy(x => x.CourseCode)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var existingIntakesLookup = existingIntakes
+                .Where(x => !string.IsNullOrWhiteSpace(x.Courses))
+                .GroupBy(x => x.Courses)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            // Project courses by level
+            List<IntakeVerificationCourseVm> Project(string level)
+            {
+                var levelCourses = allCourses
+                    .Where(c => string.Equals(
+                        c.CourseLevel,
+                        level,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                return levelCourses
+                    .Select(c =>
+                    {
+                        var courseCode = c.CourseCode.ToString();
+
+                        intakeDetailsLookup.TryGetValue(courseCode, out var detail);
+
+                        existingIntakesLookup.TryGetValue(courseCode, out var existing);
+
+                        return new IntakeVerificationCourseVm
+                        {
+                            Id = existing?.Id ?? 0,
+
+                            CourseCode = courseCode,
+                            CourseName = c.CourseName,
+
+                            // Document availability
+                            HasNmcDocument = existing?.Ay2025NmcDocument?.Length > 0,
+
+                            HasLopDocument = existing?.Ay2025LopDentalDocument?.Length > 0,
+
+                            HasAY2025DciDocument = existing?.Ay2025Dcidocument?.Length > 0,
+
+                            HasAY2025KsdcDocument = existing?.Ay2025Ksdcdocument?.Length > 0,
+
+                            HasAY2026LopDocument = existing?.Ay2026Dcidocument?.Length > 0,
+
+                            HasAY2026DciDocument = existing?.Ay2026Dcidocument?.Length > 0,
+
+                            HasAY2027DciDocument = existing?.Ay2027Dcidocument?.Length > 0,
+
+                            // AY 2024-25
+                            AY2024_ExistingIntake = detail?.ExistingIntake ?? existing?.Ay2024ExistingIntake ?? 0,
+
+                            AY2024_IncreaseIntake = existing?.Ay2024IncreaseIntake ?? 0,
+
+                            AY2024_TotalIntake = existing?.Ay2024TotalIntake ?? detail?.ExistingIntake ?? 0,
+
+                            // AY 2025-26
+                            AY2025_ExistingIntake = existing?.Ay2025ExistingIntake ?? detail?.ExistingIntake ?? 0,
+
+                            AY2025_LopNmcIntake = existing?.Ay2025LopNmcIntake ?? 0,
+
+                            AY2025_TotalIntake = existing?.Ay2025TotalIntake ?? 0,
+
+                            AY2025_LopDate = existing?.Ay2025LopDate,
+
+                            // AY 2026-27
+                            AY2026_ExistingIntake = existing?.Ay2026ExistingIntake ?? 0,
+
+                            AY2026_AddRequestedIntake = existing?.Ay2026AddRequestedIntake ?? 0,
+
+                            AY2026_TotalIntake = existing?.Ay2026TotalIntake ?? 0,
+
+                            //AY2026_LopDate =                                // new
+                            //    existing?.Ay2025LopDate,
+
+                            // AY 2027-28
+                            //AY2027_ExistingIntake =
+                            //    existing?.Ay2027ExistingIntake ?? 0,
+
+                            //AY2027_TotalIntake =
+                            //    existing?.Ay2027TotalIntake ?? 0
+                        };
+                    })
+                    .DistinctBy(x => x.CourseCode)
+                    .ToList();
+            }
+
+            // Populate course-level collections
+            model.UgCourses = Project("UG");
+            model.PgCourses = Project("PG");
+            model.SsCourses = Project("SS");
+
+            // Saved academic intake summary
+            model.SavedIntakes = (
+                from e in existingIntakes
+                where !string.IsNullOrWhiteSpace(e.Courses)
+                join c in allCourses
+                    on e.Courses equals c.CourseCode.ToString()
+                select new SavedAcademicIntakeVerificationVm
+                {
+                    Id = e.Id,
+
+                    CourseLevel = c.CourseLevel,
+                    CourseCode = e.Courses,
+                    CourseName = c.CourseName,
+
+                    AY2024_TotalIntake = e.Ay2024TotalIntake,
+                    AY2025_TotalIntake = e.Ay2025TotalIntake,
+                    AY2026_TotalIntake = e.Ay2026TotalIntake,
+                    AY2027_TotalIntake = e.Ay2027TotalIntake,
+
+                    HasNmcDocument =
+                        e.Ay2025NmcDocument?.Length > 0,
+
+                    HasLopDocument =
+                        e.Ay2025LopDentalDocument?.Length > 0,
+
+                    HasDciDocument =
+                        e.Ay2025Dcidocument?.Length > 0 ||
+                        e.Ay2026Dcidocument?.Length > 0 ||
+                        e.Ay2027Dcidocument?.Length > 0,
+
+                    HasKsdcDocument =
+                        e.Ay2025Ksdcdocument?.Length > 0 ||
+                        e.Ay2026Ksdcdocument?.Length > 0 ||
+                        e.Ay2027Ksdcdocument?.Length > 0,
+
+                    CreatedOn = DateTime.Now
+                }
+            )
+            .OrderBy(x =>
+                x.CourseLevel == "UG" ? 1 :
+                x.CourseLevel == "PG" ? 2 : 3)
+            .ToList();
+        }
+
 
         // GET: /VerificationDashboard/PgCourseDetails/{collegeCode}
         [HttpGet]
@@ -9864,6 +10228,147 @@ namespace VerificationPortal.Controllers
             return View("GeoTaggedPhotos", vm);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> MedicalCourseIntake(string collegeCode)
+        {
+            //var collegeCode = HttpContext.Session.GetString("CollegeCode")?.Trim();
+            var collegeName = HttpContext.Session.GetString("CollegeName");
+            var courseLevel = HttpContext.Session.GetString("CourseLevel")?.Trim();
+            var verifierName = HttpContext.Session.GetString("UserName");
+            var facultyCode = HttpContext.Session.GetString("FacultyCode");
+            var isAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
+
+            if (string.IsNullOrWhiteSpace(collegeCode))
+                return RedirectToAction("Collegelogin", "Login");
+
+            if (string.IsNullOrWhiteSpace(courseLevel))
+                return BadRequest("Course level is not selected.");
+
+            // 1. Get page context
+            var context = await GetPageContextAsync(collegeCode);
+
+            facultyCode = context.FacultyCode;
+
+            if (!int.TryParse(facultyCode, out var facultyId))
+                return BadRequest("Invalid faculty code.");
+
+            var level = courseLevel.ToUpperInvariant();
+
+            const string tabName = "Medical Course Intake";
+
+            // 2. Resolve affiliation type
+            var affiliationTypeId = context.AffiliationTypeId;
+
+            // 3. Resolve application type
+            var showIncreasedIntakeFields =
+                await IsEnhancementApplicationSelectedAsync();
+
+            // 4. Get course intake details
+            var vm = await _medicalCollegeCourseIntakeVerificationService
+                .GetMedicalCollegeCourseIntakeAsync(
+                    collegeCode,
+                    facultyId,
+                    level,
+                    affiliationTypeId,
+                    showIncreasedIntakeFields);
+
+            vm.CollegeName = collegeName ?? string.Empty;
+
+            var verificationDetails = await GetTabVerificationDetailsAsync(facultyId, collegeCode, courseLevel, context.Institution.TypeOfInstitution);
+
+            var completedTabNames = verificationDetails.Where(e => e.IsCompleted).Select(e => e.TabName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+
+            var userDesignation = GetUserDesignation();
+
+            // TAB DETAILS
+
+
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyId);
+            // 5. Page context
+            vm.PageContext = new VerificationPageContextVm
+            {
+                FacultyId = context.FacultyCodeInt,
+                CollegeCode = context.CollegeCode,
+                CollegeName = context.InstitutionName,
+                InstitutionName = context.InstitutionName,
+                FacultyName = context.FacultyName,
+                UserDesignation = GetUserDesignation(),
+                IsAdmin = IsAdminUser(),
+                CurrentVerifier = verifierName,
+
+                IsSection = IsSectionUser(),
+                ActiveTab = ControllerContext.ActionDescriptor.ActionName,
+                TabId = tabId,
+
+                PrevTabAction = "InstitutionDetails",
+                PrevTabLabel = "Previous: Institution Details",
+
+                NextTabAction = "TrustMemberDetails",
+                NextTabLabel = "Next: Trust Member Details"
+
+            };
+
+            // 6. Tab-wise verification
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync( collegeCode, tabName, verifierName ?? string.Empty,facultyId, courseLevel, isAdmin);
+
+            // 7. Section feedback
+            var returnUrl = $"{Request.Path}{Request.QueryString}";
+
+            vm.SectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync( collegeCode, tabName, facultyId, courseLevel, verifierName, isAdmin, returnUrl);
+
+            return View(vm);
+        }
+        private const string EnhancementApplicationType = "Enhancement of Seats / Increase in Intake";
+        private static bool IsEnhancementApplication(string? applicationType) =>
+            string.Equals(applicationType?.Trim(), EnhancementApplicationType, StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsEnhancementApplicationId(int? affiliationTypeId) =>
+            affiliationTypeId == 3;
+
+        private async Task<bool> IsEnhancementApplicationSelectedAsync()
+        {
+            var candidateSessionValues = new[]
+            {
+                HttpContext.Session.GetString("ApplicationType"),
+                HttpContext.Session.GetString("AffiliationType"),
+                HttpContext.Session.GetString("TypeOfAffiliation"),
+                HttpContext.Session.GetString("SelectedTypeOfAffiliation"),
+                HttpContext.Session.GetString("AffiliationTypeId"),
+                HttpContext.Session.GetString("TypeOfAffiliationId")
+            };
+
+            foreach (var value in candidateSessionValues)
+            {
+                if (IsEnhancementApplication(value))
+                    return true;
+
+                if (int.TryParse(value, out var parsedId) &&
+                    IsEnhancementApplicationId(parsedId))
+                    return true;
+            }
+
+            var affiliationTypeIdValue =
+                HttpContext.Session.GetInt32("AffiliationType")
+                ?? HttpContext.Session.GetInt32("AffiliationTypeId")
+                ?? HttpContext.Session.GetInt32("TypeOfAffiliationId");
+
+            if (IsEnhancementApplicationId(affiliationTypeIdValue))
+                return true;
+
+            if (affiliationTypeIdValue.HasValue)
+            {
+                var resolvedDescription = await _context.TypeOfAffiliations
+                    .Where(t => t.TypeId == affiliationTypeIdValue.Value)
+                    .Select(t => t.TypeDescription)
+                    .FirstOrDefaultAsync();
+
+                if (IsEnhancementApplication(resolvedDescription))
+                    return true;
+            }
+
+            return false;
+        }
         private async Task<List<TabSectionVerificationStatusVm>> GetTabVerificationDetailsAsync( int facultyId, string collegeCode, string? courseLevel, string? typeOfInstitution)
         {
             var tabs = await _context.MstTabs

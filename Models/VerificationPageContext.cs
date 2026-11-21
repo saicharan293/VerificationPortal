@@ -15,5 +15,6 @@
 
         public Faculty Faculty { get; set; } = null!;
         public string FacultyName => Faculty.FacultyName;
+        public int? AffiliationTypeId { get; set; }
     }
 }

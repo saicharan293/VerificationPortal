@@ -8,10 +8,11 @@ namespace VerificationPortal.Services.Verification.Services
     public class VerificationPageContextService : IVerificationPageContextService
     {
         private readonly ApplicationDbContext _context;
-
-        public VerificationPageContextService(ApplicationDbContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public VerificationPageContextService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<VerificationPageContext> GetPageContextAsync (string collegeCode, string userId)
@@ -37,11 +38,14 @@ namespace VerificationPortal.Services.Verification.Services
 
             if (user == null) throw new Exception("Logged-in user not found.");
 
+            var affiliationTypeId = _httpContextAccessor.HttpContext.Session.GetInt32("AffiliationTypeId");
+
             return new VerificationPageContext
             {
                 Institution = institution,
                 Faculty = faculty,
-                User = user
+                User = user,
+                AffiliationTypeId = affiliationTypeId
             };
         }
     }
