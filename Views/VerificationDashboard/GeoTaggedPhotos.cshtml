@@ -15,6 +15,8 @@
     ViewData["PrevTabLabel"] = page.PrevTabLabel;
     ViewData["NextTabAction"] = page.NextTabAction;
     ViewData["NextTabLabel"] = page.NextTabLabel;
+    ViewData["TabwiseVerification"] = Model.TabwiseVerification;
+
 }
 
 <link rel="stylesheet" href="~/css/geo-tagged-photos.css" asp-append-version="true" />
@@ -63,21 +65,28 @@
                     {
                         <div class="geo-photo-card">
                             <div class="geo-photo-thumb">
-                                <img src="@photo.ImagePath" alt="@photo.OriginalFileName" class="geo-photo-img" />
+                                <img src="@Url.Action("Image", "VerificationDashboard", new { id = photo.PhotoId })"
+                                     alt="@photo.OriginalFileName"
+                                     class="geo-photo-img"
+                                     loading="lazy" />
+
                                 <span class="geo-photo-badge">Slot @photo.ImageSlotNo</span>
                             </div>
+
                             <div class="geo-photo-body">
                                 <div class="geo-photo-info">
                                     <div class="geo-photo-info-row">
                                         <i class="bi bi-calendar"></i>
                                         <span>@(photo.CapturedOn?.ToString("dd MMM yyyy") ?? "-")</span>
                                     </div>
+
                                     <div class="geo-photo-info-row">
                                         <i class="bi bi-geo-alt"></i>
                                         <span>
                                             @if (photo.Latitude.HasValue && photo.Longitude.HasValue)
                                             {
                                                 <span>@photo.Latitude.Value.ToString("F6"), @photo.Longitude.Value.ToString("F6")</span>
+
                                                 @if (photo.AccuracyMeters.HasValue)
                                                 {
                                                     <small class="text-muted">±@photo.AccuracyMeters.Value</small>
@@ -89,17 +98,24 @@
                                             }
                                         </span>
                                     </div>
+
                                     <div class="geo-photo-info-row">
                                         <i class="bi bi-hdd-stack"></i>
                                         <span>@(photo.FileSizeKb?.ToString() ?? "-") KB</span>
                                     </div>
+
                                     <div class="geo-photo-info-row">
                                         <i class="bi bi-person"></i>
                                         <span>@(photo.UploadedBy ?? "-")</span>
                                     </div>
                                 </div>
-                                <a href="@photo.ImagePath" target="_blank" class="geo-photo-view">
-                                    <i class="bi bi-eye"></i> View
+
+                                <a asp-controller="VerificationDashboard"
+                                   asp-action="Image"
+                                   asp-route-id="@photo.PhotoId"
+                                   target="_blank"
+                                   class="geo-photo-view">
+                                    <i class="bi bi-eye"></i> View Full Image
                                 </a>
                             </div>
                         </div>
@@ -109,7 +125,7 @@
                 <!-- SECTION FEEDBACK PER CATEGORY -->
                 @if (Model.FeedbackByCategory.TryGetValue(group.Key, out var categoryFeedback) && categoryFeedback != null)
                 {
-                    <div class="geo-feedback-section mt-3">
+                    <div class="geo-feedback-section mt-3" id="@categoryFeedback.SectionId">
                         <h6 class="geo-feedback-title">
                             <i class="bi bi-chat-left-text me-2"></i>
                             Verification Feedback - @group.Key

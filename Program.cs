@@ -36,6 +36,7 @@ builder.Services.AddScoped<IVerificationPageContextService, VerificationPageCont
 builder.Services.AddScoped<IDocumentViewerService, DocumentViewerService>();
 builder.Services.AddScoped<ICollegeVerificationStatusService, CollegeVerificationStatusService>();
 builder.Services.AddScoped<IMedicalCollegeCourseIntakeVerificationService, MedicalCollegeCourseIntakeVerificationService>();
+builder.Services.AddScoped<IGeoTaggedPhotosService, GeoTaggedPhotosService>();
 builder.Services.AddScoped<ITabService, TabService>();
 builder.Services.AddScoped<InstitutionTypeFilter>();
 

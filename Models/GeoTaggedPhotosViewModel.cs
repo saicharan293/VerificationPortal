@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using VerificationPortal.Services.Verification.Models;
 
 namespace VerificationPortal.Models;
 
@@ -17,7 +18,14 @@ public class GeoTaggedPhotosViewModel
     // Section feedback grouped by category name
     public Dictionary<string, SectionFeedbackViewModel> FeedbackByCategory { get; set; } = new();
 
+    // Section Feedback
     public List<SectionFeedbackViewModel> SectionFeedback { get; set; } = new();
+
+    // Tab-wise Verification
+    public TabWiseVerificationResultVm TabwiseVerification { get; set; } = new();
+
+    // Verification Details
+    public VerificationDisplayModel? Verification { get; set; }
 }
 
 public class GeoPhotoItemVm

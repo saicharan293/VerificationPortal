@@ -14,6 +14,7 @@ using VerificationPortal.Models.ViewModels;
 using VerificationPortal.Services.Verification;
 using VerificationPortal.Services.Verification.Interfaces;
 using VerificationPortal.Services.Verification.Models;
+using VerificationPortal.Services.Verification.Services;
 using VerificationPortal.ViewModels;
 
 namespace VerificationPortal.Controllers
@@ -34,6 +35,7 @@ namespace VerificationPortal.Controllers
         private readonly IVerificationPageService _verificationPageService;
         private readonly ITabWiseVerificationService _tabWiseVerificationService;
         private readonly ISectionFeedbackService _sectionFeedbackService;
+        private readonly IGeoTaggedPhotosService _geoTaggedPhotosService;
         private readonly IMedicalCollegeCourseIntakeVerificationService _medicalCollegeCourseIntakeVerificationService;
 
         private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
@@ -52,7 +54,8 @@ namespace VerificationPortal.Controllers
             IVerificationPageContextService verificationPageContextService,
             IVerificationPageService verificationPageService,
             IPrincipalDetailsService principalDetailsService,
-            IMedicalCollegeCourseIntakeVerificationService medicalCollegeCourseIntakeVerificationService)
+            IMedicalCollegeCourseIntakeVerificationService medicalCollegeCourseIntakeVerificationService,
+            IGeoTaggedPhotosService geoTaggedPhotosService)
         {
             _context = context;
             _verificationService = verificationService;
@@ -68,6 +71,7 @@ namespace VerificationPortal.Controllers
             _verificationPageContextService = verificationPageContextService;
             _principalDetailsService = principalDetailsService;
             _medicalCollegeCourseIntakeVerificationService = medicalCollegeCourseIntakeVerificationService;
+            _geoTaggedPhotosService = geoTaggedPhotosService;
         }
 
         protected string BaseMedicalPath
@@ -10176,8 +10180,37 @@ namespace VerificationPortal.Controllers
                 })
                 .ToListAsync();
 
-            ViewData["TabId"]  = await _tabService.GetTabIdAsync("Geo Tagged Photos", pageContext.FacultyCodeInt);
-            
+            var context = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = context.Faculty.FacultyId;
+            var facultyCodeInt = context.FacultyCodeInt;
+
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
+            var courseLevel = HttpContext.Session.GetString("CourseLevel")?.Trim().ToUpperInvariant();
+            var isAdmin = IsAdminUser();
+
+            // Tab details
+            var tabName = _tabService.GetDatabaseTabName("GeoTaggedPhotos");
+
+            var tabId = await _tabService.GetTabIdAsync(tabName, facultyCodeInt);
+
+            // Verification details
+            var verificationDetails = await GetTabVerificationDetailsAsync(
+                facultyCodeInt,
+                collegeCode,
+                courseLevel,
+                context.Institution.TypeOfInstitution
+            );
+
+            var completedTabNames = verificationDetails
+                .Where(e => e.IsCompleted)
+                .Select(e => e.TabName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            ViewData["CompletedTabNames"] = completedTabNames;
+            ViewData["TabVerificationDetails"] = verificationDetails;
+            ViewData["TabId"] = tabId;
+
             // Fetch all categories for reference
             var categories = await _context.GeoPhotoCategoryMasters
                 .AsNoTracking()
@@ -10185,8 +10218,7 @@ namespace VerificationPortal.Controllers
                 .OrderBy(x => x.DisplayOrder)
                 .ToListAsync();
 
-            var sectionFeedback = await GetSectionFeedbackByTabNameAsync(
-                collegeCode, "Geo Tagged Photos", pageContext.FacultyCodeInt);
+            var sectionFeedback = await GetSectionFeedbackByTabNameAsync( collegeCode, "Geo Tagged Photos", pageContext.FacultyCodeInt);
 
             // Group photos by category from backend
             var photosByCategory = photos
@@ -10213,19 +10245,90 @@ namespace VerificationPortal.Controllers
                     PrevTabAction = Url.Action("PaymentDetails", "VerificationDashboard", new { collegeCode }),
                     PrevTabLabel = "Previous : Payment Details",
                     NextTabAction = Url.Action("FacultyDetails", "VerificationDashboard", new { collegeCode }),
-                    NextTabLabel = "Next : Faculty Details"
+                    NextTabLabel = "Next : Faculty Details",
+                    CompletedTabNames = completedTabNames
                 },
                 Photos = photos,
                 Categories = categories,
                 PhotosByCategory = photosByCategory,
                 FeedbackByCategory = feedbackByCategory,
                 SectionFeedback = sectionFeedback
+
+                //TabwiseVerification = verificationDetails
             };
 
             await SetTabWiseVerificationViewData(
                 collegeCode, ControllerContext.ActionDescriptor.ActionName, pageContext.FacultyCodeInt);
 
+            // Tabwise verification
+            vm.TabwiseVerification = await _tabWiseVerificationService.GetTabFeedbackByTabNameAsync(collegeCode, tabName, verifierName, facultyCodeInt, courseLevel, isAdmin);
+
+            // Section feedback
+            var returnUrl = Request.Path + Request.QueryString;
+
+            vm.SectionFeedback = await _sectionFeedbackService.GetSectionFeedbackByTabNameAsync(collegeCode, tabName, facultyCodeInt, courseLevel, verifierName, isAdmin, returnUrl);
+
             return View("GeoTaggedPhotos", vm);
+        }
+
+        private string StorageRoot => Path.Combine( Directory.Exists(@"E:\") ? @"E:\Affiliation_Medical" : @"D:\Affiliation_Medical", "GeoPhotos");
+
+        [HttpGet]
+        public async Task<IActionResult> Image(long id)
+        {
+
+            var collegeCode = await _context.GeoPhotoUploads.Where(e => e.PhotoId == id ).Select(e => e.CollegeCode).FirstOrDefaultAsync();
+            var pageContext = await GetPageContextAsync(collegeCode);
+
+            var facultyCode = pageContext.FacultyCodeInt.ToString();
+
+            var photo = await _context.GeoPhotoUploads
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.PhotoId == id &&
+                    x.CollegeCode == collegeCode &&
+                    x.FacultyCode == facultyCode &&
+                    x.IsActive);
+
+            if (photo == null)
+                return NotFound();
+
+            var fullPath = ResolveSafe(photo.ImagePath);
+
+            if (fullPath == null || !System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            Response.Headers["X-Content-Type-Options"] = "nosniff";
+            Response.Headers["Cache-Control"] = "private, max-age=300";
+
+            return PhysicalFile(
+                fullPath,
+                photo.ContentType ?? "image/jpeg");
+        }
+
+        private string? ResolveSafe(string? relativePath)
+        {
+            if (string.IsNullOrWhiteSpace(relativePath))
+                return null;
+
+            relativePath = relativePath.Replace(
+                '/',
+                Path.DirectorySeparatorChar);
+
+            if (Path.IsPathRooted(relativePath))
+                return null;
+
+            var root = Path.GetFullPath(StorageRoot);
+
+            var fullPath = Path.GetFullPath(
+                Path.Combine(root, relativePath));
+
+            if (!fullPath.StartsWith(
+                root + Path.DirectorySeparatorChar,
+                StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return fullPath;
         }
 
         [HttpGet]
@@ -10466,5 +10569,6 @@ namespace VerificationPortal.Controllers
             }
             return result;
         }
+
     }
 }
