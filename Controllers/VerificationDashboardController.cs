@@ -35,7 +35,6 @@ namespace VerificationPortal.Controllers
         private readonly IVerificationPageService _verificationPageService;
         private readonly ITabWiseVerificationService _tabWiseVerificationService;
         private readonly ISectionFeedbackService _sectionFeedbackService;
-        private readonly IGeoTaggedPhotosService _geoTaggedPhotosService;
         private readonly IMedicalCollegeCourseIntakeVerificationService _medicalCollegeCourseIntakeVerificationService;
 
         private static readonly int?[] _yearIds = { 1, 2, 3, 4 };
@@ -54,8 +53,7 @@ namespace VerificationPortal.Controllers
             IVerificationPageContextService verificationPageContextService,
             IVerificationPageService verificationPageService,
             IPrincipalDetailsService principalDetailsService,
-            IMedicalCollegeCourseIntakeVerificationService medicalCollegeCourseIntakeVerificationService,
-            IGeoTaggedPhotosService geoTaggedPhotosService)
+            IMedicalCollegeCourseIntakeVerificationService medicalCollegeCourseIntakeVerificationService)
         {
             _context = context;
             _verificationService = verificationService;
@@ -71,7 +69,6 @@ namespace VerificationPortal.Controllers
             _verificationPageContextService = verificationPageContextService;
             _principalDetailsService = principalDetailsService;
             _medicalCollegeCourseIntakeVerificationService = medicalCollegeCourseIntakeVerificationService;
-            _geoTaggedPhotosService = geoTaggedPhotosService;
         }
 
         protected string BaseMedicalPath
