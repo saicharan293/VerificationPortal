@@ -518,6 +518,7 @@ namespace VerificationPortal.Controllers
             SectionManagementViewModel model)
         {
             model.Faculties = await _context.Faculties
+                .Where(e => e.Status == "Active")
                 .OrderBy(x => x.FacultyName)
                 .Select(x => new SelectListItem
                 {

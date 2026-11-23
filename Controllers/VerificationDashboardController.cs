@@ -10335,7 +10335,8 @@ namespace VerificationPortal.Controllers
             //var collegeCode = HttpContext.Session.GetString("CollegeCode")?.Trim();
             var collegeName = HttpContext.Session.GetString("CollegeName");
             var courseLevel = HttpContext.Session.GetString("CourseLevel")?.Trim();
-            var verifierName = HttpContext.Session.GetString("UserName");
+            //var verifierName = HttpContext.Session.GetString("UserName");
+            var verifierName = User.FindFirst("FullName")?.Value ?? string.Empty;
             var facultyCode = HttpContext.Session.GetString("FacultyCode");
             var isAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
 
@@ -10378,7 +10379,7 @@ namespace VerificationPortal.Controllers
             var verificationDetails = await GetTabVerificationDetailsAsync(facultyId, collegeCode, courseLevel, context.Institution.TypeOfInstitution);
 
             var completedTabNames = verificationDetails.Where(e => e.IsCompleted).Select(e => e.TabName).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
+            
 
             var userDesignation = GetUserDesignation();
 
@@ -10386,6 +10387,10 @@ namespace VerificationPortal.Controllers
 
 
             var tabId = await _tabService.GetTabIdAsync(tabName, facultyId);
+
+            ViewData["CompletedTabNames"] = completedTabNames;
+            ViewData["TabVerificationDetails"] = verificationDetails;
+            ViewData["TabId"] = tabId;
             // 5. Page context
             vm.PageContext = new VerificationPageContextVm
             {

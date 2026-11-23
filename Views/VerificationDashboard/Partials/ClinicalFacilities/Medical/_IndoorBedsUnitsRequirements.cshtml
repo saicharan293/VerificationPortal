@@ -4,7 +4,7 @@
 
     @{
         var indoorBedsUnitsFeedback = (ViewBag.SectionFeedback as List<VerificationPortal.Models.SectionFeedbackViewModel>)
-                                    ?.FirstOrDefault(x => x.SectionName == "Out Patient Area Requirements");
+                                    ?.FirstOrDefault(x => x.SectionName == "Indoor Beds Units Requirements");
     }
 
     <div class="verification-card-header" id="section_@indoorBedsUnitsFeedback?.SectionId">

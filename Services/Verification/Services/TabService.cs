@@ -30,6 +30,7 @@ namespace VerificationPortal.Services.Verification.Services
                 "DentalIncreaseIntake" => "Dental Increase Intake",
                 "DentalFieldPracticeArea" => "Field Practice Area",
                 "Courses" => "Dental Increase Intake",
+                "MedicalCourseIntake" => "Medical Course Intake",
                 "UGCourseDetails" => "UG Course Details",
                 "UgCourseDetails" => "UG Course Details",
                 "PGCourseDetails" => "PG Course Details",
