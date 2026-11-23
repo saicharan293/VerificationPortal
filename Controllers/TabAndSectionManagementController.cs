@@ -503,6 +503,7 @@ namespace VerificationPortal.Controllers
         private async Task PopulateFacultiesAsync(TabViewModel model)
         {
             model.Faculties = await _context.Faculties
+                .Where(e => e.Status == "Active")
                 .OrderBy(x => x.FacultyName)
                 .Select(x => new SelectListItem
                 {

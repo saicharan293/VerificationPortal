@@ -4977,7 +4977,8 @@ namespace VerificationPortal.Controllers
 
                 FieldTypes = fieldTypes,
 
-                SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 30)
+                //SectionFeedback = await GetTabSectionFeedbackAsync(collegeCode, 30)
+                SectionFeedback = await GetSectionFeedbackByTabNameAsync(collegeCode, "Field Practice Area", context.FacultyCodeInt)
             };
 
 
