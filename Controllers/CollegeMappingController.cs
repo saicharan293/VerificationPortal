@@ -123,6 +123,7 @@ namespace VerificationPortal.Controllers
             {
                 AvailableUsers = await GetNonAdminUsersAsync(facultyId),
                 AvailableFaculties = await _context.Faculties
+                    .Where(e => e.Status == "Active")
                     .OrderBy(f => f.FacultyName)
                     .ToListAsync()
             };
@@ -164,21 +165,21 @@ namespace VerificationPortal.Controllers
             // ---------------------------------------------------------
             // 1. Prevent duplicate mapping for the SAME user + faculty
             // ---------------------------------------------------------
-            var existingUserMapping = await _context.TblCollegeMappings
-                .FirstOrDefaultAsync(m =>
-                    m.UserId == user.UserId &&
-                    m.FacultyCode == model.SelectedFacultyId &&
-                    m.IsActive);
+            //var existingUserMapping = await _context.TblCollegeMappings
+            //    .FirstOrDefaultAsync(m =>
+            //        m.UserId == user.UserId &&
+            //        m.FacultyCode == model.SelectedFacultyId &&
+            //        m.IsActive);
 
-            if (existingUserMapping != null)
-            {
-                ModelState.AddModelError("",
-                    "This user already has an active college mapping for this faculty. " +
-                    "Please edit the existing mapping instead.");
+            //if (existingUserMapping != null)
+            //{
+            //    ModelState.AddModelError("",
+            //        "This user already has an active college mapping for this faculty. " +
+            //        "Please edit the existing mapping instead.");
 
-                await PopulateCreateViewModel(model);
-                return View(model);
-            }
+            //    await PopulateCreateViewModel(model);
+            //    return View(model);
+            //}
 
             // ---------------------------------------------------------
             // 2. Get selected colleges
@@ -632,15 +633,20 @@ namespace VerificationPortal.Controllers
                 return NotFound();
 
             var fromCollege = await _context.AffiliationCollegeMasters
+                .OrderBy(e => e.CollegeName)
+                .ThenBy(e => e.CollegeCode)
                 .FirstOrDefaultAsync(c => c.CollegeCode == mapping.CollegeFrom);
 
             var toCollege = await _context.AffiliationCollegeMasters
+                .OrderBy(e => e.CollegeName)
+                .ThenBy(e => e.CollegeCode)
                 .FirstOrDefaultAsync(c => c.CollegeCode == mapping.CollegeTo);
 
             var user = await _context.TblRguhsFacultyUsers
                 .FirstOrDefaultAsync(u => u.UserId == mapping.UserId);
 
             var faculties = await _context.Faculties
+                .Where(e => e.Status == "Active")
                 .OrderBy(f => f.FacultyName)
                 .ToListAsync();
 
