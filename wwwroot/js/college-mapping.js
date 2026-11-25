@@ -196,4 +196,188 @@ document.addEventListener('DOMContentLoaded', function () {
 
         selectedCount.textContent = count;
     }
+
+    const indexConfig = document.getElementById('collegeMappingIndexConfig');
+
+
+
+    if (indexConfig) {
+
+        const urls = {
+            updateVerification: indexConfig.dataset.updateVerificationUrl,
+            toggleActive: indexConfig.dataset.toggleActiveUrl,
+            delete: indexConfig.dataset.deleteUrl,
+            getColleges: indexConfig.dataset.getCollegesUrl
+        };
+
+        const token = document.querySelector(
+            'input[name="__RequestVerificationToken"]'
+        )?.value;
+
+        const mappingTbody = document.querySelector('#mappingTable tbody');
+
+
+        if (mappingTbody) {
+            new Sortable(mappingTbody, {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: async function(evt) {
+                    const orderedIds = Array.from(mappingTbody.querySelectorAll('tr[data-id]'))
+                        .map(row => parseInt(row.dataset.id));
+
+                    await fetch(urls.updateVerification, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(orderedIds)
+                    });
+
+                    location.reload();
+                }
+            });
+        }
+
+        // Toggle Active Status
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.dataset.id;
+                const response = await fetch(`${urls.toggleActive}/${encodeURIComponent(id)}`, {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
+                });
+                const data = await response.json();
+                if (data.success) location.reload();
+            });
+        });
+
+        // Delete
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                if (!confirm('Are you sure you want to delete this mapping?')) return;
+                const id = this.dataset.id;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `${urls.delete}?id=${encodeURIComponent(id)}`;
+                const token = document.createElement('input');
+                token.name = '__RequestVerificationToken';
+                token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                form.appendChild(token);
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+
+        document.querySelectorAll('.clickable-range').forEach(element => {
+            element.addEventListener('click', function() {
+                const mappingId = this.dataset.mappingId;
+                const facultyId = this.dataset.facultyId;
+                const fromLetter = this.dataset.from;
+                const toLetter = this.dataset.to;
+                const mappingType = this.dataset.mappingType;
+
+                // Update modal title
+                if(mappingType == "Selective"){
+                    document.getElementById('modalRangeDisplay').textContent = "(Selected Colleges)";
+                }
+                else{
+                    document.getElementById('modalRangeDisplay').textContent = `(${fromLetter} - ${toLetter})`;
+                }
+
+                // Show loading, hide content
+                document.getElementById('collegesLoading').style.display = 'block';
+                document.getElementById('collegesContent').style.display = 'none';
+                document.getElementById('collegesTableBody').innerHTML = '';
+                document.getElementById('collegesEmpty').style.display = 'none';
+                document.getElementById('collegesError').style.display = 'none';
+                document.getElementById('collegesCount').textContent = '';
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('collegesModal'));
+                modal.show();
+
+                // Fetch colleges
+                fetch(`${urls.getColleges}?mappingId=${encodeURIComponent(mappingId)}`)
+                    .then(response => response.json())
+                    .then(colleges => {
+
+                        document.getElementById('collegesLoading').style.display = 'none';
+                        document.getElementById('collegesContent').style.display = 'block';
+
+                        if ($.fn.DataTable.isDataTable('#collegesTable')) {
+                            $('#collegesTable').DataTable().destroy();
+                        }
+
+                        const tbody = document.getElementById('collegesTableBody');
+                        tbody.innerHTML = "";
+
+                        if (colleges.length > 0) {
+
+                            colleges.forEach(college => {
+
+                                const row = document.createElement('tr');
+
+                                [college.code, college.name, college.town || "N/A"].forEach(value => {
+                                    const td = document.createElement('td');
+                                    td.textContent = value ?? '';
+                                    row.appendChild(td);
+                                });
+
+                                tbody.appendChild(row);
+
+                            });
+
+                            $('#collegesTable').DataTable({
+
+                                pageLength: 10,
+
+                                lengthMenu: [
+                                    [10,25,50,100,-1],
+                                    [10,25,50,100,"All"]
+                                ],
+
+                                ordering: false,
+
+                                searching: true,
+
+                                responsive: true,
+
+                                autoWidth: false,
+
+                                language: {
+                                    search: "Search:",
+                                    lengthMenu: "Show _MENU_ colleges",
+                                    info: "Showing _START_ to _END_ of _TOTAL_ colleges",
+                                    zeroRecords: "No matching colleges found"
+                                }
+
+                            });
+
+                            document.getElementById('collegesCount').textContent =
+                                `${colleges.length} college(s) found`;
+
+                        }
+                        else {
+
+                            document.getElementById('collegesEmpty').style.display = 'block';
+
+                            document.getElementById('collegesCount').textContent =
+                                '0 college(s) found';
+
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error('Error loading colleges:', error);
+                        document.getElementById('collegesLoading').style.display = 'none';
+                        document.getElementById('collegesError').style.display = 'block';
+                    });
+            });
+        });
+    }
+
+    
+
+    // View Colleges in Range Modal
 });

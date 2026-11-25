@@ -354,6 +354,12 @@
         </div>
     </div>
 </div>
+<div id="collegeMappingIndexConfig"
+     data-update-verification-url="@Url.Action("UpdateVerificationLevels", "CollegeMapping")"
+     data-toggle-active-url="@Url.Action("ToggleActive", "CollegeMapping")"
+     data-delete-url="@Url.Action("Delete", "CollegeMapping")"
+     data-get-colleges-url="@Url.Action("GetCollegesByFaculty", "CollegeMapping")">
+</div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
@@ -362,166 +368,5 @@
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 
 @section Scripts {
-    <script>
-        // Drag and Drop for Verification Level
-        const mappingTbody = document.querySelector('#mappingTable tbody');
-        if (mappingTbody) {
-            new Sortable(mappingTbody, {
-                handle: '.drag-handle',
-                animation: 150,
-                onEnd: async function(evt) {
-                    const orderedIds = Array.from(mappingTbody.querySelectorAll('tr[data-id]'))
-                        .map(row => parseInt(row.dataset.id));
-
-                    await fetch('@Url.Action("UpdateVerificationLevels")', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                        },
-                        body: JSON.stringify(orderedIds)
-                    });
-
-                    location.reload();
-                }
-            });
-        }
-
-        // Toggle Active Status
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const id = this.dataset.id;
-                const response = await fetch(`@Url.Action("ToggleActive")/${id}`, {
-                    method: 'POST',
-                    headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
-                });
-                const data = await response.json();
-                if (data.success) location.reload();
-            });
-        });
-
-        // Delete
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                if (!confirm('Are you sure you want to delete this mapping?')) return;
-                const id = this.dataset.id;
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `@Url.Action("Delete")/${id}`;
-                const token = document.createElement('input');
-                token.name = '__RequestVerificationToken';
-                token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                form.appendChild(token);
-                document.body.appendChild(form);
-                form.submit();
-            });
-        });
-
-        // View Colleges in Range Modal
-        document.querySelectorAll('.clickable-range').forEach(element => {
-            element.addEventListener('click', function() {
-                const mappingId = this.dataset.mappingId;
-                const facultyId = this.dataset.facultyId;
-                const fromLetter = this.dataset.from;
-                const toLetter = this.dataset.to;
-                const mappingType = this.dataset.mappingType;
-
-                // Update modal title
-                if(mappingType == "Selective"){
-                    document.getElementById('modalRangeDisplay').textContent = "(Selected Colleges)";
-                }
-                else{
-                    document.getElementById('modalRangeDisplay').textContent = `(${fromLetter} - ${toLetter})`;
-                }
-
-                // Show loading, hide content
-                document.getElementById('collegesLoading').style.display = 'block';
-                document.getElementById('collegesContent').style.display = 'none';
-                document.getElementById('collegesTableBody').innerHTML = '';
-                document.getElementById('collegesEmpty').style.display = 'none';
-                document.getElementById('collegesError').style.display = 'none';
-                document.getElementById('collegesCount').textContent = '';
-
-                // Show modal
-                const modal = new bootstrap.Modal(document.getElementById('collegesModal'));
-                modal.show();
-
-                // Fetch colleges
-                fetch(`@Url.Action("GetCollegesByFaculty", "CollegeMapping")?mappingId=${mappingId}`)
-                    .then(response => response.json())
-                    .then(colleges => {
-
-                        document.getElementById('collegesLoading').style.display = 'none';
-                        document.getElementById('collegesContent').style.display = 'block';
-
-                        if ($.fn.DataTable.isDataTable('#collegesTable')) {
-                            $('#collegesTable').DataTable().destroy();
-                        }
-
-                        const tbody = document.getElementById('collegesTableBody');
-                        tbody.innerHTML = "";
-
-                        if (colleges.length > 0) {
-
-                            colleges.forEach(college => {
-
-                                tbody.insertAdjacentHTML("beforeend", `
-                                    <tr>
-                                        <td><code>${college.code}</code></td>
-                                        <td>${college.name}</td>
-                                        <td>${college.town || "N/A"}</td>
-                                    </tr>
-                                `);
-
-                            });
-
-                            $('#collegesTable').DataTable({
-
-                                pageLength: 10,
-
-                                lengthMenu: [
-                                    [10,25,50,100,-1],
-                                    [10,25,50,100,"All"]
-                                ],
-
-                                ordering: false,
-
-                                searching: true,
-
-                                responsive: true,
-
-                                autoWidth: false,
-
-                                language: {
-                                    search: "Search:",
-                                    lengthMenu: "Show _MENU_ colleges",
-                                    info: "Showing _START_ to _END_ of _TOTAL_ colleges",
-                                    zeroRecords: "No matching colleges found"
-                                }
-
-                            });
-
-                            document.getElementById('collegesCount').textContent =
-                                `${colleges.length} college(s) found`;
-
-                        }
-                        else {
-
-                            document.getElementById('collegesEmpty').style.display = 'block';
-
-                            document.getElementById('collegesCount').textContent =
-                                '0 college(s) found';
-
-                        }
-
-                    })
-                    .catch(error => {
-                        console.error('Error loading colleges:', error);
-                        document.getElementById('collegesLoading').style.display = 'none';
-                        document.getElementById('collegesError').style.display = 'block';
-                    });
-            });
-        });
-        
-    </script>
+    <script src="~/js/college-mapping.js" asp-append-version="true"></script>
 }
