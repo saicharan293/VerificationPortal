@@ -85,6 +85,13 @@ namespace VerificationPortal.Models
         public List<Faculty> AvailableFaculties { get; set; } = new();
     }
 
+    public class CollegeOptionViewModel
+    {
+        public string? Code { get; set; }
+        public string Name { get; set; } = "";
+        public string Town { get; set; } = "";
+    }
+
     public class CollegeMappingEditViewModel
     {
         public int Id { get; set; }
