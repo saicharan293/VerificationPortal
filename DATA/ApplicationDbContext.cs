@@ -70,6 +70,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<AffiliatedYearwiseMaterialsDatum> AffiliatedYearwiseMaterialsData { get; set; }
 
+    public virtual DbSet<AffiliationApplicationDocument> AffiliationApplicationDocuments { get; set; }
+
     public virtual DbSet<AffiliationCollege> AffiliationColleges { get; set; }
 
     public virtual DbSet<AffiliationCollegeMaster> AffiliationCollegeMasters { get; set; }
@@ -603,6 +605,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<TabWiseFeedback> TabWiseFeedbacks { get; set; }
 
     public virtual DbSet<TalukMaster> TalukMasters { get; set; }
+
+    public virtual DbSet<TblAllCollegesMapping> TblAllCollegesMappings { get; set; }
 
     public virtual DbSet<TblClassroomAvailability> TblClassroomAvailabilities { get; set; }
 
@@ -1534,6 +1538,37 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Year1).HasMaxLength(50);
             entity.Property(e => e.Year2).HasMaxLength(50);
             entity.Property(e => e.Year3).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<AffiliationApplicationDocument>(entity =>
+        {
+            entity.HasKey(e => e.DocumentId);
+
+            entity.HasIndex(e => new { e.TypeId, e.IsActive, e.UploadedOn }, "IX_AffiliationApplicationDocuments_TypeId_IsActive").IsDescending(false, false, true);
+
+            entity.HasIndex(e => e.DocumentGuid, "UQ_AffiliationApplicationDocuments_DocumentGuid").IsUnique();
+
+            entity.Property(e => e.DocumentGuid).HasDefaultValueSql("(newid())", "DF_AffiliationApplicationDocuments_DocumentGuid");
+            entity.Property(e => e.DocumentTitle).HasMaxLength(200);
+            entity.Property(e => e.FileExtension)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.FilePath).HasMaxLength(1024);
+            entity.Property(e => e.IsActive).HasDefaultValue(true, "DF_AffiliationApplicationDocuments_IsActive");
+            entity.Property(e => e.OriginalFileName).HasMaxLength(255);
+            entity.Property(e => e.StorageDrive)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength();
+            entity.Property(e => e.UploadedBy).HasMaxLength(100);
+            entity.Property(e => e.UploadedOn)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_AffiliationApplicationDocuments_UploadedOn");
+
+            entity.HasOne(d => d.Type).WithMany(p => p.AffiliationApplicationDocuments)
+                .HasForeignKey(d => d.TypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AffiliationApplicationDocuments_TypeOfAffiliation");
         });
 
         modelBuilder.Entity<AffiliationCollege>(entity =>
@@ -8494,6 +8529,23 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.TalukName).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<TblAllCollegesMapping>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TblAllCo__3214EC07E202F666");
+
+            entity.ToTable("TblAllCollegesMapping");
+
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.FromCollegeCode).HasMaxLength(50);
+            entity.Property(e => e.FromLetter).HasMaxLength(10);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.ToCollegeCode).HasMaxLength(50);
+            entity.Property(e => e.ToLetter).HasMaxLength(10);
+        });
+
         modelBuilder.Entity<TblClassroomAvailability>(entity =>
         {
             entity.HasKey(e => e.Id)
@@ -8519,36 +8571,26 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.ToTable("Tbl_CollegeMapping");
 
-            entity.HasIndex(e => new { e.VerificationLevel, e.IsActive }, "IX_CollegeMapping_Level_Active");
-
             entity.HasIndex(e => e.UserId, "IX_CollegeMapping_UserId");
 
             entity.HasIndex(e => e.FacultyCode, "IX_Tbl_CollegeMapping_FacultyCode");
 
             entity.HasIndex(e => e.UserId, "IX_Tbl_CollegeMapping_UserId");
 
-            entity.Property(e => e.CollegeFrom)
-                .HasMaxLength(5)
-                .IsUnicode(false);
-            entity.Property(e => e.CollegeTo)
-                .HasMaxLength(5)
-                .IsUnicode(false);
             entity.Property(e => e.CreatedBy)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.FromLetter)
-                .HasMaxLength(1)
-                .HasDefaultValue("A");
             entity.Property(e => e.IsActive).HasDefaultValue(true, "DF_TblCollegeMapping_IsActive");
-            entity.Property(e => e.ToLetter)
-                .HasMaxLength(1)
-                .HasDefaultValue("Z");
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.VerificationLevel).HasDefaultValue(1, "DF_CollegeMapping_VerificationLevel");
             entity.Property(e => e.VerifiedDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.AllCollegesMapping).WithMany(p => p.TblCollegeMappings)
+                .HasForeignKey(d => d.AllCollegesMappingId)
+                .HasConstraintName("FK_Tbl_CollegeMapping_TblAllCollegesMapping");
 
             entity.HasOne(d => d.FacultyCodeNavigation).WithMany(p => p.TblCollegeMappings)
                 .HasForeignKey(d => d.FacultyCode)

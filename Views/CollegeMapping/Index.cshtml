@@ -172,7 +172,7 @@
                         <th>User</th>
                         <th>Designation</th>
                         <th>Faculty</th>
-                        <th>Range</th>
+                        <th>Mapping Details</th>
                         <th>Verification Level</th>
                         <th>Status</th>
                         <th>Created</th>
@@ -191,28 +191,65 @@
                                 <td>
                                     <strong>@item.Mapping.UserName</strong>
                                     <br />
-                                    <small class="text-muted">ID: @item.Mapping.UserId</small>
+                                    @* <small class="text-muted">ID: @item.Mapping.UserId</small> *@
                                 </td>
                                 <td>@item.UserDesignation</td>
                                 <td>
                                     <span class="faculty-badge">@item.FacultyName</span>
                                 </td>
                                 <td>
-                                    <span class="range-badge clickable-range"
-                                          data-mapping-id="@item.Mapping.Id"
-                                          data-faculty-id="@item.Mapping.FacultyCode"
-                                          data-from="@item.Mapping.FromLetter"
-                                          data-to="@item.Mapping.ToLetter"
-                                          title="Click to view colleges in this range">
-                                        <div>
-                                            <strong>@item.Mapping.FromLetter - @item.Mapping.ToLetter</strong>
-                                        </div>
+                                    @if(item.MappingType == "Serial")
+                                    {
+                                        <span class="range-badge clickable-range"
+                                              data-mapping-id="@item.Mapping.Id"
+                                              data-faculty-id="@item.Mapping.FacultyCode"
+                                              data-from="@item.Mapping.AllCollegesMapping?.FromLetter"
+                                              data-to="@item.Mapping.AllCollegesMapping?.ToLetter"
+                                              title="Click to view colleges in this range">
 
-                                        <small>
-                                            @item.Mapping.CollegeFrom → @item.Mapping.CollegeTo
-                                        </small>
-                                        <i class="bi bi-eye ms-1 small"></i>
-                                    </span>
+                                            <span class="badge bg-primary mb-1">Serial</span>
+
+                                            <div>
+                                                <strong>@item.Mapping.AllCollegesMapping?.FromLetter - @item.Mapping.AllCollegesMapping?.ToLetter</strong>
+                                            </div>
+
+                                            <small>
+                                                @item.Mapping.AllCollegesMapping?.FromCollegeCode → @item.Mapping.AllCollegesMapping?.ToCollegeCode
+                                            </small>
+                                            <i class="bi bi-eye ms-1 small"></i>
+                                        </span>
+                                    }
+                                    else if(item.MappingType == "Selective")
+                                    {
+                                        <span class="range-badge clickable-range"
+                                              data-mapping-id="@item.Mapping.Id"
+                                              data-faculty-id="@item.Mapping.FacultyCode"
+                                              data-mapping-type="Selective"
+                                              title="Click to view selected colleges">
+
+                                            <span class="badge bg-success mb-1">Selective</span>
+
+                                            <div>
+                                                <strong>
+                                                    @item.SelectedCollegeCodes.Count college(s) selected
+                                                </strong>
+                                            </div>
+
+                                            <small>
+                                                @string.Join(", ", item.SelectedCollegeCodes)
+                                            </small>
+
+                                            <i class="bi bi-eye ms-1 small"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Mixed</span>
+
+                                        <div>
+                                            @item.SelectedCollegeCodes.Count college(s)
+                                        </div>
+                                    }
                                 </td>
                                 <td>
                                     <span class="badge bg-info" style="padding: 1.1rem; font-size: 1.2rem; background-color:rgb(24 57 64) !important">@item.Mapping.VerificationLevel</span>
@@ -387,9 +424,15 @@
                 const facultyId = this.dataset.facultyId;
                 const fromLetter = this.dataset.from;
                 const toLetter = this.dataset.to;
+                const mappingType = this.dataset.mappingType;
 
                 // Update modal title
-                document.getElementById('modalRangeDisplay').textContent = `(${fromLetter} - ${toLetter})`;
+                if(mappingType == "Selective"){
+                    document.getElementById('modalRangeDisplay').textContent = "(Selected Colleges)";
+                }
+                else{
+                    document.getElementById('modalRangeDisplay').textContent = `(${fromLetter} - ${toLetter})`;
+                }
 
                 // Show loading, hide content
                 document.getElementById('collegesLoading').style.display = 'block';
@@ -404,7 +447,7 @@
                 modal.show();
 
                 // Fetch colleges
-                fetch(`@Url.Action("GetCollegesByFaculty", "CollegeMapping")?facultyId=${facultyId}&fromLetter=${fromLetter}&toLetter=${toLetter}`)
+                fetch(`@Url.Action("GetCollegesByFaculty", "CollegeMapping")?mappingId=${mappingId}`)
                     .then(response => response.json())
                     .then(colleges => {
 
@@ -479,5 +522,6 @@
                     });
             });
         });
+        
     </script>
 }

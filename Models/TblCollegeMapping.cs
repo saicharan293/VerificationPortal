@@ -13,25 +13,21 @@ public partial class TblCollegeMapping
 
     public int FacultyCode { get; set; }
 
-    public string CollegeFrom { get; set; } = null!;
-
-    public string CollegeTo { get; set; } = null!;
-
     public DateTime? CreatedDate { get; set; }
 
     public string? CreatedBy { get; set; }
 
     public bool IsActive { get; set; }
 
-    public string FromLetter { get; set; } = null!;
-
-    public string ToLetter { get; set; } = null!;
-
     public int VerificationLevel { get; set; }
 
     public int? VerifiedBy { get; set; }
 
     public DateTime? VerifiedDate { get; set; }
+
+    public int? AllCollegesMappingId { get; set; }
+
+    public virtual TblAllCollegesMapping? AllCollegesMapping { get; set; }
 
     public virtual Faculty FacultyCodeNavigation { get; set; } = null!;
 }

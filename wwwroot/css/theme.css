@@ -108,6 +108,10 @@
     border-color: var(--border-color) !important;
 }
 
+[data-theme="dark"] .text-danger{
+    color: var(--text-danger) !important;
+}
+
 /* ==================== GLOBAL THEME TRANSITIONS ==================== */
 body,
 .card,

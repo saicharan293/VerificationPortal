@@ -107,20 +107,31 @@ namespace VerificationPortal.Controllers
             {
                 var facultyCode = mapping.FacultyCode.ToString();
 
+                var range = mapping.AllCollegesMapping;
+
                 var fromLetter = char.ToUpperInvariant(
-                    mapping.FromLetter?.FirstOrDefault() ?? 'A');
+                    range.FromLetter?.FirstOrDefault() ?? 'A');
 
                 var toLetter = char.ToUpperInvariant(
-                    mapping.ToLetter?.FirstOrDefault() ?? 'Z');
+                    range.ToLetter?.FirstOrDefault() ?? 'Z');
+
+
+                var fromCollegeCode = range?.FromCollegeCode ?? "";
+                var toCollegeCode = range?.ToCollegeCode ?? "";
 
                 // Step 1: Get only assigned colleges
                 var assignedColleges = colleges
                     .Where(c =>
                         c.FacultyCode == facultyCode &&
-                        (
-                            c.CollegeCode == mapping.CollegeFrom ||
-                            c.CollegeCode == mapping.CollegeTo
-                        ))
+                        !string.IsNullOrWhiteSpace(c.CollegeCode) &&
+                        string.Compare(
+                            c.CollegeCode.Trim(),
+                            fromCollegeCode.Trim(),
+                            StringComparison.OrdinalIgnoreCase) >= 0 &&
+                        string.Compare(
+                            c.CollegeCode.Trim(),
+                            toCollegeCode.Trim(),
+                            StringComparison.OrdinalIgnoreCase) <= 0)
                     .ToList();
 
                 // Step 2 & 3: Apply FromLetter and ToLetter filters
@@ -141,14 +152,9 @@ namespace VerificationPortal.Controllers
                 return new CollegeMappingWithCollegesViewModel
                 {
                     Mapping = mapping,
-                    FacultyName = faculties.GetValueOrDefault(
-                        mapping.FacultyCode, "Unknown Faculty"),
+                    FacultyName = faculties.GetValueOrDefault(mapping.FacultyCode, "Unknown Faculty"),
                     Colleges = filteredColleges,
                     CollegeCount = filteredColleges.Count,
-                    FromLetter = mapping.FromLetter,
-                    ToLetter = mapping.ToLetter,
-                    CollegeFromCode = mapping.CollegeFrom,
-                    CollegeToCode = mapping.CollegeTo
                 };
             }).ToList();
 
@@ -327,12 +333,13 @@ namespace VerificationPortal.Controllers
                     m.UserId == userId &&
                     m.FacultyCode == facultyId &&
                     m.IsActive &&
-                    m.CollegeFrom != null &&
-                    m.CollegeTo != null)
+                    m.AllCollegesMapping != null && 
+                    m.AllCollegesMapping.FromCollegeCode != null &&
+                    m.AllCollegesMapping.ToCollegeCode != null)
                 .Select(m => new
                 {
-                    m.CollegeFrom,
-                    m.CollegeTo
+                    CollegeFrom = m.AllCollegesMapping!.FromCollegeCode,
+                    CollegeTo = m.AllCollegesMapping!.ToCollegeCode
                 })
                 .ToListAsync();
 

@@ -134,8 +134,8 @@
             <input type="hidden" asp-for="UserName" />
             <input type="hidden" asp-for="CreatedDate" />
             <input type="hidden" asp-for="CreatedBy" />
-            <input type="hidden" asp-for="SelectedCollegeFromCode" />
-            <input type="hidden" asp-for="SelectedCollegeToCode" />
+            @* <input type="hidden" asp-for="SelectedCollegeFromCode" /> *@
+            @* <input type="hidden" asp-for="SelectedCollegeToCode" /> *@
 
             <div class="user-info-box">
                 <i class="bi bi-person-circle"></i>
@@ -181,33 +181,33 @@
                     </select>
                 </div>
 
-                <div class="college-dropdowns-row">
-                <div class="college-dropdown-container">
-                    <label asp-for="CollegeFrom" class="form-label">From College *</label>
-                    <select asp-for="CollegeFrom" class="form-select" id="collegeFrom">
-                        <option value="">-- Select College --</option>
-                        @foreach (var college in Model.AvailableColleges)
-                        {
-                            <option value="@college.Code" @(Model.CollegeFrom == college.Code ? "selected" : "")>
-                                @college.DisplayText
-                            </option>
-                        }
-                    </select>
-                </div>
+            @*     <div class="college-dropdowns-row">
+                    <div class="college-dropdown-container">
+                        <label asp-for="CollegeFrom" class="form-label">From College *</label>
+                        <select asp-for="CollegeFrom" class="form-select" id="collegeFrom">
+                            <option value="">-- Select College --</option>
+                            @foreach (var college in Model.AvailableColleges)
+                            {
+                                <option value="@college.Code" @(Model.CollegeFrom == college.Code ? "selected" : "")>
+                                    @college.DisplayText
+                                </option>
+                            }
+                        </select>
+                    </div>
 
-                <div class="college-dropdown-container">
-                    <label asp-for="CollegeTo" class="form-label">To College *</label>
-                    <select asp-for="CollegeTo" class="form-select" id="collegeTo">
-                        <option value="">-- Select College --</option>
-                        @foreach (var college in Model.AvailableColleges)
-                        {
-                            <option value="@college.Code" @(Model.CollegeTo == college.Code ? "selected" : "")>
-                                @college.DisplayText
-                            </option>
-                        }
-                    </select>
-                </div>
-            </div>
+                    <div class="college-dropdown-container">
+                        <label asp-for="CollegeTo" class="form-label">To College *</label>
+                        <select asp-for="CollegeTo" class="form-select" id="collegeTo">
+                            <option value="">-- Select College --</option>
+                            @foreach (var college in Model.AvailableColleges)
+                            {
+                                <option value="@college.Code" @(Model.CollegeTo == college.Code ? "selected" : "")>
+                                    @college.DisplayText
+                                </option>
+                            }
+                        </select>
+                    </div>
+            </div> *@
 
                 <div class="col-12">
                     <div class="form-check form-switch">

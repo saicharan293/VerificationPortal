@@ -16,15 +16,19 @@ namespace VerificationPortal.Models
         public TblCollegeMapping Mapping { get; set; } = null!;
         public string? UserDesignation { get; set; }
         public string? FacultyName { get; set; }
+        public string MappingType { get; set; } = "";
+        public List<string> SelectedCollegeCodes { get; set; } = new();
     }
 
     public class CollegeMappingCreateViewModel
     {
         [Required(ErrorMessage = "Please select a user")]
+        [Range(1, int.MaxValue, ErrorMessage ="Pleae select a valid user.")]
         [Display(Name = "User")]
         public int SelectedUserId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Please select a faculty")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a valid faculty")]
         [Display(Name = "Faculty")]
         public int SelectedFacultyId { get; set; }
 
@@ -49,7 +53,8 @@ namespace VerificationPortal.Models
 
         // Verification level
         [Display(Name = "Verification Level")]
-        public int VerificationLevel { get; set; }
+        [Required(ErrorMessage = "Please select a Verification Level.")]
+        public int? VerificationLevel { get; set; }
 
         // Next verification level number to set on save (optional)
         [Display(Name = "Next Verification Level")]
@@ -88,6 +93,11 @@ namespace VerificationPortal.Models
         [Display(Name = "Faculty")]
         public int FacultyCode { get; set; }
 
+        // College selection
+        [Required(ErrorMessage = "Please select at least one college")]
+        [Display(Name = "Colleges")]
+        public List<string> SelectedCollegeCodes { get; set; } = new();
+
         [Required]
         [RegularExpression("^[A-Z]$", ErrorMessage = "Must be a single uppercase letter")]
         [Display(Name = "From Letter")]
@@ -98,13 +108,13 @@ namespace VerificationPortal.Models
         [Display(Name = "To Letter")]
         public string ToLetter { get; set; } = "Z";
 
-        [Required]
-        [Display(Name = "From College")]
-        public string CollegeFrom { get; set; } = "";
+        // [Required]
+        // [Display(Name = "From College")]
+        // public string CollegeFrom { get; set; } = "";
 
-        [Required]
-        [Display(Name = "To College")]
-        public string CollegeTo { get; set; } = "";
+        // [Required]
+        // [Display(Name = "To College")]
+        // public string CollegeTo { get; set; } = "";
 
         public bool IsActive { get; set; } = true;
 
@@ -129,8 +139,8 @@ namespace VerificationPortal.Models
         public List<SelectCollegeOption> AvailableColleges { get; set; } = new();
 
         // For client-side filtering
-        public string SelectedCollegeFromCode { get; set; } = "";
-        public string SelectedCollegeToCode { get; set; } = "";
+        // public string SelectedCollegeFromCode { get; set; } = "";
+        // public string SelectedCollegeToCode { get; set; } = "";
     }
 
     public class SelectCollegeOption
@@ -148,10 +158,7 @@ namespace VerificationPortal.Models
         public string UserDesignation { get; set; } = "";
         public List<CollegeDisplayViewModel> Colleges { get; set; } = new();
         public int CollegeCount { get; set; }
-        public string FromLetter { get; set; } = "";
-        public string ToLetter { get; set; } = "";
-        public string CollegeFromCode { get; set; } = "";
-        public string CollegeToCode { get; set; } = "";
+        
 
         public Dictionary<string, CollegeFeedbackStatusViewModel> FeedbackStatuses
         {
